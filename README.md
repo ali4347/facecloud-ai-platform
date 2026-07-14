@@ -284,82 +284,100 @@ To transition this project into a production-grade application, a microservices 
 ## 15. Backend Database Setup (PostgreSQL + Prisma)
 
 > [!IMPORTANT]
-> **Database: PostgreSQL** — Selected and configured via Prisma ORM.
-> **Supabase MCP is NOT required** for local development or for running migrations.
-> Local development uses **Docker PostgreSQL** via `docker-compose.yml`.
+> **Database: PostgreSQL** ✅ — Running locally, schema applied, seed data loaded.
+> **Supabase MCP is NOT required** and should NOT be used.
+> **Prisma ORM** manages all schema definitions, migrations, and queries.
+
+### Database Status
+| Component | Status | Details |
+|:----------|:-------|:--------|
+| PostgreSQL | ✅ Running | `localhost:5432` / database `facecloud` |
+| Schema | ✅ Applied | 15 tables created via `prisma db push` |
+| Migration | ✅ Tracked | `20260714_init` marked as applied |
+| Seed Data | ✅ Loaded | user / admin / moderator accounts created |
+
+### Seeded Accounts (default password: `password`)
+| Role          | Email                    |
+|:--------------|:-------------------------|
+| **User**      | `user@facecloud.ai`      |
+| **Admin**     | `admin@dtm.io`           |
+| **Moderator** | `moderator@facecloud.ai` |
 
 ### Prerequisites
-* **Docker** and **Docker Compose** (for local PostgreSQL + Redis)
+* **PostgreSQL** installed and running locally (or via Docker)
 * **Node.js** v18.x or higher
 
-### 1. Start the Database (Docker)
-```bash
-# From the project root — starts PostgreSQL 16 + Redis 7
-docker compose up -d
-```
+### Setup Steps
 
-Services started:
-| Service    | Port | Container              |
-|:-----------|:-----|:-----------------------|
-| PostgreSQL | 5432 | `facecloud_postgres`   |
-| Redis      | 6379 | `facecloud_redis`      |
-
-### 2. Configure Environment Variables
+#### 1. Configure Environment Variables
 ```bash
-# Copy the template to .env and edit as needed
 cp .env.example .env
-```
-
-Key variables in `.env`:
-```env
-DATABASE_URL="postgresql://facecloud:facecloud@localhost:5432/facecloud_db?schema=public"
+# Edit .env and set your DATABASE_URL:
+DATABASE_URL="postgresql://facecloud:facecloud123@localhost:5432/facecloud?schema=public"
 REDIS_URL="redis://localhost:6379"
 ```
 
-### 3. Install Backend Dependencies
+#### 2. Install Backend Dependencies
 ```bash
 cd backend
 npm install
 ```
 
-### 4. Run Prisma Migrations
+#### 3. Apply the Database Schema
 ```bash
-# Still inside backend/
+# If user has CREATE DATABASE privilege (shadow DB required):
 npx prisma migrate dev --name init
+
+# Alternative — if user lacks CREATE DATABASE (use db push):
+DATABASE_URL="postgresql://..." npx prisma db push
 ```
 
-This generates the SQL migration and applies it to the Docker PostgreSQL instance.
-
-### 5. Seed the Database
+#### 4. Seed the Database
 ```bash
 npm run seed
 ```
 
-Seeded accounts (default password: `password`):
-
-| Role          | Email                      |
-|:--------------|:---------------------------|
-| **User**      | `user@facecloud.ai`        |
-| **Admin**     | `admin@dtm.io`             |
-| **Moderator** | `moderator@facecloud.ai`   |
-
-### 6. Inspect with Prisma Studio (Optional)
+#### 5. Inspect with Prisma Studio (Optional)
 ```bash
 npx prisma studio
 # Opens at http://localhost:5555
 ```
 
+### Database Tables Created (15 models)
+```
+users                  — User accounts (roles: USER, ADMIN, MODERATOR)
+sessions               — JWT refresh token sessions
+uploads                — Raw file upload records
+images                 — Processed image records
+detected_faces         — Per-image face bounding boxes
+image_quality_checks   — Sharpness / brightness / face-size scores
+face_embeddings        — 128-D InsightFace/ArcFace vectors
+person_folders         — Identity group / face cluster folders
+person_folder_images   — Image ↔ Person Folder junction table
+processing_jobs        — Async pipeline job records
+processing_steps       — Individual pipeline stage steps
+notifications          — User notification messages
+activity_logs          — Per-user action event stream
+admin_audit_logs       — Immutable admin-level audit trail
+moderator_reviews      — Human-in-the-loop review queue
+```
+
 ### Backend File Structure
 ```
 backend/
-├── package.json          # Backend-specific deps (Prisma, bcryptjs)
-├── tsconfig.json         # TypeScript config for backend scripts
+├── package.json              # Prisma, bcryptjs, ts-node
+├── tsconfig.json             # TypeScript config for scripts
 └── prisma/
-    ├── schema.prisma     # Full database schema (15 models)
-    └── seed.ts           # Seed script for user/admin/moderator
+    ├── schema.prisma         # Full Prisma schema (15 models)
+    ├── seed.ts               # Seed: user / admin / moderator
+    └── migrations/
+        ├── migration_lock.toml
+        └── 20260714_init/
+            └── migration.sql # Full initial schema SQL
 
-docker-compose.yml        # PostgreSQL 16 + Redis 7 containers
-.env.example              # Environment variable template
+docker-compose.yml            # Optional: PostgreSQL 16 + Redis 7
+.env.example                  # Environment variable template
+.env                          # Local secrets (gitignored)
 ```
 
 ---
