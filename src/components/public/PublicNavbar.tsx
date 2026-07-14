@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ScanFace, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
+import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 
 const NAV_LINKS = ['Features', 'Methodology', 'Security', 'Contact']
 
@@ -19,15 +20,7 @@ export function PublicNavbar() {
       <div className="liquid-glass rounded-full px-5 py-3 flex items-center justify-between max-w-5xl mx-auto">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-[#0084FF] flex items-center justify-center shadow-[0_0_14px_rgba(0,132,255,0.5)]">
-            <ScanFace className="w-4 h-4 text-white" />
-          </div>
-          <div className="leading-none">
-            <span className="block text-sm font-semibold text-white tracking-tight">FaceCloud</span>
-            <span className="block text-[8px] text-white/40 font-bold tracking-[0.2em] uppercase mt-0.5">DATAMART</span>
-          </div>
-        </Link>
+        <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} />
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-7 text-white/70 text-sm font-medium">

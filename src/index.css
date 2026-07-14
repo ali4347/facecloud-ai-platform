@@ -35,6 +35,15 @@
   --fc-mint:        #4FFFB0;
   --fc-violet:      #7B61FF;
 
+  /* FaceCloud Branding Color Tokens */
+  --facecloud-blue: #168BFF;
+  --facecloud-blue-bright: #42A5FF;
+  --facecloud-blue-deep: #0758D8;
+  --facecloud-silver: #C9D2E3;
+  --facecloud-white: #F5F8FF;
+  --facecloud-black: #030712;
+  --facecloud-navy: #07101F;
+
   /* Status colors */
   --fc-success: #4FFFB0;
   --fc-warning: #F59E0B;

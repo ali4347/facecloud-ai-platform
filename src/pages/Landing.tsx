@@ -8,6 +8,7 @@ import {
 import { BeforeAfterSlider } from '../components/features/BeforeAfterSlider'
 import { BackgroundVideo } from '../components/public/BackgroundVideo'
 import { PublicNavbar } from '../components/public/PublicNavbar'
+import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 import { HeroSection } from '../components/public/HeroSection'
 
 const LOGOS = ['DataMart', 'VisionGrid', 'NeuralStack', 'CloudNova', 'OrbitAI']
@@ -787,12 +788,7 @@ export default function Landing() {
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 text-xs text-white/40">
             {/* Logo Column */}
             <div className="space-y-3.5">
-              <div className="flex items-center gap-2.5 text-sm font-bold text-white">
-                <div className="w-6 h-6 rounded bg-[#0084FF] flex items-center justify-center text-white shadow-[0_0_10px_rgba(0,132,255,0.4)]">
-                  <FaceCloudIcon />
-                </div>
-                <span>FaceCloud</span>
-              </div>
+              <FaceCloudLogo variant="horizontal" size="sm" href="/" priority={false} />
               <p className="text-[10px] text-white/30 font-medium leading-relaxed">
                 Powered by DATAMART / DTM.IO. Advanced facial image organization, quality check, and Zero-DCE restorative node suite.
               </p>
@@ -833,15 +829,7 @@ export default function Landing() {
   )
 }
 
-function FaceCloudIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-white">
-      <path d="M5 2H2v3M19 2h3v3M5 22H2v-3M19 22h3v-3" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-      <path d="M7 16a3 3 0 0 1 .5-5.96 5 5 0 0 1 9.46.96h.04a3 3 0 0 1 0 6H7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-    </svg>
-  )
-}
+
 
 function FileCheckIcon() {
   return (

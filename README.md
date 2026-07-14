@@ -409,7 +409,36 @@ docker-compose.yml            # Optional: PostgreSQL 16 + Redis 7
 
 ---
 
-## 19. Development Rule
+## 20. Branding
+
+FaceCloud utilizes a dark luxury, premium branding style built around the official FaceCloud logo:
+
+* **Official FaceCloud Logo**: Represents the single source of truth for the platform's visual identity.
+  * Location: [facecloud-logo-original.png](file:///Users/Ali/Downloads/FYP/public/branding/facecloud-logo-original.png)
+* **Logo Variants**: Available under `public/branding/` for different UI surface areas:
+  * `facecloud-logo-full.png`: Full version with electric blue cloud, metallic silver FC insignia, human face profile, neural-network nodes, wordmark, and subtitle. Used on login pages.
+  * `facecloud-logo-horizontal.png`: Horizontal layout optimized for sidebars and top navigation bars.
+  * `facecloud-logo-icon.png`: Icon-only variant for collapsed layouts and avatar elements.
+  * `facecloud-wordmark.png`: Text-only wordmark.
+  * `facecloud-logo-dark.png` / `facecloud-logo-light.png`: Dark/light background variants.
+* **Favicon Assets**: Optimized icon-only favicons in multiple resolutions (`16x16`, `32x32`, `48x48`, `192x192`, `512x512`) and `facecloud-apple-touch-icon.png`.
+* **Design Integration**: Rendered exclusively via the reusable `FaceCloudLogo` component (`src/components/branding/FaceCloudLogo.tsx`).
+* **Brand Colors**:
+  * Electric Blue: `#168BFF`
+  * Bright Blue: `#42A5FF`
+  * Deep Blue: `#0758D8`
+  * Metallic Silver: `#C9D2E3`
+  * Off-white: `#F5F8FF`
+  * Deep Black/Navy: `#030712` / `#07101F`
+* **DATAMART Relationship**: FaceCloud is powered by **DATAMART / DTM.IO**. Datamart is kept as secondary text to maintain FaceCloud as the primary user-facing brand.
+
+> [!IMPORTANT]
+> **Branding Rule:**
+> The official FaceCloud logo must be used across all public, user, admin, and moderator interfaces. Do not use temporary icons, text-only placeholders, generic cloud marks, or alternative FaceCloud logos. All application layouts must use the reusable `FaceCloudLogo` component and assets from `public/branding/`.
+
+---
+
+## 21. Development Rule
 
 > [!IMPORTANT]
 > **Core Development Workflow:**

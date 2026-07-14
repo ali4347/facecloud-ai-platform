@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Shield, Lock, Mail } from 'lucide-react'
+import { Lock, Mail } from 'lucide-react'
+import { FaceCloudLogo } from '../../components/branding/FaceCloudLogo'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -54,23 +55,8 @@ export default function AdminLogin() {
       <div className="w-full max-w-md relative z-10 space-y-5">
         
         {/* Logo */}
-        <div className="text-center space-y-3">
-          <Link to="/" className="inline-flex items-center gap-2.5 justify-center group">
-            <div
-              className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-              style={{
-                background: 'linear-gradient(135deg, #7B61FF, #0084FF)',
-                boxShadow: '0 0 24px rgba(123,97,255,0.50)',
-              }}
-            >
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white tracking-tight">FaceCloud</span>
-          </Link>
-          <span className="block text-[9px] font-bold uppercase tracking-[0.22em]"
-            style={{ color: 'rgba(255,255,255,0.35)' }}>
-            Admin Console Access
-          </span>
+        <div className="text-center">
+          <FaceCloudLogo variant="full" size="lg" roleLabel="Admin Console" href="/" priority={true} className="mx-auto" />
         </div>
 
         {/* Card */}

@@ -7,6 +7,7 @@ import {
   ChevronRight, Sparkles, X, LogOut, Bell
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -95,24 +96,13 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         className="flex items-center justify-between px-5 py-5"
         style={{ borderBottom: '1px solid rgba(96,177,255,0.1)' }}
       >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-[#0084FF]"
-            style={{
-              background: 'rgba(0,132,255,0.1)',
-              border: '1px solid rgba(0,132,255,0.2)',
-              boxShadow: '0 0 16px rgba(0,132,255,0.15)',
-            }}
-          >
-            <FaceCloudIcon />
-          </div>
-          <div>
-            <span className="text-sm font-bold text-white tracking-tight">FaceCloud</span>
-            <div className={`text-[10px] font-bold bg-gradient-to-r ${cfg.gradient} bg-clip-text text-transparent`}>
-              {cfg.label}
-            </div>
-          </div>
-        </div>
+        <FaceCloudLogo
+          variant="horizontal"
+          size="md"
+          roleLabel={cfg.label}
+          href={role === 'admin' ? '/admin' : role === 'moderator' ? '/moderator' : '/dashboard'}
+          priority={true}
+        />
         {onClose && (
           <button
             onClick={onClose}
@@ -182,15 +172,5 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         </div>
       </div>
     </aside>
-  )
-}
-
-function FaceCloudIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="text-[#0084FF]">
-      <path d="M5 2H2v3M19 2h3v3M5 22H2v-3M19 22h3v-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M7 16a3 3 0 0 1 .5-5.96 5 5 0 0 1 9.46.96h.04a3 3 0 0 1 0 6H7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-    </svg>
   )
 }
