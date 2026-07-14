@@ -1,0 +1,30 @@
+{
+  "name": "facecloud-backend",
+  "version": "1.0.0",
+  "description": "FaceCloud backend database setup — PostgreSQL + Prisma ORM",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:migrate:reset": "prisma migrate reset",
+    "prisma:studio": "prisma studio",
+    "prisma:validate": "prisma validate",
+    "seed": "ts-node prisma/seed.ts",
+    "db:setup": "prisma migrate dev && ts-node prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force && ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.13.0",
+    "prisma": "^5.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

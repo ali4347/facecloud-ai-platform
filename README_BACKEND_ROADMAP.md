@@ -2,6 +2,14 @@
 
 This document serves as the technical blueprints and implementation roadmap for building the production-ready microservices backend for FaceCloud. It covers system architecture, database schemas, REST APIs, task queues, and AI/deep learning model deployment.
 
+> [!IMPORTANT]
+> **Technology Decision — Database Setup:**
+> - ✅ **PostgreSQL** is the selected primary database for FaceCloud.
+> - ✅ **Prisma ORM** is used for all schema definitions, migrations, and database access.
+> - ✅ **Docker Compose** (`docker-compose.yml`) provides local PostgreSQL 16 + Redis 7 for development.
+> - ❌ **Supabase MCP is NOT required** and should NOT be used. Use the Docker PostgreSQL setup instead.
+> - See [README.md § 15. Backend Database Setup](./README.md) for step-by-step local setup instructions.
+
 ---
 
 ## 1. System Architecture
@@ -31,7 +39,18 @@ graph TD
 
 ## 2. Database Schema (PostgreSQL & Prisma)
 
-Below is the proposed database schema written in Prisma schema syntax:
+Below is the proposed database schema written in Prisma schema syntax.
+
+**Implementation Status:**
+- ✅ Schema implemented in `backend/prisma/schema.prisma`
+- ✅ All 15 models defined (see schema file for full implementation)
+- ✅ Seed data available via `npm run seed` inside `backend/`
+- ✅ Local DB: Docker PostgreSQL (`docker compose up -d`)
+- ❌ Supabase MCP not required — do not use it
+
+The schema below is the roadmap reference. The actual implementation in `backend/prisma/schema.prisma` includes additional models:
+`sessions`, `uploads`, `detected_faces`, `image_quality_checks`, `face_embeddings`,
+`person_folders`, `person_folder_images`, `processing_steps`, `notifications`, `activity_logs`, `admin_audit_logs`.
 
 ```prisma
 datasource db {

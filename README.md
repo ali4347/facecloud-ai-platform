@@ -227,11 +227,14 @@ To transition this project into a production-grade application, a microservices 
 
 ### Suggested Backend Stack
 * **API Service**: Node.js + TypeScript + NestJS / Express
-* **Database**: PostgreSQL (relational storage for users, jobs, logs) + Prisma ORM
+* **Database**: **PostgreSQL** (relational storage for users, jobs, logs) + **Prisma ORM** ✅ Selected
 * **Work Queue**: Redis + BullMQ (asynchronous job tracking)
-* **Storage**: AWS S3 / Cloudflare R2 / Supabase Storage
+* **Storage**: AWS S3 / Cloudflare R2
 * **AI Worker Service**: Python + FastAPI
 * **Deployment**: Frontend hosted on Vercel; Backend services deployed on Railway, Render, or AWS ECS via Docker.
+
+> [!NOTE]
+> **Supabase MCP is NOT required.** Local development uses Docker PostgreSQL (`docker-compose.yml`). Prisma handles all schema migrations and database access.
 
 ### Production AI Models
 * **Zero-DCE**: Real-time low-light restoration.
@@ -244,13 +247,13 @@ To transition this project into a production-grade application, a microservices 
 
 ## 14. Installation and Local Development
 
-Follow these steps to run the FaceCloud frontend locally.
+### Frontend Setup
 
-### Prerequisites
+#### Prerequisites
 * **Node.js** (v18.x or higher recommended)
 * **npm** or **yarn**
 
-### Steps
+#### Steps
 1. **Clone the repository** and navigate to the project directory:
    ```bash
    cd fyp
@@ -278,14 +281,97 @@ Follow these steps to run the FaceCloud frontend locally.
 
 ---
 
-## 15. Deployment
+## 15. Backend Database Setup (PostgreSQL + Prisma)
+
+> [!IMPORTANT]
+> **Database: PostgreSQL** — Selected and configured via Prisma ORM.
+> **Supabase MCP is NOT required** for local development or for running migrations.
+> Local development uses **Docker PostgreSQL** via `docker-compose.yml`.
+
+### Prerequisites
+* **Docker** and **Docker Compose** (for local PostgreSQL + Redis)
+* **Node.js** v18.x or higher
+
+### 1. Start the Database (Docker)
+```bash
+# From the project root — starts PostgreSQL 16 + Redis 7
+docker compose up -d
+```
+
+Services started:
+| Service    | Port | Container              |
+|:-----------|:-----|:-----------------------|
+| PostgreSQL | 5432 | `facecloud_postgres`   |
+| Redis      | 6379 | `facecloud_redis`      |
+
+### 2. Configure Environment Variables
+```bash
+# Copy the template to .env and edit as needed
+cp .env.example .env
+```
+
+Key variables in `.env`:
+```env
+DATABASE_URL="postgresql://facecloud:facecloud@localhost:5432/facecloud_db?schema=public"
+REDIS_URL="redis://localhost:6379"
+```
+
+### 3. Install Backend Dependencies
+```bash
+cd backend
+npm install
+```
+
+### 4. Run Prisma Migrations
+```bash
+# Still inside backend/
+npx prisma migrate dev --name init
+```
+
+This generates the SQL migration and applies it to the Docker PostgreSQL instance.
+
+### 5. Seed the Database
+```bash
+npm run seed
+```
+
+Seeded accounts (default password: `password`):
+
+| Role          | Email                      |
+|:--------------|:---------------------------|
+| **User**      | `user@facecloud.ai`        |
+| **Admin**     | `admin@dtm.io`             |
+| **Moderator** | `moderator@facecloud.ai`   |
+
+### 6. Inspect with Prisma Studio (Optional)
+```bash
+npx prisma studio
+# Opens at http://localhost:5555
+```
+
+### Backend File Structure
+```
+backend/
+├── package.json          # Backend-specific deps (Prisma, bcryptjs)
+├── tsconfig.json         # TypeScript config for backend scripts
+└── prisma/
+    ├── schema.prisma     # Full database schema (15 models)
+    └── seed.ts           # Seed script for user/admin/moderator
+
+docker-compose.yml        # PostgreSQL 16 + Redis 7 containers
+.env.example              # Environment variable template
+```
+
+---
+
+## 16. Deployment
 
 * **Hosting Platforms**: The application is configured for deployment on static hosting providers like Vercel, Netlify, or AWS Amplify.
 * **SPA Routing Configuration**: For React Router's client-side routing to function correctly on page reloads, a rewrite rule is required. The Vercel configuration file is located at `vercel.json` and directs all requests to `index.html`.
 
 ---
 
-## 16. Known Limitations
+## 17. Known Limitations
 
 * **No Server Persistence**: Data created during a browser session (uploaded photos, logs, changes) is stored in local memory or `localStorage`. Refreshing or clearing storage resets the mock data.
 * **Client-Side Simulation**: Image filter outputs use browser canvas contexts (`ctx.filter`) rather than deep-learning GPU model logic.
@@ -294,7 +380,7 @@ Follow these steps to run the FaceCloud frontend locally.
 
 ---
 
-## 17. Future Work
+## 18. Future Work
 
 * **API Integration**: Swap local mock data services for Axios/Fetch clients communicating with the Node.js API Gateway.
 * **Database Integration**: Connect the client to a PostgreSQL database via backend endpoints to persist uploaded files and jobs permanently.
@@ -305,7 +391,7 @@ Follow these steps to run the FaceCloud frontend locally.
 
 ---
 
-## 18. Development Rule
+## 19. Development Rule
 
 > [!IMPORTANT]
 > **Core Development Workflow:**
