@@ -16,6 +16,7 @@ import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChildren'
 import { CountUp } from '../components/animation/CountUp'
 import FreedomSection from '../components/landing/FreedomSection'
+import MacBookDemoFrame from '../components/landing/MacBookDemoFrame'
 
 /* ═══════════════════════════════════════════════════════════════════════
    STATIC DATA
@@ -590,31 +591,29 @@ export default function Landing() {
         <FreedomSection />
 
         {/* ── 7. Before/After Showcase Section ──────────────────── */}
-        <section ref={sliderSectionRef} className="py-24 max-w-4xl mx-auto px-6 text-center space-y-10">
+        <section ref={sliderSectionRef} className="py-24 max-w-6xl mx-auto px-6 text-center space-y-10">
           <SectionHeading
             tag="Interactive Demo"
             title="See the enhancement difference instantly"
             subtitle="Drag the central divider handle to view real-time shadow recovery."
           />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center text-left">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left">
             <div className="lg:col-span-8">
               <RevealOnScroll>
-                <div className="fc-panel p-4">
-                  <div className="aspect-[16/10] rounded-3xl overflow-hidden relative border border-white/[0.06]">
-                    <BeforeAfterSlider
-                      beforeSrc="/demo/facecloud-enhancement-demo-original.jpg"
-                      afterSrc="/demo/facecloud-enhancement-demo-original.jpg"
-                      beforeStyle={{ filter: 'brightness(0.72) contrast(0.88) saturate(0.84)' }}
-                      afterStyle={{ filter: 'brightness(1.08) contrast(1.08) saturate(1.03)' }}
-                      beforeLabel="BEFORE"
-                      afterLabel="AFTER"
-                      initialPosition={sliderAutoPos}
-                    />
-                  </div>
-                </div>
+                <MacBookDemoFrame>
+                  <BeforeAfterSlider
+                    beforeSrc="/demo/facecloud-enhancement-demo-original.jpg"
+                    afterSrc="/demo/facecloud-enhancement-demo-original.jpg"
+                    beforeStyle={{ filter: 'brightness(0.72) contrast(0.88) saturate(0.84)' }}
+                    afterStyle={{ filter: 'brightness(1.08) contrast(1.08) saturate(1.03)' }}
+                    beforeLabel="BEFORE"
+                    afterLabel="AFTER"
+                    initialPosition={sliderAutoPos}
+                  />
+                </MacBookDemoFrame>
               </RevealOnScroll>
-              <p className="text-[10px] text-white/35 mt-2.5 text-center font-medium">
+              <p className="text-[10px] text-white/35 mt-6 text-center font-medium">
                 Frontend enhancement preview. Production processing uses the FaceCloud AI pipeline.
               </p>
             </div>

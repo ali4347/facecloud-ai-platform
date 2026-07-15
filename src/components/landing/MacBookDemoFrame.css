@@ -1,0 +1,315 @@
+/* ── MacBook Pro-Style Device Mockup Styles ──────────────────────────── */
+
+.fc-macbook {
+  --device-radius: clamp(18px, 1.8vw, 30px);
+  --bezel-size: clamp(7px, 0.8vw, 13px);
+  --chin-size: clamp(10px, 1.1vw, 18px);
+  --shell-border: rgba(167, 190, 222, 0.24);
+  --screen-radius: clamp(11px, 1.2vw, 20px);
+  position: relative;
+  width: min(100%, 850px);
+  margin-inline: auto;
+  isolation: isolate;
+  user-select: none;
+}
+
+/* Display shell (Screen outer aluminum rim) */
+.fc-macbook__display-shell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--device-radius) var(--device-radius) clamp(10px, 1vw, 16px) clamp(10px, 1vw, 16px);
+  padding: clamp(3px, 0.35vw, 6px);
+  background: linear-gradient(
+    145deg,
+    #556173 0%,
+    #242d3a 18%,
+    #111822 52%,
+    #303b4a 82%,
+    #7a8799 100%
+  );
+  border: 1px solid rgba(190, 210, 237, 0.24);
+  box-shadow:
+    0 34px 80px rgba(0, 0, 0, 0.46),
+    0 0 70px rgba(22, 139, 255, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.80);
+}
+
+/* Metallic highlight along outer display shell edges */
+.fc-macbook__outer-highlight {
+  position: absolute;
+  inset: 1px;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.24) 0%,
+    rgba(255, 255, 255, 0.05) 18%,
+    transparent 38%,
+    transparent 72%,
+    rgba(102, 162, 255, 0.12) 100%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  padding: 1px;
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  opacity: 0.85;
+}
+
+/* Dark display bezel wrapper */
+.fc-macbook__bezel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: var(--bezel-size) var(--bezel-size) var(--chin-size);
+  border-radius:
+    calc(var(--device-radius) - 4px)
+    calc(var(--device-radius) - 4px)
+    clamp(7px, 0.8vw, 13px)
+    clamp(7px, 0.8vw, 13px);
+  background: linear-gradient(
+    145deg,
+    #070a10 0%,
+    #010205 44%,
+    #080c13 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 0 22px rgba(0, 0, 0, 0.85);
+}
+
+/* Camera notch indicators */
+.fc-macbook__camera {
+  position: absolute;
+  z-index: 10;
+  top: clamp(2px, 0.2vw, 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(12px, 1.2vw, 19px);
+  height: clamp(4px, 0.45vw, 7px);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.fc-macbook__camera-lens {
+  width: clamp(3px, 0.32vw, 5px);
+  height: clamp(3px, 0.32vw, 5px);
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 40% 35%,
+    rgba(78, 171, 255, 0.85),
+    rgba(12, 33, 61, 0.92) 34%,
+    #010204 72%
+  );
+  box-shadow: 0 0 5px rgba(22, 139, 255, 0.26);
+}
+
+/* Laptop viewport screen */
+.fc-macbook__screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--screen-radius);
+  background: #02050a;
+  box-shadow:
+    inset 0 0 0 1px rgba(132, 168, 216, 0.11),
+    inset 0 0 34px rgba(0, 0, 0, 0.34);
+  isolation: isolate;
+}
+
+.fc-macbook__screen > *:first-child {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 !important; /* Screen handles rounding clip */
+}
+
+/* Glass screen reflection highlight overlay */
+.fc-macbook__screen-reflection {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.035) 17%,
+    transparent 31%,
+    transparent 74%,
+    rgba(65, 145, 255, 0.025) 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.40;
+}
+
+.fc-macbook__screen-vignette {
+  position: absolute;
+  z-index: 19;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025);
+}
+
+/* Lower bezel chin display mark */
+.fc-macbook__chin {
+  position: absolute;
+  z-index: 8;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--chin-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 18, 25, 0.4),
+    rgba(1, 2, 4, 0.96)
+  );
+}
+
+.fc-macbook__chin-mark {
+  width: clamp(18px, 2.2vw, 34px);
+  height: 1px;
+  border-radius: 999px;
+  background: rgba(190, 211, 242, 0.16);
+}
+
+/* Shell connection hinge */
+.fc-macbook__hinge {
+  position: relative;
+  z-index: -1;
+  width: 38%;
+  height: clamp(5px, 0.55vw, 9px);
+  margin: clamp(-3px, -0.25vw, -5px) auto 0;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(
+    180deg,
+    #4f5a68,
+    #151b24 56%,
+    #05070b
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 3px 7px rgba(0, 0, 0, 0.45);
+}
+
+/* Bottom base projected 3D deck */
+.fc-macbook__base {
+  position: relative;
+  z-index: -2;
+  width: 112%;
+  height: clamp(15px, 1.8vw, 28px);
+  margin-left: -6%;
+  margin-top: clamp(-2px, -0.1vw, -1px);
+  transform-origin: center top;
+  transform: perspective(900px) rotateX(58deg);
+  border-radius:
+    0 0
+    clamp(24px, 3vw, 46px)
+    clamp(24px, 3vw, 46px);
+  background: linear-gradient(
+    180deg,
+    #667284 0%,
+    #313b49 20%,
+    #141b25 61%,
+    #080b10 100%
+  );
+  border: 1px solid rgba(193, 211, 235, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 15px 34px rgba(0, 0, 0, 0.40);
+  overflow: hidden;
+}
+
+.fc-macbook__base-highlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.11) 50%,
+    transparent 100%
+  );
+  opacity: 0.45;
+}
+
+.fc-macbook__trackpad-hint {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  transform: translateX(-50%);
+  width: 27%;
+  height: 36%;
+  border: 1px solid rgba(207, 222, 244, 0.09);
+  border-radius: 4px;
+  opacity: 0.75;
+}
+
+.fc-macbook__front-lip {
+  position: absolute;
+  left: 42%;
+  right: 42%;
+  bottom: 1px;
+  height: 2px;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(218, 229, 245, 0.30),
+    transparent
+  );
+}
+
+/* Floor contact soft shadow */
+.fc-macbook__floor-shadow {
+  position: absolute;
+  z-index: -4;
+  left: 8%;
+  right: 8%;
+  bottom: clamp(-18px, -1.8vw, -30px);
+  height: clamp(24px, 3vw, 48px);
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.60) 0%,
+    rgba(7, 88, 216, 0.13) 40%,
+    transparent 74%
+  );
+  filter: blur(12px);
+}
+
+/* Mobile Overrides */
+@media (max-width: 767px) {
+  .fc-macbook {
+    width: 100%;
+  }
+
+  .fc-macbook__base {
+    width: 106%;
+    margin-left: -3%;
+    height: 14px;
+    transform: perspective(700px) rotateX(62deg);
+  }
+
+  .fc-macbook__trackpad-hint {
+    display: none;
+  }
+
+  .fc-macbook__floor-shadow {
+    left: 14%;
+    right: 14%;
+    opacity: 0.72;
+  }
+}
