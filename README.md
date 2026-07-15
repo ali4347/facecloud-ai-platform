@@ -438,7 +438,18 @@ FaceCloud utilizes a dark luxury, premium branding style built around the offici
 
 ---
 
-## 21. Development Rule
+## 21. Interactive Demo
+
+The Interactive Demo uses a locally stored facial image with frontend visual filters to demonstrate the intended original-versus-enhanced experience until the production FaceCloud AI processing service is connected.
+
+* **Demo Image Asset Path**: [facecloud-enhancement-demo-original.jpg](file:///Users/Ali/Downloads/FYP/public/demo/facecloud-enhancement-demo-original.jpg)
+* **Visual Filters**:
+  * Original (Before): `filter: brightness(0.72) contrast(0.88) saturate(0.84)`
+  * AI Enhanced (After): `filter: brightness(1.08) contrast(1.08) saturate(1.03)`
+
+---
+
+## 22. Development Rule
 
 > [!IMPORTANT]
 > **Core Development Workflow:**

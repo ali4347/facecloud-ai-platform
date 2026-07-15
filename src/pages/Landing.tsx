@@ -430,10 +430,22 @@ export default function Landing() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center text-left">
-            <div className="lg:col-span-8 fc-panel p-4">
-              <div className="aspect-[16/10] rounded-3xl overflow-hidden relative border border-white/[0.06]">
-                <BeforeAfterSlider beforeColor="#07090D" afterColor="#0084FF" />
+            <div className="lg:col-span-8">
+              <div className="fc-panel p-4">
+                <div className="aspect-[16/10] rounded-3xl overflow-hidden relative border border-white/[0.06]">
+                  <BeforeAfterSlider
+                    beforeSrc="/demo/facecloud-enhancement-demo-original.jpg"
+                    afterSrc="/demo/facecloud-enhancement-demo-original.jpg"
+                    beforeStyle={{ filter: 'brightness(0.72) contrast(0.88) saturate(0.84)' }}
+                    afterStyle={{ filter: 'brightness(1.08) contrast(1.08) saturate(1.03)' }}
+                    beforeLabel="BEFORE"
+                    afterLabel="AFTER"
+                  />
+                </div>
               </div>
+              <p className="text-[10px] text-white/35 mt-2.5 text-center font-medium">
+                Frontend enhancement preview. Production processing uses the FaceCloud AI pipeline.
+              </p>
             </div>
             
             <div className="lg:col-span-4 space-y-4">
@@ -455,6 +467,10 @@ export default function Landing() {
                   <div className="flex justify-between">
                     <span>Face size validation:</span>
                     <span className="text-[#4FFFB0] font-bold">PASSED (128x128px)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Faces detected:</span>
+                    <span className="text-[#4FFFB0] font-bold">1</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Dataset payload status:</span>

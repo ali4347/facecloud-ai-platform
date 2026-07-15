@@ -9,6 +9,8 @@ interface BeforeAfterSliderProps {
   afterColor?: string
   beforeSrc?: string
   afterSrc?: string
+  beforeStyle?: React.CSSProperties
+  afterStyle?: React.CSSProperties
 }
 
 export function BeforeAfterSlider({
@@ -19,6 +21,8 @@ export function BeforeAfterSlider({
   afterColor = '#3b82f6',
   beforeSrc,
   afterSrc,
+  beforeStyle,
+  afterStyle,
 }: BeforeAfterSliderProps) {
   const [position, setPosition] = useState(50)
   const [dragging, setDragging] = useState(false)
@@ -28,28 +32,68 @@ export function BeforeAfterSlider({
     if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
-    setPosition((x / rect.width) * 100)
+    setPosition(Math.round((x / rect.width) * 100))
   }, [])
 
-  const onMouseMove = useCallback((e: React.MouseEvent) => {
-    if (dragging) updatePosition(e.clientX)
-  }, [dragging, updatePosition])
+  // Dragging event listeners (pointer capture/document listeners)
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setDragging(true)
+    if (containerRef.current) {
+      containerRef.current.setPointerCapture(e.pointerId)
+    }
+    updatePosition(e.clientX)
+  }
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    updatePosition(e.touches[0].clientX)
-  }, [updatePosition])
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return
+    updatePosition(e.clientX)
+  }
+
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    setDragging(false)
+    if (containerRef.current) {
+      containerRef.current.releasePointerCapture(e.pointerId)
+    }
+  }
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      setPosition(pos => Math.max(0, pos - 2))
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      setPosition(pos => Math.min(100, pos + 2))
+    } else if (e.key === 'Home') {
+      e.preventDefault()
+      setPosition(0)
+    } else if (e.key === 'End') {
+      e.preventDefault()
+      setPosition(100)
+    }
+  }
 
   const hasImages = beforeSrc && afterSrc
 
   return (
     <div
       ref={containerRef}
-      className={cn('relative select-none rounded-3xl overflow-hidden cursor-col-resize h-72 sm:h-96', className)}
-      onMouseMove={onMouseMove}
-      onMouseUp={() => setDragging(false)}
-      onMouseLeave={() => setDragging(false)}
-      onTouchMove={onTouchMove}
-      onTouchEnd={() => setDragging(false)}
+      role="slider"
+      tabIndex={0}
+      aria-label="Compare the original and FaceCloud AI-enhanced image"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={position}
+      onKeyDown={handleKeyDown}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      className={cn(
+        'relative select-none rounded-3xl overflow-hidden cursor-col-resize h-72 sm:h-96 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0084FF]',
+        className
+      )}
+      style={{ touchAction: 'pan-y' }} // prevent scrolling only horizontally
     >
       {/* Before (left) */}
       <div
@@ -57,12 +101,20 @@ export function BeforeAfterSlider({
         style={hasImages ? { background: '#000' } : { background: `linear-gradient(135deg, ${beforeColor} 0%, #0f172a 100%)` }}
       >
         {hasImages ? (
-          <img src={beforeSrc} alt="Before" className="w-full h-full object-contain" draggable={false} />
+          <img
+            src={beforeSrc}
+            alt="Original unprocessed portrait"
+            className="w-full h-full object-cover"
+            style={{ ...beforeStyle, objectPosition: 'center 30%' }}
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+          />
         ) : (
           <MockFaceDisplay tint={beforeColor} dark />
         )}
-        <div className="absolute bottom-3 left-3 z-20">
-          <span className="px-3 py-1 bg-black/50 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+        <div className="absolute top-4 left-4 z-20">
+          <span className="px-3 py-1 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full border border-white/10">
             {beforeLabel}
           </span>
         </div>
@@ -77,12 +129,20 @@ export function BeforeAfterSlider({
         }}
       >
         {hasImages ? (
-          <img src={afterSrc} alt="After" className="w-full h-full object-contain" draggable={false} />
+          <img
+            src={afterSrc}
+            alt="AI enhanced portrait"
+            className="w-full h-full object-cover"
+            style={{ ...afterStyle, objectPosition: 'center 30%' }}
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+          />
         ) : (
           <MockFaceDisplay tint={afterColor} />
         )}
-        <div className="absolute bottom-3 right-3 z-20">
-          <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full ring-1 ring-white/30">
+        <div className="absolute top-4 right-4 z-20">
+          <span className="px-3 py-1 bg-[#0084FF]/25 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full border border-[#0084FF]/30">
             {afterLabel} ✨
           </span>
         </div>
@@ -90,15 +150,16 @@ export function BeforeAfterSlider({
 
       {/* Divider handle */}
       <div
-        className="absolute top-0 bottom-0 z-10 flex items-center justify-center"
+        className={cn(
+          "absolute top-0 bottom-0 z-10 flex items-center justify-center pointer-events-none",
+          dragging && "scale-105"
+        )}
         style={{ left: `${position}%`, transform: 'translateX(-50%)' }}
-        onMouseDown={() => setDragging(true)}
-        onTouchStart={() => setDragging(true)}
       >
-        <div className="w-0.5 h-full bg-white/80 shadow-lg" />
-        <div className="absolute w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center ring-2 ring-primary-200">
-          <svg className="w-5 h-5 text-primary" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M7 5l-3 5 3 5M13 5l3 5-3 5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <div className="w-0.5 h-full bg-white/80 shadow-[0_0_12px_rgba(255,255,255,0.4)]" />
+        <div className="absolute w-8 h-8 rounded-full bg-black/80 border border-white/40 shadow-2xl flex items-center justify-center ring-2 ring-[#0084FF]/40 backdrop-blur-sm transition-transform duration-200">
+          <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7 5l-3 5 3 5M13 5l3 5-3 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
           </svg>
         </div>
       </div>
