@@ -481,17 +481,34 @@
   animation: hero-drift 30s ease-in-out infinite;
 }
 
-/* ── Logo marquee slide ─────────────────────────────────────────────── */
-@keyframes logos-slide {
+/* ── Logo marquee slide LTR and RTL ─────────────────────────────────── */
+@keyframes logos-slide-rtl {
   0%   { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-.logos-marquee {
-  animation: logos-slide 25s linear infinite;
+@keyframes logos-slide-ltr {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.logos-marquee-rtl {
+  animation: logos-slide-rtl 25s linear infinite;
+}
+.logos-marquee-ltr {
+  animation: logos-slide-ltr 25s linear infinite;
+}
+.logos-marquee-rtl:hover,
+.logos-marquee-ltr:hover {
+  animation-play-state: paused;
+}
+.logos-container-mask {
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
 }
 
 /* ── Respect reduced motion for custom animations ───────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .hero-drift { animation: none; }
-  .logos-marquee { animation: none; }
+  .logos-marquee-rtl,
+  .logos-marquee-ltr { animation: none; }
 }
+

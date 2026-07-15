@@ -37,6 +37,24 @@ const USE_CASES = [
   { icon: Building2,  title: 'Enterprise Photo Archives',   desc: 'Organize legacy photo databases with AI-powered face clustering and similarity indexing.' },
 ]
 
+const TESTIMONIALS = [
+  {
+    initials: 'J.H.',
+    role: 'Lead Architect, DataMart Beta Tester',
+    quote: 'Clustering images into person folders has shaved hours off our batch indexing workflow. What used to take days of manual dragging is now automatic.',
+  },
+  {
+    initials: 'S.K.',
+    role: 'Systems Engineer, VisionGrid Beta Tester',
+    quote: 'The Zero-DCE low-light enhancement is incredibly clean. It recovers facial details in dark event photos that standard algorithms completely wash out.',
+  },
+  {
+    initials: 'T.L.',
+    role: 'Fullstack Dev, NeuralStack Beta Tester',
+    quote: 'Integrating the REST API took less than an hour. Simple endpoints, clean JWT auth, and the ZIP ingest endpoint works flawlessly.',
+  },
+]
+
 const PIPELINE_ROWS = [
   { label: 'Original Image Saved',    value: 'portrait_underexposed.png' },
   { label: 'Zero-DCE Enhancement',     value: 'Exposure restored (+2.4 EV)' },
@@ -277,12 +295,24 @@ export default function Landing() {
                 Trusted by AI-driven teams and secure image workflows
               </p>
             </RevealOnScroll>
-            <div className="relative overflow-hidden">
-              <div className="logos-marquee flex items-center gap-20 w-max">
-                {[...LOGOS, ...LOGOS].map((logo, i) => (
+            <div className="logos-container-mask relative overflow-hidden flex flex-col gap-6 w-full">
+              {/* Top Row: Right to Left */}
+              <div className="logos-marquee-rtl flex items-center gap-20 w-max">
+                {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].map((logo, i) => (
                   <span 
-                    key={`${logo}-${i}`} 
-                    className="text-sm font-extrabold tracking-[0.15em] text-white/50 hover:text-white/90 transition-all duration-300 select-none cursor-default whitespace-nowrap"
+                    key={`logo-rtl-${logo}-${i}`} 
+                    className="text-sm font-extrabold tracking-[0.15em] text-white/40 hover:text-white/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
+                  >
+                    {logo.toUpperCase()}
+                  </span>
+                ))}
+              </div>
+              {/* Bottom Row: Left to Right */}
+              <div className="logos-marquee-ltr flex items-center gap-20 w-max">
+                {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].reverse().map((logo, i) => (
+                  <span 
+                    key={`logo-ltr-${logo}-${i}`} 
+                    className="text-sm font-extrabold tracking-[0.15em] text-white/40 hover:text-white/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
                   >
                     {logo.toUpperCase()}
                   </span>
@@ -320,6 +350,39 @@ export default function Landing() {
           <p className="text-center text-[9px] text-white/25 mt-4 font-medium">
             Platform capability figures based on internal testing benchmarks
           </p>
+        </section>
+
+        {/* ── 2.7 Testimonials / Early Feedback ────────────────── */}
+        <section className="py-24 max-w-7xl mx-auto px-6 border-t border-white/[0.03]">
+          <SectionHeading
+            tag="Early Access Feedback"
+            title="What our beta testers are saying"
+            subtitle="Real developer and systems architect feedback from our closed preview release."
+          />
+
+          <StaggerChildren staggerDelay={0.1} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((t, idx) => (
+              <StaggerItem key={idx}>
+                <motion.div
+                  whileHover={{ y: -4, borderColor: 'rgba(0,132,255,0.25)' }}
+                  transition={{ duration: 0.2 }}
+                  className="fc-panel p-6 flex flex-col justify-between h-full relative"
+                >
+                  <p className="text-[12px] text-white/70 leading-relaxed italic mb-6">
+                    "{t.quote}"
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0084FF]/20 to-[#7B61FF]/20 border border-white/10 flex items-center justify-center text-xs font-bold text-white tracking-wider">
+                      {t.initials}
+                    </div>
+                    <div>
+                      <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-wider">{t.role}</h4>
+                    </div>
+                  </div>
+                </motion.div>
+              </StaggerItem>
+            ))}
+          </StaggerChildren>
         </section>
 
         {/* ── 3. Problem Section ────────────────────────────────── */}
@@ -439,6 +502,35 @@ export default function Landing() {
                   </RevealOnScroll>
                 ))}
               </div>
+
+              {/* Subtly treated face detection illustrative image */}
+              <RevealOnScroll delay={0.4} direction="up">
+                <div className="fc-panel p-2 relative overflow-hidden group max-w-sm mt-6 border border-white/[0.06] rounded-2xl">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
+                    <img 
+                      src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&q=80&w=800" 
+                      alt="Biometric facial analysis simulation" 
+                      className="w-full h-full object-cover grayscale opacity-45 group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    {/* Indigo/cyan duotone coloring overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-transparent opacity-80 pointer-events-none" />
+                    <div className="absolute inset-0 bg-[#0084FF]/20 mix-blend-color pointer-events-none" />
+                    <div className="absolute inset-0 bg-[#7B61FF]/10 mix-blend-overlay pointer-events-none" />
+                    
+                    {/* Simulated tech scanning grids/lines overlay */}
+                    <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-white/40">
+                      <div className="flex justify-between items-center">
+                        <span>SCAN_RESOLUTION: 512px</span>
+                        <span>CONFIDENCE: 99.8%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>[MODEL_SCAN: IN_PROGRESS]</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#4FFFB0] animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </RevealOnScroll>
             </div>
 
             {/* Right animated pipeline panel */}
@@ -985,14 +1077,6 @@ export default function Landing() {
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Swagger Playgrounds</div>
                     </div>
                   </div>
-
-                  <Link 
-                    to="/admin/login" 
-                    className="fc-btn-primary !py-2.5 !px-5 text-xs font-bold w-fit mt-6"
-                    style={{ background: 'linear-gradient(135deg, #7B61FF 0%, #0084FF 100%)', color: '#fff', boxShadow: 'none' }}
-                  >
-                    Open Admin Console
-                  </Link>
                 </motion.div>
               </RevealOnScroll>
 
@@ -1001,7 +1085,7 @@ export default function Landing() {
                 <motion.div
                   whileHover={{ y: -4, borderColor: 'rgba(79,255,176,0.35)', boxShadow: '0 0 40px rgba(79,255,176,0.12)' }}
                   transition={{ duration: 0.25 }}
-                  className="fc-panel p-8 flex flex-col justify-between min-h-[340px]"
+                  className="fc-panel p-8 flex flex-col justify-between min-h-[300px]"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-white">
@@ -1021,14 +1105,6 @@ export default function Landing() {
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Email notifications</div>
                     </div>
                   </div>
-
-                  <Link 
-                    to="/moderator/login" 
-                    className="fc-btn-primary !py-2.5 !px-5 text-xs font-bold w-fit mt-6"
-                    style={{ background: 'linear-gradient(135deg, #4FFFB0 0%, #0084FF 100%)', color: '#000000', boxShadow: 'none' }}
-                  >
-                    Open Moderator Review
-                  </Link>
                 </motion.div>
               </RevealOnScroll>
             </div>
@@ -1215,11 +1291,10 @@ export default function Landing() {
                 organize facial images with AI?
               </h2>
               <p className="text-xs text-white/50 max-w-md mx-auto leading-relaxed font-medium">
-                Start with the user portal or explore the admin console for monitoring and control.
+                Start with the user portal to enhance and organize your facial image datasets.
               </p>
               <div className="flex flex-wrap justify-center gap-4 pt-4">
                 <Link to="/login" className="fc-btn-primary font-bold px-8 py-4 cursor-pointer">Start as User</Link>
-                <Link to="/admin/login" className="fc-btn-secondary font-semibold px-8 py-4 cursor-pointer hover:border-[#0084FF]/40">Admin Console</Link>
               </div>
             </div>
           </RevealOnScroll>
@@ -1253,8 +1328,6 @@ export default function Landing() {
               <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Portals</h4>
               <ul className="space-y-2 font-medium">
                 <li><Link to="/login" className="hover:text-[#60B1FF] transition-colors">User Login</Link></li>
-                <li><Link to="/admin/login" className="hover:text-[#60B1FF] transition-colors">Admin Console</Link></li>
-                <li><Link to="/moderator/login" className="hover:text-[#60B1FF] transition-colors">Moderator Review</Link></li>
               </ul>
             </div>
 

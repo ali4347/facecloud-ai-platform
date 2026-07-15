@@ -44,12 +44,6 @@ export function PublicNavbar() {
             User Login
           </Link>
           <Link
-            to="/admin/login"
-            className="px-4 py-2 text-[13px] font-medium text-white/65 hover:text-white transition-colors duration-200"
-          >
-            Admin Console
-          </Link>
-          <Link
             to="/login"
             className="glass-pill px-5 py-2 text-[13px] font-medium text-white border border-white/15 hover:border-white/30 hover:bg-white/[0.06] transition-all duration-300 cursor-pointer ml-1"
           >
@@ -94,13 +88,6 @@ export function PublicNavbar() {
               onClick={() => setMobileOpen(false)}
             >
               User Login
-            </Link>
-            <Link
-              to="/admin/login"
-              className="text-white/65 hover:text-white text-sm font-medium py-1 transition-colors"
-              onClick={() => setMobileOpen(false)}
-            >
-              Admin Console
             </Link>
             <Link
               to="/login"
