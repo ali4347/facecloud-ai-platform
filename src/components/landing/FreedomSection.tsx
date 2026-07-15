@@ -91,9 +91,28 @@ export default function FreedomSection() {
       id="methodology"
       className="freedom-section w-full flex flex-col items-center select-none"
       style={{
-        backgroundColor: '#ffffff',
+        background: `
+          radial-gradient(
+            circle at 50% 45%,
+            rgba(22, 139, 255, 0.10),
+            transparent 34%
+          ),
+          radial-gradient(
+            circle at 80% 30%,
+            rgba(123, 97, 255, 0.07),
+            transparent 26%
+          ),
+          linear-gradient(
+            180deg,
+            #030712 0%,
+            #050B16 50%,
+            #030712 100%
+          )
+        `,
         padding: 'clamp(48px, 6vw, 80px) clamp(16px, 3vw, 40px)',
         gap: '36px',
+        borderTop: '1px solid rgba(66, 165, 255, 0.08)',
+        borderBottom: '1px solid rgba(66, 165, 255, 0.08)',
       }}
     >
       {/* Header */}
@@ -102,10 +121,15 @@ export default function FreedomSection() {
         <div
           className="flex items-center gap-2 text-lg font-medium rounded-full"
           style={{
-            backgroundColor: 'rgb(249, 249, 249)',
+            backgroundColor: 'rgba(12, 24, 44, 0.72)',
+            border: '1px solid rgba(66, 165, 255, 0.22)',
+            color: '#D9E8FF',
+            backdropFilter: 'blur(16px) saturate(150%)',
             padding: 'clamp(10px, 0.9vw, 14px) clamp(14px, 1.25vw, 20px)',
-            color: 'rgb(26, 11, 84)',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.03)',
+            boxShadow: `
+              inset 0 1px 0 rgba(255, 255, 255, 0.06),
+              0 10px 30px rgba(0, 91, 210, 0.10)
+            `,
           }}
         >
           {/* Inline SVG for Badge */}
@@ -114,7 +138,7 @@ export default function FreedomSection() {
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="currentColor"
+            stroke="#42A5FF"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -135,15 +159,16 @@ export default function FreedomSection() {
           className="font-medium tracking-tight"
           style={{
             fontSize: 'clamp(32px, 4vw, 56px)',
-            color: 'rgb(26, 11, 84)',
+            color: '#F5F8FF',
             lineHeight: 1.15,
             margin: 0,
+            filter: 'drop-shadow(0 0 20px rgba(22, 139, 255, 0.12))',
           }}
         >
           Stop absorbing image chaos.<br />
           <span
             style={{
-              backgroundImage: 'linear-gradient(90deg, rgb(43,167,255), rgb(202,69,255) 50%, rgb(254,136,27))',
+              backgroundImage: 'linear-gradient(90deg, #42A5FF 0%, #168BFF 38%, #22D3EE 70%, #4FFFB0 100%)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -160,11 +185,11 @@ export default function FreedomSection() {
         <p
           className="text-xs sm:text-sm md:text-base leading-relaxed max-w-[760px] mx-auto font-medium"
           style={{
-            color: 'rgb(131, 121, 158)',
+            color: '#8FA0BA',
             lineHeight: 1.6,
           }}
         >
-          FaceCloud transforms unstructured facial images into enhanced, validated, identity-grouped, and securely downloadable results.
+          FaceCloud transforms unstructured facial images into <span style={{ color: '#C9D9F2' }}>enhanced</span>, <span style={{ color: '#C9D9F2' }}>validated</span>, <span style={{ color: '#C9D9F2' }}>identity-grouped</span>, and <span style={{ color: '#C9D9F2' }}>securely downloadable</span> results.
         </p>
       </div>
 
@@ -196,9 +221,10 @@ export default function FreedomSection() {
                 gap: '12px',
                 padding: 'clamp(12px, 0.97vw, 16px) clamp(14px, 1.25vw, 20px)',
                 borderRadius: '18px',
-                backgroundColor: 'rgb(255,255,255)',
-                boxShadow: '0 3px 9.1px #3f4a7e0d, 0 1px 29px #3f4a7e1a',
-                border: '1px solid rgba(63, 74, 126, 0.05)',
+                background: 'linear-gradient(145deg, rgba(16, 25, 43, 0.90), rgba(9, 16, 30, 0.82))',
+                border: '1px solid rgba(239, 68, 68, 0.14)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 14px 38px rgba(0, 0, 0, 0.26)',
+                backdropFilter: 'blur(18px) saturate(130%)',
               }}
             >
               <img
@@ -213,7 +239,7 @@ export default function FreedomSection() {
               <span
                 style={{
                   fontSize: 'clamp(13px, 1.15vw, 17px)',
-                  color: 'rgb(131, 121, 158)',
+                  color: '#9AA8BE',
                   lineHeight: 1.4,
                   fontWeight: 400,
                 }}
@@ -224,7 +250,7 @@ export default function FreedomSection() {
           ))}
         </div>
 
-        {/* Center Column: HlsVideo Circle */}
+        {/* Center Column: HlsVideo Circle Wrapper */}
         <div
           className="flex items-center justify-center order-first lg:order-none"
           style={{
@@ -235,16 +261,29 @@ export default function FreedomSection() {
             style={{
               position: 'relative',
               borderRadius: '50%',
-              overflow: 'hidden',
-              width: 'clamp(200px, 22vw, 400px)',
-              height: 'clamp(200px, 22vw, 400px)',
-              flexShrink: 0,
-              backgroundColor: '#140b2f',
-              boxShadow: '0 24px 80px rgba(84, 62, 190, 0.18)',
-              border: '1px solid rgba(65, 36, 142, 0.12)',
+              padding: '3px',
+              background: 'conic-gradient(from 180deg, #0758D8, #168BFF, #22D3EE, #4FFFB0, #7B61FF, #168BFF, #0758D8)',
+              boxShadow: `
+                0 0 0 8px rgba(22, 139, 255, 0.035),
+                0 24px 80px rgba(0, 87, 190, 0.20),
+                0 0 70px rgba(34, 211, 238, 0.08)
+              `,
             }}
           >
-            <HlsVideo />
+            <div
+              style={{
+                position: 'relative',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                width: 'clamp(200px, 22vw, 400px)',
+                height: 'clamp(200px, 22vw, 400px)',
+                flexShrink: 0,
+                backgroundColor: '#07101F',
+                border: '1px solid rgba(66, 165, 255, 0.32)',
+              }}
+            >
+              <HlsVideo />
+            </div>
           </div>
         </div>
 
@@ -263,9 +302,9 @@ export default function FreedomSection() {
                 gap: '12px',
                 padding: 'clamp(12px, 0.97vw, 16px) clamp(14px, 1.25vw, 20px)',
                 borderRadius: '18px',
-                backgroundColor: 'rgb(255,255,255)',
-                boxShadow: '0 3px 9.1px #3f4a7e0d, 0 1px 29px #3f4a7e1a',
-                border: '1px solid rgba(63, 74, 126, 0.05)',
+                background: 'linear-gradient(145deg, rgba(10, 30, 48, 0.94), rgba(8, 20, 36, 0.86))',
+                border: '1px solid rgba(79, 255, 176, 0.16)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 40px rgba(0, 70, 120, 0.13)',
               }}
             >
               <img
@@ -280,7 +319,7 @@ export default function FreedomSection() {
               <span
                 style={{
                   fontSize: 'clamp(13px, 1.15vw, 17px)',
-                  color: 'rgb(26, 11, 84)',
+                  color: '#E7F3FF',
                   lineHeight: 1.4,
                   fontWeight: 500,
                 }}
