@@ -63,7 +63,7 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 5. **Use Cases / Who It's For** — 4 cards: Identity Verification, Event Photography, HR & Onboarding, Enterprise Photo Archives.
 6. **AI Infrastructure** — Live-looping pipeline panel cycling PENDING → ACTIVE → SUCCESS status badges.
 7. **Ingestion Suite** — 12-card feature grid with staggered reveal and hover glow.
-8. **Methodology** — Auto-advancing 10-step stepper synced with Job Preview panel.
+8. **Methodology** — The Methodology section uses a responsive three-column FreedomSection layout with an HLS-hosted processing visual, operational pain points, and FaceCloud workflow benefits. The HLS source is loaded through hls.js, while Safari uses native HLS support. Other compatible browsers use hls.js. The video is decorative and muted.
 9. **Interactive Demo** — Before/after slider with auto-demo scroll trigger (0→50%).
 10. **Processing Options** — Single, Multiple, ZIP upload cards.
 11. **Pricing** — Monthly/Yearly toggle, 3 tier cards (Free/Basic/Pro) with highlighted Pro tier.

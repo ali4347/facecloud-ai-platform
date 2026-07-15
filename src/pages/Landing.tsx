@@ -15,6 +15,7 @@ import { HeroSection } from '../components/public/HeroSection'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChildren'
 import { CountUp } from '../components/animation/CountUp'
+import FreedomSection from '../components/landing/FreedomSection'
 
 /* ═══════════════════════════════════════════════════════════════════════
    STATIC DATA
@@ -63,31 +64,7 @@ const PIPELINE_ROWS = [
   { label: 'Person Cluster Match',     value: 'Mapped to grp-001 (Confidence 99.2%)' },
 ]
 
-const PIPELINE_STEPS = [
-  { step: 1,  name: 'JWT Login',        d: 'JWT credentials' },
-  { step: 2,  name: 'Upload Images',    d: 'ZIP/Multipart POST' },
-  { step: 3,  name: 'Store Original',   d: 'AWS S3 asset buffer' },
-  { step: 4,  name: 'AI Enhance',       d: 'Zero-DCE lighting' },
-  { step: 5,  name: 'Face Detection',   d: 'Rekognition check' },
-  { step: 6,  name: 'Quality Checks',   d: 'Blur & exposure' },
-  { step: 7,  name: 'Face Embedding',   d: '512-D vector extraction' },
-  { step: 8,  name: 'Person Folder',    d: 'Identity matching' },
-  { step: 9,  name: 'Secure Download',  d: 'Signed URL generation' },
-  { step: 10, name: 'Logs & Alerts',    d: 'In-app notification' },
-]
 
-const JOB_PREVIEW_DATA: Record<number, { model: string; quality: string; qualityColor: string; faces: string; folder: string }> = {
-  1:  { model: 'Authenticating…', quality: 'Pending',       qualityColor: '#fff/50', faces: '—', folder: '—' },
-  2:  { model: 'Receiving…',      quality: 'Pending',       qualityColor: '#fff/50', faces: '—', folder: '—' },
-  3:  { model: 'S3 Buffer',       quality: 'Pending',       qualityColor: '#fff/50', faces: '—', folder: '—' },
-  4:  { model: 'Zero-DCE Suite',  quality: 'Processing 67%', qualityColor: '#60B1FF', faces: '—', folder: '—' },
-  5:  { model: 'Zero-DCE Suite',  quality: '88% (Passed)',  qualityColor: '#4FFFB0', faces: '1 Subject', folder: '—' },
-  6:  { model: 'Zero-DCE Suite',  quality: '94% (Passed)',  qualityColor: '#4FFFB0', faces: '1 Subject', folder: '—' },
-  7:  { model: 'Zero-DCE Suite',  quality: '94% (Passed)',  qualityColor: '#4FFFB0', faces: '1 Subject', folder: 'Matching…' },
-  8:  { model: 'Zero-DCE Suite',  quality: '94% (Passed)',  qualityColor: '#4FFFB0', faces: '1 Subject', folder: 'Person 001' },
-  9:  { model: 'Zero-DCE Suite',  quality: '94% (Passed)',  qualityColor: '#4FFFB0', faces: '1 Subject', folder: 'Person 001' },
-  10: { model: 'Zero-DCE Suite',  quality: '94% (Passed)',  qualityColor: '#4FFFB0', faces: '1 Subject', folder: 'Person 001' },
-}
 
 const FEATURE_GRID = [
   { icon: Zap,           t: 'Zero-DCE Illumination', d: 'Estimates lighting maps without reference curves.' },
@@ -195,17 +172,7 @@ export default function Landing() {
     return () => clearInterval(timer)
   }, [])
 
-  /* ── Methodology stepper auto-advance ───────────────────────── */
-  const [activeStep, setActiveStep] = useState(1)
-  const [stepPaused, setStepPaused] = useState(false)
 
-  useEffect(() => {
-    if (stepPaused) return
-    const timer = setInterval(() => {
-      setActiveStep(prev => (prev % 10) + 1)
-    }, 2500)
-    return () => clearInterval(timer)
-  }, [stepPaused])
 
   /* ── Security log animation ─────────────────────────────────── */
   const [logs, setLogs] = useState<string[]>([
@@ -260,7 +227,7 @@ export default function Landing() {
     return 'PENDING'
   }, [pipelineActiveIdx])
 
-  const jobData = JOB_PREVIEW_DATA[activeStep] || JOB_PREVIEW_DATA[1]
+
 
   return (
     <div className="bg-[#050816] text-[#F0F4FF] font-sans selection:bg-[#0084FF] selection:text-white overflow-x-hidden relative min-h-screen">
@@ -620,137 +587,7 @@ export default function Landing() {
         </section>
 
         {/* ── 6. Methodology / Pipeline Section ─────────────────── */}
-        <section id="methodology" className="py-24 bg-black/40 border-y border-white/[0.05] relative">
-          <div className="max-w-7xl mx-auto px-6">
-            <SectionHeading
-              tag="Methodology"
-              title="From upload to secure download"
-              subtitle="Our unified REST pipeline checks biometric details and matches subjects with micro-node GPU tasks."
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Pipeline Steps Grid */}
-              <div className="lg:col-span-8 space-y-4">
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                  {PIPELINE_STEPS.map(item => {
-                    const isActive = activeStep === item.step
-                    return (
-                      <motion.div 
-                        key={item.step}
-                        onClick={() => { setActiveStep(item.step); setStepPaused(true); setTimeout(() => setStepPaused(false), 8000) }}
-                        whileHover={{ y: -2 }}
-                        className={`fc-panel p-4 flex flex-col justify-between min-h-[120px] transition-all cursor-pointer relative ${
-                          isActive ? 'border-[#0084FF]/60 ring-1 ring-[#0084FF]/40' : ''
-                        }`}
-                      >
-                        {isActive && (
-                          <motion.div
-                            layoutId="step-highlight"
-                            className="absolute inset-0 rounded-[24px] border-2 border-[#0084FF]/50 pointer-events-none"
-                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                          />
-                        )}
-                        <div className="flex justify-between items-center relative z-10">
-                          <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                            isActive ? 'bg-[#0084FF] text-white' : 'bg-white/10 text-white/50'
-                          }`}>
-                            {item.step}
-                          </span>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            isActive ? 'bg-[#4FFFB0] animate-pulse' : 'bg-white/20'
-                          }`} />
-                        </div>
-                        <div className="space-y-0.5 relative z-10">
-                          <h4 className="text-[10px] font-bold text-white truncate">{item.name}</h4>
-                          <p className="text-[9px] text-white/40 leading-snug truncate">{item.d}</p>
-                        </div>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Side Stats Job preview */}
-              <div className="lg:col-span-4">
-                <RevealOnScroll direction="right">
-                  <div className="fc-panel p-5 space-y-4 bg-black/60 relative">
-                    <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#0084FF]/10 border border-[#0084FF]/20 text-[#60B1FF] text-[8px] font-bold">
-                      JOB PREVIEW
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <FileCheckIcon />
-                      <div>
-                        <h4 className="text-xs font-bold text-white">portrait_ali_001.jpg</h4>
-                        <p className="text-[9px] text-white/40 font-mono mt-0.5">Job ID: job-001</p>
-                      </div>
-                    </div>
-                    <div className="h-px bg-white/[0.08]" />
-                    <div className="grid grid-cols-2 gap-3 text-[10px] font-medium text-white/60">
-                      <div>
-                        <span className="block text-white/30 text-[9px] uppercase tracking-wider">AI Model</span>
-                        <AnimatePresence mode="wait">
-                          <motion.span
-                            key={jobData.model}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="block text-white font-bold mt-0.5"
-                          >
-                            {jobData.model}
-                          </motion.span>
-                        </AnimatePresence>
-                      </div>
-                      <div>
-                        <span className="block text-white/30 text-[9px] uppercase tracking-wider">Quality Score</span>
-                        <AnimatePresence mode="wait">
-                          <motion.span
-                            key={jobData.quality}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="block font-bold mt-0.5"
-                            style={{ color: jobData.qualityColor === '#4FFFB0' ? '#4FFFB0' : jobData.qualityColor === '#60B1FF' ? '#60B1FF' : undefined }}
-                          >
-                            {jobData.quality}
-                          </motion.span>
-                        </AnimatePresence>
-                      </div>
-                      <div>
-                        <span className="block text-white/30 text-[9px] uppercase tracking-wider">Face Count</span>
-                        <AnimatePresence mode="wait">
-                          <motion.span
-                            key={jobData.faces}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="block text-white font-bold mt-0.5"
-                          >
-                            {jobData.faces}
-                          </motion.span>
-                        </AnimatePresence>
-                      </div>
-                      <div>
-                        <span className="block text-white/30 text-[9px] uppercase tracking-wider">Clustered folder</span>
-                        <AnimatePresence mode="wait">
-                          <motion.span
-                            key={jobData.folder}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="block text-[#A78BFA] font-bold mt-0.5"
-                          >
-                            {jobData.folder}
-                          </motion.span>
-                        </AnimatePresence>
-                      </div>
-                    </div>
-                  </div>
-                </RevealOnScroll>
-              </div>
-
-            </div>
-          </div>
-        </section>
+        <FreedomSection />
 
         {/* ── 7. Before/After Showcase Section ──────────────────── */}
         <section ref={sliderSectionRef} className="py-24 max-w-4xl mx-auto px-6 text-center space-y-10">
@@ -1347,12 +1184,4 @@ export default function Landing() {
 }
 
 
-function FileCheckIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#60B1FF] flex-shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-      <polyline points="14 2 14 8 20 8" />
-      <polyline points="9 15 11 17 15 13" />
-    </svg>
-  )
-}
+
