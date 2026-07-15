@@ -1,55 +1,25 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Check, Zap, Shield, Users, Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-const TYPEWRITER_TEXT = 'Enter your email for FaceCloud early access'
-const SUBMITTED_TEXT  = 'You will receive FaceCloud updates by email'
-const TYPEWRITER_SPEED_MS = 60
+const SUBMITTED_TEXT = "You're on the list — we'll be in touch."
 
 const STATS = [
   { icon: Zap,      label: 'Zero-DCE Enhancement' },
-  { icon: Shield,   label: 'One Face Validation' },
+  { icon: Shield,   label: 'Std Face Validation' },
   { icon: Users,    label: 'Person Folder Matching' },
   { icon: Download, label: 'Secure ZIP + Report' },
 ]
 
 export function HeroSection() {
-  const [showForm, setShowForm]     = useState(false)
   const [email, setEmail]           = useState('')
   const [submitted, setSubmitted]   = useState(false)
-  const [placeholder, setPlaceholder] = useState('')
+  const prefersReduced              = useReducedMotion()
+  const resetTimeoutRef             = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const typeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  // Typewriter effect whenever form opens or submitted state changes
-  useEffect(() => {
-    if (!showForm) {
-      setPlaceholder('')
-      return
-    }
-    const text = submitted ? SUBMITTED_TEXT : TYPEWRITER_TEXT
-    let i = 0
-    setPlaceholder('')
-    if (typeIntervalRef.current) clearInterval(typeIntervalRef.current)
-    typeIntervalRef.current = setInterval(() => {
-      i++
-      setPlaceholder(text.slice(0, i))
-      if (i >= text.length && typeIntervalRef.current) {
-        clearInterval(typeIntervalRef.current)
-      }
-    }, TYPEWRITER_SPEED_MS)
-
-    return () => {
-      if (typeIntervalRef.current) clearInterval(typeIntervalRef.current)
-    }
-  }, [showForm, submitted])
-
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (typeIntervalRef.current)  clearInterval(typeIntervalRef.current)
       if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current)
     }
   }, [])
@@ -57,17 +27,39 @@ export function HeroSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
+    // TODO: Connect to Supabase waitlist table or backend API endpoint
     setSubmitted(true)
-    // Reset everything after 4 seconds
     resetTimeoutRef.current = setTimeout(() => {
-      setShowForm(false)
       setEmail('')
       setSubmitted(false)
     }, 4000)
   }
 
+  const stagger = prefersReduced ? 0 : 0.12
+
   return (
     <div className="relative flex-1 flex flex-col items-center justify-center px-6 pb-8">
+      {/* ── Decorative drifting swirl ─────────────────────────── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+        <svg
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-[0.04] hero-drift"
+          viewBox="0 0 800 800"
+          fill="none"
+        >
+          <circle cx="400" cy="400" r="300" stroke="url(#swirl-grad)" strokeWidth="1.5" strokeDasharray="12 8" />
+          <circle cx="400" cy="400" r="220" stroke="url(#swirl-grad)" strokeWidth="1" strokeDasharray="8 12" />
+          <circle cx="400" cy="400" r="140" stroke="url(#swirl-grad)" strokeWidth="0.8" strokeDasharray="6 10" />
+          <ellipse cx="400" cy="400" rx="360" ry="180" stroke="url(#swirl-grad)" strokeWidth="0.8" strokeDasharray="10 14" />
+          <defs>
+            <linearGradient id="swirl-grad" x1="0" y1="0" x2="800" y2="800">
+              <stop offset="0%" stopColor="#0084FF" />
+              <stop offset="50%" stopColor="#7B61FF" />
+              <stop offset="100%" stopColor="#4FFFB0" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
       <div className="relative z-10 text-center max-w-5xl mx-auto flex flex-col items-center justify-center w-full gap-10">
 
         {/* ── Tagline ────────────────────────────────────────── */}
@@ -80,20 +72,31 @@ export function HeroSection() {
           AI Face Enhancement&nbsp;•&nbsp;Validation&nbsp;•&nbsp;Identity Grouping
         </motion.p>
 
-        {/* ── Heading ────────────────────────────────────────── */}
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="text-4xl md:text-[64px] font-medium tracking-[-0.01em] leading-[1.1]
-                     bg-gradient-to-b from-white via-white/95 to-white/65
-                     bg-clip-text text-transparent max-w-4xl"
-          style={{ fontFamily: "'Instrument Serif', serif" }}
-        >
-          A new way to enhance{' '}
-          <br className="hidden md:block" />
-          and organize facial images
-        </motion.h1>
+        {/* ── Heading (staggered lines) ───────────────────────── */}
+        <div className="space-y-1">
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-[64px] font-medium tracking-[-0.01em] leading-[1.1]
+                       bg-gradient-to-b from-white via-white/95 to-white/65
+                       bg-clip-text text-transparent max-w-4xl"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            A new way to enhance
+          </motion.h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: stagger, ease: [0.16, 1, 0.3, 1] }}
+            className="text-4xl md:text-[64px] font-medium tracking-[-0.01em] leading-[1.1]
+                       bg-gradient-to-b from-white via-white/95 to-white/65
+                       bg-clip-text text-transparent max-w-4xl"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            and organize facial images
+          </motion.h1>
+        </div>
 
         {/* ── Supporting paragraph ───────────────────────────── */}
         <motion.p
@@ -107,7 +110,7 @@ export function HeroSection() {
           into person folders, and generates secure downloads.
         </motion.p>
 
-        {/* ── CTA: Email capture ─────────────────────────────── */}
+        {/* ── CTA: Inline email capture ───────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -115,23 +118,7 @@ export function HeroSection() {
           className="flex flex-col items-center gap-4 w-full"
         >
           <AnimatePresence mode="wait">
-            {!showForm ? (
-              /* ── Initial button ── */
-              <motion.button
-                key="cta-btn"
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.2 }}
-                onClick={() => setShowForm(true)}
-                className="px-10 py-3 text-[14px] font-medium border border-white/10 rounded-full
-                           hover:border-white/30 hover:bg-white/[0.02] transition-all duration-300
-                           text-white/85 backdrop-blur-sm cursor-pointer"
-              >
-                Get early access
-              </motion.button>
-            ) : (
-              /* ── Email form ── */
+            {!submitted ? (
               <motion.form
                 key="email-form"
                 initial={{ opacity: 0, scale: 0.96 }}
@@ -139,32 +126,39 @@ export function HeroSection() {
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.2 }}
                 onSubmit={handleSubmit}
-                className="flex items-center gap-2 pl-5 pr-1.5 py-1.5 border border-white/20 rounded-full
-                           bg-white/[0.02] backdrop-blur-sm w-full max-w-[360px]
+                className="flex items-center gap-2 pl-5 pr-1.5 py-1.5 border border-white/15 rounded-full
+                           bg-white/[0.03] backdrop-blur-sm w-full max-w-[420px]
                            focus-within:border-white/40 transition-colors duration-300"
               >
                 <input
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder={placeholder}
-                  autoFocus
-                  disabled={submitted}
+                  placeholder="Enter your email for early access"
                   className="flex-1 bg-transparent text-white text-sm outline-none
-                             placeholder:text-white/40 min-w-0 disabled:cursor-default"
+                             placeholder:text-white/35 min-w-0"
                 />
                 <button
                   type="submit"
-                  disabled={submitted}
-                  className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20
-                             flex items-center justify-center transition-colors disabled:cursor-default"
+                  className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-r from-[#0084FF] to-[#319AFF] hover:from-[#319AFF] hover:to-[#60B1FF]
+                             flex items-center justify-center transition-all cursor-pointer shadow-[0_2px_12px_rgba(0,132,255,0.4)]"
                 >
-                  {submitted
-                    ? <Check className="w-4 h-4 text-[#4FFFB0]" />
-                    : <ArrowRight className="w-4 h-4 text-white" />
-                  }
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </button>
               </motion.form>
+            ) : (
+              <motion.div
+                key="success-pill"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.25 }}
+                className="flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#4FFFB0]/25
+                           bg-[#4FFFB0]/[0.06] backdrop-blur-sm"
+              >
+                <Check className="w-4 h-4 text-[#4FFFB0]" />
+                <span className="text-sm font-medium text-[#4FFFB0]/90">{SUBMITTED_TEXT}</span>
+              </motion.div>
             )}
           </AnimatePresence>
 
@@ -178,22 +172,31 @@ export function HeroSection() {
           </Link>
         </motion.div>
 
-        {/* ── Micro stats ────────────────────────────────────── */}
+        {/* ── Pill badges (staggered pop-in) ──────────────────── */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.5 }}
           className="hidden sm:flex flex-wrap justify-center gap-2.5"
         >
-          {STATS.map(s => (
-            <div
+          {STATS.map((s, i) => (
+            <motion.div
               key={s.label}
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                delay: 0.65 + i * 0.08,
+                duration: 0.35,
+                type: 'spring',
+                stiffness: 300,
+                damping: 20,
+              }}
               className="glass-pill flex items-center gap-2 px-4 py-2 text-[11px] font-medium
                          text-white/55 border border-white/[0.07]"
             >
               <s.icon className="w-3.5 h-3.5 text-[#4FFFB0] flex-shrink-0" />
               {s.label}
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>

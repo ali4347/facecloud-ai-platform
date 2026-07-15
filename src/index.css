@@ -470,3 +470,28 @@
     transform: scale(1.2);
   }
 }
+
+/* ── Hero drifting swirl animation ──────────────────────────────────── */
+@keyframes hero-drift {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  33%      { transform: translate(-50%, -50%) rotate(120deg) scale(1.05); }
+  66%      { transform: translate(-50%, -50%) rotate(240deg) scale(0.95); }
+}
+.hero-drift {
+  animation: hero-drift 30s ease-in-out infinite;
+}
+
+/* ── Logo marquee slide ─────────────────────────────────────────────── */
+@keyframes logos-slide {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.logos-marquee {
+  animation: logos-slide 25s linear infinite;
+}
+
+/* ── Respect reduced motion for custom animations ───────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-drift { animation: none; }
+  .logos-marquee { animation: none; }
+}

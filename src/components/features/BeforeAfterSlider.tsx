@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { cn } from '../../lib/utils'
 
 interface BeforeAfterSliderProps {
@@ -11,6 +11,8 @@ interface BeforeAfterSliderProps {
   afterSrc?: string
   beforeStyle?: React.CSSProperties
   afterStyle?: React.CSSProperties
+  /** External position value for auto-demo (0-100). Once user drags, external updates are ignored. */
+  initialPosition?: number
 }
 
 export function BeforeAfterSlider({
@@ -23,10 +25,19 @@ export function BeforeAfterSlider({
   afterSrc,
   beforeStyle,
   afterStyle,
+  initialPosition,
 }: BeforeAfterSliderProps) {
-  const [position, setPosition] = useState(50)
+  const [position, setPosition] = useState(initialPosition ?? 50)
   const [dragging, setDragging] = useState(false)
+  const userInteracted = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Sync external auto-demo position until user drags
+  useEffect(() => {
+    if (initialPosition !== undefined && !userInteracted.current) {
+      setPosition(initialPosition)
+    }
+  }, [initialPosition])
 
   const updatePosition = useCallback((clientX: number) => {
     if (!containerRef.current) return
@@ -38,6 +49,7 @@ export function BeforeAfterSlider({
   // Dragging event listeners (pointer capture/document listeners)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault()
+    userInteracted.current = true
     setDragging(true)
     if (containerRef.current) {
       containerRef.current.setPointerCapture(e.pointerId)

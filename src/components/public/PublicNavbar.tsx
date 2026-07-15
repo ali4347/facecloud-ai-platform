@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 
-const NAV_LINKS = ['Features', 'Methodology', 'Security', 'Contact']
+const NAV_LINKS = ['Features', 'Methodology', 'Pricing', 'Security', 'Contact']
 
 export function PublicNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
