@@ -48,12 +48,37 @@ The application relies on the following frontend dependencies (from [package.jso
 ## 4. Design System / UI Theme
 
 FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
-* **Background**: Clean dark palette (`#0A0D14` primary background).
+* **Background**: Clean dark palette (`#050816` primary background).
 * **Glassmorphism**: Backdrop blur panels (`backdrop-filter: blur(24px)`) styled with subtle border stroke overlays (`rgba(96, 177, 255, 0.12)`).
-* **Color Accents**: Cyberpunk-inspired colors (Blue `#0084FF`, Cyan `#60B1FF`, Mint/Green `#4FFFB0`, Violet `#A78BFA`, and Pink `#FF518D`).
+* **Color Accents**: Indigo/violet + cyan accent gradients (Blue `#0084FF`, Cyan `#60B1FF`, Mint/Green `#4FFFB0`, Violet `#A78BFA`, and Pink `#FF518D`).
 * **Visual Effects**: Micro-animations on buttons and cards using Framer Motion, dynamic hover transitions, and pulse glows on status badges.
-* **Landing Page**: Implements a fullscreen video hero streaming an HLS background video using `hls.js` with fallback support for native Safari HLS.
+* **Landing Page**: Implements a fullscreen video hero streaming an HLS background video using `hls.js` with fallback support for native Safari HLS. Features a "live systems" data-ops aesthetic with status badges, terminal-style logs, live pipeline cards, and animated percentage indicators.
 * **Responsive Layouts**: Multi-device sidebars that automatically collapse on mobile screens with responsive top header bars.
+
+### Landing Page Sections (in order)
+1. **Fullscreen Video Hero** — HLS background video, staggered headline animation, inline email waitlist capture, pill badge pop-in.
+2. **Trusted Logos Marquee** — Infinite horizontal scroll of partner logos.
+3. **Stats / Metrics Bar** — 4 animated CountUp counters (detection accuracy, processing time, images processed, RBAC roles).
+4. **Dataset Challenge (Problem Cards)** — 5 problem cards with staggered scroll reveal and icon pop animations.
+5. **Use Cases / Who It's For** — 4 cards: Identity Verification, Event Photography, HR & Onboarding, Enterprise Photo Archives.
+6. **AI Infrastructure** — Live-looping pipeline panel cycling PENDING → ACTIVE → SUCCESS status badges.
+7. **Ingestion Suite** — 12-card feature grid with staggered reveal and hover glow.
+8. **Methodology** — Auto-advancing 10-step stepper synced with Job Preview panel.
+9. **Interactive Demo** — Before/after slider with auto-demo scroll trigger (0→50%).
+10. **Processing Options** — Single, Multiple, ZIP upload cards.
+11. **Pricing** — Monthly/Yearly toggle, 3 tier cards (Free/Basic/Pro) with highlighted Pro tier.
+12. **User Interface** — 3 dashboard preview mockup cards.
+13. **Administrative Control** — Admin Console and Moderator Review cards with accent-colored hover glows.
+14. **Enterprise Security** — Security points grid + animated terminal log feed with typewriter effect.
+15. **FAQ** — Accordion with Framer Motion layout height animation.
+16. **API / Integrations Teaser** — Terminal-style code block showing example REST request.
+17. **Final CTA** — Call to action with gradient orb background.
+18. **Footer** — Logo, Product links (Features, Methodology, Pricing, Security, FAQ), Portals, Compliance.
+
+### Animation Utility Components
+* [`RevealOnScroll`](file:///Users/Ali/Downloads/FYP/src/components/animation/RevealOnScroll.tsx) — `whileInView` scroll-triggered reveal with direction, delay, and `prefers-reduced-motion` support.
+* [`StaggerChildren`](file:///Users/Ali/Downloads/FYP/src/components/animation/StaggerChildren.tsx) — Container + item wrapper for staggered child animations.
+* [`CountUp`](file:///Users/Ali/Downloads/FYP/src/components/animation/CountUp.tsx) — Animated number counter with easeOutQuart easing, triggered on scroll.
 
 ---
 
