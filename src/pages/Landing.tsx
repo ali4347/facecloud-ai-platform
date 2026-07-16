@@ -10,7 +10,7 @@ import {
 import { BeforeAfterSlider } from '../components/features/BeforeAfterSlider'
 import { BackgroundVideo } from '../components/public/BackgroundVideo'
 import { PublicNavbar } from '../components/public/PublicNavbar'
-import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
+import { PublicFooter } from '../components/public/PublicFooter'
 import { HeroSection } from '../components/public/HeroSection'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChildren'
@@ -233,6 +233,8 @@ export default function Landing() {
   return (
     <div className="bg-[#050816] text-[#F0F4FF] font-sans selection:bg-[#0084FF] selection:text-white overflow-x-hidden relative min-h-screen">
       
+      <PublicNavbar />
+
       {/* Background ambient lighting */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-[120vh] left-[-20%] w-[60%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(0,132,255,0.06) 0%, transparent 70%)' }} />
@@ -246,7 +248,6 @@ export default function Landing() {
           ══════════════════════════════════════════════════════════ */}
       <main className="relative bg-black h-screen w-screen flex flex-col overflow-hidden selection:bg-white selection:text-black shrink-0 z-10">
         <BackgroundVideo />
-        <PublicNavbar />
         <HeroSection />
       </main>
 
@@ -1137,45 +1138,8 @@ export default function Landing() {
         </section>
 
         {/* ── 13. Footer ────────────────────────────────────────── */}
-        <footer className="py-16 bg-[#030508] border-t border-white/[0.06] relative">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 text-xs text-white/40">
-            {/* Logo Column */}
-            <div className="space-y-3.5">
-              <FaceCloudLogo variant="horizontal" size="sm" href="/" priority={false} />
-              <p className="text-[10px] text-white/30 font-medium leading-relaxed">
-                Powered by DATAMART / DTM.IO. Advanced facial image organization, quality check, and Zero-DCE restorative node suite.
-              </p>
-            </div>
-
-            {/* Product Links */}
-            <div className="space-y-3">
-              <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Product</h4>
-              <ul className="space-y-2 font-medium">
-                <li><a href="#features" className="hover:text-[#60B1FF] transition-colors">Features</a></li>
-                <li><a href="#methodology" className="hover:text-[#60B1FF] transition-colors">Methodology</a></li>
-                <li><a href="#pricing" className="hover:text-[#60B1FF] transition-colors">Pricing</a></li>
-                <li><a href="#security" className="hover:text-[#60B1FF] transition-colors">Security</a></li>
-                <li><a href="#faq" className="hover:text-[#60B1FF] transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-
-            {/* Portals */}
-            <div className="space-y-3">
-              <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Portals</h4>
-              <ul className="space-y-2 font-medium">
-                <li><Link to="/login" className="hover:text-[#60B1FF] transition-colors">User Login</Link></li>
-              </ul>
-            </div>
-
-            {/* Copyright */}
-            <div className="space-y-3">
-              <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Registry Compliance</h4>
-              <p className="text-[10px] text-white/30 leading-relaxed font-medium">
-                &copy; {new Date().getFullYear()} FaceCloud. Registered datasets under local Django SQL configurations. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
+        {/* ── 13. Footer ────────────────────────────────────────── */}
+        <PublicFooter />
 
       </div>
     </div>

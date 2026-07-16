@@ -75,6 +75,17 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 17. **Final CTA** — Call to action with gradient orb background.
 18. **Footer** — Logo, Product links (Features, Methodology, Pricing, Security, FAQ), Portals, Compliance.
 
+### Public Marketing Pages
+* **About Page (`/about`)**: Full-width marketing overview highlighting the product genesis and core mission:
+  * **Hero Section**: Mission badge and first-person-plural story explaining *why* FaceCloud was built.
+  * **Mission Statement**: Explains FaceCloud's approach to the Dataset Challenge.
+  * **How We Work**: Three card-based value pillars (Automation with Control, Security, and Production-tested building in partnership with DataMart).
+  * **The Team**: Styled profile card list displaying Ali Chaudhry, Maria F., and David S. with initials-based testimonials avatars.
+* **Contact Page (`/contact`)**: Centered contact hub containing:
+  - **Header**: Inline badge and workflow question subtext.
+  - **Inquiry Form**: Interactive layout capturing Name, Email, optional Company, select inquiry Reason, and Message. Includes real-time validation, dynamic error labels, asynchronous submission status overlays (processing state, success state, retry error state), and console-logged JSON payload stub.
+  - **Context Info Cards**: Displays general support email, enterprise partnerships channel, and quick FAQ anchor redirection back to the home page.
+
 ### Animation Utility Components
 * [`RevealOnScroll`](file:///Users/Ali/Downloads/FYP/src/components/animation/RevealOnScroll.tsx) — `whileInView` scroll-triggered reveal with direction, delay, and `prefers-reduced-motion` support.
 * [`StaggerChildren`](file:///Users/Ali/Downloads/FYP/src/components/animation/StaggerChildren.tsx) — Container + item wrapper for staggered child animations.

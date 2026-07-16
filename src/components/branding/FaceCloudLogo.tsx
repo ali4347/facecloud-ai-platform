@@ -13,15 +13,7 @@ export interface FaceCloudLogoProps {
   decorative?: boolean
 }
 
-const variantPaths = {
-  full: '/branding/facecloud-logo-full.png',
-  horizontal: '/branding/facecloud-logo-horizontal.png',
-  icon: '/branding/facecloud-logo-icon.png',
-  wordmark: '/branding/facecloud-wordmark.png',
-  light: '/branding/facecloud-logo-light.png',
-  dark: '/branding/facecloud-logo-dark.png',
-}
-
+// Map size to classes for outer container and SVG dimensions
 const sizeClasses = {
   xs: 'h-5',
   sm: 'h-7',
@@ -31,13 +23,22 @@ const sizeClasses = {
   hero: 'h-24 md:h-28',
 }
 
-const ratioClasses = {
-  full: 'aspect-square',
-  horizontal: 'aspect-[3.6/1]',
-  icon: 'aspect-square',
-  wordmark: 'aspect-[4.5/1]',
-  light: 'aspect-square',
-  dark: 'aspect-square',
+const textSizes = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-lg',
+  xl: 'text-2xl',
+  hero: 'text-4xl md:text-5xl',
+}
+
+const subTextSizes = {
+  xs: 'text-[6px]',
+  sm: 'text-[7px]',
+  md: 'text-[8px]',
+  lg: 'text-[9px]',
+  xl: 'text-[11px]',
+  hero: 'text-[13px] md:text-[14px]',
 }
 
 export function FaceCloudLogo({
@@ -48,10 +49,10 @@ export function FaceCloudLogo({
   roleLabel,
   className,
   href,
-  priority = false,
   decorative = false,
 }: FaceCloudLogoProps) {
-  // Determine actual variant to render based on options
+
+  // Active variant determination
   let activeVariant = variant
   if (!showText && (variant === 'full' || variant === 'horizontal' || variant === 'wordmark')) {
     activeVariant = 'icon'
@@ -59,50 +60,132 @@ export function FaceCloudLogo({
     activeVariant = 'horizontal'
   }
 
-  // Determine source image path
-  const src = variantPaths[activeVariant]
-
-  // Image component
-  const imgElement = (
-    <img
-      src={src}
-      alt={decorative ? "" : "FaceCloud AI Platform logo"}
+  // Pure SVG icon representing FaceCloud (Cloud + Biometric Scan)
+  const renderSvgIcon = () => (
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={cn("object-contain h-full w-auto", sizeClasses[size])}
       aria-hidden={decorative ? "true" : undefined}
-      loading={priority ? "eager" : "lazy"}
-      className={cn(
-        "object-contain w-auto max-w-full transition-all duration-300",
-        sizeClasses[size],
-        ratioClasses[activeVariant]
-      )}
-    />
+    >
+      <defs>
+        <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0084FF" />
+          <stop offset="100%" stopColor="#7B61FF" />
+        </linearGradient>
+        <linearGradient id="faceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#7DEBFF" />
+          <stop offset="100%" stopColor="#4FFFB0" />
+        </linearGradient>
+      </defs>
+      
+      {/* Cloud Outline */}
+      <path
+        d="M28.5 28.5A5.5 5.5 0 0 0 34 23c0-2.45-1.63-4.52-3.92-5.16A7.5 7.5 0 0 0 16.5 14.5c0 .43.04.86.12 1.28A5.5 5.5 0 0 0 11 21c0 2.68 1.95 4.9 4.58 5.38"
+        stroke="url(#cloudGrad)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      
+      {/* Face Scan Brackets */}
+      <path d="M12 16h-3v-3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M28 16h3v-3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 28h-3v3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M28 28h3v3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
+      
+      {/* Stylized Center Face Scan Target */}
+      <circle cx="20" cy="22" r="5" stroke="url(#faceGrad)" strokeWidth="1.5" strokeDasharray="3 3" />
+      <path d="M20 14v16M12 22h16" stroke="url(#faceGrad)" strokeWidth="1" strokeOpacity="0.4" />
+    </svg>
   )
 
-  // Wrap in link if href or redirect is set
-  const logoContent = href ? (
-    <Link
-      to={href}
-      className={cn(
-        "inline-flex flex-col items-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0084FF] rounded-xl transition-all duration-300 hover:opacity-90 hover:drop-shadow-[0_0_8px_rgba(22,139,255,0.3)]",
-        className
-      )}
-    >
-      {imgElement}
-      {roleLabel && (
-        <span className="block text-[10px] font-bold tracking-wider uppercase mt-1 bg-gradient-to-r from-[#60B1FF] to-[#168BFF] bg-clip-text text-transparent leading-none">
-          {roleLabel}
+  // Wordmark Text Component
+  const renderWordmark = () => (
+    <div className={cn(
+      "flex flex-col justify-center",
+      activeVariant === 'full' ? "items-center text-center mt-2.5" : "items-start ml-3"
+    )}>
+      <div className="flex items-baseline">
+        <span className={cn("font-extrabold tracking-tight text-white", textSizes[size])} style={{ fontFamily: "'Mazzard H', 'Inter', sans-serif" }}>
+          Face
         </span>
-      )}
-    </Link>
-  ) : (
-    <div className={cn("inline-flex flex-col items-start", className)}>
-      {imgElement}
-      {roleLabel && (
-        <span className="block text-[10px] font-bold tracking-wider uppercase mt-1 bg-gradient-to-r from-[#60B1FF] to-[#168BFF] bg-clip-text text-transparent leading-none">
-          {roleLabel}
+        <span className={cn("font-medium tracking-tight bg-gradient-to-r from-[#60B1FF] to-[#168BFF] bg-clip-text text-transparent", textSizes[size])} style={{ fontFamily: "'Mazzard H', 'Inter', sans-serif" }}>
+          Cloud
+        </span>
+      </div>
+      {showSubtitle && (
+        <span className={cn("font-bold tracking-[0.25em] uppercase text-white/35", subTextSizes[size])}>
+          AI Platform
         </span>
       )}
     </div>
   )
 
-  return logoContent
+  // Layout selection based on variant
+  const renderLayout = () => {
+    switch (activeVariant) {
+      case 'icon':
+        return renderSvgIcon()
+      case 'wordmark':
+        return renderWordmark()
+      case 'full':
+        return (
+          <div className="flex flex-col items-center justify-center">
+            {renderSvgIcon()}
+            {renderWordmark()}
+          </div>
+        )
+      case 'horizontal':
+      case 'light':
+      case 'dark':
+      default:
+        return (
+          <div className="flex items-center">
+            {renderSvgIcon()}
+            {renderWordmark()}
+          </div>
+        )
+    }
+  }
+
+  const innerContent = (
+    <>
+      {renderLayout()}
+      {roleLabel && (
+        <span className={cn(
+          "block font-bold tracking-wider uppercase bg-gradient-to-r from-[#60B1FF] to-[#168BFF] bg-clip-text text-transparent leading-none",
+          activeVariant === 'full' ? "mt-2.5 text-[10px]" : "mt-1.5 text-[10px]"
+        )}>
+          {roleLabel}
+        </span>
+      )}
+    </>
+  )
+
+  if (href) {
+    return (
+      <Link
+        to={href}
+        className={cn(
+          "inline-flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0084FF] rounded-xl transition-all duration-300 hover:opacity-90 hover:drop-shadow-[0_0_8px_rgba(22,139,255,0.3)]",
+          activeVariant === 'full' ? "items-center" : "items-start",
+          className
+        )}
+      >
+        {innerContent}
+      </Link>
+    )
+  }
+
+  return (
+    <div className={cn(
+      "inline-flex flex-col",
+      activeVariant === 'full' ? "items-center" : "items-start",
+      className
+    )}>
+      {innerContent}
+    </div>
+  )
 }
