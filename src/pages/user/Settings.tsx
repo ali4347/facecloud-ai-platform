@@ -105,16 +105,48 @@ function SecuritySettings() {
 
 function NotificationSettings() {
   const items = [
-    { label: 'Upload completed', desc: 'When your images finish processing' },
-    { label: 'Enhancement done', desc: 'When AI enhancement completes' },
-    { label: 'Validation failed', desc: 'When an image is rejected' },
-    { label: 'Identity grouped', desc: 'When new identity groups are created' },
-    { label: 'Email notifications', desc: 'Receive summaries via email' },
-    { label: 'Live session alerts', desc: 'Notifications during live enhancement' },
+    {
+      label: 'Photo accepted',
+      desc: 'Email confirms enhancement and grouping when your photo passes all checks',
+    },
+    {
+      label: 'Photo rejected',
+      desc: 'Email includes the exact rejection reason (e.g. "Image too blurry") so you know what to fix',
+    },
+    {
+      label: 'Batch upload finished',
+      desc: 'When a multiple or ZIP upload finishes, get a summary of accepted and rejected counts',
+    },
+    {
+      label: 'Person group created',
+      desc: 'When a new person folder is created from your photos',
+    },
+    {
+      label: 'Email notifications',
+      desc: 'Receive all of the above as emails to your registered address',
+    },
+    {
+      label: 'Live session alerts',
+      desc: 'Notifications during live camera enhancement sessions',
+    },
   ]
   return (
     <div className="space-y-5">
       <h2 className="text-base font-bold text-dark">Notification Settings</h2>
+
+      {/* Rejection email note */}
+      <div
+        className="p-4 rounded-2xl text-xs font-medium space-y-1"
+        style={{
+          background: 'rgba(79,255,176,0.04)',
+          border: '1px solid rgba(79,255,176,0.15)',
+          color: 'rgba(255,255,255,0.55)',
+        }}
+      >
+        <p className="font-bold" style={{ color: '#4FFFB0' }}>Rejection emails are enabled by default</p>
+        <p>When one of your photos is rejected, you'll receive an email with the specific reason — such as "Image too blurry" or "No face detected" — so you know exactly what to fix before re-uploading.</p>
+      </div>
+
       {items.map((item, i) => (
         <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
           <div>

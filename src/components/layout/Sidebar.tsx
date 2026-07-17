@@ -1,10 +1,10 @@
 import { useEffect } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Upload, Camera, Images, Users, Briefcase,
-  Download, Activity, Settings, BarChart3, AlertCircle,
+  LayoutDashboard, Upload, Images, Users,
+  Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, Code2, ShieldCheck, Key, Eye, ScrollText,
-  ChevronRight, Sparkles, X, LogOut, Bell
+  ChevronRight, Sparkles, X, LogOut
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
@@ -17,16 +17,12 @@ interface SidebarProps {
 }
 
 const userNav = [
-  { label: 'Overview',        icon: LayoutDashboard, to: '/dashboard' },
-  { label: 'Upload Center',   icon: Upload,           to: '/dashboard/upload' },
-  { label: 'Live Enhancement',icon: Camera,           to: '/dashboard/live-enhancement' },
-  { label: 'My Images',       icon: Images,           to: '/dashboard/images' },
-  { label: 'Person Folders',  icon: Users,            to: '/dashboard/groups' },
-  { label: 'Processing Jobs', icon: Briefcase,        to: '/dashboard/jobs' },
-  { label: 'Downloads',       icon: Download,         to: '/dashboard/downloads' },
-  { label: 'Notifications',   icon: Bell,             to: '/dashboard/notifications' },
-  { label: 'Activity Logs',   icon: Activity,         to: '/dashboard/activity' },
-  { label: 'Settings',        icon: Settings,         to: '/dashboard/settings' },
+  { label: 'Overview',       icon: LayoutDashboard, to: '/dashboard' },
+  { label: 'Upload Center',  icon: Upload,          to: '/dashboard/upload' },
+  { label: 'My Images',      icon: Images,          to: '/dashboard/images' },
+  { label: 'Person Folders', icon: Users,           to: '/dashboard/groups' },
+  { label: 'Downloads',      icon: Download,        to: '/dashboard/downloads' },
+  { label: 'Settings',       icon: Settings,        to: '/dashboard/settings' },
 ]
 
 const adminNav = [

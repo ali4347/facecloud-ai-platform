@@ -223,8 +223,8 @@ export default function UploadSingle() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <PageHeader 
-          title="Single Image Upload"
-          subtitle="Process a single face portrait through our AI restoration pipeline."
+          title="Upload a Photo"
+          subtitle="Review your photo below, then confirm to start processing."
         />
       </div>
 
@@ -271,7 +271,7 @@ export default function UploadSingle() {
               {/* Process trigger */}
               {selectedFile && status === 'idle' && (
                 <button onClick={startPipeline} className="fc-btn-primary w-full justify-center py-3 font-bold cursor-pointer flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" /> Start AI Processing Pipeline
+                  <Sparkles className="w-4 h-4" /> Confirm &amp; Upload Photo
                 </button>
               )}
 
@@ -317,10 +317,10 @@ export default function UploadSingle() {
           <AnimatePresence mode="wait">
             
             {status === 'idle' && (
-              <ChartCard title="Pipeline Output" subtitle="Waiting to execute process">
+              <ChartCard title="Photo Preview" subtitle="Your photo will appear here">
                 <div className="h-64 flex flex-col items-center justify-center text-center text-white/35 gap-2">
                   <Upload className="w-10 h-10 text-white/20 opacity-40 animate-bounce" />
-                  <p className="text-xs font-semibold">Select and run a file to inspect biometrics metrics.</p>
+                  <p className="text-xs font-semibold">Select a photo and confirm to start processing.</p>
                 </div>
               </ChartCard>
             )}

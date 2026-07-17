@@ -1,14 +1,17 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { Lock, Mail } from 'lucide-react'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { Lock, Mail, AlertTriangle } from 'lucide-react'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 
 export default function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [email, setEmail] = useState('user@facecloud.ai')
   const [password, setPassword] = useState('password')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const sessionExpired = (location.state as { sessionExpired?: boolean } | null)?.sessionExpired === true
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,6 +65,21 @@ export default function Login() {
           <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.48)' }}>
             Access your AI-enhanced image workspace.
           </p>
+
+          {/* Session-expired banner */}
+          {sessionExpired && (
+            <div
+              className="p-3 mb-5 rounded-2xl text-sm flex items-start gap-2.5"
+              style={{
+                background: 'rgba(245,158,11,0.08)',
+                border: '1px solid rgba(245,158,11,0.25)',
+                color: '#FCD34D',
+              }}
+            >
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>Your session has expired — please log in again.</span>
+            </div>
+          )}
 
           {error && (
             <div
