@@ -50,7 +50,8 @@ export interface PersonFolder {
   label: string
   imageCount: number
   lastUpdated: string
-  coverImages: string[] // color swatches
+  coverImages: string[] // color swatches (legacy fallback)
+  representative_image_id?: string // preferred thumbnail
   matchingConfidence: number
   createdDate: string
 }
@@ -458,9 +459,9 @@ export const mockImages: ImageRecord[] = [
 
 // ─── 2. PERSON FOLDERS (GROUPS) ──────────────────────────────────────────────
 export const mockGroups: PersonFolder[] = [
-  { id: 'grp-001', label: 'Person 1', imageCount: 4, lastUpdated: '2026-07-08T18:22:00Z', coverImages: ['#60B1FF', '#7B61FF', '#4FFFB0'], matchingConfidence: 98.4, createdDate: '2026-07-06T10:00:00Z' },
-  { id: 'grp-002', label: 'Person 2', imageCount: 4, lastUpdated: '2026-07-08T17:45:00Z', coverImages: ['#7B61FF', '#60B1FF', '#7B61FF'], matchingConfidence: 96.1, createdDate: '2026-07-06T11:30:00Z' },
-  { id: 'grp-003', label: 'Person 3', imageCount: 2, lastUpdated: '2026-07-08T12:10:00Z', coverImages: ['#60B1FF', '#4FFFB0'], matchingConfidence: 99.2, createdDate: '2026-07-07T08:00:00Z' }
+  { id: 'grp-001', label: 'Person 1', imageCount: 4, lastUpdated: '2026-07-08T18:22:00Z', coverImages: ['#60B1FF', '#7B61FF', '#4FFFB0'], representative_image_id: 'img-1001', matchingConfidence: 98.4, createdDate: '2026-07-06T10:00:00Z' },
+  { id: 'grp-002', label: 'Person 2', imageCount: 4, lastUpdated: '2026-07-08T17:45:00Z', coverImages: ['#7B61FF', '#60B1FF', '#7B61FF'], representative_image_id: 'img-1002', matchingConfidence: 96.1, createdDate: '2026-07-06T11:30:00Z' },
+  { id: 'grp-003', label: 'Person 3', imageCount: 2, lastUpdated: '2026-07-08T12:10:00Z', coverImages: ['#60B1FF', '#4FFFB0'], representative_image_id: 'img-1012', matchingConfidence: 99.2, createdDate: '2026-07-07T08:00:00Z' }
 ]
 
 // ─── 3. ACTIVITY LOGS (AT LEAST 20 ITEMS FOR SECURITY/METHODOLOGY) ────────────
