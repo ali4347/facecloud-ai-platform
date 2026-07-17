@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { ProtectedRoute } from './components/layout/ProtectedRoute'
+import { ModeratorAccessGate } from './components/layout/ModeratorAccessGate'
 
 // Public & Auth pages
 import Landing from './pages/Landing'
@@ -49,6 +50,10 @@ import ReviewQueue from './pages/moderator/ReviewQueue'
 import ModeratorImageReview from './pages/moderator/ModeratorImageReview'
 import ModeratorAudit from './pages/moderator/ModeratorAudit'
 import ModeratorSettings from './pages/moderator/ModeratorSettings'
+import MemberManagement from './pages/moderator/MemberManagement'
+import BatchManagement from './pages/moderator/BatchManagement'
+import NotificationCenter from './pages/moderator/NotificationCenter'
+import ReportsExports from './pages/moderator/ReportsExports'
 import NotFound from './pages/NotFound'
 
 export default function App() {
@@ -122,14 +127,18 @@ export default function App() {
         <Route 
           path="/moderator" 
           element={
-            <ProtectedRoute allowedRole="moderator">
+            <ModeratorAccessGate>
               <AppShell role="moderator" />
-            </ProtectedRoute>
+            </ModeratorAccessGate>
           }
         >
           <Route index element={<ModeratorDashboard />} />
+          <Route path="members" element={<MemberManagement />} />
           <Route path="queue" element={<ReviewQueue />} />
           <Route path="images/:id" element={<ModeratorImageReview />} />
+          <Route path="batches" element={<BatchManagement />} />
+          <Route path="notifications" element={<NotificationCenter />} />
+          <Route path="reports" element={<ReportsExports />} />
           <Route path="audit" element={<ModeratorAudit />} />
           <Route path="settings" element={<ModeratorSettings />} />
         </Route>

@@ -128,6 +128,13 @@ export interface ReviewItem {
   faceCount: number
   detectionConfidence: number
   enhancementScore: number
+  isDuplicate?: boolean
+  similarityScore?: number
+  matchedFilename?: string
+  matchedThumbnail?: string
+  allowReprocess?: boolean
+  escalated?: boolean
+  escalationNote?: string
 }
 
 export interface SecurityAlert {
@@ -583,7 +590,8 @@ export const mockReviewItems: ReviewItem[] = [
     faceSizeScore: 85,
     faceCount: 1,
     detectionConfidence: 91.2,
-    enhancementScore: 52
+    enhancementScore: 52,
+    allowReprocess: true
   },
   {
     id: 'mod-img-002',
@@ -600,7 +608,8 @@ export const mockReviewItems: ReviewItem[] = [
     faceSizeScore: 92,
     faceCount: 1,
     detectionConfidence: 89.5,
-    enhancementScore: 40
+    enhancementScore: 40,
+    allowReprocess: true
   },
   {
     id: 'mod-img-003',
@@ -617,7 +626,52 @@ export const mockReviewItems: ReviewItem[] = [
     faceSizeScore: 50,
     faceCount: 3,
     detectionConfidence: 94.6,
-    enhancementScore: 68
+    enhancementScore: 68,
+    allowReprocess: false
+  },
+  {
+    id: 'mod-img-005',
+    thumbnail: '#EF4444',
+    filename: 'double_upload_face.jpg',
+    rejectionReason: 'Duplicate upload flagged',
+    uploadedBy: 'Ijaz Ahmad',
+    uploadedAt: '2026-07-08T13:00:00Z',
+    status: 'pending',
+    qualityScore: 92,
+    riskLevel: 'medium',
+    blurScore: 95,
+    brightnessScore: 90,
+    faceSizeScore: 91,
+    faceCount: 1,
+    detectionConfidence: 98.5,
+    enhancementScore: 94,
+    isDuplicate: true,
+    similarityScore: 94.2,
+    matchedFilename: 'original_user_face_001.jpg',
+    matchedThumbnail: '#0084FF',
+    allowReprocess: true
+  },
+  {
+    id: 'mod-img-006',
+    thumbnail: '#F59E0B',
+    filename: 'twin_match_check.jpg',
+    rejectionReason: 'Duplicate upload flagged',
+    uploadedBy: 'Sarah Khan',
+    uploadedAt: '2026-07-08T11:45:00Z',
+    status: 'pending',
+    qualityScore: 88,
+    riskLevel: 'low',
+    blurScore: 92,
+    brightnessScore: 86,
+    faceSizeScore: 88,
+    faceCount: 1,
+    detectionConfidence: 96.8,
+    enhancementScore: 90,
+    isDuplicate: true,
+    similarityScore: 89.8,
+    matchedFilename: 'profile_face_backup.png',
+    matchedThumbnail: '#A78BFA',
+    allowReprocess: false
   },
   {
     id: 'mod-img-004',
@@ -634,7 +688,8 @@ export const mockReviewItems: ReviewItem[] = [
     faceSizeScore: 86,
     faceCount: 1,
     detectionConfidence: 97.2,
-    enhancementScore: 80
+    enhancementScore: 80,
+    allowReprocess: false
   }
 ]
 
@@ -973,3 +1028,138 @@ export const processingOverviewData = [
   { name: 'Grouped', value: 115 },
   { name: 'Rejected', value: 22 }
 ]
+
+// ─── MODERATOR PANEL EXPANSION MOCK DATA ─────────────────────────────────────
+export interface OrgMember {
+  id: string
+  name: string
+  email: string
+  role: 'user' | 'moderator' | 'admin'
+  status: 'active' | 'suspended' | 'pending'
+  joinedAt: string
+  createdBy: string
+}
+
+export const mockOrgMembers: OrgMember[] = [
+  { id: 'm-1', name: 'Ali Hassan', email: 'ali@dtm.io', role: 'admin', status: 'active', joinedAt: '2026-01-15', createdBy: 'u1' },
+  { id: 'm-2', name: 'Ijaz Ahmad', email: 'user@facecloud.ai', role: 'user', status: 'active', joinedAt: '2026-02-10', createdBy: 'u3' },
+  { id: 'm-3', name: 'Sarah Khan', email: 'sarah@example.com', role: 'user', status: 'active', joinedAt: '2026-03-05', createdBy: 'u3' },
+  { id: 'm-4', name: 'Omar Farooq', email: 'omar@example.com', role: 'user', status: 'suspended', joinedAt: '2026-03-22', createdBy: 'u3' },
+  { id: 'm-5', name: 'Ayesha Malik', email: 'ayesha@example.com', role: 'user', status: 'active', joinedAt: '2026-04-12', createdBy: 'u99' }, // Not visible to u3
+  { id: 'm-6', name: 'Zainab Bibi', email: 'zainab@example.com', role: 'user', status: 'pending', joinedAt: '2026-05-18', createdBy: 'u3' },
+  { id: 'm-7', name: 'Usman Ghani', email: 'usman@example.com', role: 'moderator', status: 'active', joinedAt: '2026-02-20', createdBy: 'u3' },
+]
+
+export interface BatchRecord {
+  id: string
+  name: string
+  type: 'ZIP' | 'Multiple'
+  submittedBy: string
+  submittedAt: string
+  status: 'processing' | 'completed' | 'failed' | 'cancelled' | 'locked'
+  progress: number
+  counts: { accepted: number; rejected: number; review: number; failed: number }
+  images: { id: string; filename: string; outcome: 'accepted' | 'rejected' | 'review' | 'failed'; size: string }[]
+}
+
+export const mockBatches: BatchRecord[] = [
+  {
+    id: 'b-101',
+    name: 'staff_portraits_q3.zip',
+    type: 'ZIP',
+    submittedBy: 'Sarah Khan',
+    submittedAt: '2026-07-16T10:00:00Z',
+    status: 'completed',
+    progress: 100,
+    counts: { accepted: 12, rejected: 2, review: 1, failed: 0 },
+    images: [
+      { id: 'img-b1', filename: 'john_doe.jpg', outcome: 'accepted', size: '1.4 MB' },
+      { id: 'img-b2', filename: 'jane_smith.jpg', outcome: 'accepted', size: '1.6 MB' },
+      { id: 'img-b3', filename: 'blurry_face.jpg', outcome: 'rejected', size: '0.9 MB' },
+      { id: 'img-b4', filename: 'side_profile.jpg', outcome: 'review', size: '1.2 MB' },
+    ]
+  },
+  {
+    id: 'b-102',
+    name: 'bulk_upload_verification',
+    type: 'Multiple',
+    submittedBy: 'Ijaz Ahmad',
+    submittedAt: '2026-07-17T11:20:00Z',
+    status: 'processing',
+    progress: 60,
+    counts: { accepted: 8, rejected: 0, review: 2, failed: 1 },
+    images: [
+      { id: 'img-b5', filename: 'face1.jpg', outcome: 'accepted', size: '1.1 MB' },
+      { id: 'img-b6', filename: 'face2.jpg', outcome: 'accepted', size: '1.3 MB' },
+      { id: 'img-b7', filename: 'dark_face.jpg', outcome: 'review', size: '1.0 MB' },
+      { id: 'img-b8', filename: 'upload_error.png', outcome: 'failed', size: '2.4 MB' },
+    ]
+  },
+  {
+    id: 'b-103',
+    name: 'archived_members_v2.zip',
+    type: 'ZIP',
+    submittedBy: 'Sarah Khan',
+    submittedAt: '2026-07-15T09:00:00Z',
+    status: 'failed',
+    progress: 40,
+    counts: { accepted: 2, rejected: 1, review: 0, failed: 5 },
+    images: [
+      { id: 'img-b9', filename: 'member1.jpg', outcome: 'accepted', size: '1.5 MB' },
+      { id: 'img-img-b10', filename: 'corrupt_header.jpg', outcome: 'failed', size: '0.1 MB' },
+    ]
+  },
+  {
+    id: 'b-104',
+    name: 'cancelled_session_import.zip',
+    type: 'ZIP',
+    submittedBy: 'Ijaz Ahmad',
+    submittedAt: '2026-07-14T14:30:00Z',
+    status: 'cancelled',
+    progress: 20,
+    counts: { accepted: 1, rejected: 0, review: 0, failed: 0 },
+    images: []
+  },
+  {
+    id: 'b-105',
+    name: 'locked_compliance_audit.zip',
+    type: 'ZIP',
+    submittedBy: 'Admin (ali@dtm.io)',
+    submittedAt: '2026-07-10T08:00:00Z',
+    status: 'locked',
+    progress: 100,
+    counts: { accepted: 45, rejected: 5, review: 0, failed: 0 },
+    images: []
+  }
+]
+
+export interface ModNotification {
+  id: string
+  type: 'Assignment' | 'Deadline' | 'Failure' | 'Escalation'
+  description: string
+  timestamp: string
+  isRead: boolean
+}
+
+export const mockModNotifications: ModNotification[] = [
+  { id: 'n-1', type: 'Assignment', description: 'New review item low_res_scan.jpg assigned to queue', timestamp: '2026-07-17T14:00:00Z', isRead: false },
+  { id: 'n-2', type: 'Deadline', description: 'SLA Warning: crowd_walking_shot.png review deadline in 2 hours', timestamp: '2026-07-17T13:30:00Z', isRead: false },
+  { id: 'n-3', type: 'Failure', description: 'ZIP Batch Extraction failed for archived_members_v2.zip', timestamp: '2026-07-17T11:45:00Z', isRead: true },
+  { id: 'n-4', type: 'Escalation', description: 'Escalation case ESC-402 resolved by Admin (ali@dtm.io)', timestamp: '2026-07-16T16:00:00Z', isRead: true },
+]
+
+export interface GeneratedReport {
+  id: string
+  type: string
+  dateRange: string
+  format: 'CSV' | 'PDF' | 'JSON'
+  generatedBy: string
+  generatedAt: string
+  downloadUrl: string
+}
+
+export const mockReportHistory: GeneratedReport[] = [
+  { id: 'rep-1', type: 'Review activity', dateRange: '2026-07-01 to 2026-07-15', format: 'PDF', generatedBy: 'Vaneeza Sohaib', generatedAt: '2026-07-15T10:00:00Z', downloadUrl: '#' },
+  { id: 'rep-2', type: 'Quality/rejection stats', dateRange: '2026-07-01 to 2026-07-10', format: 'CSV', generatedBy: 'Vaneeza Sohaib', generatedAt: '2026-07-10T11:30:00Z', downloadUrl: '#' }
+]
+

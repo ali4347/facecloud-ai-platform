@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, Code2, ShieldCheck, Key, Eye, ScrollText,
-  ChevronRight, Sparkles, X, LogOut
+  ChevronRight, Sparkles, X, LogOut, Bell, Briefcase
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
@@ -40,9 +40,13 @@ const adminNav = [
 
 const moderatorNav = [
   { label: 'Moderator Dashboard', icon: LayoutDashboard, to: '/moderator' },
-  { label: 'Rejected Queue',      icon: Eye,             to: '/moderator/queue' },
-  { label: 'Audit Entries',       icon: ScrollText,      to: '/moderator/audit' },
-  { label: 'Settings',            icon: Settings,        to: '/moderator/settings' },
+  { label: 'Member Management',    icon: Users,           to: '/moderator/members' },
+  { label: 'Review & Dup. Queue',  icon: Eye,             to: '/moderator/queue' },
+  { label: 'Batch Management',     icon: Briefcase,       to: '/moderator/batches' },
+  { label: 'Notification Center',  icon: Bell,            to: '/moderator/notifications' },
+  { label: 'Reports & Exports',    icon: BarChart3,       to: '/moderator/reports' },
+  { label: 'Audit Entries',        icon: ScrollText,      to: '/moderator/audit' },
+  { label: 'Settings',             icon: Settings,        to: '/moderator/settings' },
 ]
 
 const navByRole = { user: userNav, admin: adminNav, moderator: moderatorNav }
