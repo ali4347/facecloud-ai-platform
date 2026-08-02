@@ -9,15 +9,15 @@ interface ActivityTimelineProps {
 
 const typeConfig = {
   upload: { icon: Upload, color: 'bg-primary/10 text-primary' },
-  enhance: { icon: Zap, color: 'bg-purple-100 text-purple-700' },
-  validate: { icon: CheckCircle, color: 'bg-green-100 text-success' },
-  download: { icon: Download, color: 'bg-sky-100 text-sky-700' },
-  live: { icon: Camera, color: 'bg-amber-100 text-warning' },
-  group: { icon: Users, color: 'bg-indigo-100 text-indigo-700' },
-  reject: { icon: XCircle, color: 'bg-red-100 text-error' },
-  login: { icon: LogIn, color: 'bg-slate-100 text-muted' },
-  admin: { icon: Shield, color: 'bg-purple-100 text-purple-700' },
-  email: { icon: Mail, color: 'bg-teal-100 text-teal-700' },
+  enhance: { icon: Zap, color: 'bg-[#EA580C]/15 text-[#EA580C]' },
+  validate: { icon: CheckCircle, color: 'bg-[#10B981]/15 text-[#10B981]' },
+  download: { icon: Download, color: 'bg-[#FB923C]/15 text-[#FB923C]' },
+  live: { icon: Camera, color: 'bg-[#F59E0B]/15 text-[#F59E0B]' },
+  group: { icon: Users, color: 'bg-[#F97316]/15 text-[#F97316]' },
+  reject: { icon: XCircle, color: 'bg-[#EF4444]/15 text-[#EF4444]' },
+  login: { icon: LogIn, color: 'bg-white/[0.05] text-white/50' },
+  admin: { icon: Shield, color: 'bg-[#EA580C]/15 text-[#EA580C]' },
+  email: { icon: Mail, color: 'bg-[#FB923C]/15 text-[#FB923C]' },
 }
 
 export function ActivityTimeline({ events }: ActivityTimelineProps) {

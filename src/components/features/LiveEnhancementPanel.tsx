@@ -751,7 +751,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
       {/* Model Loader Warnings */}
       {detectorStatus === 'loading' && (
-        <div className="mb-4 p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-[#FB923C] font-semibold flex items-center gap-2">
+        <div className="mb-4 p-4 rounded-2xl bg-[#F97316]/10 border border-[#F97316]/20 text-xs text-[#FB923C] font-semibold flex items-center gap-2">
           <Info className="w-4.5 h-4.5 flex-shrink-0 animate-spin" />
           <span>Loading face detection model...</span>
         </div>
