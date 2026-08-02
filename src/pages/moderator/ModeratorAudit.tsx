@@ -16,7 +16,7 @@ function getCategory(action: string): 'member' | 'review' | 'batch' | 'report' |
 
 const CATEGORY_COLORS = {
   member: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
-  review: 'bg-[#0084FF]/10 text-[#60B1FF] border-[#0084FF]/20',
+  review: 'bg-[#F97316]/10 text-[#FB923C] border-[#F97316]/20',
   batch: 'bg-[#4FFFB0]/10 text-[#4FFFB0] border-[#4FFFB0]/20',
   report: 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20',
   system: 'bg-white/5 text-white/50 border-white/10'

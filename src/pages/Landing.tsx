@@ -17,6 +17,7 @@ import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChi
 import { CountUp } from '../components/animation/CountUp'
 import FreedomSection from '../components/landing/FreedomSection'
 import MacBookDemoFrame from '../components/landing/MacBookDemoFrame'
+import { ScrambleText } from '../components/animation/ScrambleText'
 
 /* ═══════════════════════════════════════════════════════════════════════
    STATIC DATA
@@ -130,25 +131,73 @@ const SECURITY_LOGS_POOL = [
    SECTION HEADING COMPONENT
    ═══════════════════════════════════════════════════════════════════════ */
 
-function SectionHeading({ tag, title, subtitle, titleHtml }: {
+function parseTitle(title: string) {
+  const parts: { text: string; highlight: boolean }[] = []
+  let current = ''
+  let inHighlight = false
+  for (let i = 0; i < title.length; i++) {
+    const char = title[i]
+    if (char === '[') {
+      if (current) {
+        parts.push({ text: current, highlight: inHighlight })
+        current = ''
+      }
+      inHighlight = true
+    } else if (char === ']') {
+      if (current) {
+        parts.push({ text: current, highlight: inHighlight })
+        current = ''
+      }
+      inHighlight = false
+    } else {
+      current += char
+    }
+  }
+  if (current) {
+    parts.push({ text: current, highlight: inHighlight })
+  }
+  return parts
+}
+
+function SectionHeading({ tag, title, subtitle, titleHtml, num }: {
   tag: string
   title?: string
   subtitle?: string
   titleHtml?: React.ReactNode
+  num?: string
 }) {
+  const parts = title ? parseTitle(title) : []
+
   return (
     <div className="text-center mb-16 space-y-4">
-      <RevealOnScroll>
-        <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">{tag}</span>
+      {num && (
+        <RevealOnScroll>
+          <span className="font-silkscreen text-[#F97316] text-[11px] block tracking-widest mb-1">{num}</span>
+        </RevealOnScroll>
+      )}
+      <RevealOnScroll delay={num ? 0.03 : 0}>
+        <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">{tag}</span>
       </RevealOnScroll>
-      <RevealOnScroll delay={0.05}>
-        <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.15]" style={{ fontFamily: "'Instrument Serif', serif" }}>
-          {titleHtml || title}
+      <RevealOnScroll delay={num ? 0.06 : 0.03}>
+        <h2 className="text-2xl sm:text-4xl font-bold text-white tracking-tight leading-relaxed font-display">
+          {titleHtml || (
+            <span>
+              {parts.map((p, idx) => (
+                p.highlight ? (
+                  <span key={idx} className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold mx-1">
+                    <ScrambleText text={p.text} />
+                  </span>
+                ) : (
+                  <ScrambleText key={idx} text={p.text} />
+                )
+              ))}
+            </span>
+          )}
         </h2>
       </RevealOnScroll>
       {subtitle && (
-        <RevealOnScroll delay={0.1}>
-          <p className="text-sm text-white/50 max-w-xl mx-auto font-medium">{subtitle}</p>
+        <RevealOnScroll delay={num ? 0.09 : 0.06}>
+          <p className="text-xs sm:text-sm text-white/50 max-w-xl mx-auto font-medium">{subtitle}</p>
         </RevealOnScroll>
       )}
     </div>
@@ -231,16 +280,16 @@ export default function Landing() {
 
 
   return (
-    <div className="bg-[#050816] text-[#F0F4FF] font-sans selection:bg-[#0084FF] selection:text-white overflow-x-hidden relative min-h-screen">
+    <div className="bg-black text-[#F0F4FF] font-sans selection:bg-[#F97316] selection:text-white overflow-x-hidden relative min-h-screen">
       
       <PublicNavbar />
 
       {/* Background ambient lighting */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[120vh] left-[-20%] w-[60%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(0,132,255,0.06) 0%, transparent 70%)' }} />
-        <div className="absolute top-[240vh] right-[-20%] w-[50%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(123,97,255,0.05) 0%, transparent 70%)' }} />
-        <div className="absolute top-[380vh] left-[-10%] w-[60%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(79,255,176,0.04) 0%, transparent 70%)' }} />
-        <div className="absolute top-[520vh] right-[-15%] w-[50%] h-[40vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(0,132,255,0.05) 0%, transparent 70%)' }} />
+        <div className="absolute top-[120vh] left-[-20%] w-[60%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%)' }} />
+        <div className="absolute top-[240vh] right-[-20%] w-[50%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(234,88,12,0.05) 0%, transparent 70%)' }} />
+        <div className="absolute top-[380vh] left-[-10%] w-[60%] h-[50vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.04) 0%, transparent 70%)' }} />
+        <div className="absolute top-[520vh] right-[-15%] w-[50%] h-[40vh] rounded-full blur-[160px]" style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.05) 0%, transparent 70%)' }} />
       </div>
 
       {/* ══════════════════════════════════════════════════════════
@@ -324,8 +373,9 @@ export default function Landing() {
         {/* ── 2.7 Testimonials / Early Feedback ────────────────── */}
         <section className="py-24 max-w-7xl mx-auto px-6 border-t border-white/[0.03]">
           <SectionHeading
+            num="01"
             tag="Early Access Feedback"
-            title="What our beta testers are saying"
+            title="What our [beta testers] are saying"
             subtitle="Real developer and systems architect feedback from our closed preview release."
           />
 
@@ -333,7 +383,7 @@ export default function Landing() {
             {TESTIMONIALS.map((t, idx) => (
               <StaggerItem key={idx}>
                 <motion.div
-                  whileHover={{ y: -4, borderColor: 'rgba(0,132,255,0.25)' }}
+                  whileHover={{ y: -4, borderColor: 'rgba(249,115,22,0.25)' }}
                   transition={{ duration: 0.2 }}
                   className="fc-panel p-6 flex flex-col justify-between h-full relative"
                 >
@@ -341,7 +391,7 @@ export default function Landing() {
                     "{t.quote}"
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0084FF]/20 to-[#7B61FF]/20 border border-white/10 flex items-center justify-center text-xs font-bold text-white tracking-wider">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#EA580C]/20 border border-white/10 flex items-center justify-center text-xs font-bold text-white tracking-wider">
                       {t.initials}
                     </div>
                     <div>
@@ -357,8 +407,9 @@ export default function Landing() {
         {/* ── 3. Problem Section ────────────────────────────────── */}
         <section className="py-24 max-w-7xl mx-auto px-6">
           <SectionHeading
+            num="02"
             tag="The Dataset Challenge"
-            title="Facial image workflows are still too manual"
+            title="Facial image workflows [are still too manual]"
             subtitle="Low-quality images, duplicate identities, and manual sorting slow down secure image management."
           />
 
@@ -366,7 +417,7 @@ export default function Landing() {
             {PROBLEM_CARDS.map((card) => (
               <StaggerItem key={card.title}>
                 <motion.div
-                  whileHover={{ y: -4, borderColor: 'rgba(0,132,255,0.3)' }}
+                  whileHover={{ y: -4, borderColor: 'rgba(249,115,22,0.3)' }}
                   transition={{ duration: 0.2 }}
                   className="fc-panel p-6 flex flex-col justify-between relative group h-full"
                 >
@@ -397,8 +448,9 @@ export default function Landing() {
         <section className="py-24 bg-black/40 border-y border-white/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
+              num="03"
               tag="Who It's For"
-              title="Built for teams that depend on face data"
+              title="Built for teams that [depend on face data]"
               subtitle="From identity verification to enterprise photo management — FaceCloud replaces fragmented manual workflows."
             />
 
@@ -406,7 +458,7 @@ export default function Landing() {
               {USE_CASES.map((uc) => (
                 <StaggerItem key={uc.title}>
                   <motion.div
-                    whileHover={{ y: -4, borderColor: 'rgba(96,177,255,0.3)' }}
+                    whileHover={{ y: -4, borderColor: 'rgba(249, 115, 22,0.3)' }}
                     transition={{ duration: 0.2 }}
                     className="fc-panel p-6 flex flex-col gap-4 h-full"
                   >
@@ -415,7 +467,7 @@ export default function Landing() {
                       whileInView={{ scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.1 }}
-                      className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[#0084FF]/10 border border-[#0084FF]/20 text-[#60B1FF]"
+                      className="w-10 h-10 rounded-2xl flex items-center justify-center bg-[#F97316]/10 border border-[#F97316]/20 text-[#FB923C]"
                     >
                       <uc.icon className="w-4 h-4" />
                     </motion.div>
@@ -437,12 +489,15 @@ export default function Landing() {
             {/* Left Info Columns */}
             <div className="lg:col-span-5 space-y-6">
               <RevealOnScroll>
-                <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">AI Infrastructure</span>
+                <span className="font-silkscreen text-[#F97316] text-[11px] block tracking-widest mb-1">04</span>
+                <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">AI Infrastructure</span>
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
-                <h2 className="text-3xl sm:text-5xl font-medium text-white leading-[1.1]" style={{ fontFamily: "'Instrument Serif', serif" }}>
-                  FaceCloud turns raw uploads <br />
-                  <span className="text-[#60B1FF] font-medium">into organized AI-ready folders</span>
+                <h2 className="text-2xl sm:text-4xl font-bold text-white leading-relaxed font-display">
+                  <ScrambleText text="FaceCloud turns raw uploads " /> <br />
+                  <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">
+                    <ScrambleText text="into organized AI-ready folders" />
+                  </span>
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={0.1}>
@@ -483,8 +538,8 @@ export default function Landing() {
                     />
                     {/* Indigo/cyan duotone coloring overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-transparent opacity-80 pointer-events-none" />
-                    <div className="absolute inset-0 bg-[#0084FF]/20 mix-blend-color pointer-events-none" />
-                    <div className="absolute inset-0 bg-[#7B61FF]/10 mix-blend-overlay pointer-events-none" />
+                    <div className="absolute inset-0 bg-[#F97316]/20 mix-blend-color pointer-events-none" />
+                    <div className="absolute inset-0 bg-[#EA580C]/10 mix-blend-overlay pointer-events-none" />
                     
                     {/* Simulated tech scanning grids/lines overlay */}
                     <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-white/40">
@@ -508,7 +563,7 @@ export default function Landing() {
                 <div className="fc-panel p-6 relative overflow-hidden">
                   <div className="flex justify-between items-center pb-4 border-b border-white/[0.08] mb-6">
                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Active AI Restructuring</span>
-                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#0084FF]/20 text-[#60B1FF] font-bold">PIPELINE: ACTIVE</span>
+                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#F97316]/20 text-[#FB923C] font-bold">PIPELINE: ACTIVE</span>
                   </div>
 
                   <div className="space-y-4">
@@ -537,7 +592,7 @@ export default function Landing() {
                               transition={{ duration: 0.25 }}
                               className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
                                 status === 'SUCCESS' ? 'bg-[#4FFFB0]/15 text-[#4FFFB0]' :
-                                status === 'ACTIVE' ? 'bg-[#0084FF]/20 text-[#60B1FF] animate-pulse' :
+                                status === 'ACTIVE' ? 'bg-[#F97316]/20 text-[#FB923C] animate-pulse' :
                                 'bg-white/5 text-white/30'
                               }`}
                             >
@@ -557,8 +612,9 @@ export default function Landing() {
         {/* ── 5. Features Grid Section ──────────────────────────── */}
         <section id="features" className="py-24 max-w-7xl mx-auto px-6">
           <SectionHeading
+            num="05"
             tag="Ingestion Suite"
-            title="Everything needed for AI facial image processing"
+            title="Everything needed for [AI facial image processing]"
             subtitle="12 specialized components engineered for rapid asset enhancement, sorting, and monitoring."
           />
 
@@ -566,7 +622,7 @@ export default function Landing() {
             {FEATURE_GRID.map((feat) => (
               <StaggerItem key={feat.t}>
                 <motion.div
-                  whileHover={{ y: -3, borderColor: 'rgba(96,177,255,0.3)' }}
+                  whileHover={{ y: -3, borderColor: 'rgba(249, 115, 22,0.3)' }}
                   transition={{ duration: 0.2 }}
                   className="fc-panel p-6 flex flex-col justify-between min-h-[170px]"
                 >
@@ -576,7 +632,7 @@ export default function Landing() {
                     viewport={{ once: true }}
                     transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.1 }}
                   >
-                    <feat.icon className="w-5 h-5 text-[#60B1FF]" />
+                    <feat.icon className="w-5 h-5 text-[#FB923C]" />
                   </motion.div>
                   <div className="mt-6 space-y-1">
                     <h3 className="text-xs font-bold text-white tracking-tight">{feat.t}</h3>
@@ -594,8 +650,9 @@ export default function Landing() {
         {/* ── 7. Before/After Showcase Section ──────────────────── */}
         <section ref={sliderSectionRef} className="py-24 max-w-6xl mx-auto px-6 text-center space-y-10">
           <SectionHeading
+            num="06"
             tag="Interactive Demo"
-            title="See the enhancement difference instantly"
+            title="See the [enhancement difference] instantly"
             subtitle="Drag the central divider handle to view real-time shadow recovery."
           />
 
@@ -646,7 +703,7 @@ export default function Landing() {
                     </div>
                     <div className="flex justify-between">
                       <span>Dataset payload status:</span>
-                      <span className="text-[#60B1FF] font-bold font-mono">ENHANCED & READY</span>
+                      <span className="text-[#FB923C] font-bold font-mono">ENHANCED & READY</span>
                     </div>
                   </div>
                 </div>
@@ -659,8 +716,9 @@ export default function Landing() {
         <section className="py-24 bg-black/40 border-y border-white/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
+              num="07"
               tag="Processing Options"
-              title="Upload your way"
+              title="Upload [your way]"
               subtitle="Choose the upload mechanism that aligns with your active workflow."
             />
 
@@ -672,7 +730,7 @@ export default function Landing() {
               ].map(card => (
                 <StaggerItem key={card.title}>
                   <motion.div
-                    whileHover={{ y: -4, borderColor: 'rgba(96,177,255,0.3)' }}
+                    whileHover={{ y: -4, borderColor: 'rgba(249, 115, 22,0.3)' }}
                     transition={{ duration: 0.2 }}
                     className="fc-panel p-6 flex flex-col justify-between min-h-[190px]"
                   >
@@ -682,7 +740,7 @@ export default function Landing() {
                     </div>
                     <Link 
                       to={card.link}
-                      className="fc-btn-secondary !py-2 !px-4 text-[11px] font-bold w-fit mt-4 flex items-center gap-1.5 hover:border-[#0084FF]/40"
+                      className="fc-btn-secondary !py-2 !px-4 text-[11px] font-bold w-fit mt-4 flex items-center gap-1.5 hover:border-[#F97316]/40"
                     >
                       {card.cta} <ArrowUpRight className="w-3.5 h-3.5" />
                     </Link>
@@ -696,8 +754,9 @@ export default function Landing() {
         {/* ── 8.5 Pricing Section ──────────────────────────────── */}
         <section id="pricing" className="py-24 max-w-5xl mx-auto px-6">
           <SectionHeading
+            num="08"
             tag="Pricing"
-            title="Simple, transparent pricing"
+            title="Simple, [transparent pricing]"
             subtitle="Start free. Scale when you need to."
           />
 
@@ -712,7 +771,7 @@ export default function Landing() {
               >
                 <motion.div
                   layout
-                  className="absolute top-0.5 w-6 h-6 rounded-full bg-gradient-to-r from-[#0084FF] to-[#319AFF] shadow-[0_2px_8px_rgba(0,132,255,0.5)]"
+                  className="absolute top-0.5 w-6 h-6 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] shadow-[0_2px_8px_rgba(249,115,22,0.5)]"
                   style={{ left: yearlyBilling ? '30px' : '2px' }}
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
@@ -729,10 +788,10 @@ export default function Landing() {
               return (
                 <StaggerItem key={plan.name}>
                   <div className={`fc-panel p-6 flex flex-col h-full relative ${
-                    plan.highlight ? 'ring-2 ring-[#0084FF]/50 border-[#0084FF]/40' : ''
+                    plan.highlight ? 'ring-2 ring-[#F97316]/50 border-[#F97316]/40' : ''
                   }`}>
                     {plan.highlight && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-[#0084FF] to-[#319AFF] text-[9px] font-bold text-white uppercase tracking-wider shadow-[0_2px_12px_rgba(0,132,255,0.4)]">
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] text-[9px] font-bold text-white uppercase tracking-wider shadow-[0_2px_12px_rgba(249,115,22,0.4)]">
                         Most Popular
                       </div>
                     )}
@@ -769,7 +828,7 @@ export default function Landing() {
                       to={plan.link}
                       className={`mt-6 text-center text-sm font-bold py-3 rounded-2xl transition-all duration-300 block ${
                         plan.highlight
-                          ? 'bg-gradient-to-r from-[#0084FF] to-[#319AFF] text-white shadow-[0_4px_20px_rgba(0,132,255,0.35)] hover:shadow-[0_6px_28px_rgba(0,132,255,0.55)] hover:-translate-y-0.5'
+                          ? 'bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white shadow-[0_4px_20px_rgba(249,115,22,0.35)] hover:shadow-[0_6px_28px_rgba(249,115,22,0.55)] hover:-translate-y-0.5'
                           : 'bg-white/[0.06] border border-white/[0.12] text-white hover:bg-white/[0.1] hover:border-white/20'
                       }`}
                     >
@@ -784,7 +843,7 @@ export default function Landing() {
           <RevealOnScroll delay={0.3}>
             <p className="text-center text-xs text-white/35 mt-8 font-medium">
               Need a custom enterprise plan?{' '}
-              <a href="#contact" className="text-[#60B1FF] hover:text-white transition-colors underline underline-offset-2">Contact us</a>.
+              <a href="#contact" className="text-[#FB923C] hover:text-white transition-colors underline underline-offset-2">Contact us</a>.
             </p>
           </RevealOnScroll>
         </section>
@@ -793,8 +852,9 @@ export default function Landing() {
         <section className="py-24 bg-black/40 border-y border-white/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
+              num="09"
               tag="User Interface"
-              title="A complete workspace for users and teams"
+              title="A complete workspace for [users and teams]"
               subtitle="A high-fidelity layout overview of our active platform screens."
             />
 
@@ -817,7 +877,7 @@ export default function Landing() {
                       </div>
                       <div className="p-2.5 rounded bg-white/[0.04] border border-white/[0.08] flex items-center justify-between">
                         <span className="truncate">Processing job-002...</span>
-                        <span className="text-[#60B1FF] animate-pulse">active</span>
+                        <span className="text-[#FB923C] animate-pulse">active</span>
                       </div>
                     </div>
                   )
@@ -859,7 +919,7 @@ export default function Landing() {
                 <StaggerItem key={mockup.title}>
                   <div className="fc-panel p-6 flex flex-col justify-between min-h-[290px] relative group overflow-hidden">
                     <div className="space-y-4">
-                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#0084FF]/10 text-[#60B1FF] uppercase w-fit block">{mockup.title}</span>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#F97316]/10 text-[#FB923C] uppercase w-fit block">{mockup.title}</span>
                       <p className="text-xs text-white/50 leading-relaxed font-medium">{mockup.desc}</p>
                     </div>
                     
@@ -883,8 +943,9 @@ export default function Landing() {
         <section className="py-24">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
+              num="10"
               tag="Administrative Control"
-              title="Control, review, and monitor every workflow"
+              title="Control, review, and [monitor every workflow]"
               subtitle="Separate workspaces for dataset administration and manual overrides."
             />
 
@@ -892,13 +953,13 @@ export default function Landing() {
               {/* Admin console */}
               <RevealOnScroll direction="left">
                 <motion.div
-                  whileHover={{ y: -4, borderColor: 'rgba(123,97,255,0.4)', boxShadow: '0 0 40px rgba(123,97,255,0.15)' }}
+                  whileHover={{ y: -4, borderColor: 'rgba(234, 88, 12,0.4)', boxShadow: '0 0 40px rgba(234, 88, 12,0.15)' }}
                   transition={{ duration: 0.25 }}
                   className="fc-panel p-8 flex flex-col justify-between min-h-[340px]"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-white">
-                      <div className="w-8 h-8 rounded-xl bg-[#7B61FF]/15 border border-[#7B61FF]/30 flex items-center justify-center text-[#A78BFA]">
+                      <div className="w-8 h-8 rounded-xl bg-[#EA580C]/15 border border-[#EA580C]/30 flex items-center justify-center text-[#A78BFA]">
                         <Cpu className="w-4 h-4" />
                       </div>
                       <h3 className="text-lg font-bold tracking-tight">Admin Console</h3>
@@ -956,11 +1017,15 @@ export default function Landing() {
               {/* Left security points */}
               <div className="lg:col-span-5 space-y-6">
                 <RevealOnScroll>
-                  <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">Enterprise Security</span>
+                  <span className="font-silkscreen text-[#F97316] text-[11px] block tracking-widest mb-1">11</span>
+                  <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Enterprise Security</span>
                 </RevealOnScroll>
                 <RevealOnScroll delay={0.05}>
-                  <h2 className="text-3xl sm:text-5xl font-medium text-white tracking-tight leading-[1.15]" style={{ fontFamily: "'Instrument Serif', serif" }}>
-                    Built for secure image workflows
+                  <h2 className="text-2xl sm:text-4xl font-bold text-white tracking-tight leading-relaxed font-display">
+                    <ScrambleText text="Built for secure " /> <br />
+                    <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">
+                      <ScrambleText text="image workflows" />
+                    </span>
                   </h2>
                 </RevealOnScroll>
                 <RevealOnScroll delay={0.1}>
@@ -1005,7 +1070,7 @@ export default function Landing() {
                           className="flex gap-2.5 items-start"
                         >
                           <span className="text-white/20 select-none">{i + 1}</span>
-                          <span className="text-[#60B1FF] flex-shrink-0">➜</span>
+                          <span className="text-[#FB923C] flex-shrink-0">➜</span>
                           <span className={i === logs.length - 1 ? 'text-white' : 'text-white/80'}>{log}</span>
                         </motion.div>
                       ))}
@@ -1026,8 +1091,9 @@ export default function Landing() {
         {/* ── 11.5 FAQ Section ─────────────────────────────────── */}
         <section id="faq" className="py-24 max-w-3xl mx-auto px-6">
           <SectionHeading
+            num="12"
             tag="FAQ"
-            title="Frequently asked questions"
+            title="Frequently [asked questions]"
             subtitle="Everything you need to know about using FaceCloud."
           />
 
@@ -1039,7 +1105,7 @@ export default function Landing() {
                     onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                     className="w-full flex items-center justify-between p-5 text-left cursor-pointer group"
                   >
-                    <span className="text-sm font-bold text-white group-hover:text-[#60B1FF] transition-colors pr-4">{item.q}</span>
+                    <span className="text-sm font-bold text-white group-hover:text-[#FB923C] transition-colors pr-4">{item.q}</span>
                     <motion.div
                       animate={{ rotate: openFaq === idx ? 180 : 0 }}
                       transition={{ duration: 0.25 }}
@@ -1073,8 +1139,9 @@ export default function Landing() {
         <section className="py-24 bg-black/40 border-y border-white/[0.05]">
           <div className="max-w-4xl mx-auto px-6">
             <SectionHeading
+              num="13"
               tag="Integrations"
-              title="Built to integrate"
+              title="Built [to integrate]"
               subtitle="Connect your applications directly to the FaceCloud processing pipeline."
             />
 
@@ -1082,14 +1149,14 @@ export default function Landing() {
               <div className="fc-panel p-6 bg-black/80 font-mono text-[10px] relative overflow-hidden">
                 <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
                   <div className="flex items-center gap-2">
-                    <Code2 className="w-4 h-4 text-[#60B1FF]" />
+                    <Code2 className="w-4 h-4 text-[#FB923C]" />
                     <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">API Request Example</span>
                   </div>
                   <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#4FFFB0]/15 text-[#4FFFB0] font-bold">REST</span>
                 </div>
 
                 <div className="space-y-1 text-[10px] leading-relaxed">
-                  <div><span className="text-[#A78BFA]">POST</span> <span className="text-[#60B1FF]">/api/v1/images/enhance</span></div>
+                  <div><span className="text-[#A78BFA]">POST</span> <span className="text-[#FB923C]">/api/v1/images/enhance</span></div>
                   <div className="text-white/30">Content-Type: multipart/form-data</div>
                   <div className="text-white/30">Authorization: Bearer {'<'}your_jwt_token{'>'}</div>
                   <div className="mt-3 text-white/20">{'{'}</div>
@@ -1102,7 +1169,7 @@ export default function Landing() {
 
                 <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between">
                   <p className="text-[10px] text-white/35 font-medium">Full Swagger documentation available for Pro subscribers.</p>
-                  <Link to="/docs" className="flex items-center gap-1.5 text-[11px] font-bold text-[#60B1FF] hover:text-white transition-colors">
+                  <Link to="/docs" className="flex items-center gap-1.5 text-[11px] font-bold text-[#FB923C] hover:text-white transition-colors">
                     View API Docs <ExternalLink className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -1115,17 +1182,14 @@ export default function Landing() {
         <section id="contact" className="py-28 relative overflow-hidden flex flex-col items-center">
           {/* Subtle glowing orb */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-[140px] pointer-events-none opacity-20"
-            style={{ background: 'radial-gradient(circle, #0084FF 0%, #7B61FF 100%)' }} />
+            style={{ background: 'radial-gradient(circle, #F97316 0%, #EA580C 100%)' }} />
 
           <RevealOnScroll>
             <div className="max-w-4xl mx-auto px-6 text-center space-y-8 flex flex-col items-center relative z-10">
-              <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">Ingestion Suite</span>
-              <h2
-                className="text-4xl sm:text-6xl font-medium text-white leading-tight tracking-tight"
-                style={{ fontFamily: "'Instrument Serif', serif" }}
-              >
+              <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Ingestion Suite</span>
+              <h2 className="text-3xl sm:text-5xl font-bold text-white leading-tight tracking-tight font-display">
                 Ready to enhance, validate, and <br />
-                organize facial images with AI?
+                organize facial images <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">with AI?</span>
               </h2>
               <p className="text-xs text-white/50 max-w-md mx-auto leading-relaxed font-medium">
                 Start with the user portal to enhance and organize your facial image datasets.

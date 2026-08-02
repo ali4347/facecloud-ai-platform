@@ -31,7 +31,7 @@
   border: 1px solid rgba(190, 210, 237, 0.24);
   box-shadow:
     0 34px 80px rgba(0, 0, 0, 0.46),
-    0 0 70px rgba(22, 139, 255, 0.10),
+    0 0 70px rgba(249, 115, 22, 0.10),
     inset 0 1px 0 rgba(255, 255, 255, 0.30),
     inset 0 -1px 0 rgba(0, 0, 0, 0.80);
 }
@@ -105,7 +105,7 @@
     rgba(12, 33, 61, 0.92) 34%,
     #010204 72%
   );
-  box-shadow: 0 0 5px rgba(22, 139, 255, 0.26);
+  box-shadow: 0 0 5px rgba(249, 115, 22, 0.26);
 }
 
 /* Laptop viewport screen */

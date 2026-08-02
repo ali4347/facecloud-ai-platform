@@ -137,12 +137,12 @@ export default function Contact() {
         {/* ── HEADER ─────────────────────────────────────────────── */}
         <section className="py-12 text-center max-w-3xl mx-auto px-6 space-y-4">
           <RevealOnScroll>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0084FF]/10 border border-[#0084FF]/20 text-[11px] font-bold text-[#60B1FF] uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F97316]/10 border border-[#F97316]/20 text-[11px] font-bold text-[#FB923C] uppercase tracking-wider">
               Get in touch
             </span>
           </RevealOnScroll>
           <RevealOnScroll delay={0.05}>
-            <h1 className="text-4xl sm:text-5xl font-medium text-white tracking-tight leading-tight" style={{ fontFamily: "'Instrument Serif', serif" }}>
+            <h1 className="text-4xl sm:text-5xl font-medium text-white tracking-tight leading-tight" style={{ fontFamily: "'Space Mono', serif" }}>
               Let's talk about your image workflow
             </h1>
           </RevealOnScroll>
@@ -206,7 +206,7 @@ export default function Contact() {
                         value={fields.name}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-[#0D0F14]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#0084FF] transition-all ${
+                        className={`bg-[#0D0F14]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all ${
                           errors.name ? 'border-red-400/40 focus:border-red-400' : 'border-white/10'
                         }`}
                         placeholder="John Doe"
@@ -230,7 +230,7 @@ export default function Contact() {
                         value={fields.email}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-[#0D0F14]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#0084FF] transition-all ${
+                        className={`bg-[#0D0F14]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all ${
                           errors.email ? 'border-red-400/40 focus:border-red-400' : 'border-white/10'
                         }`}
                         placeholder="john@example.com"
@@ -254,7 +254,7 @@ export default function Contact() {
                         value={fields.company}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className="bg-[#0D0F14]/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#0084FF] transition-all"
+                        className="bg-[#0D0F14]/50 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all"
                         placeholder="DataMart Inc."
                       />
                     </div>
@@ -270,7 +270,7 @@ export default function Contact() {
                         value={fields.reason}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-[#0D0F14]/80 border rounded-xl px-4 py-3 text-xs text-white/80 focus:outline-none focus:border-[#0084FF] transition-all cursor-pointer ${
+                        className={`bg-[#0D0F14]/80 border rounded-xl px-4 py-3 text-xs text-white/80 focus:outline-none focus:border-[#F97316] transition-all cursor-pointer ${
                           errors.reason ? 'border-red-400/40 focus:border-red-400' : 'border-white/10'
                         }`}
                       >
@@ -299,7 +299,7 @@ export default function Contact() {
                         value={fields.message}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-[#0D0F14]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#0084FF] transition-all h-32 resize-none ${
+                        className={`bg-[#0D0F14]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all h-32 resize-none ${
                           errors.message ? 'border-red-400/40 focus:border-red-400' : 'border-white/10'
                         }`}
                         placeholder="Tell us about your project, team, or specific quality/enhancement needs..."
@@ -315,7 +315,7 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={status === 'submitting'}
-                      className="w-full flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-[#0084FF] to-[#7B61FF] hover:opacity-95 text-white font-bold uppercase text-[11px] tracking-wider py-4 px-6 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,132,255,0.2)]"
+                      className="w-full flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:opacity-95 text-white font-bold uppercase text-[11px] tracking-wider py-4 px-6 rounded-xl transition-all shadow-[0_4px_20px_rgba(249, 115, 22,0.2)]"
                     >
                       {status === 'submitting' ? (
                         <>
@@ -343,7 +343,7 @@ export default function Contact() {
             {/* General Card */}
             <RevealOnScroll delay={0.05}>
               <div className="fc-panel p-6 bg-[#0D0F14]/30 border border-white/[0.06] rounded-2xl space-y-4 text-left">
-                <div className="w-8 h-8 rounded-lg bg-[#0084FF]/10 flex items-center justify-center border border-[#0084FF]/20 text-[#60B1FF]">
+                <div className="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center border border-[#F97316]/20 text-[#FB923C]">
                   <Mail className="w-4.5 h-4.5" />
                 </div>
                 <div className="space-y-1.5">
@@ -353,7 +353,7 @@ export default function Contact() {
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-white/[0.06] flex flex-col gap-1">
-                  <span className="text-xs font-bold text-[#60B1FF]">hello@facecloudai.pro</span>
+                  <span className="text-xs font-bold text-[#FB923C]">hello@facecloudai.pro</span>
                   <span className="text-[9px] text-white/30 font-medium">We typically reply within 1-2 business days.</span>
                 </div>
               </div>
@@ -382,7 +382,7 @@ export default function Contact() {
             <RevealOnScroll delay={0.15}>
               <div className="fc-panel p-5 bg-black/30 border border-white/[0.06] rounded-2xl flex items-center justify-between text-left hover:border-white/15 transition-all">
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-md bg-[#7B61FF]/10 flex items-center justify-center border border-[#7B61FF]/20 text-[#A78BFA]">
+                  <div className="w-7 h-7 rounded-md bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#A78BFA]">
                     <HelpCircle className="w-4 h-4" />
                   </div>
                   <div className="space-y-0.5">
@@ -390,7 +390,7 @@ export default function Contact() {
                     <p className="text-[9px] text-white/35 font-medium">Check our FAQ section on the landing page.</p>
                   </div>
                 </div>
-                <a href="/#faq" className="text-[#60B1FF] hover:text-white transition-colors shrink-0">
+                <a href="/#faq" className="text-[#FB923C] hover:text-white transition-colors shrink-0">
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

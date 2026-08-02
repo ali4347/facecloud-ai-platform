@@ -15,9 +15,9 @@ interface StatCardProps {
 }
 
 const accentConfig = {
-  blue:    { iconBg: 'rgba(0,132,255,0.15)',   iconBorder: 'rgba(0,132,255,0.28)',   iconColor: '#60B1FF' },
-  purple:  { iconBg: 'rgba(123,97,255,0.15)',  iconBorder: 'rgba(123,97,255,0.28)',  iconColor: '#A78BFA' },
-  teal:    { iconBg: 'rgba(96,177,255,0.15)',  iconBorder: 'rgba(96,177,255,0.28)',  iconColor: '#7DEBFF' },
+  blue:    { iconBg: 'rgba(249, 115, 22,0.15)',   iconBorder: 'rgba(249, 115, 22,0.28)',   iconColor: '#FB923C' },
+  purple:  { iconBg: 'rgba(234, 88, 12,0.15)',  iconBorder: 'rgba(234, 88, 12,0.28)',  iconColor: '#A78BFA' },
+  teal:    { iconBg: 'rgba(249, 115, 22,0.15)',  iconBorder: 'rgba(249, 115, 22,0.28)',  iconColor: '#FB923C' },
   emerald: { iconBg: 'rgba(79,255,176,0.12)',  iconBorder: 'rgba(79,255,176,0.25)',  iconColor: '#4FFFB0' },
 }
 

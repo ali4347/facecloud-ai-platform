@@ -41,8 +41,8 @@ export default function UsersPage() {
                 <div 
                   className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                   style={{
-                    background: 'linear-gradient(135deg, #7B61FF, #0084FF)',
-                    boxShadow: '0 0 10px rgba(0,132,255,0.15)',
+                    background: 'linear-gradient(135deg, #EA580C, #F97316)',
+                    boxShadow: '0 0 10px rgba(249, 115, 22,0.15)',
                   }}
                 >
                   {String(row.avatar)}
@@ -61,7 +61,7 @@ export default function UsersPage() {
             { key: 'joinedAt', label: 'Joined', render: row => <span className="text-sm text-white/50">{formatDate(String(row.joinedAt))}</span> },
             { key: 'actions', label: 'Actions', render: row => (
               <div className="flex gap-2">
-                <button className="text-xs text-[#60B1FF] font-medium hover:underline cursor-pointer">View</button>
+                <button className="text-xs text-[#FB923C] font-medium hover:underline cursor-pointer">View</button>
                 <button className={`text-xs font-medium hover:underline cursor-pointer ${row.status === 'active' ? 'text-[#F87171]' : 'text-[#4FFFB0]'}`}>
                   {row.status === 'active' ? 'Suspend' : 'Activate'}
                 </button>

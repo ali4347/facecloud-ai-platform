@@ -27,8 +27,8 @@ export function GradientButton({
   const getStyle = () => {
     switch (variant) {
       case 'primary':   return {
-        background: 'linear-gradient(135deg, #0084FF, #319AFF)',
-        boxShadow: '0 4px 20px rgba(0,132,255,0.35), inset 0 1px 0 rgba(255,255,255,0.20)',
+        background: 'linear-gradient(135deg, #F97316, #FB923C)',
+        boxShadow: '0 4px 20px rgba(249, 115, 22,0.35), inset 0 1px 0 rgba(255,255,255,0.20)',
       }
       case 'secondary': return {
         background: 'rgba(255,255,255,0.07)',

@@ -36,8 +36,8 @@ export function Topbar({ role, onMenuClick }: TopbarProps) {
     <header
       className="sticky top-0 z-30 h-16 flex items-center gap-4 px-6"
       style={{
-        background: 'rgba(10,13,20,0.85)',
-        borderBottom: '1px solid rgba(96,177,255,0.1)',
+        background: 'rgba(0,0,0,0.85)',
+        borderBottom: '1px solid rgba(249,115,22,0.1)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
       }}
@@ -60,7 +60,7 @@ export function Topbar({ role, onMenuClick }: TopbarProps) {
       {/* Right actions */}
       <div className="flex items-center gap-2">
         <NotificationDropdown />
-        <div className="w-px h-6 mx-1" style={{ background: 'rgba(96,177,255,0.15)' }} />
+        <div className="w-px h-6 mx-1" style={{ background: 'rgba(249,115,22,0.15)' }} />
         <UserMenu name={user.name} email={user.email} role={role} initials={user.initials} />
       </div>
     </header>

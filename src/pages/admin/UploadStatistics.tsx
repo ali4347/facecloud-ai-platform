@@ -38,7 +38,7 @@ export default function UploadStatistics() {
           <ChartCard title="Upload Ingestion Pipeline Breakdown" subtitle="Relative distribution of file upload methods">
             <div className="space-y-4">
               {[
-                { label: 'Single Uploads', count: stats.singleUploadsCount, icon: FileImage, color: '#60B1FF' },
+                { label: 'Single Uploads', count: stats.singleUploadsCount, icon: FileImage, color: '#FB923C' },
                 { label: 'Batch Multiple Uploads', count: stats.multipleUploadsCount, icon: Files, color: '#4FFFB0' },
                 { label: 'ZIP File Archives', count: stats.zipUploadsCount, icon: FolderArchive, color: '#A78BFA' }
               ].map(item => {
@@ -74,9 +74,9 @@ export default function UploadStatistics() {
           <ChartCard title="Daily Ingestion Load (Past 7 Days)" subtitle="Total files unpacked by worker nodes">
             <div className="space-y-4">
               <div className="flex items-center gap-4 text-[10px] font-bold text-white/40 pb-2 border-b border-white/[0.08]">
-                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#0084FF] rounded" /> Single</div>
+                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#F97316] rounded" /> Single</div>
                 <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#4FFFB0] rounded" /> Multiple</div>
-                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#7B61FF] rounded" /> ZIP</div>
+                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#EA580C] rounded" /> ZIP</div>
               </div>
 
               <div className="space-y-3.5 pt-2">
@@ -86,9 +86,9 @@ export default function UploadStatistics() {
                     <div key={day.date} className="grid grid-cols-12 items-center gap-3 text-xs">
                       <span className="col-span-2 font-bold text-white/85">{day.date}</span>
                       <div className="col-span-8 flex h-4 rounded overflow-hidden bg-white/[0.06]">
-                        <div className="bg-[#0084FF]" style={{ width: `${(day.single / dayTotal) * 100}%` }} />
+                        <div className="bg-[#F97316]" style={{ width: `${(day.single / dayTotal) * 100}%` }} />
                         <div className="bg-[#4FFFB0]" style={{ width: `${(day.multiple / dayTotal) * 100}%` }} />
-                        <div className="bg-[#7B61FF]" style={{ width: `${(day.zip / dayTotal) * 100}%` }} />
+                        <div className="bg-[#EA580C]" style={{ width: `${(day.zip / dayTotal) * 100}%` }} />
                       </div>
                       <span className="col-span-2 text-right font-bold text-white">{dayTotal} files</span>
                     </div>

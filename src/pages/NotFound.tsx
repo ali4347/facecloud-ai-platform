@@ -7,21 +7,21 @@ export default function NotFound() {
       className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"
       style={{
         background:
-          'radial-gradient(circle at 20% 15%, rgba(0,132,255,0.12), transparent 38%),' +
-          'radial-gradient(circle at 80% 85%, rgba(123,97,255,0.08), transparent 38%),' +
+          'radial-gradient(circle at 20% 15%, rgba(249, 115, 22,0.12), transparent 38%),' +
+          'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.08), transparent 38%),' +
           '#000000',
       }}
     >
       <div className="absolute top-[20%] left-[20%] w-72 h-72 rounded-full blur-[80px]"
-        style={{ background: 'rgba(0,132,255,0.05)' }} />
+        style={{ background: 'rgba(249, 115, 22,0.05)' }} />
       
       <div className="w-full max-w-md relative z-10 space-y-6 text-center">
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
           style={{
-            background: 'rgba(96,177,255,0.12)',
-            border: '1px solid rgba(96,177,255,0.30)',
-            color: '#60B1FF',
-            boxShadow: '0 0 24px rgba(0,132,255,0.15)'
+            background: 'rgba(249, 115, 22,0.12)',
+            border: '1px solid rgba(249, 115, 22,0.30)',
+            color: '#FB923C',
+            boxShadow: '0 0 24px rgba(249, 115, 22,0.15)'
           }}
         >
           <AlertCircle className="w-8 h-8" />

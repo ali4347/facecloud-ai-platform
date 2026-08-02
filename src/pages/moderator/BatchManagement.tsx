@@ -146,7 +146,7 @@ export default function BatchManagement() {
                         <div className="flex justify-between items-center text-[10px]">
                           <span className={`font-bold uppercase tracking-wider ${
                             batch.status === 'completed' ? 'text-[#4FFFB0]' :
-                            batch.status === 'processing' ? 'text-[#0084FF] animate-pulse' :
+                            batch.status === 'processing' ? 'text-[#F97316] animate-pulse' :
                             batch.status === 'failed' ? 'text-red-400' :
                             batch.status === 'cancelled' ? 'text-white/40' :
                             'text-[#F59E0B]'
@@ -162,7 +162,7 @@ export default function BatchManagement() {
                               width: `${batch.progress}%`,
                               backgroundColor: 
                                 batch.status === 'completed' ? '#4FFFB0' :
-                                batch.status === 'processing' ? '#0084FF' :
+                                batch.status === 'processing' ? '#F97316' :
                                 batch.status === 'failed' ? '#EF4444' :
                                 batch.status === 'cancelled' ? 'rgba(255,255,255,0.2)' :
                                 '#F59E0B'

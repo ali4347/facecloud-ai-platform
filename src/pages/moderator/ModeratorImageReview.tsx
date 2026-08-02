@@ -177,7 +177,7 @@ export default function ModeratorImageReview() {
 
               {/* Flagged Duplicate Comparison Panel */}
               {record.isDuplicate && (
-                <div className="p-4 rounded-3xl bg-[#7B61FF]/[0.06] border border-[#7B61FF]/20 space-y-4">
+                <div className="p-4 rounded-3xl bg-[#EA580C]/[0.06] border border-[#EA580C]/20 space-y-4">
                   <div className="flex justify-between items-center pb-2 border-b border-white/5">
                     <span className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Duplicate Match Analysis</span>
                     <span className="text-xs font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded">
@@ -233,7 +233,7 @@ export default function ModeratorImageReview() {
                     className="fc-btn-secondary w-full justify-center py-3 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                     title={!record.allowReprocess ? "Reprocessing is not permitted for this item's state" : "Request pipeline reprocessing"}
                   >
-                    <Play className="w-3.5 h-3.5 text-[#0084FF]" /> Reprocess
+                    <Play className="w-3.5 h-3.5 text-[#F97316]" /> Reprocess
                   </button>
                   
                   <button 
@@ -305,7 +305,7 @@ export default function ModeratorImageReview() {
 
               {/* Recommendation summary card */}
               <div className="p-4 rounded-3xl bg-white/5 border border-white/10 flex gap-3 text-xs text-white/55 items-start">
-                <ShieldAlert className="w-5 h-5 text-[#0084FF] shrink-0 mt-0.5" />
+                <ShieldAlert className="w-5 h-5 text-[#F97316] shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-white">AI Policy Recommender</h4>
                   <p className="mt-1 leading-relaxed text-[11px] text-white/45">

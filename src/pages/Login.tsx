@@ -40,17 +40,17 @@ export default function Login() {
       className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"
       style={{
         background:
-          'radial-gradient(circle at 20% 15%, rgba(0,132,255,0.18), transparent 38%),' +
-          'radial-gradient(circle at 80% 85%, rgba(123,97,255,0.14), transparent 38%),' +
+          'radial-gradient(circle at 20% 15%, rgba(249, 115, 22,0.18), transparent 38%),' +
+          'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.14), transparent 38%),' +
           '#000000',
       }}
     >
       {/* Animated ambient layers */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[8%] left-[5%] w-96 h-96 rounded-full blur-[100px]"
-          style={{ background: 'rgba(0,132,255,0.08)' }} />
+          style={{ background: 'rgba(249, 115, 22,0.08)' }} />
         <div className="absolute bottom-[8%] right-[5%] w-96 h-96 rounded-full blur-[120px]"
-          style={{ background: 'rgba(123,97,255,0.08)' }} />
+          style={{ background: 'rgba(234, 88, 12,0.08)' }} />
       </div>
 
       <div className="w-full max-w-md relative z-10 space-y-5">
@@ -142,9 +142,9 @@ export default function Login() {
           <p>
             Don't have an account?{' '}
             <Link to="/register" className="font-semibold transition-colors"
-              style={{ color: '#60B1FF' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#7DEBFF')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#60B1FF')}
+              style={{ color: '#FB923C' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#FB923C')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#FB923C')}
             >
               Create Account
             </Link>

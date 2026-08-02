@@ -212,7 +212,7 @@ export default function GroupDetail() {
                       key={img.id}
                       className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-150 cursor-pointer group ${
                         isSelected
-                          ? 'border-primary shadow-[0_0_0_1px_rgba(96,177,255,0.3)]'
+                          ? 'border-primary shadow-[0_0_0_1px_rgba(249, 115, 22,0.3)]'
                           : 'border-white/10 hover:border-white/25'
                       }`}
                       onClick={() => toggleOne(img.id)}

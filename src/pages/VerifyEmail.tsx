@@ -37,14 +37,14 @@ export default function VerifyEmail() {
       className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"
       style={{
         background:
-          'radial-gradient(circle at 20% 20%, rgba(0,132,255,0.18), transparent 38%),' +
+          'radial-gradient(circle at 20% 20%, rgba(249, 115, 22,0.18), transparent 38%),' +
           'radial-gradient(circle at 80% 80%, rgba(79,255,176,0.10), transparent 38%),' +
           '#000000',
       }}
     >
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[10%] left-[5%] w-96 h-96 rounded-full blur-[100px]"
-          style={{ background: 'rgba(0,132,255,0.08)' }} />
+          style={{ background: 'rgba(249, 115, 22,0.08)' }} />
         <div className="absolute bottom-[10%] right-[5%] w-96 h-96 rounded-full blur-[120px]"
           style={{ background: 'rgba(79,255,176,0.07)' }} />
       </div>
@@ -61,15 +61,15 @@ export default function VerifyEmail() {
           <div
             className="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto"
             style={{
-              background: success ? 'rgba(79,255,176,0.12)' : 'rgba(0,132,255,0.12)',
-              border: `1px solid ${success ? 'rgba(79,255,176,0.28)' : 'rgba(96,177,255,0.28)'}`,
-              boxShadow: success ? '0 0 30px rgba(79,255,176,0.15)' : '0 0 30px rgba(0,132,255,0.15)',
+              background: success ? 'rgba(79,255,176,0.12)' : 'rgba(249, 115, 22,0.12)',
+              border: `1px solid ${success ? 'rgba(79,255,176,0.28)' : 'rgba(249, 115, 22,0.28)'}`,
+              boxShadow: success ? '0 0 30px rgba(79,255,176,0.15)' : '0 0 30px rgba(249, 115, 22,0.15)',
               transition: 'all 0.4s ease',
             }}
           >
             {success
               ? <CheckCircle className="w-8 h-8" style={{ color: '#4FFFB0' }} />
-              : <Mail className="w-8 h-8" style={{ color: '#60B1FF' }} />
+              : <Mail className="w-8 h-8" style={{ color: '#FB923C' }} />
             }
           </div>
 

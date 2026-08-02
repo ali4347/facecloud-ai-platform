@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Check, Zap, Shield, Users, Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { ScrambleText } from '../animation/ScrambleText'
 
 const SUBMITTED_TEXT = "You're on the list — we'll be in touch."
 
@@ -27,7 +28,6 @@ export function HeroSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!email.trim()) return
-    // TODO: Connect to Supabase waitlist table or backend API endpoint
     setSubmitted(true)
     resetTimeoutRef.current = setTimeout(() => {
       setEmail('')
@@ -42,7 +42,7 @@ export function HeroSection() {
       {/* ── Decorative drifting swirl ─────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <svg
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-[0.04] hero-drift"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-[0.05] hero-drift"
           viewBox="0 0 800 800"
           fill="none"
         >
@@ -52,9 +52,9 @@ export function HeroSection() {
           <ellipse cx="400" cy="400" rx="360" ry="180" stroke="url(#swirl-grad)" strokeWidth="0.8" strokeDasharray="10 14" />
           <defs>
             <linearGradient id="swirl-grad" x1="0" y1="0" x2="800" y2="800">
-              <stop offset="0%" stopColor="#0084FF" />
-              <stop offset="50%" stopColor="#7B61FF" />
-              <stop offset="100%" stopColor="#4FFFB0" />
+              <stop offset="0%" stopColor="#F97316" />
+              <stop offset="50%" stopColor="#FB923C" />
+              <stop offset="100%" stopColor="#EA580C" />
             </linearGradient>
           </defs>
         </svg>
@@ -67,7 +67,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.7 }}
-          className="text-white/75 text-[10px] md:text-[11px] font-medium tracking-[0.22em] uppercase"
+          className="text-white/75 text-[10px] md:text-[11px] font-mono font-bold tracking-[0.22em] uppercase"
         >
           AI Face Enhancement&nbsp;•&nbsp;Validation&nbsp;•&nbsp;Identity Grouping
         </motion.p>
@@ -78,23 +78,20 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-[64px] font-medium tracking-[-0.01em] leading-[1.1]
-                       bg-gradient-to-b from-white via-white/95 to-white/65
-                       bg-clip-text text-transparent max-w-4xl"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
+            className="text-4xl md:text-[56px] font-extrabold tracking-tight leading-[1.15] text-white max-w-4xl font-display"
           >
-            A new way to enhance
+            <ScrambleText text="A new way to enhance" />
           </motion.h1>
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: stagger, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-[64px] font-medium tracking-[-0.01em] leading-[1.1]
-                       bg-gradient-to-b from-white via-white/95 to-white/65
-                       bg-clip-text text-transparent max-w-4xl"
-            style={{ fontFamily: "'Instrument Serif', serif" }}
+            className="text-4xl md:text-[56px] font-extrabold tracking-tight leading-[1.15] max-w-4xl font-display"
           >
-            and organize facial images
+            <span className="text-white">and organize </span>
+            <span className="bg-[#F97316] text-white px-2 py-1 inline-block font-bold">
+              <ScrambleText text="facial images" />
+            </span>
           </motion.h1>
         </div>
 
@@ -128,7 +125,7 @@ export function HeroSection() {
                 onSubmit={handleSubmit}
                 className="flex items-center gap-2 pl-5 pr-1.5 py-1.5 border border-white/15 rounded-full
                            bg-white/[0.03] backdrop-blur-sm w-full max-w-[420px]
-                           focus-within:border-white/40 transition-colors duration-300"
+                           focus-within:border-[#F97316]/50 transition-colors duration-300"
               >
                 <input
                   type="email"
@@ -140,8 +137,8 @@ export function HeroSection() {
                 />
                 <button
                   type="submit"
-                  className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-r from-[#0084FF] to-[#319AFF] hover:from-[#319AFF] hover:to-[#60B1FF]
-                             flex items-center justify-center transition-all cursor-pointer shadow-[0_2px_12px_rgba(0,132,255,0.4)]"
+                  className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] hover:from-[#FB923C] hover:to-[#FFA43A]
+                             flex items-center justify-center transition-all cursor-pointer shadow-[0_2px_12px_rgba(249,115,22,0.4)]"
                 >
                   <ArrowRight className="w-4 h-4 text-white" />
                 </button>
@@ -153,11 +150,11 @@ export function HeroSection() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.25 }}
-                className="flex items-center gap-2.5 px-6 py-3 rounded-full border border-[#4FFFB0]/25
-                           bg-[#4FFFB0]/[0.06] backdrop-blur-sm"
+                className="flex items-center gap-2.5 px-6 py-3 rounded-full border border-emerald-500/25
+                           bg-emerald-500/[0.06] backdrop-blur-sm"
               >
-                <Check className="w-4 h-4 text-[#4FFFB0]" />
-                <span className="text-sm font-medium text-[#4FFFB0]/90">{SUBMITTED_TEXT}</span>
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span className="text-sm font-medium text-emerald-400/90">{SUBMITTED_TEXT}</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -165,7 +162,7 @@ export function HeroSection() {
           {/* Demo link */}
           <Link
             to="/dashboard"
-            className="text-white/55 hover:text-white/80 transition-colors duration-300
+            className="text-white/55 hover:text-[#F97316] transition-colors duration-300
                        text-[13px] font-medium tracking-wide"
           >
             Watch FaceCloud processing demo →
@@ -194,7 +191,7 @@ export function HeroSection() {
               className="glass-pill flex items-center gap-2 px-4 py-2 text-[11px] font-medium
                          text-white/55 border border-white/[0.07]"
             >
-              <s.icon className="w-3.5 h-3.5 text-[#4FFFB0] flex-shrink-0" />
+              <s.icon className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0" />
               {s.label}
             </motion.div>
           ))}

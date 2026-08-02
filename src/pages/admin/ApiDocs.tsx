@@ -5,10 +5,10 @@ import { Code2, CheckCircle, Zap } from 'lucide-react'
 
 const methodColors: Record<string, { bg: string; text: string }> = {
   GET:    { bg: 'rgba(79,255,176,0.12)',  text: '#4FFFB0' },
-  POST:   { bg: 'rgba(0,132,255,0.15)',   text: '#60B1FF' },
+  POST:   { bg: 'rgba(249, 115, 22,0.15)',   text: '#FB923C' },
   PATCH:  { bg: 'rgba(245,158,11,0.12)',  text: '#FCD34D' },
   DELETE: { bg: 'rgba(239,68,68,0.15)',   text: '#F87171' },
-  PUT:    { bg: 'rgba(123,97,255,0.12)',  text: '#A78BFA' },
+  PUT:    { bg: 'rgba(234, 88, 12,0.12)',  text: '#A78BFA' },
 }
 
 export default function ApiDocs() {
@@ -22,8 +22,8 @@ export default function ApiDocs() {
           <div
             className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
             style={{
-              background: 'linear-gradient(135deg, #0084FF, #7B61FF)',
-              boxShadow: '0 0 20px rgba(0,132,255,0.25)',
+              background: 'linear-gradient(135deg, #F97316, #EA580C)',
+              boxShadow: '0 0 20px rgba(249, 115, 22,0.25)',
             }}
           >
             <Code2 className="w-5 h-5 text-white" />
@@ -32,7 +32,7 @@ export default function ApiDocs() {
             <h2 className="text-sm font-bold text-white">FaceCloud API v1.0</h2>
             <p className="text-xs text-white/40 mt-0.5">
               Base URL:{' '}
-              <code className="bg-white/[0.04] px-1.5 py-0.5 rounded text-[#60B1FF] font-mono text-[11px] border border-white/[0.08]">
+              <code className="bg-white/[0.04] px-1.5 py-0.5 rounded text-[#FB923C] font-mono text-[11px] border border-white/[0.08]">
                 https://api.facecloud.io/api/v1
               </code>
             </p>
@@ -44,7 +44,7 @@ export default function ApiDocs() {
             JWT Bearer Auth required
           </div>
           <div className="flex items-center gap-1.5 text-xs text-white/60">
-            <Zap className="w-3.5 h-3.5 style={{ color: '#0084FF' }}" />
+            <Zap className="w-3.5 h-3.5 style={{ color: '#F97316' }}" />
             Django REST Framework
           </div>
           <div className="flex items-center gap-1.5 text-xs text-white/60">
@@ -86,12 +86,12 @@ export default function ApiDocs() {
       <div
         className="mt-4 p-4 rounded-2xl border"
         style={{
-          background: 'rgba(0,132,255,0.04)',
-          borderColor: 'rgba(0,132,255,0.20)',
+          background: 'rgba(249, 115, 22,0.04)',
+          borderColor: 'rgba(249, 115, 22,0.20)',
         }}
       >
         <p className="text-xs text-white/60">
-          <span className="font-semibold text-white">Note:</span> Full interactive Swagger UI and OpenAPI JSON spec will be available at <code className="text-[#60B1FF] font-mono">/api/docs/</code> and <code className="text-[#60B1FF] font-mono">/api/openapi.json</code> when the Django backend is deployed.
+          <span className="font-semibold text-white">Note:</span> Full interactive Swagger UI and OpenAPI JSON spec will be available at <code className="text-[#FB923C] font-mono">/api/docs/</code> and <code className="text-[#FB923C] font-mono">/api/openapi.json</code> when the Django backend is deployed.
         </p>
       </div>
     </div>

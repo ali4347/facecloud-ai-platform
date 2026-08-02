@@ -102,7 +102,7 @@ export function BeforeAfterSlider({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       className={cn(
-        'relative select-none rounded-3xl overflow-hidden cursor-col-resize h-72 sm:h-96 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0084FF]',
+        'relative select-none rounded-3xl overflow-hidden cursor-col-resize h-72 sm:h-96 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316]',
         className
       )}
       style={{ touchAction: 'pan-y' }} // prevent scrolling only horizontally
@@ -154,7 +154,7 @@ export function BeforeAfterSlider({
           <MockFaceDisplay tint={afterColor} />
         )}
         <div className="absolute top-4 right-4 z-20">
-          <span className="px-3 py-1 bg-[#0084FF]/25 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full border border-[#0084FF]/30">
+          <span className="px-3 py-1 bg-[#F97316]/25 backdrop-blur-md text-white text-[10px] font-bold tracking-widest uppercase rounded-full border border-[#F97316]/30">
             {afterLabel} ✨
           </span>
         </div>
@@ -169,7 +169,7 @@ export function BeforeAfterSlider({
         style={{ left: `${position}%`, transform: 'translateX(-50%)' }}
       >
         <div className="w-0.5 h-full bg-white/80 shadow-[0_0_12px_rgba(255,255,255,0.4)]" />
-        <div className="absolute w-8 h-8 rounded-full bg-black/80 border border-white/40 shadow-2xl flex items-center justify-center ring-2 ring-[#0084FF]/40 backdrop-blur-sm transition-transform duration-200">
+        <div className="absolute w-8 h-8 rounded-full bg-black/80 border border-white/40 shadow-2xl flex items-center justify-center ring-2 ring-[#F97316]/40 backdrop-blur-sm transition-transform duration-200">
           <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 20 20" fill="currentColor">
             <path d="M7 5l-3 5 3 5M13 5l3 5-3 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
           </svg>

@@ -107,7 +107,7 @@ export default function ProcessingJobs() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
           { label: 'Total Jobs', value: totalJobs, border: 'rgba(255,255,255,0.08)' },
-          { label: 'Processing', value: processingJobs, border: 'rgba(0,132,255,0.25)', highlight: 'text-[#60B1FF]' },
+          { label: 'Processing', value: processingJobs, border: 'rgba(249, 115, 22,0.25)', highlight: 'text-[#FB923C]' },
           { label: 'Completed', value: completedJobs, border: 'rgba(79,255,176,0.25)', highlight: 'text-[#4FFFB0]' },
           { label: 'Rejected', value: rejectedJobs, border: 'rgba(239,68,68,0.25)', highlight: 'text-[#F87171]' },
           { label: 'Avg Time', value: avgTime, border: 'rgba(255,255,255,0.08)' }
@@ -197,13 +197,13 @@ export default function ProcessingJobs() {
               <div 
                 key={job.id} 
                 className={`fc-card p-6 transition-all duration-300 ${
-                  isExpanded ? 'border-[#0084FF]/25 shadow-[0_4px_30px_rgba(0,132,255,0.04)]' : ''
+                  isExpanded ? 'border-[#F97316]/25 shadow-[0_4px_30px_rgba(249, 115, 22,0.04)]' : ''
                 }`}
               >
                 {/* Upper Summary Row */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#60B1FF]">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#FB923C]">
                       <FileIcon className="w-5 h-5" />
                     </div>
                     <div>
@@ -222,7 +222,7 @@ export default function ProcessingJobs() {
                     </div>
                     <button
                       onClick={() => toggleExpand(job.id)}
-                      className="fc-btn-secondary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5 hover:border-[#0084FF]/30"
+                      className="fc-btn-secondary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5 hover:border-[#F97316]/30"
                     >
                       {isExpanded ? 'Hide Details' : 'View Details'}
                       {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -241,7 +241,7 @@ export default function ProcessingJobs() {
                   <div className="h-2 w-full rounded-full bg-white/[0.05] overflow-hidden relative">
                     <div 
                       className={`h-full rounded-full transition-all duration-500 ${
-                        isFailed ? 'bg-[#EF4444]' : 'bg-gradient-to-r from-[#0084FF] to-[#4FFFB0]'
+                        isFailed ? 'bg-[#EF4444]' : 'bg-gradient-to-r from-[#F97316] to-[#4FFFB0]'
                       }`}
                       style={{ width: `${job.progress}%` }}
                     />
@@ -308,7 +308,7 @@ export default function ProcessingJobs() {
                               href={job.details.secureDownload}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-[#60B1FF] font-bold hover:underline flex items-center gap-1 text-[11px]"
+                              className="text-[#FB923C] font-bold hover:underline flex items-center gap-1 text-[11px]"
                             >
                               Download Assets <ArrowUpRight className="w-3.5 h-3.5" />
                             </a>
@@ -336,7 +336,7 @@ export default function ProcessingJobs() {
                               <div className="flex flex-col items-center text-center gap-2">
                                 <div className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
                                   isDone ? 'bg-[#4FFFB0]/10 border-[#4FFFB0]/30 text-[#4FFFB0]' :
-                                  isActive ? 'bg-[#0084FF]/20 border-[#0084FF]/30 text-[#60B1FF] animate-pulse' :
+                                  isActive ? 'bg-[#F97316]/20 border-[#F97316]/30 text-[#FB923C] animate-pulse' :
                                   isFailed ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' :
                                   'bg-white/5 border-transparent text-white/20'
                                 }`}>
@@ -351,7 +351,7 @@ export default function ProcessingJobs() {
                               {idx < job.stages.length - 1 && (
                                 <div className={`h-0.5 flex-1 mx-2 ${
                                   isDone ? 'bg-[#4FFFB0]/40' :
-                                  isActive ? 'bg-[#0084FF]/40 border-dashed border-[#0084FF]' :
+                                  isActive ? 'bg-[#F97316]/40 border-dashed border-[#F97316]' :
                                   'bg-white/5'
                                 }`} />
                               )}
@@ -372,7 +372,7 @@ export default function ProcessingJobs() {
                             <div key={stage.label} className="flex items-center gap-3">
                               <div className={`w-8 h-8 rounded-lg border flex items-center justify-center flex-shrink-0 ${
                                 isDone ? 'bg-[#4FFFB0]/10 border-[#4FFFB0]/30 text-[#4FFFB0]' :
-                                isActive ? 'bg-[#0084FF]/20 border-[#0084FF]/30 text-[#60B1FF] animate-pulse' :
+                                isActive ? 'bg-[#F97316]/20 border-[#F97316]/30 text-[#FB923C] animate-pulse' :
                                 isFailed ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' :
                                 'bg-white/5 border-transparent text-white/20'
                               }`}>

@@ -54,7 +54,7 @@ export function FaceCloudLogo({
 
   // Active variant determination
   let activeVariant = variant
-  if (!showText && (variant === 'full' || variant === 'horizontal' || variant === 'wordmark')) {
+  if (!showText && (variant === 'full' || variant === 'horizontal' || variant === 'icon' || variant === 'wordmark')) {
     activeVariant = 'icon'
   } else if (!showSubtitle && variant === 'full') {
     activeVariant = 'horizontal'
@@ -71,12 +71,12 @@ export function FaceCloudLogo({
     >
       <defs>
         <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#0084FF" />
-          <stop offset="100%" stopColor="#7B61FF" />
+          <stop offset="0%" stopColor="#F97316" />
+          <stop offset="100%" stopColor="#EA580C" />
         </linearGradient>
         <linearGradient id="faceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#7DEBFF" />
-          <stop offset="100%" stopColor="#4FFFB0" />
+          <stop offset="0%" stopColor="#FB923C" />
+          <stop offset="100%" stopColor="#FDBA74" />
         </linearGradient>
       </defs>
       
@@ -108,15 +108,15 @@ export function FaceCloudLogo({
       activeVariant === 'full' ? "items-center text-center mt-2.5" : "items-start ml-3"
     )}>
       <div className="flex items-baseline">
-        <span className={cn("font-extrabold tracking-tight text-white", textSizes[size])} style={{ fontFamily: "'Mazzard H', 'Inter', sans-serif" }}>
+        <span className={cn("font-extrabold tracking-tight text-white", textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
           Face
         </span>
-        <span className={cn("font-medium tracking-tight bg-gradient-to-r from-[#60B1FF] to-[#168BFF] bg-clip-text text-transparent", textSizes[size])} style={{ fontFamily: "'Mazzard H', 'Inter', sans-serif" }}>
+        <span className={cn("font-medium tracking-tight bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent", textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
           Cloud
         </span>
       </div>
       {showSubtitle && (
-        <span className={cn("font-bold tracking-[0.25em] uppercase text-white/35", subTextSizes[size])}>
+        <span className={cn("font-bold tracking-[0.25em] uppercase text-white/35 font-mono", subTextSizes[size])}>
           AI Platform
         </span>
       )}
@@ -155,7 +155,7 @@ export function FaceCloudLogo({
       {renderLayout()}
       {roleLabel && (
         <span className={cn(
-          "block font-bold tracking-wider uppercase bg-gradient-to-r from-[#60B1FF] to-[#168BFF] bg-clip-text text-transparent leading-none",
+          "block font-bold tracking-wider uppercase bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent leading-none font-mono",
           activeVariant === 'full' ? "mt-2.5 text-[10px]" : "mt-1.5 text-[10px]"
         )}>
           {roleLabel}
@@ -169,7 +169,7 @@ export function FaceCloudLogo({
       <Link
         to={href}
         className={cn(
-          "inline-flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0084FF] rounded-xl transition-all duration-300 hover:opacity-90 hover:drop-shadow-[0_0_8px_rgba(22,139,255,0.3)]",
+          "inline-flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316] rounded-xl transition-all duration-300 hover:opacity-90 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]",
           activeVariant === 'full' ? "items-center" : "items-start",
           className
         )}

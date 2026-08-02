@@ -52,9 +52,9 @@ const moderatorNav = [
 const navByRole = { user: userNav, admin: adminNav, moderator: moderatorNav }
 
 const roleConfig = {
-  user:      { label: 'User Portal',      gradient: 'from-[#0084FF] to-[#60B1FF]' },
-  admin:     { label: 'Admin Panel',      gradient: 'from-[#7B61FF] to-[#0084FF]' },
-  moderator: { label: 'Moderator Panel',  gradient: 'from-[#4FFFB0] to-[#0084FF]' },
+  user:      { label: 'User Portal',      gradient: 'from-[#F97316] to-[#FB923C]' },
+  admin:     { label: 'Admin Panel',      gradient: 'from-[#EA580C] to-[#FDBA74]' },
+  moderator: { label: 'Moderator Panel',  gradient: 'from-[#FB923C] to-[#EA580C]' },
 }
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
@@ -84,8 +84,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
       style={{
-        background: 'rgba(10, 13, 20, 0.95)',
-        borderRight: '1px solid rgba(96, 177, 255, 0.12)',
+        background: 'rgba(0, 0, 0, 0.95)',
+        borderRight: '1px solid rgba(249, 115, 22, 0.12)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         boxShadow: '4px 0 40px rgba(0,0,0,0.5)',
@@ -94,7 +94,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       {/* Logo */}
       <div
         className="flex items-center justify-between px-5 py-5"
-        style={{ borderBottom: '1px solid rgba(96,177,255,0.1)' }}
+        style={{ borderBottom: '1px solid rgba(249,115,22,0.1)' }}
       >
         <FaceCloudLogo
           variant="horizontal"
@@ -132,9 +132,9 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
               }}
               className={cn(isActive ? 'sidebar-item-active' : 'sidebar-item')}
             >
-              <item.icon className={cn('w-4 h-4 flex-shrink-0', isActive ? 'text-[#0084FF]' : 'text-white/35')} />
+              <item.icon className={cn('w-4 h-4 flex-shrink-0', isActive ? 'text-[#F97316]' : 'text-white/35')} />
               <span className="flex-1 text-xs">{item.label}</span>
-              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#0084FF]" />}
+              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#F97316]" />}
             </NavLink>
           )
         })}
@@ -144,7 +144,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       <div className="px-3 py-2">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold text-[#FF518D] hover:bg-[#FF518D]/5 transition-all duration-200 cursor-pointer"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold text-[#EF4444] hover:bg-[#EF4444]/5 transition-all duration-200 cursor-pointer"
         >
           <LogOut className="w-4 h-4 flex-shrink-0" />
           <span>Logout</span>
@@ -154,21 +154,21 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       {/* Bottom badge */}
       <div
         className="px-4 py-4"
-        style={{ borderTop: '1px solid rgba(96,177,255,0.1)' }}
+        style={{ borderTop: '1px solid rgba(249,115,22,0.1)' }}
       >
         <div
           className="flex items-center gap-2.5 p-3 rounded-2xl"
           style={{
-            background: 'rgba(0,132,255,0.06)',
-            border: '1px solid rgba(0,132,255,0.15)',
+            background: 'rgba(249, 115, 22, 0.06)',
+            border: '1px solid rgba(249, 115, 22, 0.15)',
           }}
         >
-          <Sparkles className="w-4 h-4 text-[#0084FF] flex-shrink-0 animate-pulse" />
+          <Sparkles className="w-4 h-4 text-[#F97316] flex-shrink-0 animate-pulse" />
           <div>
             <p className="text-xs font-semibold text-white">Zero-DCE AI</p>
             <p className="text-[10px] text-white/35">Model active</p>
           </div>
-          <div className="ml-auto w-2 h-2 bg-[#4FFFB0] rounded-full animate-pulse" />
+          <div className="ml-auto w-2 h-2 bg-[#10B981] rounded-full animate-pulse" />
         </div>
       </div>
     </aside>

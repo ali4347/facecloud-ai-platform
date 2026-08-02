@@ -61,7 +61,7 @@ export default function ImageMonitoring() {
                   <td>
                     <Link 
                       to={`/dashboard/images/${img.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#60B1FF] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline"
                     >
                       Audit Details <ArrowRight className="w-3.5 h-3.5" />
                     </Link>

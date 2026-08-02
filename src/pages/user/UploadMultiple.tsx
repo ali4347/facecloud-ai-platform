@@ -284,8 +284,8 @@ export default function UploadMultiple() {
                 )}
 
                 {stage === 'preview' && (
-                  <div className="p-4 rounded-2xl bg-[#0084FF]/[0.06] border border-[#0084FF]/20 text-xs text-[#60B1FF] font-medium">
-                    <Eye className="w-4 h-4 mb-2 text-[#60B1FF]" />
+                  <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium">
+                    <Eye className="w-4 h-4 mb-2 text-[#FB923C]" />
                     Review your photos above. You can remove any before uploading.
                   </div>
                 )}

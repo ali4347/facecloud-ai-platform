@@ -34,7 +34,7 @@ export default function ImageDetail() {
                 <div className="aspect-[4/3] rounded-3xl overflow-hidden relative border border-border bg-black/20">
                   <BeforeAfterSlider 
                     beforeColor="#0D0F14"
-                    afterColor="#0084FF"
+                    afterColor="#F97316"
                   />
                 </div>
               ) : (

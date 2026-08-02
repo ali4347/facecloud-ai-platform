@@ -93,7 +93,7 @@ export default function ProcessingPage() {
                 </div>
               </div>
 
-              <div className="p-4 rounded-3xl bg-[#0084FF]/5 border border-[#0084FF]/10 flex gap-3 text-xs text-muted">
+              <div className="p-4 rounded-3xl bg-[#F97316]/5 border border-[#F97316]/10 flex gap-3 text-xs text-muted">
                 <AlertCircle className="w-5 h-5 text-primary flex-shrink-0" />
                 <p className="leading-relaxed">
                   The client browser session will receive an in-app and email alert immediately when biometric classification clusters complete.

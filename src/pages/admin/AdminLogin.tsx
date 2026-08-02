@@ -39,17 +39,17 @@ export default function AdminLogin() {
       className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"
       style={{
         background:
-          'radial-gradient(circle at 20% 15%, rgba(123,97,255,0.18), transparent 38%),' +
-          'radial-gradient(circle at 80% 85%, rgba(0,132,255,0.14), transparent 38%),' +
+          'radial-gradient(circle at 20% 15%, rgba(234, 88, 12,0.18), transparent 38%),' +
+          'radial-gradient(circle at 80% 85%, rgba(249, 115, 22,0.14), transparent 38%),' +
           '#000000',
       }}
     >
       {/* Animated ambient layers */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[8%] left-[5%] w-96 h-96 rounded-full blur-[100px]"
-          style={{ background: 'rgba(123,97,255,0.08)' }} />
+          style={{ background: 'rgba(234, 88, 12,0.08)' }} />
         <div className="absolute bottom-[8%] right-[5%] w-96 h-96 rounded-full blur-[120px]"
-          style={{ background: 'rgba(0,132,255,0.08)' }} />
+          style={{ background: 'rgba(249, 115, 22,0.08)' }} />
       </div>
 
       <div className="w-full max-w-md relative z-10 space-y-5">
@@ -120,8 +120,8 @@ export default function AdminLogin() {
               type="submit" 
               className="fc-btn-primary w-full mt-2"
               style={{
-                background: 'linear-gradient(135deg, #7B61FF 0%, #0084FF 100%)',
-                boxShadow: '0 4px 20px rgba(123,97,255,0.35), inset 0 1px 0 rgba(255,255,255,0.20)'
+                background: 'linear-gradient(135deg, #EA580C 0%, #F97316 100%)',
+                boxShadow: '0 4px 20px rgba(234, 88, 12,0.35), inset 0 1px 0 rgba(255,255,255,0.20)'
               }}
               disabled={loading}
             >

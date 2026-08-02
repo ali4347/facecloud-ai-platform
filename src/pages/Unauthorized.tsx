@@ -8,7 +8,7 @@ export default function Unauthorized() {
       style={{
         background:
           'radial-gradient(circle at 20% 15%, rgba(239,68,68,0.12), transparent 38%),' +
-          'radial-gradient(circle at 80% 85%, rgba(123,97,255,0.08), transparent 38%),' +
+          'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.08), transparent 38%),' +
           '#000000',
       }}
     >

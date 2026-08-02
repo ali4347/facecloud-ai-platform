@@ -18,7 +18,7 @@ export default function RejectionSummary() {
         {[
           { label: 'Total Rejected Images', value: stats.totalRejected.toLocaleString(), color: 'text-[#F87171]' },
           { label: 'Overall Rejection Rate', value: `${stats.rejectionRate}%`, color: 'text-[#FCD34D]' },
-          { label: 'Most Common Failure Node', value: stats.reasons[0].name, color: 'text-[#60B1FF]' }
+          { label: 'Most Common Failure Node', value: stats.reasons[0].name, color: 'text-[#FB923C]' }
         ].map(item => (
           <div key={item.label} className="fc-card p-6 space-y-2">
             <span className="text-[10px] text-white/50 font-bold uppercase tracking-wider block">{item.label}</span>

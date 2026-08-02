@@ -167,7 +167,7 @@ export default function ReviewQueue() {
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                       row.riskLevel === 'critical' ? 'bg-[#EF4444]/10 text-[#EF4444]' :
                       row.riskLevel === 'high' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
-                      'bg-[#0084FF]/10 text-[#60B1FF]'
+                      'bg-[#F97316]/10 text-[#FB923C]'
                     }`}>
                       {row.riskLevel} risk
                     </span>
@@ -179,7 +179,7 @@ export default function ReviewQueue() {
                     {row.status === 'pending' ? (
                       <Link 
                         to={`/moderator/images/${row.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[#60B1FF] hover:underline"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline"
                       >
                         Open Review <ArrowRight className="w-3.5 h-3.5" />
                       </Link>

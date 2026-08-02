@@ -48,7 +48,7 @@ export default function Downloads() {
       <div className="flex items-center gap-4 px-5 py-3.5 rounded-2xl text-xs font-medium text-white/60"
         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <Clock className="w-4 h-4 text-[#60B1FF] shrink-0" />
+        <Clock className="w-4 h-4 text-[#FB923C] shrink-0" />
         <span>All download links are secure and time-limited. Copy a link to share or re-download from any device.</span>
       </div>
 
@@ -66,9 +66,9 @@ export default function Downloads() {
               <div key={dl.id} className="flex items-center gap-4 px-5 py-4 hover:bg-white/[0.02] transition-colors">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(0,132,255,0.10)', border: '1px solid rgba(0,132,255,0.20)' }}
+                  style={{ background: 'rgba(249, 115, 22,0.10)', border: '1px solid rgba(249, 115, 22,0.20)' }}
                 >
-                  <cfg.icon className="w-4 h-4 text-[#60B1FF]" />
+                  <cfg.icon className="w-4 h-4 text-[#FB923C]" />
                 </div>
 
                 <div className="flex-1 min-w-0">

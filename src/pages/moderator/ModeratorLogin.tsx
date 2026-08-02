@@ -40,7 +40,7 @@ export default function ModeratorLogin() {
       style={{
         background:
           'radial-gradient(circle at 20% 15%, rgba(79,255,176,0.14), transparent 38%),' +
-          'radial-gradient(circle at 80% 85%, rgba(0,132,255,0.14), transparent 38%),' +
+          'radial-gradient(circle at 80% 85%, rgba(249, 115, 22,0.14), transparent 38%),' +
           '#000000',
       }}
     >
@@ -49,7 +49,7 @@ export default function ModeratorLogin() {
         <div className="absolute top-[8%] left-[5%] w-96 h-96 rounded-full blur-[100px]"
           style={{ background: 'rgba(79,255,176,0.06)' }} />
         <div className="absolute bottom-[8%] right-[5%] w-96 h-96 rounded-full blur-[120px]"
-          style={{ background: 'rgba(0,132,255,0.08)' }} />
+          style={{ background: 'rgba(249, 115, 22,0.08)' }} />
       </div>
 
       <div className="w-full max-w-md relative z-10 space-y-5">
@@ -120,7 +120,7 @@ export default function ModeratorLogin() {
               type="submit" 
               className="fc-btn-primary w-full mt-2"
               style={{
-                background: 'linear-gradient(135deg, #4FFFB0 0%, #0084FF 100%)',
+                background: 'linear-gradient(135deg, #4FFFB0 0%, #F97316 100%)',
                 color: '#000000',
                 boxShadow: '0 4px 20px rgba(79,255,176,0.30), inset 0 1px 0 rgba(255,255,255,0.40)'
               }}

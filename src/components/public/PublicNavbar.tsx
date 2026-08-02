@@ -50,7 +50,7 @@ export function PublicNavbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-in-out",
         scrolled
-          ? "bg-[#050816]/80 backdrop-blur-md border-b border-white/10 py-3 shadow-lg"
+          ? "bg-black/80 backdrop-blur-md border-b border-white/10 py-3 shadow-lg"
           : "bg-transparent py-5"
       )}
     >

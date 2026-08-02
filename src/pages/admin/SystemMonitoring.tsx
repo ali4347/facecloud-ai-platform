@@ -14,10 +14,10 @@ export default function SystemMonitoring() {
       {/* General Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { title: 'Global CPU Load', value: '42.8%', detail: '8 Core Thread allocation', icon: Cpu, color: '#60B1FF' },
+          { title: 'Global CPU Load', value: '42.8%', detail: '8 Core Thread allocation', icon: Cpu, color: '#FB923C' },
           { title: 'Memory Allocated', value: '11.8 GB / 16 GB', detail: 'RAM buffer allocation', icon: HardDrive, color: '#A78BFA' },
           { title: 'Global Uptime', value: '99.94%', detail: 'Calculated over 30 days', icon: CheckCircle2, color: '#4FFFB0' },
-          { title: 'Active Processing Queue', value: '14 files', detail: 'Queue buffer queue count', icon: RefreshCw, color: '#7DEBFF' }
+          { title: 'Active Processing Queue', value: '14 files', detail: 'Queue buffer queue count', icon: RefreshCw, color: '#FB923C' }
         ].map(stat => (
           <div key={stat.title} className="fc-card p-6 flex items-center justify-between">
             <div className="space-y-2">

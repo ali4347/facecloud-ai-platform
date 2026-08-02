@@ -11,10 +11,10 @@ const statusConfig = {
   success:    { bg: 'rgba(79,255,176,0.10)',   border: 'rgba(79,255,176,0.25)',   text: '#4FFFB0',           dot: '#4FFFB0' },
   warning:    { bg: 'rgba(245,158,11,0.12)',   border: 'rgba(245,158,11,0.25)',   text: '#FCD34D',           dot: '#F59E0B' },
   error:      { bg: 'rgba(239,68,68,0.12)',    border: 'rgba(239,68,68,0.25)',    text: '#F87171',           dot: '#EF4444' },
-  info:       { bg: 'rgba(0,132,255,0.12)',    border: 'rgba(96,177,255,0.25)',   text: '#60B1FF',           dot: '#0084FF' },
-  purple:     { bg: 'rgba(123,97,255,0.12)',   border: 'rgba(123,97,255,0.25)',   text: '#A78BFA',           dot: '#7B61FF' },
+  info:       { bg: 'rgba(249, 115, 22,0.12)',    border: 'rgba(249, 115, 22,0.25)',   text: '#FB923C',           dot: '#F97316' },
+  purple:     { bg: 'rgba(234, 88, 12,0.12)',   border: 'rgba(234, 88, 12,0.25)',   text: '#A78BFA',           dot: '#EA580C' },
   muted:      { bg: 'rgba(255,255,255,0.06)',  border: 'rgba(255,255,255,0.12)',  text: 'rgba(255,255,255,0.52)', dot: 'rgba(255,255,255,0.35)' },
-  processing: { bg: 'rgba(0,132,255,0.12)',    border: 'rgba(96,177,255,0.25)',   text: '#7DEBFF',           dot: '#0084FF' },
+  processing: { bg: 'rgba(249, 115, 22,0.12)',    border: 'rgba(249, 115, 22,0.25)',   text: '#FB923C',           dot: '#F97316' },
 }
 
 export function StatusBadge({ status, label, dot = true, className }: StatusBadgeProps) {

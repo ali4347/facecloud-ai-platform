@@ -11,15 +11,15 @@ interface UserMenuProps {
 }
 
 const roleBadge: Record<Role, { bg: string; border: string; color: string }> = {
-  user:      { bg: 'rgba(0,132,255,0.12)',   border: 'rgba(96,177,255,0.25)',  color: '#60B1FF' },
-  admin:     { bg: 'rgba(123,97,255,0.12)',  border: 'rgba(123,97,255,0.25)', color: '#A78BFA' },
+  user:      { bg: 'rgba(249, 115, 22,0.12)',   border: 'rgba(249, 115, 22,0.25)',  color: '#FB923C' },
+  admin:     { bg: 'rgba(234, 88, 12,0.12)',  border: 'rgba(234, 88, 12,0.25)', color: '#A78BFA' },
   moderator: { bg: 'rgba(79,255,176,0.10)',  border: 'rgba(79,255,176,0.22)', color: '#4FFFB0' },
 }
 
 const avatarGradient: Record<Role, string> = {
-  user:      'linear-gradient(135deg, #0084FF, #319AFF)',
-  admin:     'linear-gradient(135deg, #7B61FF, #0084FF)',
-  moderator: 'linear-gradient(135deg, #4FFFB0, #0084FF)',
+  user:      'linear-gradient(135deg, #F97316, #FB923C)',
+  admin:     'linear-gradient(135deg, #EA580C, #F97316)',
+  moderator: 'linear-gradient(135deg, #4FFFB0, #F97316)',
 }
 
 export function UserMenu({ name, email, role, initials }: UserMenuProps) {
@@ -56,10 +56,10 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
             className="absolute right-0 top-14 z-40 w-64 rounded-3xl overflow-hidden"
             style={{
               background: 'rgba(5,7,10,0.95)',
-              border: '1px solid rgba(96,177,255,0.20)',
+              border: '1px solid rgba(249, 115, 22,0.20)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              boxShadow: '0 24px 90px rgba(0,0,0,0.65), 0 0 50px rgba(0,132,255,0.10)',
+              boxShadow: '0 24px 90px rgba(0,0,0,0.65), 0 0 50px rgba(249, 115, 22,0.10)',
             }}
           >
             {/* Profile info */}
@@ -94,8 +94,8 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
                   onClick={() => { navigate(r === 'user' ? '/dashboard' : `/${r}`); setOpen(false) }}
                   className="w-full text-left px-3 py-2 rounded-xl text-sm transition-colors capitalize"
                   style={{
-                    background: role === r ? 'rgba(0,132,255,0.12)' : 'transparent',
-                    color: role === r ? '#60B1FF' : 'rgba(255,255,255,0.65)',
+                    background: role === r ? 'rgba(249, 115, 22,0.12)' : 'transparent',
+                    color: role === r ? '#FB923C' : 'rgba(255,255,255,0.65)',
                     fontWeight: role === r ? 600 : 400,
                   }}
                   onMouseEnter={e => { if (role !== r) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)' }}

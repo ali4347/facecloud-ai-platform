@@ -23,7 +23,7 @@ export function IdentityGroupCard({ group }: IdentityGroupCardProps) {
     return groupImgs[0] ?? null
   })()
 
-  const fallbackColor = group.coverImages[0] ?? '#60B1FF'
+  const fallbackColor = group.coverImages[0] ?? '#FB923C'
 
   return (
     <div className="fc-card p-5 hover:shadow-card-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col">

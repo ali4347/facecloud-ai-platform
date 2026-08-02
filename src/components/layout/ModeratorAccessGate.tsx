@@ -60,7 +60,7 @@ export function ModeratorAccessGate({ children }: ModeratorAccessGateProps) {
           style={{ background: 'rgba(239, 68, 68, 0.05)' }} 
         />
         <div className="absolute bottom-[20%] right-[20%] w-[400px] h-[400px] rounded-full blur-[120px]" 
-          style={{ background: 'rgba(0, 132, 255, 0.04)' }} 
+          style={{ background: 'rgba(249, 115, 22, 0.04)' }} 
         />
 
         <div className="w-full max-w-md relative z-10 text-center space-y-6">

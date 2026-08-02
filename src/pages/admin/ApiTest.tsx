@@ -57,7 +57,7 @@ export default function ApiTest() {
             <button 
               key={idx}
               onClick={() => selectPreset(idx)}
-              className="py-2 px-4 rounded-xl border border-white/[0.08] bg-white/[0.03] text-xs font-bold text-white/60 hover:border-[#0084FF]/40 hover:text-[#60B1FF] transition-all cursor-pointer"
+              className="py-2 px-4 rounded-xl border border-white/[0.08] bg-white/[0.03] text-xs font-bold text-white/60 hover:border-[#F97316]/40 hover:text-[#FB923C] transition-all cursor-pointer"
             >
               {ep.method} {ep.path}
             </button>
@@ -106,7 +106,7 @@ export default function ApiTest() {
                   <textarea 
                     value={reqBody}
                     onChange={e => setReqBody(e.target.value)}
-                    className="w-full h-40 font-mono text-[10px] bg-black/40 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:ring-1 focus:ring-[#0084FF] focus:border-[#0084FF]"
+                    className="w-full h-40 font-mono text-[10px] bg-black/40 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:ring-1 focus:ring-[#F97316] focus:border-[#F97316]"
                     placeholder="{}"
                   />
                 </div>

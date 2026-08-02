@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
+import { ScrambleText } from '../animation/ScrambleText';
 
 const HLS_SRC =
   'https://stream.mux.com/bnYL6x5cAX6WiJv2pOKpITehZd3NVdXpj3ylJFpX5Lk.m3u8';
@@ -94,25 +95,20 @@ export default function FreedomSection() {
         background: `
           radial-gradient(
             circle at 50% 45%,
-            rgba(22, 139, 255, 0.10),
+            rgba(249, 115, 22, 0.08),
             transparent 34%
           ),
           radial-gradient(
             circle at 80% 30%,
-            rgba(123, 97, 255, 0.07),
+            rgba(234, 88, 12, 0.05),
             transparent 26%
           ),
-          linear-gradient(
-            180deg,
-            #030712 0%,
-            #050B16 50%,
-            #030712 100%
-          )
+          #000000
         `,
         padding: 'clamp(48px, 6vw, 80px) clamp(16px, 3vw, 40px)',
         gap: '36px',
-        borderTop: '1px solid rgba(66, 165, 255, 0.08)',
-        borderBottom: '1px solid rgba(66, 165, 255, 0.08)',
+        borderTop: '1px solid rgba(249, 115, 22, 0.08)',
+        borderBottom: '1px solid rgba(249, 115, 22, 0.08)',
       }}
     >
       {/* Header */}
@@ -121,14 +117,14 @@ export default function FreedomSection() {
         <div
           className="flex items-center gap-2 text-lg font-medium rounded-full"
           style={{
-            backgroundColor: 'rgba(12, 24, 44, 0.72)',
-            border: '1px solid rgba(66, 165, 255, 0.22)',
-            color: '#D9E8FF',
+            backgroundColor: 'rgba(0, 0, 0, 0.72)',
+            border: '1px solid rgba(249, 115, 22, 0.22)',
+            color: '#FFFFFF',
             backdropFilter: 'blur(16px) saturate(150%)',
             padding: 'clamp(10px, 0.9vw, 14px) clamp(14px, 1.25vw, 20px)',
             boxShadow: `
               inset 0 1px 0 rgba(255, 255, 255, 0.06),
-              0 10px 30px rgba(0, 91, 210, 0.10)
+              0 10px 30px rgba(249, 115, 22, 0.10)
             `,
           }}
         >
@@ -138,11 +134,12 @@ export default function FreedomSection() {
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#42A5FF"
+            stroke="#F97316"
             strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-5 h-5"
+            className="w-5 h-5 animate-spin"
+            style={{ animationDuration: '3s' }}
           >
             <circle cx="12" cy="12" r="10" />
             <path d="m4.93 4.93 4.24 4.24" />
@@ -156,28 +153,17 @@ export default function FreedomSection() {
 
         {/* Heading */}
         <h2
-          className="font-medium tracking-tight"
+          className="font-bold tracking-tight text-white font-display"
           style={{
-            fontSize: 'clamp(32px, 4vw, 56px)',
-            color: '#F5F8FF',
-            lineHeight: 1.15,
+            fontSize: 'clamp(28px, 3.5vw, 48px)',
+            lineHeight: 1.2,
             margin: 0,
-            filter: 'drop-shadow(0 0 20px rgba(22, 139, 255, 0.12))',
+            filter: 'drop-shadow(0 0 20px rgba(249, 115, 22, 0.12))',
           }}
         >
-          Stop absorbing image chaos.<br />
-          <span
-            style={{
-              backgroundImage: 'linear-gradient(90deg, #42A5FF 0%, #168BFF 38%, #22D3EE 70%, #4FFFB0 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              color: 'transparent',
-              paddingBottom: '0.3vw',
-              display: 'inline-block',
-            }}
-          >
-            Run FaceCloud with confidence.
+          <ScrambleText text="Stop absorbing image chaos." /><br />
+          <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold mt-2">
+            <ScrambleText text="Run FaceCloud with confidence." />
           </span>
         </h2>
 
@@ -185,11 +171,11 @@ export default function FreedomSection() {
         <p
           className="text-xs sm:text-sm md:text-base leading-relaxed max-w-[760px] mx-auto font-medium"
           style={{
-            color: '#8FA0BA',
+            color: '#9CA3AF',
             lineHeight: 1.6,
           }}
         >
-          FaceCloud transforms unstructured facial images into <span style={{ color: '#C9D9F2' }}>enhanced</span>, <span style={{ color: '#C9D9F2' }}>validated</span>, <span style={{ color: '#C9D9F2' }}>identity-grouped</span>, and <span style={{ color: '#C9D9F2' }}>securely downloadable</span> results.
+          FaceCloud transforms unstructured facial images into <span style={{ color: '#FFFFFF' }}>enhanced</span>, <span style={{ color: '#FFFFFF' }}>validated</span>, <span style={{ color: '#FFFFFF' }}>identity-grouped</span>, and <span style={{ color: '#FFFFFF' }}>securely downloadable</span> results.
         </p>
       </div>
 
@@ -221,7 +207,7 @@ export default function FreedomSection() {
                 gap: '12px',
                 padding: 'clamp(12px, 0.97vw, 16px) clamp(14px, 1.25vw, 20px)',
                 borderRadius: '18px',
-                background: 'linear-gradient(145deg, rgba(16, 25, 43, 0.90), rgba(9, 16, 30, 0.82))',
+                background: 'linear-gradient(145deg, rgba(10, 10, 10, 0.90), rgba(5, 5, 5, 0.82))',
                 border: '1px solid rgba(239, 68, 68, 0.14)',
                 boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 14px 38px rgba(0, 0, 0, 0.26)',
                 backdropFilter: 'blur(18px) saturate(130%)',
@@ -239,7 +225,7 @@ export default function FreedomSection() {
               <span
                 style={{
                   fontSize: 'clamp(13px, 1.15vw, 17px)',
-                  color: '#9AA8BE',
+                  color: '#9CA3AF',
                   lineHeight: 1.4,
                   fontWeight: 400,
                 }}
@@ -262,11 +248,11 @@ export default function FreedomSection() {
               position: 'relative',
               borderRadius: '50%',
               padding: '3px',
-              background: 'conic-gradient(from 180deg, #0758D8, #168BFF, #22D3EE, #4FFFB0, #7B61FF, #168BFF, #0758D8)',
+              background: 'conic-gradient(from 180deg, #EA580C, #F97316, #FB923C, #FDBA74, #EA580C)',
               boxShadow: `
-                0 0 0 8px rgba(22, 139, 255, 0.035),
-                0 24px 80px rgba(0, 87, 190, 0.20),
-                0 0 70px rgba(34, 211, 238, 0.08)
+                0 0 0 8px rgba(249, 115, 22, 0.035),
+                0 24px 80px rgba(249, 115, 22, 0.20),
+                0 0 70px rgba(249, 115, 22, 0.08)
               `,
             }}
           >
@@ -278,8 +264,8 @@ export default function FreedomSection() {
                 width: 'clamp(200px, 22vw, 400px)',
                 height: 'clamp(200px, 22vw, 400px)',
                 flexShrink: 0,
-                backgroundColor: '#07101F',
-                border: '1px solid rgba(66, 165, 255, 0.32)',
+                backgroundColor: '#000000',
+                border: '1px solid rgba(249, 115, 22, 0.32)',
               }}
             >
               <HlsVideo />
@@ -302,9 +288,9 @@ export default function FreedomSection() {
                 gap: '12px',
                 padding: 'clamp(12px, 0.97vw, 16px) clamp(14px, 1.25vw, 20px)',
                 borderRadius: '18px',
-                background: 'linear-gradient(145deg, rgba(10, 30, 48, 0.94), rgba(8, 20, 36, 0.86))',
-                border: '1px solid rgba(79, 255, 176, 0.16)',
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 40px rgba(0, 70, 120, 0.13)',
+                background: 'linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(10, 10, 10, 0.86))',
+                border: '1px solid rgba(16, 185, 129, 0.16)',
+                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 40px rgba(0, 0, 0, 0.13)',
               }}
             >
               <img
@@ -319,7 +305,7 @@ export default function FreedomSection() {
               <span
                 style={{
                   fontSize: 'clamp(13px, 1.15vw, 17px)',
-                  color: '#E7F3FF',
+                  color: '#FFFFFF',
                   lineHeight: 1.4,
                   fontWeight: 500,
                 }}

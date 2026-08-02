@@ -179,7 +179,7 @@ export const mockImages: ImageRecord[] = [
     embeddingExtracted: true,
     matchingConfidence: 98.4,
     personFolderId: 'grp-001',
-    thumbnail: '#60B1FF',
+    thumbnail: '#FB923C',
     secureDownloadLink: 'https://facecloud.ai/download/sec-01a2b3c',
     emailNotificationSent: true,
     activityLogged: true
@@ -204,7 +204,7 @@ export const mockImages: ImageRecord[] = [
     embeddingExtracted: true,
     matchingConfidence: 96.1,
     personFolderId: 'grp-002',
-    thumbnail: '#7B61FF',
+    thumbnail: '#EA580C',
     secureDownloadLink: 'https://facecloud.ai/download/sec-02c3d4e',
     emailNotificationSent: true,
     activityLogged: true
@@ -350,7 +350,7 @@ export const mockImages: ImageRecord[] = [
     embeddingExtracted: true,
     matchingConfidence: 99.2,
     personFolderId: 'grp-003',
-    thumbnail: '#60B1FF',
+    thumbnail: '#FB923C',
     secureDownloadLink: 'https://facecloud.ai/download/sec-08g8h9i',
     emailNotificationSent: true,
     activityLogged: true
@@ -375,7 +375,7 @@ export const mockImages: ImageRecord[] = [
     embeddingExtracted: true,
     matchingConfidence: 97.5,
     personFolderId: 'grp-002',
-    thumbnail: '#7B61FF',
+    thumbnail: '#EA580C',
     secureDownloadLink: 'https://facecloud.ai/download/sec-09i9j0k',
     emailNotificationSent: true,
     activityLogged: true
@@ -425,7 +425,7 @@ export const mockImages: ImageRecord[] = [
     embeddingExtracted: true,
     matchingConfidence: 97.9,
     personFolderId: 'grp-001',
-    thumbnail: '#7B61FF',
+    thumbnail: '#EA580C',
     secureDownloadLink: 'https://facecloud.ai/download/sec-11l2m3n',
     emailNotificationSent: true,
     activityLogged: true
@@ -450,7 +450,7 @@ export const mockImages: ImageRecord[] = [
     embeddingExtracted: true,
     matchingConfidence: 96.7,
     personFolderId: 'grp-002',
-    thumbnail: '#60B1FF',
+    thumbnail: '#FB923C',
     secureDownloadLink: 'https://facecloud.ai/download/sec-12m3n4o',
     emailNotificationSent: true,
     activityLogged: true
@@ -459,9 +459,9 @@ export const mockImages: ImageRecord[] = [
 
 // ─── 2. PERSON FOLDERS (GROUPS) ──────────────────────────────────────────────
 export const mockGroups: PersonFolder[] = [
-  { id: 'grp-001', label: 'Person 1', imageCount: 4, lastUpdated: '2026-07-08T18:22:00Z', coverImages: ['#60B1FF', '#7B61FF', '#4FFFB0'], representative_image_id: 'img-1001', matchingConfidence: 98.4, createdDate: '2026-07-06T10:00:00Z' },
-  { id: 'grp-002', label: 'Person 2', imageCount: 4, lastUpdated: '2026-07-08T17:45:00Z', coverImages: ['#7B61FF', '#60B1FF', '#7B61FF'], representative_image_id: 'img-1002', matchingConfidence: 96.1, createdDate: '2026-07-06T11:30:00Z' },
-  { id: 'grp-003', label: 'Person 3', imageCount: 2, lastUpdated: '2026-07-08T12:10:00Z', coverImages: ['#60B1FF', '#4FFFB0'], representative_image_id: 'img-1012', matchingConfidence: 99.2, createdDate: '2026-07-07T08:00:00Z' }
+  { id: 'grp-001', label: 'Person 1', imageCount: 4, lastUpdated: '2026-07-08T18:22:00Z', coverImages: ['#FB923C', '#EA580C', '#4FFFB0'], representative_image_id: 'img-1001', matchingConfidence: 98.4, createdDate: '2026-07-06T10:00:00Z' },
+  { id: 'grp-002', label: 'Person 2', imageCount: 4, lastUpdated: '2026-07-08T17:45:00Z', coverImages: ['#EA580C', '#FB923C', '#EA580C'], representative_image_id: 'img-1002', matchingConfidence: 96.1, createdDate: '2026-07-06T11:30:00Z' },
+  { id: 'grp-003', label: 'Person 3', imageCount: 2, lastUpdated: '2026-07-08T12:10:00Z', coverImages: ['#FB923C', '#4FFFB0'], representative_image_id: 'img-1012', matchingConfidence: 99.2, createdDate: '2026-07-07T08:00:00Z' }
 ]
 
 // ─── 3. ACTIVITY LOGS (AT LEAST 20 ITEMS FOR SECURITY/METHODOLOGY) ────────────
@@ -552,8 +552,8 @@ export const mockRejectionStats = {
   reasons: [
     { name: 'Face too small', value: 1845, color: '#FF8A02' },
     { name: 'Too dark after enhance', value: 1240, color: '#EF4444' },
-    { name: 'Multiple faces', value: 924, color: '#7B61FF' },
-    { name: 'Face not detected', value: 684, color: '#0084FF' },
+    { name: 'Multiple faces', value: 924, color: '#EA580C' },
+    { name: 'Face not detected', value: 684, color: '#F97316' },
     { name: 'Image too blurry', value: 570, color: '#4FFFB0' }
   ],
   rejectionsPerDay: [
@@ -578,7 +578,7 @@ export const mockDownloads: DownloadRecord[] = [
 export const mockReviewItems: ReviewItem[] = [
   {
     id: 'mod-img-001',
-    thumbnail: '#7B61FF',
+    thumbnail: '#EA580C',
     filename: 'unclear_dark_portrait.jpg',
     rejectionReason: 'Too dark after enhancement',
     uploadedBy: 'Ali Hassan',
@@ -596,7 +596,7 @@ export const mockReviewItems: ReviewItem[] = [
   },
   {
     id: 'mod-img-002',
-    thumbnail: '#60B1FF',
+    thumbnail: '#FB923C',
     filename: 'shaky_shutter_022.jpg',
     rejectionReason: 'Image too blurry',
     uploadedBy: 'Sarah Khan',
@@ -649,7 +649,7 @@ export const mockReviewItems: ReviewItem[] = [
     isDuplicate: true,
     similarityScore: 94.2,
     matchedFilename: 'original_user_face_001.jpg',
-    matchedThumbnail: '#0084FF',
+    matchedThumbnail: '#F97316',
     allowReprocess: true
   },
   {
@@ -977,8 +977,8 @@ export const uploadTrendData = [
 export const rejectionReasonsData = [
   { name: 'Face too small', value: 35, color: '#FF8A02' },
   { name: 'Too dark after enhance', value: 24, color: '#EF4444' },
-  { name: 'Multiple faces', value: 18, color: '#7B61FF' },
-  { name: 'Face not detected', value: 13, color: '#0084FF' },
+  { name: 'Multiple faces', value: 18, color: '#EA580C' },
+  { name: 'Face not detected', value: 13, color: '#F97316' },
   { name: 'Image too blurry', value: 10, color: '#4FFFB0' }
 ]
 

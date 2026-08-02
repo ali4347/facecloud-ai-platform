@@ -91,8 +91,8 @@ export default function Dashboard() {
       label: 'Total Uploads',
       value: userStats.totalUploads,
       icon: Upload,
-      fill: '#0084FF',
-      glow: 'rgba(0,132,255,0.1)',
+      fill: '#F97316',
+      glow: 'rgba(249, 115, 22,0.1)',
       sub: 'All time',
     },
     {
@@ -115,8 +115,8 @@ export default function Dashboard() {
       label: 'Groups',
       value: userStats.identityGroups,
       icon: Users,
-      fill: '#7B61FF',
-      glow: 'rgba(123,97,255,0.1)',
+      fill: '#EA580C',
+      glow: 'rgba(234, 88, 12,0.1)',
       sub: 'Person folders',
     },
   ], [])
@@ -139,7 +139,7 @@ export default function Dashboard() {
       <div
         className="fc-card p-6 md:p-8 rounded-[28px] relative overflow-hidden backdrop-blur-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
         style={{
-          background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(0, 132, 255, 0.08) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
+          background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
         }}
       >
         <div className="space-y-2 max-w-xl">
@@ -151,7 +151,7 @@ export default function Dashboard() {
         <Link
           to="/dashboard/upload"
           className="fc-btn-primary !py-3 !px-6 text-xs font-bold shrink-0"
-          style={{ background: 'linear-gradient(135deg, #0084FF 0%, #7B61FF 100%)', color: '#fff', boxShadow: 'none' }}
+          style={{ background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)', color: '#fff', boxShadow: 'none' }}
         >
           Upload Photos
         </Link>
@@ -185,11 +185,11 @@ export default function Dashboard() {
               onMouseLeave={() => setHoveredCard(null)}
             >
               <motion.div
-                whileHover={{ y: -3, borderColor: 'rgba(0,132,255,0.3)' }}
+                whileHover={{ y: -3, borderColor: 'rgba(249, 115, 22,0.3)' }}
                 className="fc-panel p-5 flex flex-col justify-between min-h-[140px] relative group h-full cursor-pointer"
               >
                 <div className="flex justify-between items-start">
-                  <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#60B1FF] group-hover:text-[#4FFFB0] transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#FB923C] group-hover:text-[#4FFFB0] transition-colors">
                     <card.icon className="w-4 h-4" />
                   </div>
                   <ChevronRight className={`w-4 h-4 text-white/20 transition-all ${isHovered ? 'translate-x-1 text-white/50' : ''}`} />
@@ -293,7 +293,7 @@ export default function Dashboard() {
                 <h3 className="text-sm font-semibold text-white">Recent Uploads</h3>
                 <p className="text-[10px] text-white/40 mt-0.5 font-medium">Your latest photos and their results</p>
               </div>
-              <Link to="/dashboard/images" className="text-xs text-[#60B1FF] font-bold hover:underline flex items-center gap-1">
+              <Link to="/dashboard/images" className="text-xs text-[#FB923C] font-bold hover:underline flex items-center gap-1">
                 View All <ArrowUpRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -353,7 +353,7 @@ export default function Dashboard() {
               {mockActivity.slice(0, 8).map(act => {
                 const Icon = ACTIVITY_ICON_MAP[act.type] ?? Clock
                 const isError = act.status === 'error'
-                const dotColor = isError ? '#EF4444' : act.status === 'success' ? '#4FFFB0' : '#60B1FF'
+                const dotColor = isError ? '#EF4444' : act.status === 'success' ? '#4FFFB0' : '#FB923C'
                 return (
                   <div key={act.id} className="relative space-y-0.5">
                     <span
@@ -405,10 +405,10 @@ export default function Dashboard() {
           <div
             className="fc-card p-6 space-y-4 rounded-[24px] border border-white/[0.08] relative overflow-hidden"
             style={{
-              background: 'radial-gradient(circle at bottom right, rgba(123,97,255,0.06) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
+              background: 'radial-gradient(circle at bottom right, rgba(234, 88, 12,0.06) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
             }}
           >
-            <div className="w-8 h-8 rounded-lg bg-[#7B61FF]/15 border border-[#7B61FF]/20 flex items-center justify-center text-[#A78BFA]">
+            <div className="w-8 h-8 rounded-lg bg-[#EA580C]/15 border border-[#EA580C]/20 flex items-center justify-center text-[#A78BFA]">
               <Download className="w-4 h-4" />
             </div>
             <div className="space-y-1">
@@ -419,7 +419,7 @@ export default function Dashboard() {
             </div>
             <Link
               to="/dashboard/downloads"
-              className="fc-btn-secondary !py-2 !px-4 text-[10px] font-bold w-full mt-2 flex items-center justify-center gap-1 hover:border-[#7B61FF]/40"
+              className="fc-btn-secondary !py-2 !px-4 text-[10px] font-bold w-full mt-2 flex items-center justify-center gap-1 hover:border-[#EA580C]/40"
             >
               Open Downloads <ArrowUpRight className="w-3 h-3" />
             </Link>

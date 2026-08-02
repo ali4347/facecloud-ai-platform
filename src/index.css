@@ -1,28 +1,8 @@
 /* ─── Google Fonts ──────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Fustat:wght@700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
-
-@font-face {
-  font-family: 'Mazzard H';
-  font-weight: 400;
-  font-style: normal;
-  src:
-    url('https://db.onlinewebfonts.com/t/eb5b5ee332420add9a40ee988cb6ac37.woff2') format('woff2'),
-    url('https://db.onlinewebfonts.com/t/eb5b5ee332420add9a40ee988cb6ac37.woff') format('woff'),
-    url('https://db.onlinewebfonts.com/t/eb5b5ee332420add9a40ee988cb6ac37.ttf') format('truetype');
-}
-
-@font-face {
-  font-family: 'Mazzard H';
-  font-weight: 500;
-  font-style: normal;
-  src:
-    url('https://db.onlinewebfonts.com/t/875fffdfa62169a0f131e90f37f1faf4.woff2') format('woff2'),
-    url('https://db.onlinewebfonts.com/t/875fffdfa62169a0f131e90f37f1faf4.woff') format('woff'),
-    url('https://db.onlinewebfonts.com/t/875fffdfa62169a0f131e90f37f1faf4.ttf') format('truetype');
-}
 
 @tailwind base;
 @tailwind components;
@@ -32,8 +12,8 @@
 :root {
   /* Core black/void */
   --fc-black:         #000000;
-  --fc-void:          #05070A;
-  --fc-dark:          #0D0F14;
+  --fc-void:          #000000;
+  --fc-dark:          #000000;
 
   /* Glass surfaces */
   --fc-surface:       rgba(255,255,255,0.035);
@@ -48,33 +28,33 @@
   --fc-soft:   rgba(255,255,255,0.42);
 
   /* Brand accent colors */
-  --fc-blue:        #0084FF;
-  --fc-bright-blue: #319AFF;
-  --fc-soft-blue:   #60B1FF;
-  --fc-cyan:        #7DEBFF;
-  --fc-mint:        #4FFFB0;
-  --fc-violet:      #7B61FF;
+  --fc-blue:        #F97316;
+  --fc-bright-blue: #FB923C;
+  --fc-soft-blue:   #FFEDD5;
+  --fc-cyan:        #FDBA74;
+  --fc-mint:        #F97316;
+  --fc-violet:      #EA580C;
 
   /* FaceCloud Branding Color Tokens */
-  --facecloud-blue: #168BFF;
-  --facecloud-blue-bright: #42A5FF;
-  --facecloud-blue-deep: #0758D8;
-  --facecloud-silver: #C9D2E3;
-  --facecloud-white: #F5F8FF;
-  --facecloud-black: #030712;
-  --facecloud-navy: #07101F;
+  --facecloud-blue: #F97316;
+  --facecloud-blue-bright: #FB923C;
+  --facecloud-blue-deep: #EA580C;
+  --facecloud-silver: #E5E7EB;
+  --facecloud-white: #FFFFFF;
+  --facecloud-black: #000000;
+  --facecloud-navy: #000000;
 
   /* Status colors */
-  --fc-success: #4FFFB0;
+  --fc-success: #10B981;
   --fc-warning: #F59E0B;
   --fc-danger:  #EF4444;
 
   /* Border / glow */
   --fc-border:       rgba(255,255,255,0.12);
-  --fc-border-blue:  rgba(96,177,255,0.24);
-  --fc-glow-blue:    rgba(0,132,255,0.22);
-  --fc-glow-mint:    rgba(79,255,176,0.16);
-  --fc-glow-violet:  rgba(123,97,255,0.18);
+  --fc-border-blue:  rgba(249,115,22,0.24);
+  --fc-glow-blue:    rgba(249,115,22,0.22);
+  --fc-glow-mint:    rgba(249,115,22,0.16);
+  --fc-glow-violet:  rgba(234,88,12,0.18);
 
   /* Tailwind token bridge */
   --background:    #000000;
@@ -120,9 +100,14 @@
 
   /* Scrollbars */
   ::-webkit-scrollbar        { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track  { background: #05070A; }
-  ::-webkit-scrollbar-thumb  { background: rgba(0,132,255,0.25); border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(0,132,255,0.45); }
+  ::-webkit-scrollbar-track  { background: #000000; }
+  ::-webkit-scrollbar-thumb  { background: rgba(249,115,22,0.25); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.45); }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Mono', 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
 }
 
 /* ─── Component Layer ────────────────────────────────────────────────── */
@@ -131,9 +116,9 @@
   /* ── Cinematic app background ──────────────────────────────────── */
   .fc-app-bg {
     background:
-      radial-gradient(circle at 18% 12%,  rgba(0,132,255,0.18),  transparent 34%),
-      radial-gradient(circle at 82%  8%,  rgba(123,97,255,0.14), transparent 30%),
-      radial-gradient(circle at 70% 85%,  rgba(79,255,176,0.10), transparent 34%),
+      radial-gradient(circle at 18% 12%,  rgba(249,115,22,0.12),  transparent 34%),
+      radial-gradient(circle at 82%  8%,  rgba(234,88,12,0.10), transparent 30%),
+      radial-gradient(circle at 70% 85%,  rgba(251,146,60,0.06), transparent 34%),
       #000000;
     min-height: 100vh;
   }
@@ -164,7 +149,7 @@
       rgba(255,255,255,0.12) 22%,
       rgba(255,255,255,0)    42%,
       rgba(255,255,255,0)    60%,
-      rgba(96,177,255,0.16)  78%,
+      rgba(249,115,22,0.16)  78%,
       rgba(255,255,255,0.34) 100%
     );
     -webkit-mask:
@@ -185,28 +170,28 @@
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.10),
       0 24px 90px rgba(0,0,0,0.32),
-      0 0 45px rgba(0,132,255,0.08);
+      0 0 45px rgba(249,115,22,0.08);
     transition: border-color 220ms ease, box-shadow 220ms ease;
   }
 
   .fc-panel:hover {
-    border-color: rgba(96,177,255,0.28);
+    border-color: rgba(249,115,22,0.28);
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
       0 30px 110px rgba(0,0,0,0.40),
-      0 0 60px rgba(0,132,255,0.12);
+      0 0 60px rgba(249,115,22,0.12);
   }
 
   .fc-panel-strong {
     background: rgba(255,255,255,0.075);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(96,177,255,0.20);
+    border: 1px solid rgba(249,115,22,0.20);
     border-radius: 28px;
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
       0 28px 100px rgba(0,0,0,0.42),
-      0 0 60px rgba(0,132,255,0.10);
+      0 0 60px rgba(249,115,22,0.10);
   }
 
   /* ── fc-card (alias for fc-panel for component usage) ────────────── */
@@ -214,11 +199,11 @@
     @apply fc-panel;
   }
   .fc-card:hover {
-    border-color: rgba(96,177,255,0.28);
+    border-color: rgba(249,115,22,0.28);
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
       0 30px 110px rgba(0,0,0,0.40),
-      0 0 60px rgba(0,132,255,0.12);
+      0 0 60px rgba(249,115,22,0.12);
     transform: translateY(-1px);
   }
 
@@ -228,12 +213,12 @@
   }
   .fc-glass-hover:hover {
     transform: translateY(-2px) scale(1.01);
-    border-color: rgba(96,177,255,0.34);
+    border-color: rgba(249,115,22,0.34);
     background: rgba(255,255,255,0.065);
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
       0 30px 110px rgba(0,0,0,0.42),
-      0 0 70px rgba(0,132,255,0.16);
+      0 0 70px rgba(249,115,22,0.16);
   }
 
   /* ── Glass pill ─────────────────────────────────────────────────── */
@@ -260,11 +245,11 @@
   .fc-btn-primary {
     @apply text-white rounded-2xl px-6 py-3.5 text-sm font-semibold transition-all duration-300
            active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer;
-    background: linear-gradient(135deg, #0084FF 0%, #319AFF 100%);
-    box-shadow: 0 4px 20px rgba(0,132,255,0.35), inset 0 1px 0 rgba(255,255,255,0.20);
+    background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
+    box-shadow: 0 4px 20px rgba(249,115,22,0.35), inset 0 1px 0 rgba(255,255,255,0.20);
   }
   .fc-btn-primary:hover {
-    box-shadow: 0 6px 28px rgba(0,132,255,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+    box-shadow: 0 6px 28px rgba(249,115,22,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
     transform: translateY(-1px) scale(1.01);
   }
   .fc-btn-primary:disabled {
@@ -276,11 +261,11 @@
   .fc-btn-success {
     @apply text-black rounded-2xl px-6 py-3.5 text-sm font-semibold transition-all duration-300
            active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer;
-    background: #4FFFB0;
-    box-shadow: 0 4px 20px rgba(79,255,176,0.40);
+    background: #10B981;
+    box-shadow: 0 4px 20px rgba(16,185,129,0.40);
   }
   .fc-btn-success:hover {
-    box-shadow: 0 6px 28px rgba(79,255,176,0.60);
+    box-shadow: 0 6px 28px rgba(16,185,129,0.60);
     transform: translateY(-1px);
   }
 
@@ -295,8 +280,8 @@
   }
   .fc-btn-secondary:hover {
     background: rgba(255,255,255,0.11);
-    border-color: rgba(96,177,255,0.35);
-    box-shadow: 0 0 20px rgba(0,132,255,0.12);
+    border-color: rgba(251,146,60,0.35);
+    box-shadow: 0 0 20px rgba(249,115,22,0.12);
   }
 
   .fc-btn-ghost {
@@ -326,12 +311,12 @@
   .badge {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide;
   }
-  /* mint — accepted / enhanced / verified */
+  /* green — accepted / enhanced / verified */
   .badge-success {
     @apply badge;
-    background: rgba(79,255,176,0.10);
-    border: 1px solid rgba(79,255,176,0.25);
-    color: #4FFFB0;
+    background: rgba(16,185,129,0.10);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: #10B981;
   }
   /* red — rejected / failed */
   .badge-error {
@@ -347,19 +332,19 @@
     border: 1px solid rgba(245,158,11,0.25);
     color: #FCD34D;
   }
-  /* blue/cyan — processing / info */
+  /* orange — processing / info */
   .badge-info {
     @apply badge;
-    background: rgba(0,132,255,0.12);
-    border: 1px solid rgba(96,177,255,0.25);
-    color: #60B1FF;
+    background: rgba(249,115,22,0.12);
+    border: 1px solid rgba(251,146,60,0.25);
+    color: #FB923C;
   }
   /* violet — admin */
   .badge-purple {
     @apply badge;
-    background: rgba(123,97,255,0.12);
-    border: 1px solid rgba(123,97,255,0.25);
-    color: #A78BFA;
+    background: rgba(234,88,12,0.12);
+    border: 1px solid rgba(234,88,12,0.25);
+    color: #FB923C;
   }
   /* muted */
   .badge-muted {
@@ -382,10 +367,10 @@
 
   .sidebar-item-active {
     @apply flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-semibold cursor-pointer;
-    background: rgba(0,132,255,0.14);
-    border: 1px solid rgba(96,177,255,0.24);
+    background: rgba(249,115,22,0.14);
+    border: 1px solid rgba(249,115,22,0.24);
     color: rgba(255,255,255,0.96);
-    box-shadow: 0 0 30px rgba(0,132,255,0.12);
+    box-shadow: 0 0 30px rgba(249,115,22,0.12);
   }
 
   /* ── Tables ──────────────────────────────────────────────────────── */
@@ -421,28 +406,28 @@
   }
   .fc-input::placeholder { color: rgba(255,255,255,0.38); }
   .fc-input:focus {
-    border-color: rgba(96,177,255,0.45);
-    box-shadow: 0 0 0 4px rgba(0,132,255,0.10);
+    border-color: rgba(251,146,60,0.45);
+    box-shadow: 0 0 0 4px rgba(249,115,22,0.10);
   }
 
   /* ── Upload dropzone ─────────────────────────────────────────────── */
   .upload-dropzone {
     @apply border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 cursor-pointer;
-    border-color: rgba(96,177,255,0.28);
-    background: rgba(0,132,255,0.03);
+    border-color: rgba(249,115,22,0.28);
+    background: rgba(249,115,22,0.03);
   }
   .upload-dropzone:hover,
   .upload-dropzone.drag-active {
-    border-color: rgba(96,177,255,0.60);
-    background: rgba(0,132,255,0.07);
-    box-shadow: 0 0 40px rgba(0,132,255,0.10);
+    border-color: rgba(249,115,22,0.60);
+    background: rgba(249,115,22,0.07);
+    box-shadow: 0 0 40px rgba(249,115,22,0.10);
   }
 
   /* ── Page animation ──────────────────────────────────────────────── */
   .page-enter { animation: fcFadeIn 0.45s cubic-bezier(0.16,1,0.3,1) both; }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-[#0084FF] via-[#60B1FF] to-[#7B61FF] bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#EA580C] bg-clip-text text-transparent;
   }
 
   .text-dark {
@@ -469,9 +454,9 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background: #4FFFB0;
+    background: #F97316;
     border: 2px solid #ffffff;
-    box-shadow: 0 0 10px rgba(79, 255, 176, 0.8);
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.8);
     transition: transform 0.1s;
   }
   .fc-range-slider::-webkit-slider-thumb:hover {
@@ -482,8 +467,8 @@
     height: 14px;
     border: 2px solid #ffffff;
     border-radius: 50%;
-    background: #4FFFB0;
-    box-shadow: 0 0 10px rgba(79, 255, 176, 0.8);
+    background: #F97316;
+    box-shadow: 0 0 10px rgba(249, 115, 22, 0.8);
     transition: transform 0.1s;
   }
   .fc-range-slider::-moz-range-thumb:hover {
@@ -535,7 +520,7 @@
 /* ── FreedomSection Scoped Typography ────────────────────────────────── */
 .freedom-section,
 .freedom-section * {
-  font-family: 'Mazzard H', sans-serif;
+  font-family: inherit;
 }
 
 

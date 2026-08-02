@@ -16,17 +16,17 @@ export default function About() {
         {/* ── SECTION 1 — Hero ───────────────────────────────────── */}
         <section className="py-20 relative overflow-hidden">
           <div className="absolute top-[20%] left-[-10%] w-[50%] h-[40vh] rounded-full blur-[140px] pointer-events-none opacity-20"
-            style={{ background: 'radial-gradient(circle, rgba(0,132,255,0.15) 0%, transparent 70%)' }} />
+            style={{ background: 'radial-gradient(circle, rgba(249, 115, 22,0.15) 0%, transparent 70%)' }} />
           
           <div className="max-w-4xl mx-auto px-6 text-center space-y-6 relative z-10">
             <RevealOnScroll>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0084FF]/10 border border-[#0084FF]/20 text-[11px] font-bold text-[#60B1FF] uppercase tracking-wider">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F97316]/10 border border-[#F97316]/20 text-[11px] font-bold text-[#FB923C] uppercase tracking-wider">
                 About FaceCloud
               </span>
             </RevealOnScroll>
 
             <RevealOnScroll delay={0.05}>
-              <h1 className="text-4xl sm:text-6xl font-medium text-white tracking-tight leading-[1.15]" style={{ fontFamily: "'Instrument Serif', serif" }}>
+              <h1 className="text-4xl sm:text-6xl font-medium text-white tracking-tight leading-[1.15]" style={{ fontFamily: "'Space Mono', serif" }}>
                 Built to bring order to <br />
                 facial image data
               </h1>
@@ -45,10 +45,10 @@ export default function About() {
           <div className="max-w-4xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             <div className="md:col-span-7 space-y-4">
               <RevealOnScroll>
-                <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">Our Mission</span>
+                <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Our Mission</span>
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
-                <h2 className="text-2xl sm:text-3xl font-medium text-white tracking-tight" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                <h2 className="text-2xl sm:text-3xl font-medium text-white tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
                   Solving the Dataset Challenge
                 </h2>
               </RevealOnScroll>
@@ -59,7 +59,7 @@ export default function About() {
               </RevealOnScroll>
               <RevealOnScroll delay={0.15}>
                 <div className="pt-2">
-                  <a href="/#features" className="text-[11px] font-bold text-[#60B1FF] hover:text-white transition-colors inline-flex items-center gap-1">
+                  <a href="/#features" className="text-[11px] font-bold text-[#FB923C] hover:text-white transition-colors inline-flex items-center gap-1">
                     Explore our processing pipeline &rarr;
                   </a>
                 </div>
@@ -69,7 +69,7 @@ export default function About() {
             <div className="md:col-span-5">
               <RevealOnScroll delay={0.1}>
                 <div className="fc-panel p-6 bg-black/60 border border-white/[0.08] relative overflow-hidden rounded-2xl">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#0084FF]/10 to-[#7B61FF]/10 blur-xl rounded-full" />
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#F97316]/10 to-[#EA580C]/10 blur-xl rounded-full" />
                   <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Target Metrics</h3>
                   <div className="space-y-3 font-mono text-[10px]">
                     <div className="flex justify-between border-b border-white/[0.05] pb-1.5">
@@ -95,10 +95,10 @@ export default function About() {
         <section className="py-20 max-w-5xl mx-auto px-6">
           <div className="text-center mb-14 space-y-3">
             <RevealOnScroll>
-              <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">Core Values</span>
+              <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Core Values</span>
             </RevealOnScroll>
             <RevealOnScroll delay={0.05}>
-              <h2 className="text-3xl font-medium text-white tracking-tight" style={{ fontFamily: "'Instrument Serif', serif" }}>
+              <h2 className="text-3xl font-medium text-white tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
                 How We Operate
               </h2>
             </RevealOnScroll>
@@ -108,7 +108,7 @@ export default function About() {
             <RevealOnScroll delay={0.05}>
               <div className="fc-panel p-6 flex flex-col justify-between h-full bg-[#0D0F14]/40 border border-white/[0.06] rounded-2xl hover:border-white/15 transition-all">
                 <div className="space-y-4">
-                  <div className="w-9 h-9 rounded-xl bg-[#0084FF]/10 flex items-center justify-center border border-[#0084FF]/20 text-[#60B1FF]">
+                  <div className="w-9 h-9 rounded-xl bg-[#F97316]/10 flex items-center justify-center border border-[#F97316]/20 text-[#FB923C]">
                     <Activity className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-semibold text-white">Automation with Control</h3>
@@ -122,7 +122,7 @@ export default function About() {
             <RevealOnScroll delay={0.1}>
               <div className="fc-panel p-6 flex flex-col justify-between h-full bg-[#0D0F14]/40 border border-white/[0.06] rounded-2xl hover:border-white/15 transition-all">
                 <div className="space-y-4">
-                  <div className="w-9 h-9 rounded-xl bg-[#7B61FF]/10 flex items-center justify-center border border-[#7B61FF]/20 text-[#A78BFA]">
+                  <div className="w-9 h-9 rounded-xl bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#A78BFA]">
                     <Shield className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-semibold text-white">Security by Default</h3>
@@ -154,10 +154,10 @@ export default function About() {
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14 space-y-3">
               <RevealOnScroll>
-                <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">The Founders</span>
+                <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">The Founders</span>
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
-                <h2 className="text-3xl font-medium text-white tracking-tight" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                <h2 className="text-3xl font-medium text-white tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
                   Meet the Team
                 </h2>
               </RevealOnScroll>
@@ -166,7 +166,7 @@ export default function About() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               <RevealOnScroll delay={0.05}>
                 <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-[#0D0F14]/30 border border-white/[0.06]">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0084FF] to-[#7B61FF] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(0,132,255,0.25)]">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(249, 115, 22,0.25)]">
                     A.C.
                   </div>
                   <div>
@@ -178,7 +178,7 @@ export default function About() {
 
               <RevealOnScroll delay={0.1}>
                 <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-[#0D0F14]/30 border border-white/[0.06]">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#7B61FF] to-[#4FFFB0] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(123,97,255,0.25)]">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#EA580C] to-[#4FFFB0] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(234, 88, 12,0.25)]">
                     M.F.
                   </div>
                   <div>
@@ -190,7 +190,7 @@ export default function About() {
 
               <RevealOnScroll delay={0.15}>
                 <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-[#0D0F14]/30 border border-white/[0.06]">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4FFFB0] to-[#0084FF] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(79,255,176,0.25)]">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4FFFB0] to-[#F97316] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(79,255,176,0.25)]">
                     D.S.
                   </div>
                   <div>
@@ -206,14 +206,14 @@ export default function About() {
         {/* ── SECTION 5 — Final CTA Band ────────────────────────── */}
         <section className="py-24 relative overflow-hidden flex flex-col items-center border-t border-white/[0.05]">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full blur-[130px] pointer-events-none opacity-20"
-            style={{ background: 'radial-gradient(circle, #0084FF 0%, #7B61FF 100%)' }} />
+            style={{ background: 'radial-gradient(circle, #F97316 0%, #EA580C 100%)' }} />
 
           <RevealOnScroll>
             <div className="max-w-4xl mx-auto px-6 text-center space-y-7 flex flex-col items-center relative z-10">
-              <span className="text-xs font-bold text-[#0084FF] tracking-widest uppercase block">Ingestion Suite</span>
+              <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Ingestion Suite</span>
               <h2
                 className="text-4xl sm:text-5xl font-medium text-white leading-tight tracking-tight"
-                style={{ fontFamily: "'Instrument Serif', serif" }}
+                style={{ fontFamily: "'Space Mono', serif" }}
               >
                 Ready to enhance, validate, and <br />
                 organize facial images with AI?

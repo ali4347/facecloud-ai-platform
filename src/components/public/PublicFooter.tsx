@@ -10,7 +10,7 @@ export function PublicFooter() {
   }
 
   return (
-    <footer className="py-16 bg-[#030508] border-t border-white/[0.06] relative z-10">
+    <footer className="py-16 bg-black border-t border-white/[0.06] relative z-10">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 text-xs text-white/40">
         {/* Logo Column */}
         <div className="space-y-3.5">
@@ -24,11 +24,11 @@ export function PublicFooter() {
         <div className="space-y-3">
           <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Product</h4>
           <ul className="space-y-2 font-medium">
-            <li><a href={getHref('#features')} className="hover:text-[#60B1FF] transition-colors">Features</a></li>
-            <li><a href={getHref('#methodology')} className="hover:text-[#60B1FF] transition-colors">Methodology</a></li>
-            <li><a href={getHref('#pricing')} className="hover:text-[#60B1FF] transition-colors">Pricing</a></li>
-            <li><a href={getHref('#security')} className="hover:text-[#60B1FF] transition-colors">Security</a></li>
-            <li><a href={getHref('#faq')} className="hover:text-[#60B1FF] transition-colors">FAQ</a></li>
+            <li><a href={getHref('#features')} className="hover:text-[#F97316] transition-colors">Features</a></li>
+            <li><a href={getHref('#methodology')} className="hover:text-[#F97316] transition-colors">Methodology</a></li>
+            <li><a href={getHref('#pricing')} className="hover:text-[#F97316] transition-colors">Pricing</a></li>
+            <li><a href={getHref('#security')} className="hover:text-[#F97316] transition-colors">Security</a></li>
+            <li><a href={getHref('#faq')} className="hover:text-[#F97316] transition-colors">FAQ</a></li>
           </ul>
         </div>
 
@@ -36,8 +36,8 @@ export function PublicFooter() {
         <div className="space-y-3">
           <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Company</h4>
           <ul className="space-y-2 font-medium">
-            <li><Link to="/about" className="hover:text-[#60B1FF] transition-colors">About Us</Link></li>
-            <li><Link to="/contact" className="hover:text-[#60B1FF] transition-colors">Contact</Link></li>
+            <li><Link to="/about" className="hover:text-[#F97316] transition-colors">About Us</Link></li>
+            <li><Link to="/contact" className="hover:text-[#F97316] transition-colors">Contact</Link></li>
           </ul>
         </div>
 
@@ -46,7 +46,7 @@ export function PublicFooter() {
           <div className="space-y-2">
             <h4 className="font-bold text-white uppercase tracking-wider text-[10px]">Portals</h4>
             <ul className="space-y-2 font-medium">
-              <li><Link to="/login" className="hover:text-[#60B1FF] transition-colors">User Login</Link></li>
+              <li><Link to="/login" className="hover:text-[#F97316] transition-colors">User Login</Link></li>
             </ul>
           </div>
           <div className="space-y-1 pt-1">

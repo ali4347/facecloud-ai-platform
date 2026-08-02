@@ -240,7 +240,7 @@ export default function UploadSingle() {
                 <label className="upload-dropzone block cursor-pointer">
                   <input type="file" onChange={handleFileChange} className="hidden" accept="image/*" />
                   <div className="flex flex-col items-center gap-3">
-                    <div className="p-4 rounded-full bg-[#0084FF]/10 border border-[#0084FF]/25 text-[#0084FF]">
+                    <div className="p-4 rounded-full bg-[#F97316]/10 border border-[#F97316]/25 text-[#F97316]">
                       <Upload className="w-6 h-6 animate-pulse" />
                     </div>
                     <span className="text-xs font-bold text-white">Click to browse or drop file here</span>
@@ -279,12 +279,12 @@ export default function UploadSingle() {
               {status === 'processing' && (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-[#60B1FF] font-bold">Processing pipeline executing...</span>
+                    <span className="text-[#FB923C] font-bold">Processing pipeline executing...</span>
                     <span className="text-white/50 font-mono font-bold">{Math.round((currentStep / pipelineSteps.length) * 100)}%</span>
                   </div>
                   <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-[#0084FF] to-[#4FFFB0] transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-[#F97316] to-[#4FFFB0] transition-all duration-300"
                       style={{ width: `${((currentStep + 1) / pipelineSteps.length) * 100}%` }}
                     />
                   </div>
@@ -293,13 +293,13 @@ export default function UploadSingle() {
                       <div key={step.label} className="flex gap-3 items-start text-xs" style={{ opacity: idx > currentStep ? 0.3 : 1 }}>
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 text-[10px] font-bold ${
                           idx < currentStep ? 'bg-[#4FFFB0]/10 text-[#4FFFB0] border border-[#4FFFB0]/20' :
-                          idx === currentStep ? 'bg-[#0084FF]/20 text-[#60B1FF] border border-[#0084FF]/30 animate-pulse' :
+                          idx === currentStep ? 'bg-[#F97316]/20 text-[#FB923C] border border-[#F97316]/30 animate-pulse' :
                           'bg-white/5 text-white/30 border border-white/10'
                         }`}>
                           {idx < currentStep ? '✓' : idx + 1}
                         </div>
                         <div>
-                          <p className={`font-bold ${idx === currentStep ? 'text-[#60B1FF]' : 'text-white'}`}>{step.label}</p>
+                          <p className={`font-bold ${idx === currentStep ? 'text-[#FB923C]' : 'text-white'}`}>{step.label}</p>
                           <p className="text-[10px] text-white/40 mt-0.5">{step.desc}</p>
                         </div>
                       </div>
@@ -331,7 +331,7 @@ export default function UploadSingle() {
                   <div className="aspect-[4/3] rounded-3xl bg-black/20 overflow-hidden flex items-center justify-center relative border border-white/[0.06]">
                     <img src={previewUrl} alt="Restoring" className="w-full h-full object-cover blur-[2px] opacity-40" />
                     <div className="absolute inset-0 bg-[#0D0F14]/50 flex items-center justify-center flex-col gap-2">
-                      <Sparkles className="w-8 h-8 text-[#0084FF] animate-spin" />
+                      <Sparkles className="w-8 h-8 text-[#F97316] animate-spin" />
                       <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Compiling CNN illumination matrix...</span>
                     </div>
                   </div>
@@ -387,7 +387,7 @@ export default function UploadSingle() {
                               className="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/20 transition-all font-semibold text-white/80 hover:text-white"
                             >
                               <span className="flex items-center gap-1.5">
-                                <FolderOpen className="w-3.5 h-3.5 text-[#0084FF]" />
+                                <FolderOpen className="w-3.5 h-3.5 text-[#F97316]" />
                                 {folder.name}
                               </span>
                               <span className="text-[10px] text-[#4FFFB0] font-bold">{folder.confidence}% match</span>
@@ -403,7 +403,7 @@ export default function UploadSingle() {
                         <div>
                           <span className="block text-[9px] text-white/40 uppercase font-bold tracking-wider">Identity Match</span>
                           {result.matchedPersonFolders[0] ? (
-                            <Link to="/dashboard/groups" className="text-[#0084FF] font-bold hover:underline flex items-center gap-1 mt-0.5">
+                            <Link to="/dashboard/groups" className="text-[#F97316] font-bold hover:underline flex items-center gap-1 mt-0.5">
                               {result.matchedPersonFolders[0].name} <Link2 className="w-3.5 h-3.5" />
                             </Link>
                           ) : (
@@ -429,7 +429,7 @@ export default function UploadSingle() {
                         to="/dashboard/groups"
                         className="fc-btn-secondary flex-1 justify-center py-3 text-xs font-bold cursor-pointer"
                       >
-                        <FolderOpen className="w-4 h-4 text-[#0084FF]" /> View Person Folders
+                        <FolderOpen className="w-4 h-4 text-[#F97316]" /> View Person Folders
                       </Link>
                     ) : (
                       <button 
@@ -445,8 +445,8 @@ export default function UploadSingle() {
                   </div>
 
                   {/* Demo disclaimer */}
-                  <div className="p-3.5 rounded-2xl flex items-start gap-2.5 bg-[#0084FF]/5 border border-[#0084FF]/15">
-                    <Info className="w-4 h-4 text-[#60B1FF] flex-shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-2xl flex items-start gap-2.5 bg-[#F97316]/5 border border-[#F97316]/15">
+                    <Info className="w-4 h-4 text-[#FB923C] flex-shrink-0 mt-0.5" />
                     <p className="text-[10px] text-white/50 leading-relaxed font-medium">
                       Frontend demo enhancement. Production backend can connect Zero-DCE/GFPGAN/CodeFormer for real AI restoration.
                     </p>

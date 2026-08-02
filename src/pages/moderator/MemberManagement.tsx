@@ -161,7 +161,7 @@ export default function MemberManagement() {
                     return (
                       <tr key={member.id} className="hover:bg-white/[0.01] transition-colors">
                         <td>
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0084FF] to-[#7B61FF] flex items-center justify-center text-[10px] font-bold text-white uppercase">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-[10px] font-bold text-white uppercase">
                             {initials}
                           </div>
                         </td>
@@ -169,7 +169,7 @@ export default function MemberManagement() {
                         <td className="text-white/60">{member.email}</td>
                         <td>
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                            member.role === 'admin' ? 'bg-[#7B61FF]/10 text-[#A78BFA]' :
+                            member.role === 'admin' ? 'bg-[#EA580C]/10 text-[#A78BFA]' :
                             member.role === 'moderator' ? 'bg-[#4FFFB0]/10 text-[#4FFFB0]' :
                             'bg-white/[0.05] text-white/60'
                           }`}>
@@ -179,7 +179,7 @@ export default function MemberManagement() {
                         <td>
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
                             member.status === 'active' ? 'bg-[#4FFFB0]/10 text-[#4FFFB0]' :
-                            member.status === 'pending' ? 'bg-[#60B1FF]/10 text-[#60B1FF]' :
+                            member.status === 'pending' ? 'bg-[#FB923C]/10 text-[#FB923C]' :
                             'bg-[#EF4444]/10 text-[#EF4444]'
                           }`}>
                             {member.status}

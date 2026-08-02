@@ -42,10 +42,10 @@ export default function MyImages() {
                 onClick={() => setStatusFilter(s)}
                 className="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all capitalize cursor-pointer"
                 style={{
-                  background: isActive ? 'rgba(0, 132, 255, 0.14)' : 'rgba(255, 255, 255, 0.04)',
-                  border: isActive ? '1px solid rgba(96, 177, 255, 0.24)' : '1px solid rgba(255, 255, 255, 0.08)',
-                  color: isActive ? '#60B1FF' : 'rgba(255, 255, 255, 0.6)',
-                  boxShadow: isActive ? '0 0 15px rgba(0, 132, 255, 0.1)' : 'none',
+                  background: isActive ? 'rgba(249, 115, 22, 0.14)' : 'rgba(255, 255, 255, 0.04)',
+                  border: isActive ? '1px solid rgba(249, 115, 22, 0.24)' : '1px solid rgba(255, 255, 255, 0.08)',
+                  color: isActive ? '#FB923C' : 'rgba(255, 255, 255, 0.6)',
+                  boxShadow: isActive ? '0 0 15px rgba(249, 115, 22, 0.1)' : 'none',
                 }}
               >
                 {s === 'All' ? 'All' : s}

@@ -12,7 +12,7 @@ export function NotificationDropdown() {
     if (status === 'success') return '#4FFFB0'
     if (status === 'error')   return '#F87171'
     if (status === 'warning') return '#FCD34D'
-    return '#60B1FF'
+    return '#FB923C'
   }
 
   return (
@@ -35,24 +35,24 @@ export function NotificationDropdown() {
             className="absolute right-0 top-12 z-50 w-80 rounded-3xl overflow-hidden"
             style={{
               background: 'rgba(5,7,10,0.96)',
-              border: '1px solid rgba(96,177,255,0.28)',
+              border: '1px solid rgba(249, 115, 22,0.28)',
               backdropFilter: 'blur(24px)',
               WebkitBackdropFilter: 'blur(24px)',
-              boxShadow: '0 24px 90px rgba(0,0,0,0.65), 0 0 50px rgba(0,132,255,0.16)',
+              boxShadow: '0 24px 90px rgba(0,0,0,0.65), 0 0 50px rgba(249, 115, 22,0.16)',
               animation: 'dropdownFadeIn 0.18s ease-out both',
             }}
           >
             {/* Header */}
             <div
               className="flex items-center justify-between px-4 py-3.5"
-              style={{ borderBottom: '1px solid rgba(96,177,255,0.16)' }}
+              style={{ borderBottom: '1px solid rgba(249, 115, 22,0.16)' }}
             >
               <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4" style={{ color: '#60B1FF' }} />
+                <Bell className="w-4 h-4" style={{ color: '#FB923C' }} />
                 <span className="text-sm font-bold text-white">Notifications</span>
                 <span
                   className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                  style={{ background: 'rgba(0,132,255,0.18)', color: '#60B1FF' }}
+                  style={{ background: 'rgba(249, 115, 22,0.18)', color: '#FB923C' }}
                 >
                   {notifications.length}
                 </span>
@@ -73,8 +73,8 @@ export function NotificationDropdown() {
                     border: '1px solid rgba(255,255,255,0.08)',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = 'rgba(0,132,255,0.10)'
-                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(96,177,255,0.20)'
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(249, 115, 22,0.10)'
+                    ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(249, 115, 22,0.20)'
                   }}
                   onMouseLeave={e => {
                     (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.045)'
@@ -98,13 +98,13 @@ export function NotificationDropdown() {
             {/* Footer */}
             <div
               className="px-4 py-3"
-              style={{ borderTop: '1px solid rgba(96,177,255,0.16)' }}
+              style={{ borderTop: '1px solid rgba(249, 115, 22,0.16)' }}
             >
               <button
                 className="flex items-center gap-1.5 text-xs font-semibold transition-colors"
-                style={{ color: '#60B1FF' }}
+                style={{ color: '#FB923C' }}
                 onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#4FFFB0'}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#60B1FF'}
+                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#FB923C'}
               >
                 <Check className="w-3.5 h-3.5" />
                 Mark all as read

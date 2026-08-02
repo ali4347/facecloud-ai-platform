@@ -91,9 +91,9 @@ export default function UploadZip() {
                   </div>
 
                   {/* Info note */}
-                  <div className="p-4 rounded-2xl bg-[#0084FF]/[0.06] border border-[#0084FF]/20 text-xs text-[#60B1FF] font-medium space-y-1">
+                  <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium space-y-1">
                     <p className="font-bold">What happens next?</p>
-                    <ul className="space-y-0.5 text-[#60B1FF]/70 list-disc list-inside">
+                    <ul className="space-y-0.5 text-[#FB923C]/70 list-disc list-inside">
                       <li>Photos are extracted from the ZIP</li>
                       <li>Each photo is enhanced and validated</li>
                       <li>Accepted photos are grouped by person</li>
