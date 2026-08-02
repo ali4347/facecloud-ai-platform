@@ -353,7 +353,7 @@ export default function Contact() {
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-white/[0.06] flex flex-col gap-1">
-                  <span className="text-xs font-bold text-[#FB923C]">hello@facecloudai.pro</span>
+                  <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.pro</span>
                   <span className="text-[9px] text-white/30 font-medium">We typically reply within 1-2 business days.</span>
                 </div>
               </div>
@@ -362,7 +362,7 @@ export default function Contact() {
             {/* Enterprise Card */}
             <RevealOnScroll delay={0.1}>
               <div className="fc-panel p-6 bg-[#0D0F14]/30 border border-white/[0.06] rounded-2xl space-y-4 text-left">
-                <div className="w-8 h-8 rounded-lg bg-[#4FFFB0]/10 flex items-center justify-center border border-[#4FFFB0]/20 text-[#4FFFB0]">
+                <div className="w-8 h-8 rounded-lg bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#FB923C]">
                   <ShieldCheck className="w-4.5 h-4.5" />
                 </div>
                 <div className="space-y-1.5">
@@ -372,7 +372,7 @@ export default function Contact() {
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-white/[0.06] flex flex-col gap-1">
-                  <span className="text-xs font-bold text-[#4FFFB0]">partnerships@facecloudai.pro</span>
+                  <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.pro</span>
                   <span className="text-[9px] text-white/30 font-medium">Fast-track response channels for production partners.</span>
                 </div>
               </div>
@@ -380,20 +380,23 @@ export default function Contact() {
 
             {/* FAQ Redirect Link */}
             <RevealOnScroll delay={0.15}>
-              <div className="fc-panel p-5 bg-black/30 border border-white/[0.06] rounded-2xl flex items-center justify-between text-left hover:border-white/15 transition-all">
+              <a
+                href="/#faq"
+                className="fc-panel p-5 bg-black/30 border border-white/[0.06] rounded-2xl flex items-center justify-between text-left hover:border-[#F97316]/50 transition-all block cursor-pointer group"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 rounded-md bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#A78BFA]">
+                  <div className="w-7 h-7 rounded-md bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#F97316] group-hover:bg-[#EA580C]/25 transition-all">
                     <HelpCircle className="w-4 h-4" />
                   </div>
                   <div className="space-y-0.5">
-                    <h4 className="text-[11px] font-bold text-white uppercase tracking-wider">Looking for quick answers?</h4>
+                    <h4 className="text-[11px] font-bold text-white uppercase tracking-wider group-hover:text-[#F97316] transition-colors">Looking for quick answers?</h4>
                     <p className="text-[9px] text-white/35 font-medium">Check our FAQ section on the landing page.</p>
                   </div>
                 </div>
-                <a href="/#faq" className="text-[#FB923C] hover:text-white transition-colors shrink-0">
+                <div className="text-[#FB923C] group-hover:text-white transition-colors shrink-0">
                   <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
+                </div>
+              </a>
             </RevealOnScroll>
 
           </div>
