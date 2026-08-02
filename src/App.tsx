@@ -56,9 +56,12 @@ import NotificationCenter from './pages/moderator/NotificationCenter'
 import ReportsExports from './pages/moderator/ReportsExports'
 import NotFound from './pages/NotFound'
 
+import { ScrollToTop } from './components/layout/ScrollToTop'
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public Marketing & Auth */}
         <Route path="/" element={<Landing />} />

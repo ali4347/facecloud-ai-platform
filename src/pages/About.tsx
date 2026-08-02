@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Shield, Users, Activity } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
@@ -5,6 +6,10 @@ import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 
 export default function About() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
   return (
     <div className="relative min-h-screen fc-app-bg overflow-x-hidden flex flex-col justify-between selection:bg-white selection:text-black">
       {/* Navigation */}
@@ -14,7 +19,7 @@ export default function About() {
       <div className="flex-grow pt-28 pb-16">
         
         {/* ── SECTION 1 — Hero ───────────────────────────────────── */}
-        <section className="py-20 relative overflow-hidden">
+        <section id="about" className="py-20 relative overflow-hidden scroll-mt-24 md:scroll-mt-28">
           <div className="absolute top-[20%] left-[-10%] w-[50%] h-[40vh] rounded-full blur-[140px] pointer-events-none opacity-20"
             style={{ background: 'radial-gradient(circle, rgba(249, 115, 22,0.15) 0%, transparent 70%)' }} />
           

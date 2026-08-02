@@ -57,6 +57,22 @@ export function PublicNavbar() {
     return `/${item.label.toLowerCase()}`
   }
 
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    item: { label: string; isHash: boolean }
+  ) => {
+    setMobileOpen(false)
+    if (item.isHash && isHomePage) {
+      const targetId = item.label.toLowerCase()
+      const targetEl = document.getElementById(targetId)
+      if (targetEl) {
+        e.preventDefault()
+        targetEl.scrollIntoView({ block: 'start', behavior: 'smooth' })
+        window.history.pushState(null, '', `#${targetId}`)
+      }
+    }
+  }
+
   return (
     <>
       <header
@@ -89,6 +105,7 @@ export function PublicNavbar() {
                     <a
                       key={item.label}
                       href={getHref(item)}
+                      onClick={(e) => handleNavClick(e, item)}
                       className="hover:text-white transition-colors duration-200"
                     >
                       {item.label}
@@ -99,6 +116,7 @@ export function PublicNavbar() {
                     <Link
                       key={item.label}
                       to={getHref(item)}
+                      onClick={(e) => handleNavClick(e, item)}
                       className={cn(
                         "transition-colors duration-200",
                         location.pathname === getHref(item)
@@ -186,7 +204,7 @@ export function PublicNavbar() {
                       <a
                         key={item.label}
                         href={href}
-                        onClick={() => setMobileOpen(false)}
+                        onClick={(e) => handleNavClick(e, item)}
                         className="text-left text-white/80 hover:text-white text-base font-medium py-1.5 transition-colors"
                       >
                         {item.label}
@@ -197,7 +215,7 @@ export function PublicNavbar() {
                       <Link
                         key={item.label}
                         to={href}
-                        onClick={() => setMobileOpen(false)}
+                        onClick={(e) => handleNavClick(e, item)}
                         className={cn(
                           "text-left text-base font-medium py-1.5 transition-colors",
                           isActive

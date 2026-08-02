@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Mail, ShieldCheck, HelpCircle, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
@@ -20,6 +20,10 @@ interface FormErrors {
 }
 
 export default function Contact() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  }, [])
+
   const [fields, setFields] = useState<FormFields>({
     name: '',
     email: '',
@@ -135,7 +139,7 @@ export default function Contact() {
       <div className="flex-grow pt-28 pb-16">
         
         {/* ── HEADER ─────────────────────────────────────────────── */}
-        <section className="py-12 text-center max-w-3xl mx-auto px-6 space-y-4">
+        <section id="contact" className="py-12 text-center max-w-3xl mx-auto px-6 space-y-4 scroll-mt-24 md:scroll-mt-28">
           <RevealOnScroll>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F97316]/10 border border-[#F97316]/20 text-[11px] font-bold text-[#FB923C] uppercase tracking-wider">
               Get in touch

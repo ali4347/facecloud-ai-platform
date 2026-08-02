@@ -8,6 +8,15 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
 /* ─── CSS Custom Properties ─────────────────────────────────────────── */
 :root {
   /* Core black/void */
