@@ -53,11 +53,11 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 * **Color Accents**: Premium orange brand accents (`#F97316` core accent, with `#EA580C` and `#FB923C` stops). Status colors (Emerald, Amber, Rose) are preserved for active success/warning/error states.
 * **Typography**: Primary display headings (`h1`, `h2`, `h3`) utilize `Space Mono` (Google Fonts). Small numbered section indicators utilize `Silkscreen` (Google Fonts). Body copy continues using `Inter`.
 * **Visual Effects**: Micro-animations on buttons and cards using Framer Motion, dynamic hover transitions, and pulse glows on status badges.
-* **Landing Page**: Implements a fullscreen video hero streaming an HLS background video using `hls.js` with fallback support for native Safari HLS. Features a "live systems" data-ops aesthetic with status badges, terminal-style logs, live pipeline cards, and animated percentage indicators.
+* **Landing Page**: The FaceCloud landing hero uses a full-bleed muted MP4 background streamed from CloudFront. The video uses native HTML playback with an optional reduced-motion-safe desktop parallax effect. Features a "live systems" data-ops aesthetic with status badges, terminal-style logs, live pipeline cards, and animated percentage indicators.
 * **Responsive Layouts**: Multi-device sidebars that automatically collapse on mobile screens with responsive top header bars.
 
 ### Landing Page Sections (in order)
-1. **Fullscreen Video Hero** — HLS background video, staggered headline animation with `<ScrambleText>` decodes and orange highlight blocks, inline email waitlist capture, pill badge pop-in.
+1. **Fullscreen Video Hero** — CloudFront MP4 background video with native HTML playback and desktop mouse parallax, staggered headline animation with `<ScrambleText>` decodes and orange highlight blocks, inline email waitlist capture, pill badge pop-in.
 2. **Trusted Logos Marquee** — Infinite horizontal scroll of partner logos.
 3. **Stats / Metrics Bar** — 4 animated CountUp counters (detection accuracy, processing time, images processed, RBAC roles).
 4. **01 / Early Access Feedback** — Testimonials block with orange hover border shadows.
