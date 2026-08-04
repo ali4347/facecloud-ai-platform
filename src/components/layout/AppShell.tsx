@@ -50,7 +50,12 @@ export function AppShell({ role }: AppShellProps) {
 
       {/* Main content */}
       <div className="lg:pl-64 flex flex-col min-h-screen relative z-10">
-        <Topbar role={role} onMenuClick={() => setSidebarOpen(o => !o)} />
+        <Topbar
+          role={role}
+          sidebarOpen={sidebarOpen}
+          onMenuClick={() => setSidebarOpen(o => !o)}
+          onCloseSidebar={() => setSidebarOpen(false)}
+        />
         <main className="flex-1 p-6 page-enter">
           <Outlet />
         </main>

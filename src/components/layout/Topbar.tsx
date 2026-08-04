@@ -7,6 +7,8 @@ import type { Role } from '../../data/mock'
 interface TopbarProps {
   role: Role
   onMenuClick?: () => void
+  sidebarOpen?: boolean
+  onCloseSidebar?: () => void
 }
 
 const roleUser = {
@@ -15,7 +17,7 @@ const roleUser = {
   moderator: { name: 'Vaneeza Sohaib',  email: 'vaneeza@facecloud.io',  initials: 'VS' },
 }
 
-export function Topbar({ role, onMenuClick }: TopbarProps) {
+export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar }: TopbarProps) {
   const sessionStr = localStorage.getItem('facecloud_session')
   let user = roleUser[role]
 
@@ -59,7 +61,7 @@ export function Topbar({ role, onMenuClick }: TopbarProps) {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        <NotificationDropdown />
+        <NotificationDropdown sidebarOpen={sidebarOpen} onOpen={onCloseSidebar} />
         <div className="w-px h-6 mx-1" style={{ background: 'rgba(249,115,22,0.15)' }} />
         <UserMenu name={user.name} email={user.email} role={role} initials={user.initials} />
       </div>
