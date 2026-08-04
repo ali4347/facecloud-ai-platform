@@ -16,12 +16,12 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
 
-// ─── Quick Action Cards ────────────────────────────────────────────────────────
+// ─── Quick Action Cards (Four Unique Actions) ──────────────────────────────────
 const ACTION_CARDS = [
-  { title: 'Single Upload', desc: 'Upload and enhance one portrait photo.', path: '/dashboard/upload/single', icon: FileText, delay: 0 },
-  { title: 'Multiple Upload', desc: 'Upload several photos at once.', path: '/dashboard/upload/multiple', icon: Upload, delay: 0.05 },
-  { title: 'Upload ZIP Archive', desc: 'Drop a ZIP of portraits for batch processing.', path: '/dashboard/upload/zip', icon: FolderArchive, delay: 0.1 },
-  { title: 'Live Camera', desc: 'Try real-time AI enhancement via camera.', path: '/dashboard/live-enhancement', icon: Camera, delay: 0.15 },
+  { title: 'Single Upload', desc: 'Upload and enhance one portrait photo.', path: '/dashboard/upload/single', icon: FileText },
+  { title: 'Multiple Upload', desc: 'Upload several photos at once.', path: '/dashboard/upload/multiple', icon: Upload },
+  { title: 'Upload ZIP Archive', desc: 'Drop a ZIP of portraits for batch processing.', path: '/dashboard/upload/zip', icon: FolderArchive },
+  { title: 'Live Camera', desc: 'Try real-time AI enhancement via camera.', path: '/dashboard/live-enhancement', icon: Camera },
 ]
 
 // ─── 7-day accepted vs rejected chart ─────────────────────────────────────────
@@ -85,7 +85,7 @@ export default function Dashboard() {
 
   const isProcessing = userStats.processingInProgress > 0
 
-  // Stat cards — 4 user-relevant ones only
+  // Stat cards — 4 user-relevant metrics
   const statCards = useMemo(() => [
     {
       label: 'Total Uploads',
@@ -124,7 +124,7 @@ export default function Dashboard() {
   return (
     <div className="page-enter space-y-6">
 
-      {/* Page Header */}
+      {/* Row 1: Page Header with single primary Upload Photos button */}
       <PageHeader
         title="My Dashboard"
         subtitle="Your uploads, results and downloads — all in one place."
@@ -135,29 +135,22 @@ export default function Dashboard() {
         }
       />
 
-      {/* 1. Welcome Banner */}
+      {/* Row 2: Compact Welcome Banner (text-only) */}
       <div
-        className="fc-card p-6 md:p-8 rounded-[28px] relative overflow-hidden backdrop-blur-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
+        className="fc-card p-5 md:p-6 rounded-[24px] relative overflow-hidden backdrop-blur-lg border border-white/[0.08]"
         style={{
           background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
         }}
       >
-        <div className="space-y-2 max-w-xl">
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-none">Welcome back, Ali Hassan</h2>
-          <p className="text-sm text-white/50 leading-relaxed font-medium">
-            Upload a photo, check your results, or download your enhanced images below.
+        <div className="space-y-1">
+          <h2 className="text-lg md:text-xl font-bold text-white tracking-tight leading-snug">Welcome back, Ali Hassan</h2>
+          <p className="text-xs text-white/50 leading-relaxed font-medium">
+            Upload a photo, review your results, or download your enhanced images below.
           </p>
         </div>
-        <Link
-          to="/dashboard/upload"
-          className="fc-btn-primary !py-3 !px-6 text-xs font-bold shrink-0"
-          style={{ background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)', color: '#fff', boxShadow: 'none' }}
-        >
-          Upload Photos
-        </Link>
       </div>
 
-      {/* Processing-in-progress banner */}
+      {/* Row 3: Processing-in-progress banner */}
       {isProcessing && (
         <motion.div
           initial={{ opacity: 0, y: -6 }}
@@ -173,7 +166,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* 2. Quick Action Cards */}
+      {/* Row 4: Four Unique Quick Action Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {ACTION_CARDS.map(card => {
           const isHovered = hoveredCard === card.title
@@ -204,7 +197,7 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* 3. Stat Cards (4 only) */}
+      {/* Row 5: Four Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {statCards.map(stat => (
           <div
@@ -235,13 +228,13 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Main two-column layout */}
+      {/* Main Two-Column Layout */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
 
-        {/* Left: Chart + Recent Uploads table */}
+        {/* Left Column: Weekly Uploads Chart + Recent Uploads Table */}
         <div className="xl:col-span-8 space-y-6">
 
-          {/* 4. This Week's Results Chart */}
+          {/* Weekly Results Chart */}
           <div className="fc-card p-6 space-y-5">
             <div>
               <h3 className="text-sm font-semibold text-white">Your uploads this week</h3>
@@ -286,7 +279,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* 5. Recent Uploads */}
+          {/* Recent Uploads Table */}
           <div className="fc-card p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-white/[0.08] pb-4">
               <div>
@@ -337,10 +330,10 @@ export default function Dashboard() {
 
         </div>
 
-        {/* Right: Activity feed + promo cards */}
+        {/* Right Column: Recent Activity Feed + Downloads Status Card */}
         <div className="xl:col-span-4 space-y-6">
 
-          {/* 6. Recent Activity */}
+          {/* Recent Activity Feed */}
           <div className="fc-card p-6 space-y-5">
             <div className="flex justify-between items-center border-b border-white/[0.08] pb-3">
               <div>
@@ -350,7 +343,7 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-4 relative pl-4 border-l border-white/[0.08] ml-2">
-              {mockActivity.slice(0, 8).map(act => {
+              {mockActivity.slice(0, 10).map(act => {
                 const Icon = ACTIVITY_ICON_MAP[act.type] ?? Clock
                 const isError = act.status === 'error'
                 const dotColor = isError ? '#EF4444' : act.status === 'success' ? '#4FFFB0' : '#FB923C'
@@ -377,51 +370,31 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* 7. Live Enhancement Promo */}
+          {/* Downloads Status Card (Informational with metadata) */}
           <div
-            className="fc-card p-6 space-y-4 rounded-[24px] border border-white/[0.08] relative overflow-hidden"
-            style={{
-              background: 'radial-gradient(circle at bottom left, rgba(79,255,176,0.06) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
-            }}
-          >
-            <div className="w-8 h-8 rounded-lg bg-[#4FFFB0]/15 border border-[#4FFFB0]/20 flex items-center justify-center text-[#4FFFB0]">
-              <Camera className="w-4 h-4" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-xs font-bold text-white">Live Camera Enhancement</h3>
-              <p className="text-[10px] text-white/45 leading-relaxed font-medium">
-                Point your camera to see AI enhancement and face detection in real time.
-              </p>
-            </div>
-            <Link
-              to="/dashboard/live-enhancement"
-              className="fc-btn-secondary !py-2 !px-4 text-[10px] font-bold w-full mt-2 flex items-center justify-center gap-1 border-[#4FFFB0]/35 hover:border-[#4FFFB0]"
-            >
-              Open Live Camera <ArrowUpRight className="w-3 h-3" />
-            </Link>
-          </div>
-
-          {/* 8. Downloads Promo */}
-          <div
-            className="fc-card p-6 space-y-4 rounded-[24px] border border-white/[0.08] relative overflow-hidden"
+            className="fc-card p-5 space-y-4 rounded-[24px] border border-white/[0.08] relative overflow-hidden"
             style={{
               background: 'radial-gradient(circle at bottom right, rgba(234, 88, 12,0.06) 0%, transparent 60%), rgba(255, 255, 255, 0.035)'
             }}
           >
-            <div className="w-8 h-8 rounded-lg bg-[#EA580C]/15 border border-[#EA580C]/20 flex items-center justify-center text-[#A78BFA]">
-              <Download className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#EA580C]/15 border border-[#EA580C]/20 flex items-center justify-center text-[#FB923C] shrink-0">
+                <Download className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-xs font-bold text-white">Downloads</h3>
+                <p className="text-[10px] text-white/40 font-medium truncate">Secure, time-limited download links</p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h3 className="text-xs font-bold text-white">Downloads</h3>
-              <p className="text-[10px] text-white/45 leading-relaxed font-medium">
-                {userStats.enhancedImages} photos are ready to download with secure, time-limited links.
-              </p>
+            <div className="p-3 bg-white/[0.02] border border-white/[0.06] rounded-xl flex items-center justify-between">
+              <span className="text-xs text-white/60 font-medium">Enhanced files ready</span>
+              <span className="text-sm font-extrabold text-[#4FFFB0] font-mono">{userStats.enhancedImages} photos</span>
             </div>
             <Link
               to="/dashboard/downloads"
-              className="fc-btn-secondary !py-2 !px-4 text-[10px] font-bold w-full mt-2 flex items-center justify-center gap-1 hover:border-[#EA580C]/40"
+              className="fc-btn-secondary !py-2.5 !px-4 text-[11px] font-bold w-full flex items-center justify-center gap-1.5 hover:border-[#EA580C]/40 transition-colors"
             >
-              Open Downloads <ArrowUpRight className="w-3 h-3" />
+              Open Downloads <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
