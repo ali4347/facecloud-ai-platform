@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 
-const FORWARD_VIDEO_SRC =
-  'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260725_114042_d2ed2a89-f2fa-449b-9609-da456344257b.mp4'
+const FORWARD_VIDEO_SRC = '/videos/facecloud-hero-forward.mp4'
 const REVERSE_VIDEO_SRC = '/videos/facecloud-hero-reverse.mp4'
+const POSTER_SRC = '/videos/facecloud-hero-poster.jpg'
 
 type PlaybackDirection = 'forward' | 'reverse'
 
@@ -149,6 +149,7 @@ export function BackgroundVideo() {
           muted
           playsInline
           preload="auto"
+          poster={POSTER_SRC}
           aria-hidden="true"
           tabIndex={-1}
           onCanPlay={handleForwardCanPlay}
@@ -163,7 +164,8 @@ export function BackgroundVideo() {
           ref={reverseVideoRef}
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster={POSTER_SRC}
           aria-hidden="true"
           tabIndex={-1}
           onEnded={handleReverseEnded}

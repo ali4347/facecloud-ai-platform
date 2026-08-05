@@ -7,16 +7,99 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/branding/facecloud-favicon-192.png" />
     <link rel="apple-touch-icon" href="/branding/facecloud-apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FaceCloud — AI Facial Image Platform</title>
-    <meta name="description" content="FaceCloud enhances, validates, organizes, and securely manages facial images using AI." />
-    <meta name="keywords" content="FaceCloud, AI image enhancement, facial recognition, Zero-DCE, face validation, identity grouping" />
-    <meta property="og:title" content="FaceCloud — AI Facial Image Platform" />
-    <meta property="og:description" content="FaceCloud enhances, validates, organizes, and securely manages facial images using AI." />
+
+    <!-- Primary SEO -->
+    <title>FaceCloud — AI-Powered Facial Image Enhancement Platform</title>
+    <meta name="description" content="FaceCloud uses AI to enhance low-light facial images, validate quality, and automatically group photos by identity — with secure, role-based access for teams." />
+    <meta name="keywords" content="FaceCloud, AI image enhancement, facial recognition, Zero-DCE, face validation, identity grouping, facial image platform" />
+    <link rel="canonical" href="https://www.facecloudai.pro/" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="FaceCloud — AI-Powered Facial Image Enhancement Platform" />
+    <meta property="og:description" content="FaceCloud uses AI to enhance low-light facial images, validate quality, and automatically group photos by identity — with secure, role-based access for teams." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.facecloudai.pro/" />
     <meta property="og:image" content="/branding/facecloud-social-preview.png" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FaceCloud — AI-Powered Facial Image Enhancement Platform" />
+    <meta name="twitter:description" content="FaceCloud uses AI to enhance low-light facial images, validate quality, and automatically group photos by identity." />
+    <meta name="twitter:image" content="/branding/facecloud-social-preview.png" />
+
     <meta name="theme-color" content="#050816" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "FaceCloud",
+      "url": "https://www.facecloudai.pro",
+      "description": "AI-powered facial image enhancement, validation, and identity organization platform.",
+      "sameAs": []
+    }
+    </script>
+
+    <!-- FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What image formats are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FaceCloud accepts JPEG, PNG, and WebP image formats. ZIP archives containing these formats are also supported for batch processing."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is my data secured?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "All uploads are encrypted at rest using AES-256 and in transit via TLS 1.3. JWT-based authentication enforces role-based access control across all API endpoints."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I delete my data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Users can delete individual images or entire person folders from the dashboard at any time. Deleted data is permanently removed from all storage systems within 24 hours."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What happens to rejected images?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Images that fail quality checks (blur, exposure, or face detection) are flagged for moderator review. Moderators can override rejections or confirm the automated decision."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is there an API for integrations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pro plan subscribers get access to the FaceCloud REST API. Full Swagger documentation and testing playgrounds are available at the /docs endpoint."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the plan limits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Free plan allows 50 images/month with 500 MB storage. Basic supports 2,000 images with 10 GB. Pro offers unlimited uploads with 100 GB storage and priority processing."
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

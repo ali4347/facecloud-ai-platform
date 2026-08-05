@@ -72,28 +72,29 @@ export function HeroSection() {
           AI Face Enhancement&nbsp;•&nbsp;Validation&nbsp;•&nbsp;Identity Grouping
         </motion.p>
 
-        {/* ── Heading (staggered lines) ───────────────────────── */}
-        <div className="space-y-1">
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-[56px] font-extrabold tracking-tight leading-[1.15] text-white max-w-4xl font-display"
+        {/* ── Heading (single h1, staggered animated lines) ───── */}
+        <motion.h1
+          className="space-y-1 text-4xl md:text-[56px] font-extrabold tracking-tight leading-[1.15] max-w-4xl font-display"
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: prefersReduced ? 0 : stagger } } }}
+        >
+          <motion.span
+            variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } } }}
+            className="block text-white"
           >
             <ScrambleText text="A new way to enhance" />
-          </motion.h1>
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: stagger, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl md:text-[56px] font-extrabold tracking-tight leading-[1.15] max-w-4xl font-display"
+          </motion.span>
+          <motion.span
+            variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } } }}
+            className="block"
           >
             <span className="text-white">and organize </span>
             <span className="bg-[#F97316] text-white px-2 py-1 inline-block font-bold">
               <ScrambleText text="facial images" />
             </span>
-          </motion.h1>
-        </div>
+          </motion.span>
+        </motion.h1>
 
         {/* ── Supporting paragraph ───────────────────────────── */}
         <motion.p
