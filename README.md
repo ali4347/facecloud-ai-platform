@@ -495,7 +495,7 @@ The Interactive Demo uses a locally stored facial image with frontend visual fil
 > After completing every major feature, bug fix, route change, or UI update:
 > 1. Run `npm run build`
 > 2. Resolve all compilation and linting errors.
-> 3. Update the `README.md` file to document new features or modifications.
+> 3. Update the `README.md` file to document new features or modifications, and add a dated entry to `WORK_LOG.md` (the running work log, Section 2).
 > 4. Commit changes with a descriptive, concise message.
 > 5. Push to the `origin main` branch.
 > 

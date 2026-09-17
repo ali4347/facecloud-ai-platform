@@ -5,7 +5,7 @@ For every task in this FaceCloud project, the agent must follow this Git Workflo
 1. Run required checks (e.g., `npm run build`, backend compiles, Prisma migrations/validations).
 2. Fix all build, lint, and compilation errors before committing.
 3. Ensure no `.env`, secrets, `node_modules/`, `backend/node_modules/`, `dist/`, or sensitive files are tracked.
-4. Update `README.md` and/or `README_BACKEND_ROADMAP.md` if features, routes, database schemas, or setup steps change.
+4. Update `README.md` and/or `README_BACKEND_ROADMAP.md` if features, routes, database schemas, or setup steps change. Always add a dated entry to `WORK_LOG.md` (Section 2, Change Log) for every task.
 5. Stage changes: `git add .`
 6. Commit changes with a descriptive, concise message.
 7. Push immediately to the remote branch (`origin main` at `git@github.com:ali4347/facecloud-ai-platform.git`).
