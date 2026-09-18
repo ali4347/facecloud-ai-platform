@@ -23,7 +23,7 @@ export function IdentityGroupCard({ group }: IdentityGroupCardProps) {
     return groupImgs[0] ?? null
   })()
 
-  const fallbackColor = group.coverImages[0] ?? '#6366F1'
+  const fallbackColor = group.coverImages[0] ?? '#FB923C'
 
   return (
     <div className="fc-card p-5 hover:shadow-card-md transition-all duration-200 hover:-translate-y-0.5 flex flex-col">
@@ -37,11 +37,11 @@ export function IdentityGroupCard({ group }: IdentityGroupCardProps) {
           >
             {/* Stylised face silhouette to indicate it's a face photo */}
             <svg width="56" height="72" viewBox="0 0 56 72" fill="none" className="opacity-60">
-              <ellipse cx="28" cy="28" rx="20" ry="24" fill="#94A3B8" stroke="#64748B" strokeWidth="1.5" />
-              <circle cx="21" cy="24" r="4" fill="#64748B" />
-              <circle cx="35" cy="24" r="4" fill="#64748B" />
-              <path d="M18 36 Q28 42 38 36" stroke="#64748B" strokeWidth="2" fill="none" strokeLinecap="round" />
-              <path d="M8 72 C8 56 48 56 48 72" fill="#E6E9EF" />
+              <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.36)" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" />
+              <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
+              <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
+              <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.52)" strokeWidth="2" fill="none" strokeLinecap="round" />
+              <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.10)" />
             </svg>
             {/* Dimension badge */}
             <span className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/40 text-[9px] text-white font-mono font-bold tracking-wider">

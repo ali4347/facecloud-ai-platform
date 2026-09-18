@@ -7,16 +7,16 @@ interface StatusBadgeProps {
   className?: string
 }
 
-/* Light-surface badge palette: a soft tint, a matching hairline, and text dark
-   enough to clear AA against the tint. */
+/* Badge palette on the dark card: a 12% tint, a matching hairline, and text
+   from the light end of each ramp so it stays legible. */
 const statusConfig = {
-  success:    { bg: '#ECFDF5', border: '#A7F3D0', text: '#047857', dot: '#059669' },
-  warning:    { bg: '#FFFBEB', border: '#FDE68A', text: '#B45309', dot: '#D97706' },
-  error:      { bg: '#FEF2F2', border: '#FECACA', text: '#B91C1C', dot: '#DC2626' },
-  info:       { bg: '#EEF0FE', border: '#C7CBFB', text: '#4338CA', dot: '#4F46E5' },
-  purple:     { bg: '#F5F3FF', border: '#DDD6FE', text: '#6D28D9', dot: '#7C3AED' },
-  muted:      { bg: '#F1F3F7', border: '#E6E9EF', text: '#64748B', dot: '#94A3B8' },
-  processing: { bg: '#EEF0FE', border: '#C7CBFB', text: '#4338CA', dot: '#4F46E5' },
+  success:    { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.28)', text: '#34D399', dot: '#10B981' },
+  warning:    { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.28)', text: '#FCD34D', dot: '#F59E0B' },
+  error:      { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.28)', text: '#F87171', dot: '#EF4444' },
+  info:       { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.28)', text: '#FB923C', dot: '#F97316' },
+  purple:     { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.28)', text: '#A78BFA', dot: '#8B5CF6' },
+  muted:      { bg: '#16181C', border: 'rgba(255,255,255,0.10)', text: 'rgba(255,255,255,0.52)', dot: 'rgba(255,255,255,0.36)' },
+  processing: { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.28)', text: '#FB923C', dot: '#F97316' },
 }
 
 export function StatusBadge({ status, label, dot = true, className }: StatusBadgeProps) {

@@ -26,7 +26,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete (mock) | Queue, image review, members, batches, notifications, reports, audit, settings |
-| Branding + design system | ✅ Done | Two scopes: public pages stay black / orange `#F97316` / monospace; the authenticated dashboards use a light theme (white cards on `#F7F8FA`, indigo `#4F46E5` accent, Inter) |
+| Branding + design system | ✅ Done | One palette site-wide: black, orange `#F97316`, white text. Public pages keep the monospace display face and glass panels; the dashboards use the same colours in a flatter card layout (scope `.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Vercel | `vercel.json` SPA rewrite that skips files with extensions (so `/videos/*.mp4` serve) |
 | Backend database (PostgreSQL 16 + Prisma 5.22) | ✅ Schema + migration + seed | 15 models, 8 enums, migration `20260714_init`, 3 seeded accounts |
@@ -46,7 +46,24 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
-### 2026-09-18 — Dashboard interface restyled to a light theme
+### 2026-09-18 — Dashboard switched to the site's black and orange palette
+*Status: committed (this commit)*
+- The owner asked for the dashboards to be dark and to use the website's orange with white, so the light palette
+  introduced earlier today was replaced. **The layout from that restyle is unchanged** — stacked sidebar cards, the
+  ⌘K search, round topbar buttons, flat cards, segmented controls and Inter headings all stay.
+- Only the values behind the tokens changed, so no dashboard page needed restyling a second time:
+  `ink` is now white at four opacities, `line` white hairlines, `surface` `#0E0F12` cards on a `#000000` page, and
+  `accent` the brand orange `#F97316` / `#FB923C` / `#EA580C`. Shadows became dark drops instead of soft grey ones.
+- `src/index.css`: the scoped block was rewritten and renamed `.fc-light` → `.fc-app`, since the scope is the app
+  shell rather than a light theme. Primary buttons are the orange gradient with white text, inputs and table headers
+  sit on `#16181C`, badges are 12% colour tints, and the active sidebar row is a lifted panel with an orange marker.
+- Converted the colour literals that the light pass had baked into 54 dashboard files back to the dark palette, and
+  lifted status text to the light end of each ramp (emerald/red/violet/amber 400s) so it stays legible on black.
+- `AppShell` no longer repaints `document.body` — the body is already black site-wide.
+- Verified by running the app: user dashboard, single-upload page and moderator queue all render dark with orange
+  accents, and the public landing page is byte-for-byte unaffected by the scope. `npm run build` passes.
+
+### 2026-09-18 — Dashboard interface restyled to a light theme (superseded the same day)
 *Status: committed (this commit)*
 - Reskinned the three authenticated dashboards (user, admin, moderator) to the light interface style the owner
   supplied as a reference: white cards on a light grey page, hairline borders, close soft shadows, large corner radii,
@@ -209,7 +226,7 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
 | 4 | 2026-08-02 → 08-05 | Rebrand + polish + SEO | Black/orange/mono design system, hero video loop, nav fixes, SEO, analytics |
 | 5 | 2026-09-16 → 09-17 | Landing v3 attempt (discarded) | Monochrome landing system prototype; discarded uncommitted on 2026-09-17 |
 | 6 | 2026-09-17 | Documentation | WORK_LOG.md, CLAUDE.md, Stop hook for automatic log updates |
-| 7 | 2026-09-18 | Dashboard light theme | Scoped light interface for the three authenticated portals |
+| 7 | 2026-09-18 | Dashboard interface | New shell layout for the three portals, first in a light palette, then switched to the site's black and orange |
 
 ---
 
@@ -224,9 +241,9 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
   `rejection-summary`, `images`, `logs`→`audit-logs`.
 - Moderator `/moderator` (9): index, `members`, `queue`, `images/:id`, `batches`, `notifications`, `reports`, `audit`, `settings`.
 
-**Design scopes:** public marketing pages use the black / orange / monospace system; everything inside the
-authenticated `AppShell` uses the light theme scoped under `.fc-light` (see the 2026-09-18 entry). The login pages
-and the moderator access-denied screen sit outside the shell and remain dark.
+**Design scopes:** one palette site-wide — black, orange `#F97316`, white text. Public marketing pages use the
+monospace display face and glass panels; everything inside the authenticated `AppShell` uses the flatter card layout
+scoped under `.fc-app` (see the 2026-09-18 entries).
 
 **Components (`src/components/`):** animation (4: CountUp, RevealOnScroll, ScrambleText, StaggerChildren) ·
 branding (FaceCloudLogo) · features (9: ActivityTimeline, BeforeAfterSlider, EnhancementControls, IdentityGroupCard,
@@ -277,8 +294,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
 - `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
-- The three login pages and the moderator access-denied screen are still dark while the dashboards behind them are
-  light. Intentional for now — the restyle was scoped to the dashboards — but the transition is abrupt.
+- The topbar's appearance (sun) button is decorative chrome copied from the reference and does nothing. Either wire
+  it to a real light/dark switch or remove it.
 - Vite 8 / rolldown chunk warning: consider `build.chunkSizeWarningLimit` or dynamic imports for portals.
 
 ---

@@ -72,7 +72,7 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar }: Topba
             placeholder="Search project..."
             aria-label="Search images, groups and jobs"
             className="w-full h-11 pl-10 pr-16 rounded-[14px] bg-surface border border-line text-[13px] text-ink
-                       placeholder:text-ink-faint shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none
+                       placeholder:text-ink-faint shadow-[0_1px_2px_rgba(0,0,0,0.45)] outline-none
                        transition-colors focus:border-accent-soft"
           />
           <span className="fc-kbd absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center">

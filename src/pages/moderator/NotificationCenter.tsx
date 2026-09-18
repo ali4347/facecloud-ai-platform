@@ -24,10 +24,10 @@ const TYPE_ICONS: Record<ModNotification['type'], React.ElementType> = {
 }
 
 const TYPE_COLORS: Record<ModNotification['type'], string> = {
-  Assignment: 'text-[#6366F1] bg-[#6366F1]/10 border-[#6366F1]/20',
-  Deadline: 'text-[#D97706] bg-[#D97706]/10 border-[#D97706]/20',
+  Assignment: 'text-[#FB923C] bg-[#FB923C]/10 border-[#FB923C]/20',
+  Deadline: 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20',
   Failure: 'text-red-400 bg-red-500/10 border-red-500/20',
-  Escalation: 'text-violet-700 bg-violet-500/10 border-violet-300/20'
+  Escalation: 'text-violet-400 bg-violet-500/10 border-violet-500/30/20'
 }
 
 export default function NotificationCenter() {
@@ -105,7 +105,7 @@ export default function NotificationCenter() {
                         {/* Unread indicator dot */}
                         <div className="w-1.5 h-1.5 shrink-0 flex items-center justify-center">
                           {!notif.isRead && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#4F46E5] animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#F97316] animate-pulse" />
                           )}
                         </div>
 
@@ -160,7 +160,7 @@ export default function NotificationCenter() {
               <div className="grid grid-cols-2 gap-3 text-center">
                 <div className="p-4 rounded-2xl bg-surface-mute border border-line">
                   <span className="block text-[8px] text-ink-mute font-bold uppercase tracking-wider">Unread</span>
-                  <span className="block text-xl font-bold text-[#4F46E5] mt-1">{unreadCount}</span>
+                  <span className="block text-xl font-bold text-[#F97316] mt-1">{unreadCount}</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-surface-mute border border-line">
                   <span className="block text-[8px] text-ink-mute font-bold uppercase tracking-wider">Total</span>

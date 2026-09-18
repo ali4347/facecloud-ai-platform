@@ -91,9 +91,9 @@ export default function UploadZip() {
                   </div>
 
                   {/* Info note */}
-                  <div className="p-4 rounded-2xl bg-[#4F46E5]/[0.06] border border-[#4F46E5]/20 text-xs text-[#6366F1] font-medium space-y-1">
+                  <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium space-y-1">
                     <p className="font-bold">What happens next?</p>
-                    <ul className="space-y-0.5 text-[#6366F1]/70 list-disc list-inside">
+                    <ul className="space-y-0.5 text-[#FB923C]/70 list-disc list-inside">
                       <li>Photos are extracted from the ZIP</li>
                       <li>Each photo is enhanced and validated</li>
                       <li>Accepted photos are grouped by person</li>
@@ -127,7 +127,7 @@ export default function UploadZip() {
                   <div className="text-[10px] text-ink-mute space-y-1 bg-surface-mute p-3 rounded-2xl border border-line">
                     <div>Unpacking archive…</div>
                     {progress >= 40 && <div className="text-accent">Found 14 image files</div>}
-                    {progress >= 80 && <div className="text-emerald-600">Enhancement and quality checks running…</div>}
+                    {progress >= 80 && <div className="text-emerald-400">Enhancement and quality checks running…</div>}
                   </div>
                 </div>
               )}
@@ -162,7 +162,7 @@ export default function UploadZip() {
                 <div className="p-4 rounded-2xl bg-surface-mute border border-line space-y-3 text-xs text-ink-mute">
                   <div className="flex justify-between items-center pb-2 border-b border-line">
                     <span className="font-bold text-[10px] uppercase tracking-wider">Results</span>
-                    <span className="text-emerald-600 font-bold flex items-center gap-1">
+                    <span className="text-emerald-400 font-bold flex items-center gap-1">
                       <CheckCircle className="w-3.5 h-3.5" /> Done
                     </span>
                   </div>
@@ -172,7 +172,7 @@ export default function UploadZip() {
                   </div>
                   <div className="flex justify-between">
                     <span>Photos accepted:</span>
-                    <span className="font-bold text-emerald-600">12 photos</span>
+                    <span className="font-bold text-emerald-400">12 photos</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Photos rejected:</span>

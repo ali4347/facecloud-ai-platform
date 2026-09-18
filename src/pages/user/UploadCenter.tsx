@@ -19,7 +19,7 @@ export default function UploadCenter() {
       path: '/dashboard/upload/multiple',
       icon: Files,
       badge: 'Batch Queue',
-      color: 'border-emerald-300/20 text-emerald-600 hover:border-emerald-300'
+      color: 'border-emerald-500/30/20 text-emerald-400 hover:border-emerald-500/30'
     },
     {
       title: 'ZIP Archive Upload',
@@ -27,7 +27,7 @@ export default function UploadCenter() {
       path: '/dashboard/upload/zip',
       icon: FolderArchive,
       badge: 'Automated Folders',
-      color: 'border-violet-300/20 text-violet-600 hover:border-violet-300'
+      color: 'border-violet-500/30/20 text-violet-400 hover:border-violet-500/30'
     }
   ]
 
@@ -71,7 +71,7 @@ export default function UploadCenter() {
               { text: 'Image resolution must not display excessive motion blur or noise indicators', ok: false }
             ].map((g, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${g.ok ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'} mt-0.5 flex-shrink-0`}>
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${g.ok ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'} mt-0.5 flex-shrink-0`}>
                   <CheckCircle className="w-3 h-3" />
                 </div>
                 <span className="text-xs text-ink">{g.text}</span>

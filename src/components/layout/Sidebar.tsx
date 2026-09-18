@@ -78,9 +78,9 @@ const roleHome = {
 /* Same avatar colour the topbar's UserMenu uses, so the two representations of
    the signed-in person match. */
 const avatarColor = {
-  user:      '#4F46E5',
-  admin:     '#4338CA',
-  moderator: '#059669',
+  user:      '#F97316',
+  admin:     '#EA580C',
+  moderator: '#10B981',
 }
 
 const fallbackUser = {
@@ -229,7 +229,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
             <p className="text-[13px] font-semibold text-ink truncate leading-none">
               {account.name}
             </p>
-            <span className="inline-flex mt-1.5 px-1.5 py-0.5 rounded-md bg-accent-tint text-accent-deep text-[10px] font-semibold capitalize leading-none">
+            <span className="inline-flex mt-1.5 px-1.5 py-0.5 rounded-md bg-accent-tint text-accent-soft text-[10px] font-semibold capitalize leading-none">
               {role}
             </span>
           </div>
@@ -238,7 +238,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
             type="button"
             aria-label="Logout"
             title="Logout"
-            className="p-2 rounded-lg text-ink-faint hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer flex-shrink-0"
+            className="p-2 rounded-lg text-ink-faint hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer flex-shrink-0"
           >
             <LogOut className="w-4 h-4" />
           </button>

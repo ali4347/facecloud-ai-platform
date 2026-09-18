@@ -25,7 +25,7 @@ export default function Security() {
           <ChartCard title="Security Events Registry" subtitle="Real-time network security logs">
             {alerts.length === 0 ? (
               <div className="h-64 flex flex-col items-center justify-center text-center text-ink-mute gap-2">
-                <CheckCircle className="w-8 h-8 text-[#059669] animate-bounce" />
+                <CheckCircle className="w-8 h-8 text-[#10B981] animate-bounce" />
                 <p className="text-xs font-semibold">Zero security threats detected inside current firewall buffer.</p>
               </div>
             ) : (
@@ -35,8 +35,8 @@ export default function Security() {
                     key={a.id} 
                     className="p-4 rounded-3xl border transition-all flex items-start justify-between gap-4"
                     style={{
-                      background: a.risk === 'critical' ? 'rgba(239,68,68,0.06)' : a.risk === 'high' ? 'rgba(217,119,6,0.06)' : '#F1F3F7',
-                      borderColor: a.risk === 'critical' ? 'rgba(239,68,68,0.20)' : a.risk === 'high' ? 'rgba(217,119,6,0.20)' : '#E6E9EF'
+                      background: a.risk === 'critical' ? 'rgba(239,68,68,0.06)' : a.risk === 'high' ? 'rgba(245,158,11,0.06)' : '#16181C',
+                      borderColor: a.risk === 'critical' ? 'rgba(239,68,68,0.20)' : a.risk === 'high' ? 'rgba(245,158,11,0.20)' : 'rgba(255,255,255,0.10)'
                     }}
                   >
                     <div className="flex gap-3 text-xs">
@@ -45,9 +45,9 @@ export default function Security() {
                           a.risk === 'critical' || a.risk === 'high' ? 'animate-pulse' : ''
                         }`}
                         style={{
-                          background: '#F1F3F7',
-                          border: '1px solid #E6E9EF',
-                          color: a.risk === 'critical' || a.risk === 'high' ? '#DC2626' : '#64748B'
+                          background: '#16181C',
+                          border: '1px solid rgba(255,255,255,0.10)',
+                          color: a.risk === 'critical' || a.risk === 'high' ? '#EF4444' : 'rgba(255,255,255,0.52)'
                         }}
                       >
                         {a.type === 'failed_login' ? <Lock className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
@@ -103,7 +103,7 @@ export default function Security() {
                 </div>
                 <div className="flex justify-between">
                   <span>Current Threat Index:</span>
-                  <span className={`font-bold ${alerts.some(a => a.risk === 'critical') ? 'text-[#DC2626]' : 'text-[#059669]'}`}>
+                  <span className={`font-bold ${alerts.some(a => a.risk === 'critical') ? 'text-[#EF4444]' : 'text-[#10B981]'}`}>
                     {alerts.some(a => a.risk === 'critical') ? 'CRITICAL' : 'SECURE'}
                   </span>
                 </div>
@@ -112,12 +112,12 @@ export default function Security() {
               <div
                 className="p-4 rounded-3xl flex gap-3 text-xs"
                 style={{
-                  background: 'rgba(217,119,6,0.06)',
-                  borderColor: 'rgba(217,119,6,0.20)',
-                  color: '#64748B'
+                  background: 'rgba(245,158,11,0.06)',
+                  borderColor: 'rgba(245,158,11,0.20)',
+                  color: 'rgba(255,255,255,0.52)'
                 }}
               >
-                <AlertOctagon className="w-5 h-5 text-[#B45309] flex-shrink-0" />
+                <AlertOctagon className="w-5 h-5 text-[#FCD34D] flex-shrink-0" />
                 <p className="leading-relaxed">
                   Firewall rates limit locks IP addresses automatically on encountering 15 failed logins in a 10-second window.
                 </p>

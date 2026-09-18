@@ -207,8 +207,8 @@ export default function UploadMultiple() {
                       )}
                       {file.status === 'success' && (
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-emerald-600 uppercase">Accepted</span>
-                          <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-[10px] font-bold text-emerald-400 uppercase">Accepted</span>
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
                         </div>
                       )}
                       {file.status === 'failed' && (
@@ -258,7 +258,7 @@ export default function UploadMultiple() {
                   </div>
                   <div className="p-4 rounded-2xl bg-surface-mute border border-line">
                     <span className="block text-[8px] text-ink-mute font-bold uppercase tracking-wider">Accepted</span>
-                    <span className="block text-xl font-bold text-emerald-600 mt-1">
+                    <span className="block text-xl font-bold text-emerald-400 mt-1">
                       {stage === 'done' ? acceptedCount : '—'}
                     </span>
                   </div>
@@ -268,7 +268,7 @@ export default function UploadMultiple() {
                   <div className="space-y-2.5 p-4 rounded-2xl bg-surface-mute border border-line text-xs text-ink-mute">
                     <div className="flex justify-between">
                       <span>Photos accepted:</span>
-                      <span className="font-bold text-emerald-600">{acceptedCount}</span>
+                      <span className="font-bold text-emerald-400">{acceptedCount}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Photos rejected:</span>
@@ -284,8 +284,8 @@ export default function UploadMultiple() {
                 )}
 
                 {stage === 'preview' && (
-                  <div className="p-4 rounded-2xl bg-[#4F46E5]/[0.06] border border-[#4F46E5]/20 text-xs text-[#6366F1] font-medium">
-                    <Eye className="w-4 h-4 mb-2 text-[#6366F1]" />
+                  <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium">
+                    <Eye className="w-4 h-4 mb-2 text-[#FB923C]" />
                     Review your photos above. You can remove any before uploading.
                   </div>
                 )}

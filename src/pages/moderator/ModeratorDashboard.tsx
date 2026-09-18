@@ -20,7 +20,7 @@ export default function ModeratorDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
           { label: 'Pending Reviews', value: pendingCount.toLocaleString(), color: 'text-accent' },
-          { label: 'Approved manually', value: approvedCount.toLocaleString(), color: 'text-emerald-600' },
+          { label: 'Approved manually', value: approvedCount.toLocaleString(), color: 'text-emerald-400' },
           { label: 'Rejected manually', value: rejectedCount.toLocaleString(), color: 'text-accent-soft' },
           { label: 'Audit Entries', value: mockModeratorAudit.length.toLocaleString(), color: 'text-ink' }
         ].map(item => (
@@ -66,7 +66,7 @@ export default function ModeratorDashboard() {
               <div className="p-4 rounded-3xl bg-surface-mute border border-line space-y-3.5 text-xs text-ink-mute">
                 <div className="flex justify-between">
                   <span>Approval decisions:</span>
-                  <span className="font-bold text-emerald-600">{approvedCount} overrides</span>
+                  <span className="font-bold text-emerald-400">{approvedCount} overrides</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Rejection confirmations:</span>

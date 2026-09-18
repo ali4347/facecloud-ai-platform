@@ -15,10 +15,10 @@ function getCategory(action: string): 'member' | 'review' | 'batch' | 'report' |
 }
 
 const CATEGORY_COLORS = {
-  member: 'bg-violet-500/10 text-violet-700 border-violet-300/20',
-  review: 'bg-[#4F46E5]/10 text-[#6366F1] border-[#4F46E5]/20',
-  batch: 'bg-[#059669]/10 text-[#059669] border-[#059669]/20',
-  report: 'bg-[#D97706]/10 text-[#D97706] border-[#D97706]/20',
+  member: 'bg-violet-500/10 text-violet-400 border-violet-500/30/20',
+  review: 'bg-[#F97316]/10 text-[#FB923C] border-[#F97316]/20',
+  batch: 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20',
+  report: 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20',
   system: 'bg-surface-mute text-ink-mute border-line'
 }
 

@@ -248,13 +248,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       const x = canvasW - rawX - width
 
       // Draw bounding box (mint)
-      ctx.strokeStyle = '#059669'
+      ctx.strokeStyle = '#10B981'
       ctx.lineWidth = 2
       ctx.strokeRect(x, y, width, height)
 
       // Corner brackets (bright blue)
       const bracketLength = Math.min(15, width * 0.2)
-      ctx.strokeStyle = '#4F46E5'
+      ctx.strokeStyle = '#F97316'
       ctx.lineWidth = 3
 
       // Top-Left
@@ -324,9 +324,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       const fontSize = Math.max(10, Math.min(12, width * 0.08))
 
       const parts: { text: string; color: string; sizeMultiplier?: number }[] = []
-      parts.push({ text: `Face ${index + 1}`, color: '#FFFFFF' })
-      parts.push({ text: ' • ', color: '#94A3B8' })
-      parts.push({ text: `${detectionConf}%`, color: '#6366F1', sizeMultiplier: 0.9 })
+      parts.push({ text: `Face ${index + 1}`, color: '#0E0F12' })
+      parts.push({ text: ' • ', color: 'rgba(255,255,255,0.36)' })
+      parts.push({ text: `${detectionConf}%`, color: '#FB923C', sizeMultiplier: 0.9 })
 
       // Calculate label width
       let totalWidth = 0
@@ -355,7 +355,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       }
 
       // Draw dark glass label background
-      drawRoundedRect(ctx, labelX, labelY, labelW, labelH, radius, 'rgba(15,23,42,0.08)', 'rgba(5,150,105, 0.35)')
+      drawRoundedRect(ctx, labelX, labelY, labelW, labelH, radius, 'rgba(0,0,0,0.45)', 'rgba(16,185,129, 0.35)')
 
       // Draw text parts
       let currentX = labelX + paddingX
@@ -370,7 +370,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
       // Keypoints (small cyan dots)
       if (det.keypoints) {
-        ctx.fillStyle = '#6366F1'
+        ctx.fillStyle = '#FB923C'
         det.keypoints.forEach((kp: any) => {
           const rawKpX = kp.x * videoW * scale + offsetX
           const kpY = kp.y * videoH * scale + offsetY
@@ -744,20 +744,20 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         }}
       >
         <div className="fc-panel px-5 py-3 rounded-2xl border border-line bg-black/90 text-xs font-bold text-white shadow-2xl flex items-center gap-2">
-          <Zap className="w-3.5 h-3.5 text-[#4F46E5]" />
+          <Zap className="w-3.5 h-3.5 text-[#F97316]" />
           <span>{toastMessage}</span>
         </div>
       </div>
 
       {/* Model Loader Warnings */}
       {detectorStatus === 'loading' && (
-        <div className="mb-4 p-4 rounded-2xl bg-[#4F46E5]/10 border border-[#4F46E5]/20 text-xs text-[#6366F1] font-semibold flex items-center gap-2">
+        <div className="mb-4 p-4 rounded-2xl bg-[#F97316]/10 border border-[#F97316]/20 text-xs text-[#FB923C] font-semibold flex items-center gap-2">
           <Info className="w-4.5 h-4.5 flex-shrink-0 animate-spin" />
           <span>Loading face detection model...</span>
         </div>
       )}
       {detectorStatus === 'error' && (
-        <div className="mb-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#DC2626] font-semibold flex flex-col gap-1">
+        <div className="mb-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#EF4444] font-semibold flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Info className="w-4.5 h-4.5 flex-shrink-0" />
             <span>Face detection model failed to load. Camera feed is active, but detection is unavailable.</span>
@@ -766,30 +766,30 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         </div>
       )}
       {detectorFallbackMsg && (
-        <div className="mb-4 p-4 rounded-2xl flex items-start gap-2 text-xs font-semibold" style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)', color: '#B45309' }}>
+        <div className="mb-4 p-4 rounded-2xl flex items-start gap-2 text-xs font-semibold" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', color: '#FCD34D' }}>
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{detectorFallbackMsg}</span>
         </div>
       )}
       {camState === 'active' && smallFaceWarning && (
-        <div className="mb-4 p-3 rounded-2xl flex items-center gap-2 text-[11px] font-semibold" style={{ background: 'rgba(79,70,229,0.06)', border: '1px solid rgba(79,70,229,0.18)', color: '#6366F1' }}>
+        <div className="mb-4 p-3 rounded-2xl flex items-center gap-2 text-[11px] font-semibold" style={{ background: 'rgba(249,115,22,0.06)', border: '1px solid rgba(249,115,22,0.18)', color: '#FB923C' }}>
           <Info className="w-3.5 h-3.5 flex-shrink-0" />
           <span>Small/distant face detected — move closer for better enhancement quality.</span>
         </div>
       )}
 
       {/* ─── Mode Tabs ─── */}
-      <div className="mb-5 flex items-center gap-1 p-1 rounded-2xl w-fit" style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}>
+      <div className="mb-5 flex items-center gap-1 p-1 rounded-2xl w-fit" style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}>
         <button
           onClick={() => setActiveTab('live')}
           className="px-5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
           style={activeTab === 'live' ? {
-            background: 'linear-gradient(135deg, rgba(79,70,229,0.25), rgba(79,70,229,0.10))',
-            color: '#6366F1',
-            border: '1px solid rgba(79,70,229,0.35)',
-            boxShadow: '0 0 20px rgba(79,70,229,0.15)',
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.25), rgba(249,115,22,0.10))',
+            color: '#FB923C',
+            border: '1px solid rgba(249,115,22,0.35)',
+            boxShadow: '0 0 20px rgba(249,115,22,0.15)',
           } : {
-            color: '#64748B',
+            color: 'rgba(255,255,255,0.52)',
             border: '1px solid transparent',
           }}
         >
@@ -800,12 +800,12 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           onClick={() => setActiveTab('snapshot')}
           className="px-5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
           style={activeTab === 'snapshot' ? {
-            background: 'linear-gradient(135deg, rgba(79,70,229,0.25), rgba(79,70,229,0.10))',
-            color: '#6366F1',
-            border: '1px solid rgba(79,70,229,0.35)',
-            boxShadow: '0 0 20px rgba(79,70,229,0.15)',
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.25), rgba(249,115,22,0.10))',
+            color: '#FB923C',
+            border: '1px solid rgba(249,115,22,0.35)',
+            boxShadow: '0 0 20px rgba(249,115,22,0.15)',
           } : {
-            color: '#64748B',
+            color: 'rgba(255,255,255,0.52)',
             border: '1px solid transparent',
           }}
         >
@@ -880,7 +880,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           <div className="fc-card overflow-hidden flex flex-col justify-between">
             <div className="px-4 py-3 border-b border-line flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#4F46E5]" />
+                <Zap className="w-4 h-4 text-[#F97316]" />
                 <span className="text-sm font-semibold text-ink">AI Enhanced Output</span>
               </div>
               <StatusBadge 
@@ -909,13 +909,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {camState === 'active' ? (
                 <>
                   <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/20 via-transparent to-black/10" />
-                  <div className="absolute inset-0 pointer-events-none border border-[#4F46E5]/25 shadow-[inset_0_0_40px_rgba(79,70,229,0.15)] z-20" />
+                  <div className="absolute inset-0 pointer-events-none border border-[#F97316]/25 shadow-[inset_0_0_40px_rgba(249,115,22,0.15)] z-20" />
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-3 text-[#4F46E5]/40 text-center p-4 z-20">
-                  <Zap className="w-12 h-12 text-[#4F46E5]/20" />
+                <div className="flex flex-col items-center gap-3 text-[#F97316]/40 text-center p-4 z-20">
+                  <Zap className="w-12 h-12 text-[#F97316]/20" />
                   <div>
-                    <p className="text-xs font-semibold text-[#4F46E5]/50">Enhancement inactive</p>
+                    <p className="text-xs font-semibold text-[#F97316]/50">Enhancement inactive</p>
                     <p className="text-[10px] text-ink-faint mt-1 max-w-[200px]">Simulated Zero-DCE correction turns on with active stream.</p>
                   </div>
                 </div>
@@ -929,7 +929,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           <div className="fc-card overflow-hidden flex flex-col justify-between">
             <div className="px-4 py-3 border-b border-line flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Aperture className="w-4 h-4 text-[#6D28D9]" />
+                <Aperture className="w-4 h-4 text-[#A78BFA]" />
                 <span className="text-sm font-semibold text-ink">Snapshot Preview</span>
               </div>
               {snapshotDataUrl ? (
@@ -958,7 +958,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
       {/* Connection & state notifications */}
       {camState === 'error' && (
-        <div className="mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#DC2626] font-semibold flex items-center gap-2">
+        <div className="mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#EF4444] font-semibold flex items-center gap-2">
           <Info className="w-4.5 h-4.5 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
@@ -1007,7 +1007,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           <div className="mt-6 fc-card p-6 space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
               <div className="flex items-center gap-2">
-                <Settings className="w-4.5 h-4.5 text-[#4F46E5]" />
+                <Settings className="w-4.5 h-4.5 text-[#F97316]" />
                 <h3 className="text-sm font-semibold text-ink">AI Enhancement Controls</h3>
               </div>
               <div className="flex gap-2">
@@ -1024,7 +1024,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                 <button
                   key={pr}
                   onClick={() => applyPreset(pr as any)}
-                  className="px-3.5 py-1.5 bg-surface-mute border border-line text-[10px] font-bold rounded-xl text-ink-mute hover:text-ink hover:border-[#4F46E5]/40 cursor-pointer capitalize"
+                  className="px-3.5 py-1.5 bg-surface-mute border border-line text-[10px] font-bold rounded-xl text-ink-mute hover:text-ink hover:border-[#F97316]/40 cursor-pointer capitalize"
                 >
                   {pr === 'low' ? 'Low Light' : pr}
                 </button>
@@ -1081,7 +1081,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                       <span className="font-bold text-ink block">{sld.label}</span>
                       <span className="text-[10px] text-ink-faint block mt-0.5">{sld.sub}</span>
                     </div>
-                    <span className="font-mono text-xs font-bold text-[#6366F1]">{sld.val}%</span>
+                    <span className="font-mono text-xs font-bold text-[#FB923C]">{sld.val}%</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-[9px] text-ink-faint font-bold uppercase w-10">{sld.l}</span>
@@ -1094,7 +1094,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                         onChange={e => sld.set(Number(e.target.value))}
                         className="fc-range-slider w-full cursor-pointer h-1 rounded-full appearance-none animate-none"
                         style={{
-                          background: `linear-gradient(to right, #4F46E5 0%, #059669 ${sld.val}%, #E6E9EF ${sld.val}%)`
+                          background: `linear-gradient(to right, #F97316 0%, #10B981 ${sld.val}%, rgba(255,255,255,0.10) ${sld.val}%)`
                         }}
                       />
                     </div>
@@ -1114,7 +1114,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               <div className="space-y-2 text-[11px] font-medium text-ink-mute">
                 <div className="flex justify-between">
                   <span>Camera Status:</span>
-                  <span className={`font-bold capitalize ${camState === 'active' ? 'text-[#059669]' : 'text-ink-mute'}`}>{camState}</span>
+                  <span className={`font-bold capitalize ${camState === 'active' ? 'text-[#10B981]' : 'text-ink-mute'}`}>{camState}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Detection FPS:</span>
@@ -1126,7 +1126,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Faces Detected:</span>
-                  <span className={`font-bold ${faceCount > 0 ? 'text-[#059669]' : 'text-ink-faint'}`}>
+                  <span className={`font-bold ${faceCount > 0 ? 'text-[#10B981]' : 'text-ink-faint'}`}>
                     {faceCount === 1 ? '1 Face' : faceCount > 1 ? `${faceCount} Faces` : '0 Faces'}
                   </span>
                 </div>
@@ -1139,7 +1139,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               <div className="space-y-2 text-[11px] font-medium text-ink-mute">
                 <div className="flex justify-between">
                   <span>Detector:</span>
-                  <span className={`font-bold ${detectorStatus === 'ready' ? 'text-[#059669]' : 'text-ink-mute'}`}>{detectorStatus === 'ready' ? 'Ready' : detectorStatus.charAt(0).toUpperCase() + detectorStatus.slice(1)}</span>
+                  <span className={`font-bold ${detectorStatus === 'ready' ? 'text-[#10B981]' : 'text-ink-mute'}`}>{detectorStatus === 'ready' ? 'Ready' : detectorStatus.charAt(0).toUpperCase() + detectorStatus.slice(1)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Detection Model:</span>
@@ -1147,13 +1147,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                 </div>
                 <div className="flex justify-between">
                   <span>Faces Detected:</span>
-                  <span className={`font-bold ${faceCount > 0 ? 'text-[#059669]' : 'text-ink-faint'}`}>{faceCount}</span>
+                  <span className={`font-bold ${faceCount > 0 ? 'text-[#10B981]' : 'text-ink-faint'}`}>{faceCount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Validation:</span>
                   <span className={`font-bold ${
-                    validation.label === 'Pass' ? 'text-[#059669]' :
-                    validation.label === 'Failed' ? 'text-[#DC2626]' :
+                    validation.label === 'Pass' ? 'text-[#10B981]' :
+                    validation.label === 'Failed' ? 'text-[#EF4444]' :
                     'text-ink-faint'
                   }`}>
                     {validation.text}
@@ -1198,9 +1198,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           {camState === 'active' && snapshotValidationMsg && (
             <div className="p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold"
               style={{
-                background: faceCount > 1 ? 'rgba(239,68,68,0.08)' : 'rgba(217,119,6,0.08)',
-                border: `1px solid ${faceCount > 1 ? 'rgba(239,68,68,0.25)' : 'rgba(217,119,6,0.25)'}`,
-                color: faceCount > 1 ? '#DC2626' : '#B45309',
+                background: faceCount > 1 ? 'rgba(239,68,68,0.08)' : 'rgba(245,158,11,0.08)',
+                border: `1px solid ${faceCount > 1 ? 'rgba(239,68,68,0.25)' : 'rgba(245,158,11,0.25)'}`,
+                color: faceCount > 1 ? '#EF4444' : '#FCD34D',
               }}
             >
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -1213,7 +1213,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
             <div className="fc-card p-6 space-y-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ScanFace className="w-5 h-5 text-[#6D28D9]" />
+                  <ScanFace className="w-5 h-5 text-[#A78BFA]" />
                   <h3 className="text-sm font-semibold text-ink">FaceCloud AI Face Restoration</h3>
                 </div>
                 <StatusBadge status="purple" label="Zero-DCE + Face Detail Recovery" dot={false} />
@@ -1237,8 +1237,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {snapshotProcessing && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-2 h-2 bg-[#4F46E5] rounded-full animate-pulse" />
-                    <span className="text-xs font-bold text-[#6366F1]">Running AI Enhancement Pipeline...</span>
+                    <div className="w-2 h-2 bg-[#F97316] rounded-full animate-pulse" />
+                    <span className="text-xs font-bold text-[#FB923C]">Running AI Enhancement Pipeline...</span>
                   </div>
                   {PIPELINE_STEPS.map((step, i) => {
                     const isComplete = i < pipelineStep
@@ -1250,20 +1250,20 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                         <div
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 transition-all duration-300"
                           style={{
-                            background: isComplete ? 'rgba(5,150,105,0.15)' : isCurrent ? 'rgba(79,70,229,0.20)' : '#F1F3F7',
-                            border: `1px solid ${isComplete ? 'rgba(5,150,105,0.30)' : isCurrent ? 'rgba(79,70,229,0.40)' : '#E6E9EF'}`,
+                            background: isComplete ? 'rgba(16,185,129,0.15)' : isCurrent ? 'rgba(249,115,22,0.20)' : '#16181C',
+                            border: `1px solid ${isComplete ? 'rgba(16,185,129,0.30)' : isCurrent ? 'rgba(249,115,22,0.40)' : 'rgba(255,255,255,0.10)'}`,
                           }}
                         >
                           {isComplete ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
                           ) : isCurrent ? (
-                            <div className="w-2.5 h-2.5 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
+                            <div className="w-2.5 h-2.5 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
                           ) : (
                             <span className="text-[10px]">{step.icon}</span>
                           )}
                         </div>
                         <span className={`text-xs font-medium transition-colors duration-300 ${
-                          isComplete ? 'text-[#059669]' : isCurrent ? 'text-[#6366F1]' : 'text-ink-faint'
+                          isComplete ? 'text-[#10B981]' : isCurrent ? 'text-[#FB923C]' : 'text-ink-faint'
                         }`}>
                           {step.label}
                         </span>
@@ -1272,12 +1272,12 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   })}
 
                   {/* Progress bar */}
-                  <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: '#F1F3F7' }}>
+                  <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: '#16181C' }}>
                     <div
                       className="h-full rounded-full transition-all duration-500 ease-out"
                       style={{
                         width: `${((pipelineStep + 1) / PIPELINE_STEPS.length) * 100}%`,
-                        background: 'linear-gradient(90deg, #4F46E5, #059669)',
+                        background: 'linear-gradient(90deg, #F97316, #10B981)',
                       }}
                     />
                   </div>
@@ -1293,11 +1293,11 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {/* Face Restored Badge */}
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl" style={{
-                  background: 'linear-gradient(135deg, rgba(5,150,105,0.12), rgba(79,70,229,0.08))',
-                  border: '1px solid rgba(5,150,105,0.25)',
+                  background: 'linear-gradient(135deg, rgba(16,185,129,0.12), rgba(249,115,22,0.08))',
+                  border: '1px solid rgba(16,185,129,0.25)',
                 }}>
-                  <CheckCircle2 className="w-4 h-4 text-[#059669]" />
-                  <span className="text-xs font-bold text-[#059669]">Face Restored</span>
+                  <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+                  <span className="text-xs font-bold text-[#10B981]">Face Restored</span>
                 </div>
                 <StatusBadge status="info" label="AI Snapshot Enhancement" dot={false} />
               </div>
@@ -1306,7 +1306,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               <div className="fc-card overflow-hidden">
                 <div className="px-4 py-3 border-b border-line flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#6D28D9]" />
+                    <Sparkles className="w-4 h-4 text-[#A78BFA]" />
                     <span className="text-sm font-semibold text-ink">Before / After Comparison</span>
                   </div>
                 </div>
@@ -1324,18 +1324,18 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {/* Quality Metrics */}
               <div className="fc-card p-5 space-y-4">
                 <div className="flex items-center gap-2 border-b border-line pb-3">
-                  <Zap className="w-4 h-4 text-[#4F46E5]" />
+                  <Zap className="w-4 h-4 text-[#F97316]" />
                   <h4 className="text-xs font-bold text-ink uppercase tracking-wider">Enhancement Metrics</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {[
-                    { label: 'Enhancement Confidence', value: `${enhancementMetrics.confidence}%`, color: '#059669' },
-                    { label: 'Brightness Improved', value: `+${enhancementMetrics.brightness}%`, color: '#6366F1' },
-                    { label: 'Detail Recovery', value: `+${enhancementMetrics.detail}%`, color: '#6D28D9' },
-                    { label: 'Face Validation', value: enhancementMetrics.validation, color: '#059669' },
-                    { label: 'Output Resolution', value: enhancementMetrics.resolution, color: '#6366F1' },
+                    { label: 'Enhancement Confidence', value: `${enhancementMetrics.confidence}%`, color: '#10B981' },
+                    { label: 'Brightness Improved', value: `+${enhancementMetrics.brightness}%`, color: '#FB923C' },
+                    { label: 'Detail Recovery', value: `+${enhancementMetrics.detail}%`, color: '#A78BFA' },
+                    { label: 'Face Validation', value: enhancementMetrics.validation, color: '#10B981' },
+                    { label: 'Output Resolution', value: enhancementMetrics.resolution, color: '#FB923C' },
                   ].map(metric => (
-                    <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: '#F1F3F7', border: '1px solid #F1F3F7' }}>
+                    <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: '#16181C', border: '1px solid #16181C' }}>
                       <p className="text-[10px] text-ink-faint font-semibold uppercase tracking-wider">{metric.label}</p>
                       <p className="text-sm font-bold font-mono" style={{ color: metric.color }}>{metric.value}</p>
                     </div>
@@ -1374,8 +1374,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               </div>
 
               {/* Demo disclaimer */}
-              <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(79,70,229,0.04)', border: '1px solid rgba(79,70,229,0.15)' }}>
-                <Info className="w-4 h-4 text-[#6366F1] flex-shrink-0 mt-0.5" />
+              <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(249,115,22,0.04)', border: '1px solid rgba(249,115,22,0.15)' }}>
+                <Info className="w-4 h-4 text-[#FB923C] flex-shrink-0 mt-0.5" />
                 <p className="text-[11px] text-ink-mute leading-relaxed font-medium">
                   This frontend demo simulates AI restoration. Production can connect GFPGAN/CodeFormer/Real-ESRGAN backend models for Remini-style results.
                 </p>
@@ -1387,7 +1387,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           {!snapshotDataUrl && (
             <div className="fc-card p-8 flex flex-col items-center justify-center gap-4 text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.15)' }}>
-                <ScanFace className="w-8 h-8 text-[#6D28D9]/50" />
+                <ScanFace className="w-8 h-8 text-[#A78BFA]/50" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-ink-mute">No snapshot captured</p>
@@ -1421,7 +1421,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   { name: 'InsightFace', desc: 'Identity embeddings' },
                 ].map(m => (
                   <div key={m.name} className="flex items-center gap-3 text-[11px]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#6D28D9]/50 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#A78BFA]/50 flex-shrink-0" />
                     <span className="font-bold text-ink-mute">{m.name}</span>
                     <span className="text-ink-faint">— {m.desc}</span>
                   </div>

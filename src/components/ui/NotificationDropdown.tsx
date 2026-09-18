@@ -77,10 +77,10 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
   }
 
   const dotColor = (status: string) => {
-    if (status === 'success') return '#059669'
-    if (status === 'error')   return '#DC2626'
-    if (status === 'warning') return '#D97706'
-    return '#4F46E5'
+    if (status === 'success') return '#10B981'
+    if (status === 'error')   return '#EF4444'
+    if (status === 'warning') return '#F59E0B'
+    return '#F97316'
   }
 
   return (
@@ -97,7 +97,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
         aria-label="Notifications"
       >
         <Bell className="w-[18px] h-[18px]" />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-surface" />
       </button>
 
       {open && (
@@ -114,7 +114,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-accent" />
               <span className="text-[13px] font-semibold text-ink">Notifications</span>
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-accent-tint text-accent-deep">
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-accent-tint text-accent-soft">
                 {notifications.length}
               </span>
             </div>
@@ -153,7 +153,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
           <div className="px-4 py-3 border-t border-line-soft">
             <button
               type="button"
-              className="flex items-center gap-1.5 text-[12px] font-semibold text-accent hover:text-accent-deep transition-colors"
+              className="flex items-center gap-1.5 text-[12px] font-semibold text-accent hover:text-accent-soft transition-colors"
             >
               <Check className="w-3.5 h-3.5" />
               Mark all as read

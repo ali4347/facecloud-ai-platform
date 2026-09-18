@@ -57,7 +57,7 @@ export default function ApiTest() {
             <button 
               key={idx}
               onClick={() => selectPreset(idx)}
-              className="py-2 px-4 rounded-xl border border-line bg-surface-mute text-xs font-bold text-ink-mute hover:border-[#4F46E5]/40 hover:text-[#6366F1] transition-all cursor-pointer"
+              className="py-2 px-4 rounded-xl border border-line bg-surface-mute text-xs font-bold text-ink-mute hover:border-[#F97316]/40 hover:text-[#FB923C] transition-all cursor-pointer"
             >
               {ep.method} {ep.path}
             </button>
@@ -79,7 +79,7 @@ export default function ApiTest() {
                     value={method} 
                     onChange={e => setMethod(e.target.value as any)}
                     className="fc-input !py-3 !px-2 text-xs text-ink"
-                    style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+                    style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
                   >
                     <option value="GET" className="bg-white text-ink">GET</option>
                     <option value="POST" className="bg-white text-ink">POST</option>
@@ -106,7 +106,7 @@ export default function ApiTest() {
                   <textarea 
                     value={reqBody}
                     onChange={e => setReqBody(e.target.value)}
-                    className="w-full h-40 font-mono text-[10px] bg-surface-mute border border-line rounded-2xl p-4 text-ink focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
+                    className="w-full h-40 font-mono text-[10px] bg-surface-mute border border-line rounded-2xl p-4 text-ink focus:outline-none focus:ring-1 focus:ring-[#F97316] focus:border-[#F97316]"
                     placeholder="{}"
                   />
                 </div>
@@ -140,7 +140,7 @@ export default function ApiTest() {
                 {/* Stats */}
                 <div className="flex justify-between items-center text-xs text-ink-mute border-b border-line pb-3">
                   <div className="flex gap-4">
-                    <span>Status: <strong className={resStatus.startsWith('2') ? 'text-[#059669]' : 'text-[#DC2626]'}>{resStatus}</strong></span>
+                    <span>Status: <strong className={resStatus.startsWith('2') ? 'text-[#10B981]' : 'text-[#EF4444]'}>{resStatus}</strong></span>
                     <span>Latency: <strong className="text-ink">{resTime}</strong></span>
                   </div>
                   <button onClick={() => { setResStatus(''); setResBody(''); }} className="p-1 hover:bg-surface-mute rounded-lg">
@@ -149,7 +149,7 @@ export default function ApiTest() {
                 </div>
 
                 {/* Body code blocks */}
-                <pre className="w-full h-56 font-mono text-[9px] bg-surface-mute border border-line rounded-2xl p-4 overflow-auto text-emerald-700">
+                <pre className="w-full h-56 font-mono text-[9px] bg-surface-mute border border-line rounded-2xl p-4 overflow-auto text-emerald-400">
                   {resBody}
                 </pre>
 

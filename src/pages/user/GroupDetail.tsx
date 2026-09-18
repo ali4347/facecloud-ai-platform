@@ -114,7 +114,7 @@ export default function GroupDetail() {
                   onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
                   className="bg-surface-mute border border-accent/40 rounded-lg px-3 py-1.5 text-lg font-bold text-ink focus:outline-none focus:border-accent w-52"
                 />
-                <button onClick={saveEdit} className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-300/30 text-emerald-600 hover:bg-emerald-500/20"><Check className="w-4 h-4" /></button>
+                <button onClick={saveEdit} className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30/30 text-emerald-400 hover:bg-emerald-500/20"><Check className="w-4 h-4" /></button>
                 <button onClick={cancelEdit} className="p-1.5 rounded-lg bg-surface-mute border border-line text-ink-mute hover:text-ink"><X className="w-4 h-4" /></button>
               </div>
             ) : (
@@ -146,7 +146,7 @@ export default function GroupDetail() {
           </button>
           <button
             onClick={copyLink}
-            className={`fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2 transition-all ${linkCopied ? 'text-emerald-600 border-emerald-300/40' : ''}`}
+            className={`fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2 transition-all ${linkCopied ? 'text-emerald-400 border-emerald-500/30/40' : ''}`}
           >
             {linkCopied ? <CheckCircle className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
             {linkCopied ? 'Copied!' : 'Secure Link'}
@@ -212,7 +212,7 @@ export default function GroupDetail() {
                       key={img.id}
                       className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-150 cursor-pointer group ${
                         isSelected
-                          ? 'border-accent shadow-[0_0_0_1px_rgba(79,70,229,0.3)]'
+                          ? 'border-accent shadow-[0_0_0_1px_rgba(249,115,22,0.3)]'
                           : 'border-line hover:border-line'
                       }`}
                       onClick={() => toggleOne(img.id)}
@@ -223,11 +223,11 @@ export default function GroupDetail() {
                         style={{ background: `linear-gradient(135deg, ${img.thumbnail} 0%, ${img.thumbnail}88 100%)` }}
                       >
                         <svg width="40" height="52" viewBox="0 0 56 72" fill="none" className="opacity-50">
-                          <ellipse cx="28" cy="28" rx="20" ry="24" fill="#94A3B8" stroke="#64748B" strokeWidth="1.5" />
-                          <circle cx="21" cy="24" r="4" fill="#64748B" />
-                          <circle cx="35" cy="24" r="4" fill="#64748B" />
-                          <path d="M18 36 Q28 42 38 36" stroke="#64748B" strokeWidth="2" fill="none" strokeLinecap="round" />
-                          <path d="M8 72 C8 56 48 56 48 72" fill="#E6E9EF" />
+                          <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.36)" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" />
+                          <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
+                          <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
+                          <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.52)" strokeWidth="2" fill="none" strokeLinecap="round" />
+                          <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.10)" />
                         </svg>
                         {/* Dim overlay + checkbox on hover / selected */}
                         <div className={`absolute inset-0 bg-black/40 transition-opacity duration-150 ${isSelected || false ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
@@ -240,7 +240,7 @@ export default function GroupDetail() {
                         </div>
                         {/* Quality badge */}
                         <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                          img.qualityStatus === 'passed' ? 'bg-emerald-500/20 text-emerald-600' : 'bg-red-500/30 text-red-300'
+                          img.qualityStatus === 'passed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/30 text-red-300'
                         }`}>
                           {img.qualityStatus}
                         </span>
@@ -280,11 +280,11 @@ export default function GroupDetail() {
                 style={{ background: `linear-gradient(135deg, ${repImage.thumbnail} 0%, ${repImage.thumbnail}88 100%)` }}
               >
                 <svg width="44" height="56" viewBox="0 0 56 72" fill="none" className="opacity-50">
-                  <ellipse cx="28" cy="28" rx="20" ry="24" fill="#94A3B8" stroke="#64748B" strokeWidth="1.5" />
-                  <circle cx="21" cy="24" r="4" fill="#64748B" />
-                  <circle cx="35" cy="24" r="4" fill="#64748B" />
-                  <path d="M18 36 Q28 42 38 36" stroke="#64748B" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M8 72 C8 56 48 56 48 72" fill="#E6E9EF" />
+                  <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.36)" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" />
+                  <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
+                  <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
+                  <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.52)" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.10)" />
                 </svg>
                 <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/40 text-[9px] text-white font-mono">
                   Representative
@@ -295,7 +295,7 @@ export default function GroupDetail() {
             <div className="space-y-2.5 text-xs text-ink-mute">
               {[
                 { k: 'Folder ID', v: group.id },
-                { k: 'Avg. Confidence', v: `${group.matchingConfidence}%`, accent: 'text-emerald-600' },
+                { k: 'Avg. Confidence', v: `${group.matchingConfidence}%`, accent: 'text-emerald-400' },
                 { k: 'Created', v: new Date(group.createdDate).toLocaleDateString() },
                 { k: 'Images linked', v: `${images.length} files` },
               ].map(row => (
@@ -326,7 +326,7 @@ export default function GroupDetail() {
               onClick={copyLink}
               className="fc-btn-secondary w-full justify-center text-xs py-2.5 flex items-center gap-2"
             >
-              {linkCopied ? <CheckCircle className="w-4 h-4 text-emerald-600" /> : <Link2 className="w-4 h-4" />}
+              {linkCopied ? <CheckCircle className="w-4 h-4 text-emerald-400" /> : <Link2 className="w-4 h-4" />}
               {linkCopied ? 'Copied!' : 'Copy Secure Link'}
             </button>
           </div>

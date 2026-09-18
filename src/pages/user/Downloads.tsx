@@ -46,9 +46,9 @@ export default function Downloads() {
 
       {/* Summary bar */}
       <div className="flex items-center gap-4 px-5 py-3.5 rounded-2xl text-xs font-medium text-ink-mute"
-        style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+        style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
       >
-        <Clock className="w-4 h-4 text-[#6366F1] shrink-0" />
+        <Clock className="w-4 h-4 text-[#FB923C] shrink-0" />
         <span>All download links are secure and time-limited. Copy a link to share or re-download from any device.</span>
       </div>
 
@@ -66,9 +66,9 @@ export default function Downloads() {
               <div key={dl.id} className="flex items-center gap-4 px-5 py-4 hover:bg-surface-mute transition-colors">
                 <div
                   className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(79,70,229,0.10)', border: '1px solid rgba(79,70,229,0.20)' }}
+                  style={{ background: 'rgba(249,115,22,0.10)', border: '1px solid rgba(249,115,22,0.20)' }}
                 >
-                  <cfg.icon className="w-4 h-4 text-[#6366F1]" />
+                  <cfg.icon className="w-4 h-4 text-[#FB923C]" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -80,7 +80,7 @@ export default function Downloads() {
                     {/* Expiry badge */}
                     <span
                       className="text-[10px] font-bold flex items-center gap-1"
-                      style={{ color: expiry.urgent ? '#D97706' : '#059669' }}
+                      style={{ color: expiry.urgent ? '#F59E0B' : '#10B981' }}
                     >
                       <Clock className="w-3 h-3" />
                       {expiry.label}
@@ -95,9 +95,9 @@ export default function Downloads() {
                   onClick={() => copyLink(dl.id, dl.secureLink)}
                   className="w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0"
                   style={{
-                    borderColor: copied ? 'rgba(5,150,105,0.4)' : '#E6E9EF',
-                    background: copied ? 'rgba(5,150,105,0.06)' : '#F1F3F7',
-                    color: copied ? '#059669' : '#94A3B8',
+                    borderColor: copied ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.10)',
+                    background: copied ? 'rgba(16,185,129,0.06)' : '#16181C',
+                    color: copied ? '#10B981' : 'rgba(255,255,255,0.36)',
                   }}
                   title="Copy secure link"
                 >

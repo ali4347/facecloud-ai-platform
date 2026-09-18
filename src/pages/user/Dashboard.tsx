@@ -91,23 +91,23 @@ export default function Dashboard() {
       label: 'Total Uploads',
       value: userStats.totalUploads,
       icon: Upload,
-      fill: '#4F46E5',
-      glow: 'rgba(79,70,229,0.1)',
+      fill: '#F97316',
+      glow: 'rgba(249,115,22,0.1)',
       sub: 'All time',
     },
     {
       label: 'Accepted',
       value: userStats.enhancedImages,
       icon: CheckCircle2,
-      fill: '#059669',
-      glow: 'rgba(5,150,105,0.1)',
+      fill: '#10B981',
+      glow: 'rgba(16,185,129,0.1)',
       sub: 'Photos approved',
     },
     {
       label: 'Rejected',
       value: userStats.rejectedImages,
       icon: XCircle,
-      fill: '#DC2626',
+      fill: '#EF4444',
       glow: 'rgba(239,68,68,0.1)',
       sub: 'Did not pass checks',
     },
@@ -115,8 +115,8 @@ export default function Dashboard() {
       label: 'Groups',
       value: userStats.identityGroups,
       icon: Users,
-      fill: '#4338CA',
-      glow: 'rgba(67,56,202,0.1)',
+      fill: '#EA580C',
+      glow: 'rgba(234,88,12,0.1)',
       sub: 'Person folders',
     },
   ], [])
@@ -139,7 +139,7 @@ export default function Dashboard() {
       <div
         className="fc-card p-5 md:p-6 rounded-[24px] relative overflow-hidden backdrop-blur-lg border border-line"
         style={{
-          background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(79,70,229, 0.08) 0%, transparent 60%), #FFFFFF'
+          background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(249,115,22, 0.08) 0%, transparent 60%), #0E0F12'
         }}
       >
         <div className="space-y-1">
@@ -155,10 +155,10 @@ export default function Dashboard() {
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 px-5 py-3.5 rounded-2xl text-xs font-semibold text-[#D97706]"
+          className="flex items-center gap-3 px-5 py-3.5 rounded-2xl text-xs font-semibold text-[#F59E0B]"
           style={{
-            background: 'rgba(217,119,6,0.06)',
-            border: '1px solid rgba(217,119,6,0.2)',
+            background: 'rgba(245,158,11,0.06)',
+            border: '1px solid rgba(245,158,11,0.2)',
           }}
         >
           <Loader2 className="w-4 h-4 animate-spin shrink-0" />
@@ -178,11 +178,11 @@ export default function Dashboard() {
               onMouseLeave={() => setHoveredCard(null)}
             >
               <motion.div
-                whileHover={{ y: -3, borderColor: 'rgba(79,70,229,0.3)' }}
+                whileHover={{ y: -3, borderColor: 'rgba(249,115,22,0.3)' }}
                 className="fc-panel p-5 flex flex-col justify-between min-h-[140px] relative group h-full cursor-pointer"
               >
                 <div className="flex justify-between items-start">
-                  <div className="w-9 h-9 rounded-xl bg-surface-mute border border-line flex items-center justify-center text-[#6366F1] group-hover:text-[#059669] transition-colors">
+                  <div className="w-9 h-9 rounded-xl bg-surface-mute border border-line flex items-center justify-center text-[#FB923C] group-hover:text-[#10B981] transition-colors">
                     <card.icon className="w-4 h-4" />
                   </div>
                   <ChevronRight className={`w-4 h-4 text-ink-faint transition-all ${isHovered ? 'translate-x-1 text-ink-mute' : ''}`} />
@@ -204,7 +204,7 @@ export default function Dashboard() {
             key={stat.label}
             className="fc-card p-4 flex flex-col justify-between min-h-[120px] relative"
             style={{
-              background: `radial-gradient(circle at top right, ${stat.glow} 0%, transparent 60%), #FFFFFF`
+              background: `radial-gradient(circle at top right, ${stat.glow} 0%, transparent 60%), #0E0F12`
             }}
           >
             <div className="flex justify-between items-start">
@@ -212,8 +212,8 @@ export default function Dashboard() {
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center border"
                 style={{
-                  borderColor: '#F1F3F7',
-                  background: '#F1F3F7',
+                  borderColor: '#16181C',
+                  background: '#16181C',
                   color: stat.fill,
                 }}
               >
@@ -243,37 +243,37 @@ export default function Dashboard() {
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={WEEKLY_DATA} barSize={12} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F3F7" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#16181C" />
                   <XAxis
                     dataKey="day"
-                    tick={{ fontSize: 10, fill: '#94A3B8' }}
+                    tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.36)' }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fontSize: 10, fill: '#94A3B8' }}
+                    tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.36)' }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip
-                    cursor={{ fill: '#F1F3F7' }}
+                    cursor={{ fill: '#16181C' }}
                     contentStyle={{
-                      background: '#FFFFFF',
-                      border: '1px solid #E6E9EF',
+                      background: '#0E0F12',
+                      border: '1px solid rgba(255,255,255,0.10)',
                       borderRadius: '14px',
                       fontSize: '11px',
-                      color: '#0F172A',
+                      color: '#FFFFFF',
                     }}
                   />
                   <Legend
                     formatter={(value) => (
-                      <span style={{ color: '#64748B', fontSize: 10, fontWeight: 600 }}>
+                      <span style={{ color: 'rgba(255,255,255,0.52)', fontSize: 10, fontWeight: 600 }}>
                         {value === 'accepted' ? 'Accepted' : 'Rejected'}
                       </span>
                     )}
                   />
-                  <Bar dataKey="accepted" fill="#059669" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="rejected" fill="#DC2626" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="accepted" fill="#10B981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="rejected" fill="#EF4444" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -286,7 +286,7 @@ export default function Dashboard() {
                 <h3 className="text-sm font-semibold text-ink">Recent Uploads</h3>
                 <p className="text-[10px] text-ink-faint mt-0.5 font-medium">Your latest photos and their results</p>
               </div>
-              <Link to="/dashboard/images" className="text-xs text-[#6366F1] font-bold hover:underline flex items-center gap-1">
+              <Link to="/dashboard/images" className="text-xs text-[#FB923C] font-bold hover:underline flex items-center gap-1">
                 View All <ArrowUpRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -346,7 +346,7 @@ export default function Dashboard() {
               {mockActivity.slice(0, 10).map(act => {
                 const Icon = ACTIVITY_ICON_MAP[act.type] ?? Clock
                 const isError = act.status === 'error'
-                const dotColor = isError ? '#DC2626' : act.status === 'success' ? '#059669' : '#6366F1'
+                const dotColor = isError ? '#EF4444' : act.status === 'success' ? '#10B981' : '#FB923C'
                 return (
                   <div key={act.id} className="relative space-y-0.5">
                     <span
@@ -374,11 +374,11 @@ export default function Dashboard() {
           <div
             className="fc-card p-5 space-y-4 rounded-[24px] border border-line relative overflow-hidden"
             style={{
-              background: 'radial-gradient(circle at bottom right, rgba(67,56,202,0.06) 0%, transparent 60%), #FFFFFF'
+              background: 'radial-gradient(circle at bottom right, rgba(234,88,12,0.06) 0%, transparent 60%), #0E0F12'
             }}
           >
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#4338CA]/15 border border-[#4338CA]/20 flex items-center justify-center text-[#6366F1] shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-[#EA580C]/15 border border-[#EA580C]/20 flex items-center justify-center text-[#FB923C] shrink-0">
                 <Download className="w-4.5 h-4.5" />
               </div>
               <div className="min-w-0">
@@ -388,11 +388,11 @@ export default function Dashboard() {
             </div>
             <div className="p-3 bg-surface-mute border border-line rounded-xl flex items-center justify-between">
               <span className="text-xs text-ink-mute font-medium">Enhanced files ready</span>
-              <span className="text-sm font-extrabold text-[#059669] font-mono">{userStats.enhancedImages} photos</span>
+              <span className="text-sm font-extrabold text-[#10B981] font-mono">{userStats.enhancedImages} photos</span>
             </div>
             <Link
               to="/dashboard/downloads"
-              className="fc-btn-secondary !py-2.5 !px-4 text-[11px] font-bold w-full flex items-center justify-center gap-1.5 hover:border-[#4338CA]/40 transition-colors"
+              className="fc-btn-secondary !py-2.5 !px-4 text-[11px] font-bold w-full flex items-center justify-center gap-1.5 hover:border-[#EA580C]/40 transition-colors"
             >
               Open Downloads <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>

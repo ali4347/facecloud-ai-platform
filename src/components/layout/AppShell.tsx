@@ -33,20 +33,8 @@ export function AppShell({ role }: AppShellProps) {
     }
   }, [sidebarOpen])
 
-  /* The document body is painted black for the marketing site. The shell is
-     light, so repaint the body while it is mounted — otherwise overscroll and
-     the area beneath short pages flash black. Restored on unmount so logging
-     out returns to the dark public pages cleanly. */
-  useEffect(() => {
-    const previousBg = document.body.style.backgroundColor
-    document.body.style.backgroundColor = '#F7F8FA'
-    return () => {
-      document.body.style.backgroundColor = previousBg
-    }
-  }, [])
-
   return (
-    <div className="fc-light min-h-screen relative">
+    <div className="fc-app min-h-screen relative">
       {/* Sidebar */}
       <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -55,7 +43,7 @@ export function AppShell({ role }: AppShellProps) {
         <button
           type="button"
           aria-label="Close sidebar"
-          className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-[2px] lg:hidden cursor-default w-full h-full text-left"
+          className="fixed inset-0 z-40 bg-black/70 backdrop-blur-[2px] lg:hidden cursor-default w-full h-full text-left"
           onClick={() => setSidebarOpen(false)}
         />
       )}

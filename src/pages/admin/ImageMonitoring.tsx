@@ -54,14 +54,14 @@ export default function ImageMonitoring() {
                   </td>
                   <td>
                     <div className="text-xs text-ink-soft">
-                      <p>Blur Score: <strong className={img.blurScore >= 60 ? 'text-[#059669]' : 'text-[#DC2626]'}>{img.blurScore}</strong></p>
+                      <p>Blur Score: <strong className={img.blurScore >= 60 ? 'text-[#10B981]' : 'text-[#EF4444]'}>{img.blurScore}</strong></p>
                       <p className="text-[10px] text-ink-faint">Brightness: {img.brightnessScore}</p>
                     </div>
                   </td>
                   <td>
                     <Link 
                       to={`/dashboard/images/${img.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#6366F1] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline"
                     >
                       Audit Details <ArrowRight className="w-3.5 h-3.5" />
                     </Link>

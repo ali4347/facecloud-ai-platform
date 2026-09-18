@@ -82,7 +82,7 @@ export default function BatchManagement() {
     <div className="space-y-6 page-enter relative">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#059669]/10 border border-[#059669]/20 text-xs font-bold text-[#059669] flex items-center gap-2 shadow-[0_4px_24px_rgba(5,150,105,0.15)] backdrop-blur-md animate-enter">
+        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#10B981]/10 border border-[#10B981]/20 text-xs font-bold text-[#10B981] flex items-center gap-2 shadow-[0_4px_24px_rgba(16,185,129,0.15)] backdrop-blur-md animate-enter">
           <CheckCircle className="w-4.5 h-4.5" />
           <span>{toastMessage}</span>
         </div>
@@ -145,11 +145,11 @@ export default function BatchManagement() {
                       <div className="w-full lg:w-48 shrink-0 space-y-1.5">
                         <div className="flex justify-between items-center text-[10px]">
                           <span className={`font-bold uppercase tracking-wider ${
-                            batch.status === 'completed' ? 'text-[#059669]' :
-                            batch.status === 'processing' ? 'text-[#4F46E5] animate-pulse' :
+                            batch.status === 'completed' ? 'text-[#10B981]' :
+                            batch.status === 'processing' ? 'text-[#F97316] animate-pulse' :
                             batch.status === 'failed' ? 'text-red-400' :
                             batch.status === 'cancelled' ? 'text-ink-faint' :
-                            'text-[#D97706]'
+                            'text-[#F59E0B]'
                           }`}>
                             {batch.status}
                           </span>
@@ -161,11 +161,11 @@ export default function BatchManagement() {
                             style={{ 
                               width: `${batch.progress}%`,
                               backgroundColor: 
-                                batch.status === 'completed' ? '#059669' :
-                                batch.status === 'processing' ? '#4F46E5' :
-                                batch.status === 'failed' ? '#DC2626' :
-                                batch.status === 'cancelled' ? '#E6E9EF' :
-                                '#D97706'
+                                batch.status === 'completed' ? '#10B981' :
+                                batch.status === 'processing' ? '#F97316' :
+                                batch.status === 'failed' ? '#EF4444' :
+                                batch.status === 'cancelled' ? 'rgba(255,255,255,0.10)' :
+                                '#F59E0B'
                             }}
                           />
                         </div>
@@ -173,10 +173,10 @@ export default function BatchManagement() {
 
                       {/* Counts */}
                       <div className="flex gap-3 text-[10px] bg-surface-mute p-2 px-3 rounded-2xl border border-line shrink-0">
-                        <span className="text-[#059669] font-bold">✓ {batch.counts.accepted}</span>
+                        <span className="text-[#10B981] font-bold">✓ {batch.counts.accepted}</span>
                         <span className="text-red-400 font-bold">✗ {batch.counts.rejected}</span>
-                        <span className="text-violet-700 font-bold">⚠ {batch.counts.review}</span>
-                        {batch.counts.failed > 0 && <span className="text-[#D97706] font-bold">— {batch.counts.failed}</span>}
+                        <span className="text-violet-400 font-bold">⚠ {batch.counts.review}</span>
+                        {batch.counts.failed > 0 && <span className="text-[#F59E0B] font-bold">— {batch.counts.failed}</span>}
                       </div>
 
                       {/* Expand Toggle */}
@@ -198,7 +198,7 @@ export default function BatchManagement() {
                                 <span className="text-[10px] text-ink-faint font-semibold cursor-not-allowed italic flex items-center gap-1.5 px-3 py-2 bg-surface-mute border border-line rounded-xl">
                                   <ShieldAlert className="w-3.5 h-3.5" /> Locked
                                 </span>
-                                <div className="absolute bottom-full right-0 mb-2 w-56 p-2 bg-[#FFFFFF]/95 border border-line rounded-xl text-[9px] text-[#DC2626] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
+                                <div className="absolute bottom-full right-0 mb-2 w-56 p-2 bg-[#0E0F12]/95 border border-line rounded-xl text-[9px] text-[#EF4444] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
                                   This batch has already completed and can't be modified.
                                 </div>
                               </div>
@@ -252,10 +252,10 @@ export default function BatchManagement() {
                                 <div className="flex items-center gap-3">
                                   <span className="text-[10px] text-ink-faint">{img.size}</span>
                                   <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
-                                    img.outcome === 'accepted' ? 'bg-[#059669]/10 text-[#059669]' :
-                                    img.outcome === 'rejected' ? 'bg-[#DC2626]/10 text-[#DC2626]' :
-                                    img.outcome === 'review' ? 'bg-violet-500/10 text-violet-700' :
-                                    'bg-[#D97706]/10 text-[#D97706]'
+                                    img.outcome === 'accepted' ? 'bg-[#10B981]/10 text-[#10B981]' :
+                                    img.outcome === 'rejected' ? 'bg-[#EF4444]/10 text-[#EF4444]' :
+                                    img.outcome === 'review' ? 'bg-violet-500/10 text-violet-400' :
+                                    'bg-[#F59E0B]/10 text-[#F59E0B]'
                                   }`}>
                                     {img.outcome}
                                   </span>

@@ -34,7 +34,7 @@ export default function ImageDetail() {
                 <div className="aspect-[4/3] rounded-3xl overflow-hidden relative border border-line bg-surface-mute">
                   <BeforeAfterSlider 
                     beforeColor="#0D0F14"
-                    afterColor="#4F46E5"
+                    afterColor="#F97316"
                   />
                 </div>
               ) : (
@@ -79,7 +79,7 @@ export default function ImageDetail() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl bg-surface-mute border border-line">
                   <span className="block text-[8px] text-ink-mute font-bold uppercase tracking-wider">Asset Status</span>
-                  <span className={`block text-xs font-bold uppercase mt-1 ${record.status === 'completed' ? 'text-emerald-600' : 'text-accent-soft'}`}>
+                  <span className={`block text-xs font-bold uppercase mt-1 ${record.status === 'completed' ? 'text-emerald-400' : 'text-accent-soft'}`}>
                     {record.status === 'completed' ? 'Accepted' : 'Rejected'}
                   </span>
                 </div>
@@ -97,7 +97,7 @@ export default function ImageDetail() {
                 </div>
                 <div className="flex justify-between">
                   <span>Original Asset Saved:</span>
-                  <span className="font-bold text-emerald-600">Yes (Secure write)</span>
+                  <span className="font-bold text-emerald-400">Yes (Secure write)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>AI Restoration model:</span>
@@ -105,43 +105,43 @@ export default function ImageDetail() {
                 </div>
                 <div className="flex justify-between">
                   <span>Enhanced Asset Saved:</span>
-                  <span className={`font-bold ${record.enhancedSaved ? 'text-emerald-600' : 'text-accent-soft'}`}>
+                  <span className={`font-bold ${record.enhancedSaved ? 'text-emerald-400' : 'text-accent-soft'}`}>
                     {record.enhancedSaved ? 'Yes' : 'No'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Face detection:</span>
-                  <span className={`font-bold ${record.faceDetected ? 'text-emerald-600' : 'text-accent-soft'}`}>
+                  <span className={`font-bold ${record.faceDetected ? 'text-emerald-400' : 'text-accent-soft'}`}>
                     {record.faceDetected ? `Exactly 1 face (${record.faceCount} found)` : 'Failed (0 faces found)'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Blur rating:</span>
-                  <span className={`font-bold ${record.blurScore >= 60 ? 'text-emerald-600' : 'text-accent-soft'}`}>
+                  <span className={`font-bold ${record.blurScore >= 60 ? 'text-emerald-400' : 'text-accent-soft'}`}>
                     {record.blurScore}/100
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Brightness index:</span>
-                  <span className={`font-bold ${record.brightnessScore >= 40 ? 'text-emerald-600' : 'text-accent-soft'}`}>
+                  <span className={`font-bold ${record.brightnessScore >= 40 ? 'text-emerald-400' : 'text-accent-soft'}`}>
                     {record.brightnessScore}/100
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Face size score:</span>
-                  <span className={`font-bold ${record.faceSizeScore >= 10 ? 'text-emerald-600' : 'text-accent-soft'}`}>
+                  <span className={`font-bold ${record.faceSizeScore >= 10 ? 'text-emerald-400' : 'text-accent-soft'}`}>
                     {record.faceSizeScore}/100
                   </span>
                 </div>
                 {record.status === 'completed' && (
                   <div className="flex justify-between">
                     <span>Face embedding matched:</span>
-                    <span className="font-bold text-emerald-600">{record.matchingConfidence}% Confidence</span>
+                    <span className="font-bold text-emerald-400">{record.matchingConfidence}% Confidence</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span>Email Notification sent:</span>
-                  <span className="font-bold text-emerald-600">Yes (Completed)</span>
+                  <span className="font-bold text-emerald-400">Yes (Completed)</span>
                 </div>
               </div>
 

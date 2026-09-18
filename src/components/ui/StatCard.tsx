@@ -14,13 +14,13 @@ interface StatCardProps {
   className?: string
 }
 
-/* The `gradient` prop name is kept so callers don't change; on the light
-   surface each option is a flat tint rather than a glow. */
+/* The `gradient` prop name is kept so callers don't change; each option is a
+   flat tint on the card rather than a glow. */
 const accentConfig = {
-  blue:    { iconBg: '#EEF0FE', iconColor: '#4F46E5' },
-  purple:  { iconBg: '#EEF0FE', iconColor: '#4338CA' },
-  teal:    { iconBg: '#ECFEFF', iconColor: '#0891B2' },
-  emerald: { iconBg: '#ECFDF5', iconColor: '#059669' },
+  blue:    { iconBg: 'rgba(249,115,22,0.12)', iconColor: '#F97316' },
+  purple:  { iconBg: 'rgba(249,115,22,0.12)', iconColor: '#EA580C' },
+  teal:    { iconBg: 'rgba(56,189,248,0.12)', iconColor: '#38BDF8' },
+  emerald: { iconBg: 'rgba(16,185,129,0.12)', iconColor: '#10B981' },
 }
 
 export function StatCard({ title, value, change, changeLabel, icon: Icon, gradient = 'blue', delay = 0, className }: StatCardProps) {
@@ -46,8 +46,8 @@ export function StatCard({ title, value, change, changeLabel, icon: Icon, gradie
           <div
             className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full"
             style={{
-              background: isPositive ? '#ECFDF5' : '#FEF2F2',
-              color: isPositive ? '#047857' : '#B91C1C',
+              background: isPositive ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
+              color: isPositive ? '#34D399' : '#F87171',
             }}
           >
             {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}

@@ -73,11 +73,11 @@ export default function ReviewQueue() {
           value={filterType}
           onChange={e => setFilterType(e.target.value as any)}
           className="fc-input text-ink"
-          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
         >
-          <option value="all" className="bg-[#FFFFFF]">All Queue Types</option>
-          <option value="rejected" className="bg-[#FFFFFF]">Rejections Only</option>
-          <option value="duplicate" className="bg-[#FFFFFF]">Duplicates Only</option>
+          <option value="all" className="bg-[#0E0F12]">All Queue Types</option>
+          <option value="rejected" className="bg-[#0E0F12]">Rejections Only</option>
+          <option value="duplicate" className="bg-[#0E0F12]">Duplicates Only</option>
         </select>
 
         {/* Filter Reason */}
@@ -85,14 +85,14 @@ export default function ReviewQueue() {
           value={filterReason}
           onChange={e => setFilterReason(e.target.value)}
           className="fc-input text-ink"
-          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
         >
-          <option value="all" className="bg-[#FFFFFF]">All Flags/Reasons</option>
-          <option value="blurry" className="bg-[#FFFFFF]">Too Blurry</option>
-          <option value="dark" className="bg-[#FFFFFF]">Too Dark</option>
-          <option value="multiple" className="bg-[#FFFFFF]">Multiple Faces</option>
-          <option value="not detected" className="bg-[#FFFFFF]">Face Not Detected</option>
-          <option value="duplicate" className="bg-[#FFFFFF]">Duplicate Upload</option>
+          <option value="all" className="bg-[#0E0F12]">All Flags/Reasons</option>
+          <option value="blurry" className="bg-[#0E0F12]">Too Blurry</option>
+          <option value="dark" className="bg-[#0E0F12]">Too Dark</option>
+          <option value="multiple" className="bg-[#0E0F12]">Multiple Faces</option>
+          <option value="not detected" className="bg-[#0E0F12]">Face Not Detected</option>
+          <option value="duplicate" className="bg-[#0E0F12]">Duplicate Upload</option>
         </select>
 
         {/* Filter Risk */}
@@ -100,13 +100,13 @@ export default function ReviewQueue() {
           value={filterRisk}
           onChange={e => setFilterRisk(e.target.value)}
           className="fc-input text-ink"
-          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
         >
-          <option value="all" className="bg-[#FFFFFF]">All Risk Levels</option>
-          <option value="low" className="bg-[#FFFFFF]">Low Risk</option>
-          <option value="medium" className="bg-[#FFFFFF]">Medium Risk</option>
-          <option value="high" className="bg-[#FFFFFF]">High Risk</option>
-          <option value="critical" className="bg-[#FFFFFF]">Critical Risk</option>
+          <option value="all" className="bg-[#0E0F12]">All Risk Levels</option>
+          <option value="low" className="bg-[#0E0F12]">Low Risk</option>
+          <option value="medium" className="bg-[#0E0F12]">Medium Risk</option>
+          <option value="high" className="bg-[#0E0F12]">High Risk</option>
+          <option value="critical" className="bg-[#0E0F12]">Critical Risk</option>
         </select>
 
         {/* Sort */}
@@ -114,10 +114,10 @@ export default function ReviewQueue() {
           value={sortOrder}
           onChange={e => setSortOrder(e.target.value as any)}
           className="fc-input text-ink"
-          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
         >
-          <option value="newest" className="bg-[#FFFFFF]">Sort: Newest First</option>
-          <option value="oldest" className="bg-[#FFFFFF]">Sort: Oldest First</option>
+          <option value="newest" className="bg-[#0E0F12]">Sort: Newest First</option>
+          <option value="oldest" className="bg-[#0E0F12]">Sort: Oldest First</option>
         </select>
       </div>
 
@@ -150,7 +150,7 @@ export default function ReviewQueue() {
                   <td>
                     {row.isDuplicate ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-700 border border-violet-300/20">
+                        <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-400 border border-violet-500/30/20">
                           Duplicate
                         </span>
                         <span className="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-surface-mute text-ink-mute">
@@ -158,16 +158,16 @@ export default function ReviewQueue() {
                         </span>
                       </div>
                     ) : (
-                      <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-[#DC2626]/10 text-red-400 border border-[#DC2626]/20">
+                      <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-[#EF4444]/10 text-red-400 border border-[#EF4444]/20">
                         {row.rejectionReason}
                       </span>
                     )}
                   </td>
                   <td>
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                      row.riskLevel === 'critical' ? 'bg-[#DC2626]/10 text-[#DC2626]' :
-                      row.riskLevel === 'high' ? 'bg-[#D97706]/10 text-[#D97706]' :
-                      'bg-[#4F46E5]/10 text-[#6366F1]'
+                      row.riskLevel === 'critical' ? 'bg-[#EF4444]/10 text-[#EF4444]' :
+                      row.riskLevel === 'high' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
+                      'bg-[#F97316]/10 text-[#FB923C]'
                     }`}>
                       {row.riskLevel} risk
                     </span>
@@ -179,13 +179,13 @@ export default function ReviewQueue() {
                     {row.status === 'pending' ? (
                       <Link 
                         to={`/moderator/images/${row.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[#6366F1] hover:underline"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline"
                       >
                         Open Review <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     ) : (
                       <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                        row.status === 'approved' ? 'text-[#059669]' : 'text-[#DC2626]'
+                        row.status === 'approved' ? 'text-[#10B981]' : 'text-[#EF4444]'
                       }`}>
                         {row.status}
                       </span>

@@ -78,7 +78,7 @@ export default function ModeratorSettings() {
               <div className="p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-mute space-y-3.5">
                 <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-line">
                   <span>Session parameter</span>
-                  <span className="text-emerald-600 font-bold flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> ACTIVE</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> ACTIVE</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Authenticated User:</span>

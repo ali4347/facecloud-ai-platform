@@ -138,12 +138,12 @@ function NotificationSettings() {
       <div
         className="p-4 rounded-2xl text-xs font-medium space-y-1"
         style={{
-          background: 'rgba(5,150,105,0.04)',
-          border: '1px solid rgba(5,150,105,0.15)',
-          color: '#64748B',
+          background: 'rgba(16,185,129,0.04)',
+          border: '1px solid rgba(16,185,129,0.15)',
+          color: 'rgba(255,255,255,0.52)',
         }}
       >
-        <p className="font-bold" style={{ color: '#059669' }}>Rejection emails are enabled by default</p>
+        <p className="font-bold" style={{ color: '#10B981' }}>Rejection emails are enabled by default</p>
         <p>When one of your photos is rejected, you'll receive an email with the specific reason — such as "Image too blurry" or "No face detected" — so you know exactly what to fix before re-uploading.</p>
       </div>
 

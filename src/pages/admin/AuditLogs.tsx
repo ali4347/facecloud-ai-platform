@@ -25,8 +25,8 @@ export default function AuditLogs() {
               <div
                 className="w-8 h-8 rounded-xl flex items-center justify-center text-ink text-xs font-bold flex-shrink-0"
                 style={{
-                  background: 'linear-gradient(135deg, #4338CA, #4F46E5)',
-                  boxShadow: '0 0 15px rgba(67,56,202,0.2)',
+                  background: 'linear-gradient(135deg, #EA580C, #F97316)',
+                  boxShadow: '0 0 15px rgba(234,88,12,0.2)',
                 }}
               >
                 {log.actor.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}

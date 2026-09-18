@@ -8,14 +8,13 @@ interface GradientButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   rightIcon?: React.ReactNode
 }
 
-/* Primary is solid ink rather than a gradient — on a light surface the flat
-   dark button is what reads as "the action". The component name is unchanged
-   so every existing caller keeps working. */
+/* Primary is the brand orange with white text, matching the marketing site's
+   main action. The component name is unchanged so every caller keeps working. */
 const variants = {
-  primary:   'bg-ink text-white font-medium shadow-pill hover:bg-slate-800 active:scale-[0.98]',
+  primary:   'bg-gradient-to-br from-accent to-accent-soft text-white font-semibold shadow-[0_4px_18px_rgba(249,115,22,0.30)] hover:shadow-[0_6px_26px_rgba(249,115,22,0.45)] active:scale-[0.98]',
   secondary: 'bg-surface text-ink-soft font-medium border border-line hover:bg-surface-mute hover:border-line-strong active:scale-[0.98]',
   ghost:     'text-ink-mute font-medium hover:bg-surface-mute hover:text-ink active:scale-[0.98]',
-  danger:    'bg-red-50 text-red-600 font-medium border border-red-200 hover:bg-red-100 active:scale-[0.98]',
+  danger:    'bg-red-500/10 text-red-400 font-medium border border-red-500/30 hover:bg-red-500/20 active:scale-[0.98]',
 }
 
 const sizes = {

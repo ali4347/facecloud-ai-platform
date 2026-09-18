@@ -106,11 +106,11 @@ export default function ProcessingJobs() {
       {/* Summary stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: 'Total Jobs', value: totalJobs, border: '#E6E9EF' },
-          { label: 'Processing', value: processingJobs, border: 'rgba(79,70,229,0.25)', highlight: 'text-[#6366F1]' },
-          { label: 'Completed', value: completedJobs, border: 'rgba(5,150,105,0.25)', highlight: 'text-[#059669]' },
-          { label: 'Rejected', value: rejectedJobs, border: 'rgba(239,68,68,0.25)', highlight: 'text-[#DC2626]' },
-          { label: 'Avg Time', value: avgTime, border: '#E6E9EF' }
+          { label: 'Total Jobs', value: totalJobs, border: 'rgba(255,255,255,0.10)' },
+          { label: 'Processing', value: processingJobs, border: 'rgba(249,115,22,0.25)', highlight: 'text-[#FB923C]' },
+          { label: 'Completed', value: completedJobs, border: 'rgba(16,185,129,0.25)', highlight: 'text-[#10B981]' },
+          { label: 'Rejected', value: rejectedJobs, border: 'rgba(239,68,68,0.25)', highlight: 'text-[#EF4444]' },
+          { label: 'Avg Time', value: avgTime, border: 'rgba(255,255,255,0.10)' }
         ].map((stat, i) => (
           <div 
             key={i} 
@@ -197,13 +197,13 @@ export default function ProcessingJobs() {
               <div 
                 key={job.id} 
                 className={`fc-card p-6 transition-all duration-300 ${
-                  isExpanded ? 'border-[#4F46E5]/25 shadow-[0_4px_30px_rgba(79,70,229,0.04)]' : ''
+                  isExpanded ? 'border-[#F97316]/25 shadow-[0_4px_30px_rgba(249,115,22,0.04)]' : ''
                 }`}
               >
                 {/* Upper Summary Row */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-surface-mute border border-line flex items-center justify-center text-[#6366F1]">
+                    <div className="w-10 h-10 rounded-xl bg-surface-mute border border-line flex items-center justify-center text-[#FB923C]">
                       <FileIcon className="w-5 h-5" />
                     </div>
                     <div>
@@ -222,7 +222,7 @@ export default function ProcessingJobs() {
                     </div>
                     <button
                       onClick={() => toggleExpand(job.id)}
-                      className="fc-btn-secondary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5 hover:border-[#4F46E5]/30"
+                      className="fc-btn-secondary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5 hover:border-[#F97316]/30"
                     >
                       {isExpanded ? 'Hide Details' : 'View Details'}
                       {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -234,14 +234,14 @@ export default function ProcessingJobs() {
                 <div className="mt-5 space-y-2">
                   <div className="flex justify-between text-[10px] font-bold text-ink-mute uppercase tracking-wider">
                     <span>Processing Ingestion Status</span>
-                    <span className={isFailed ? 'text-[#DC2626]' : 'text-[#059669]'}>
+                    <span className={isFailed ? 'text-[#EF4444]' : 'text-[#10B981]'}>
                       {isFailed ? 'Execution Halted' : `${job.progress}% complete`}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-surface-mute overflow-hidden relative">
                     <div 
                       className={`h-full rounded-full transition-all duration-500 ${
-                        isFailed ? 'bg-[#DC2626]' : 'bg-gradient-to-r from-[#4F46E5] to-[#059669]'
+                        isFailed ? 'bg-[#EF4444]' : 'bg-gradient-to-r from-[#F97316] to-[#10B981]'
                       }`}
                       style={{ width: `${job.progress}%` }}
                     />
@@ -253,7 +253,7 @@ export default function ProcessingJobs() {
                   <div className="mt-6 pt-6 border-t border-line space-y-6">
                     {/* Failure details alert if rejected */}
                     {isFailed && job.failureReason && (
-                      <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#DC2626] font-semibold flex items-center gap-2">
+                      <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#EF4444] font-semibold flex items-center gap-2">
                         <AlertCircle className="w-4 h-4 flex-shrink-0" />
                         <span>{job.failureReason}</span>
                       </div>
@@ -291,7 +291,7 @@ export default function ProcessingJobs() {
                         </div>
                         <div className="flex justify-between">
                           <span>Identity Person folder:</span>
-                          <span className="text-[#6D28D9] font-bold">{job.details?.personFolder}</span>
+                          <span className="text-[#A78BFA] font-bold">{job.details?.personFolder}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Status alerts sent:</span>
@@ -308,7 +308,7 @@ export default function ProcessingJobs() {
                               href={job.details.secureDownload}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-[#6366F1] font-bold hover:underline flex items-center gap-1 text-[11px]"
+                              className="text-[#FB923C] font-bold hover:underline flex items-center gap-1 text-[11px]"
                             >
                               Download Assets <ArrowUpRight className="w-3.5 h-3.5" />
                             </a>
@@ -335,9 +335,9 @@ export default function ProcessingJobs() {
                             <div key={stage.label} className="flex-1 flex items-center">
                               <div className="flex flex-col items-center text-center gap-2">
                                 <div className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
-                                  isDone ? 'bg-[#059669]/10 border-[#059669]/30 text-[#059669]' :
-                                  isActive ? 'bg-[#4F46E5]/20 border-[#4F46E5]/30 text-[#6366F1] animate-pulse' :
-                                  isFailed ? 'bg-[#DC2626]/10 border-[#DC2626]/30 text-[#DC2626]' :
+                                  isDone ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
+                                  isActive ? 'bg-[#F97316]/20 border-[#F97316]/30 text-[#FB923C] animate-pulse' :
+                                  isFailed ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' :
                                   'bg-surface-mute border-transparent text-ink-faint'
                                 }`}>
                                   <IconComp className="w-4.5 h-4.5" />
@@ -350,8 +350,8 @@ export default function ProcessingJobs() {
 
                               {idx < job.stages.length - 1 && (
                                 <div className={`h-0.5 flex-1 mx-2 ${
-                                  isDone ? 'bg-[#059669]/40' :
-                                  isActive ? 'bg-[#4F46E5]/40 border-dashed border-[#4F46E5]' :
+                                  isDone ? 'bg-[#10B981]/40' :
+                                  isActive ? 'bg-[#F97316]/40 border-dashed border-[#F97316]' :
                                   'bg-surface-mute'
                                 }`} />
                               )}
@@ -371,9 +371,9 @@ export default function ProcessingJobs() {
                           return (
                             <div key={stage.label} className="flex items-center gap-3">
                               <div className={`w-8 h-8 rounded-lg border flex items-center justify-center flex-shrink-0 ${
-                                isDone ? 'bg-[#059669]/10 border-[#059669]/30 text-[#059669]' :
-                                isActive ? 'bg-[#4F46E5]/20 border-[#4F46E5]/30 text-[#6366F1] animate-pulse' :
-                                isFailed ? 'bg-[#DC2626]/10 border-[#DC2626]/30 text-[#DC2626]' :
+                                isDone ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
+                                isActive ? 'bg-[#F97316]/20 border-[#F97316]/30 text-[#FB923C] animate-pulse' :
+                                isFailed ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' :
                                 'bg-surface-mute border-transparent text-ink-faint'
                               }`}>
                                 <IconComp className="w-3.5 h-3.5" />

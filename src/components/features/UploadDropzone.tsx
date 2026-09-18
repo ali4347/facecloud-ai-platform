@@ -94,8 +94,8 @@ export function UploadDropzone() {
           className="fc-card p-4 flex flex-col items-center gap-2 hover:border-accent/30 hover:bg-soft-blue transition-all cursor-pointer"
         >
           <div className="relative">
-            <FileImage className="w-6 h-6 text-violet-700" />
-            <FileImage className="w-4 h-4 text-violet-700 absolute -bottom-1 -right-1" />
+            <FileImage className="w-6 h-6 text-violet-400" />
+            <FileImage className="w-4 h-4 text-violet-400 absolute -bottom-1 -right-1" />
           </div>
           <span className="text-xs font-semibold text-ink">Multiple Images</span>
         </button>
@@ -103,7 +103,7 @@ export function UploadDropzone() {
           onClick={() => addMockFiles([`batch_upload_${Date.now()}.zip`])}
           className="fc-card p-4 flex flex-col items-center gap-2 hover:border-accent/30 hover:bg-soft-blue transition-all cursor-pointer"
         >
-          <FolderArchive className="w-6 h-6 text-[#6366F1]" />
+          <FolderArchive className="w-6 h-6 text-[#FB923C]" />
           <span className="text-xs font-semibold text-ink">ZIP Upload</span>
         </button>
       </div>
@@ -119,7 +119,7 @@ export function UploadDropzone() {
             {files.map((f, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3">
                 {f.type === 'zip'
-                  ? <FolderArchive className="w-5 h-5 text-[#6366F1] flex-shrink-0" />
+                  ? <FolderArchive className="w-5 h-5 text-[#FB923C] flex-shrink-0" />
                   : <FileImage className="w-5 h-5 text-accent flex-shrink-0" />
                 }
                 <div className="flex-1 min-w-0">

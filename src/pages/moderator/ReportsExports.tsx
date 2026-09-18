@@ -72,7 +72,7 @@ export default function ReportsExports() {
     <div className="space-y-6 page-enter relative">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#059669]/10 border border-[#059669]/20 text-xs font-bold text-[#059669] flex items-center gap-2 shadow-[0_4px_24px_rgba(5,150,105,0.15)] backdrop-blur-md animate-enter">
+        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#10B981]/10 border border-[#10B981]/20 text-xs font-bold text-[#10B981] flex items-center gap-2 shadow-[0_4px_24px_rgba(16,185,129,0.15)] backdrop-blur-md animate-enter">
           <CheckCircle className="w-4.5 h-4.5" />
           <span>{toastMessage}</span>
         </div>
@@ -104,12 +104,12 @@ export default function ReportsExports() {
                         onClick={() => setSelectedType(type.id)}
                         className={`p-4 rounded-3xl border transition-all cursor-pointer text-left flex gap-3.5 items-start ${
                           isSelected 
-                            ? 'bg-[#4F46E5]/[0.06] border-[#4F46E5]/40 shadow-[0_4px_20px_rgba(79,70,229,0.05)]' 
+                            ? 'bg-[#F97316]/[0.06] border-[#F97316]/40 shadow-[0_4px_20px_rgba(249,115,22,0.05)]' 
                             : 'bg-surface-mute border-line hover:border-line'
                         }`}
                       >
                         <div className={`p-2.5 rounded-2xl border shrink-0 ${
-                          isSelected ? 'bg-[#4F46E5]/10 border-[#4F46E5]/20 text-[#6366F1]' : 'bg-surface-mute border-line text-ink-faint'
+                          isSelected ? 'bg-[#F97316]/10 border-[#F97316]/20 text-[#FB923C]' : 'bg-surface-mute border-line text-ink-faint'
                         }`}>
                           <Icon className="w-4.5 h-4.5" />
                         </div>
@@ -162,7 +162,7 @@ export default function ReportsExports() {
                         type="button"
                         onClick={() => setSelectedFormat(fmt)}
                         className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-                          isFmtSelected ? 'bg-[#4F46E5] text-white shadow-lg' : 'text-ink-mute hover:text-ink'
+                          isFmtSelected ? 'bg-[#F97316] text-white shadow-lg' : 'text-ink-mute hover:text-ink'
                         }`}
                       >
                         {fmt}
@@ -207,7 +207,7 @@ export default function ReportsExports() {
                     <span>By {rep.generatedBy}</span>
                     <button
                       onClick={() => handleDownloadReport(rep)}
-                      className="inline-flex items-center gap-1 font-bold text-[#6366F1] hover:underline"
+                      className="inline-flex items-center gap-1 font-bold text-[#FB923C] hover:underline"
                     >
                       <Download className="w-3.5 h-3.5" /> Download
                     </button>

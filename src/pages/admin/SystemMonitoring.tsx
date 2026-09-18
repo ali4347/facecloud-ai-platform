@@ -14,10 +14,10 @@ export default function SystemMonitoring() {
       {/* General Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { title: 'Global CPU Load', value: '42.8%', detail: '8 Core Thread allocation', icon: Cpu, color: '#6366F1' },
-          { title: 'Memory Allocated', value: '11.8 GB / 16 GB', detail: 'RAM buffer allocation', icon: HardDrive, color: '#6D28D9' },
-          { title: 'Global Uptime', value: '99.94%', detail: 'Calculated over 30 days', icon: CheckCircle2, color: '#059669' },
-          { title: 'Active Processing Queue', value: '14 files', detail: 'Queue buffer queue count', icon: RefreshCw, color: '#6366F1' }
+          { title: 'Global CPU Load', value: '42.8%', detail: '8 Core Thread allocation', icon: Cpu, color: '#FB923C' },
+          { title: 'Memory Allocated', value: '11.8 GB / 16 GB', detail: 'RAM buffer allocation', icon: HardDrive, color: '#A78BFA' },
+          { title: 'Global Uptime', value: '99.94%', detail: 'Calculated over 30 days', icon: CheckCircle2, color: '#10B981' },
+          { title: 'Active Processing Queue', value: '14 files', detail: 'Queue buffer queue count', icon: RefreshCw, color: '#FB923C' }
         ].map(stat => (
           <div key={stat.title} className="fc-card p-6 flex items-center justify-between">
             <div className="space-y-2">
@@ -27,7 +27,7 @@ export default function SystemMonitoring() {
             </div>
             <div
               className="p-3 rounded-2xl flex items-center justify-center"
-              style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+              style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
             >
               <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
             </div>
@@ -45,9 +45,9 @@ export default function SystemMonitoring() {
             >
               <div className="flex gap-3 text-xs">
                 <div className="mt-0.5">
-                  {service.status === 'operational' && <CheckCircle2 className="w-5 h-5 text-[#059669]" />}
-                  {service.status === 'degraded' && <AlertTriangle className="w-5 h-5 text-[#B45309]" />}
-                  {service.status === 'outage' && <AlertOctagon className="w-5 h-5 text-[#DC2626]" />}
+                  {service.status === 'operational' && <CheckCircle2 className="w-5 h-5 text-[#10B981]" />}
+                  {service.status === 'degraded' && <AlertTriangle className="w-5 h-5 text-[#FCD34D]" />}
+                  {service.status === 'outage' && <AlertOctagon className="w-5 h-5 text-[#EF4444]" />}
                 </div>
                 
                 <div className="space-y-1">

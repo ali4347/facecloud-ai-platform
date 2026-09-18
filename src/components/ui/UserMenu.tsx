@@ -11,15 +11,15 @@ interface UserMenuProps {
 }
 
 const roleBadge: Record<Role, { bg: string; border: string; color: string }> = {
-  user:      { bg: '#EEF0FE', border: '#C7CBFB', color: '#4338CA' },
-  admin:     { bg: '#F5F3FF', border: '#DDD6FE', color: '#6D28D9' },
-  moderator: { bg: '#ECFDF5', border: '#A7F3D0', color: '#047857' },
+  user:      { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.28)', color: '#EA580C' },
+  admin:     { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.28)', color: '#A78BFA' },
+  moderator: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.28)', color: '#34D399' },
 }
 
 const avatarColor: Record<Role, string> = {
-  user:      '#4F46E5',
-  admin:     '#4338CA',
-  moderator: '#059669',
+  user:      '#F97316',
+  admin:     '#EA580C',
+  moderator: '#10B981',
 }
 
 export function UserMenu({ name, email, role, initials }: UserMenuProps) {
@@ -89,7 +89,7 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
                   onClick={() => { navigate(r === 'user' ? '/dashboard' : `/${r}`); setOpen(false) }}
                   className={`w-full text-left px-3 py-2 rounded-lg text-[13px] transition-colors capitalize cursor-pointer ${
                     role === r
-                      ? 'bg-accent-tint text-accent-deep font-semibold'
+                      ? 'bg-accent-tint text-accent-soft font-semibold'
                       : 'text-ink-soft hover:bg-surface-mute'
                   }`}
                 >
@@ -111,7 +111,7 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
               <Link
                 to="/login"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-red-600 hover:bg-red-50 transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] text-red-400 hover:bg-red-500/10 transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Logout

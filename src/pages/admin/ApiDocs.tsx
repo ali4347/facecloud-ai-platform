@@ -4,11 +4,11 @@ import { mockApiEndpoints } from '../../data/mock'
 import { Code2, CheckCircle, Zap } from 'lucide-react'
 
 const methodColors: Record<string, { bg: string; text: string }> = {
-  GET:    { bg: 'rgba(5,150,105,0.12)',  text: '#059669' },
-  POST:   { bg: 'rgba(79,70,229,0.15)',   text: '#6366F1' },
-  PATCH:  { bg: 'rgba(217,119,6,0.12)',  text: '#B45309' },
-  DELETE: { bg: 'rgba(239,68,68,0.15)',   text: '#DC2626' },
-  PUT:    { bg: 'rgba(67,56,202,0.12)',  text: '#6D28D9' },
+  GET:    { bg: 'rgba(16,185,129,0.12)',  text: '#10B981' },
+  POST:   { bg: 'rgba(249,115,22,0.15)',   text: '#FB923C' },
+  PATCH:  { bg: 'rgba(245,158,11,0.12)',  text: '#FCD34D' },
+  DELETE: { bg: 'rgba(239,68,68,0.15)',   text: '#EF4444' },
+  PUT:    { bg: 'rgba(234,88,12,0.12)',  text: '#A78BFA' },
 }
 
 export default function ApiDocs() {
@@ -22,8 +22,8 @@ export default function ApiDocs() {
           <div
             className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
             style={{
-              background: 'linear-gradient(135deg, #4F46E5, #4338CA)',
-              boxShadow: '0 0 20px rgba(79,70,229,0.25)',
+              background: 'linear-gradient(135deg, #F97316, #EA580C)',
+              boxShadow: '0 0 20px rgba(249,115,22,0.25)',
             }}
           >
             <Code2 className="w-5 h-5 text-ink" />
@@ -32,7 +32,7 @@ export default function ApiDocs() {
             <h2 className="text-sm font-bold text-ink">FaceCloud API v1.0</h2>
             <p className="text-xs text-ink-faint mt-0.5">
               Base URL:{' '}
-              <code className="bg-surface-mute px-1.5 py-0.5 rounded text-[#6366F1] font-mono text-[11px] border border-line">
+              <code className="bg-surface-mute px-1.5 py-0.5 rounded text-[#FB923C] font-mono text-[11px] border border-line">
                 https://api.facecloud.io/api/v1
               </code>
             </p>
@@ -40,15 +40,15 @@ export default function ApiDocs() {
         </div>
         <div className="flex flex-wrap gap-4 pt-2 border-t border-line">
           <div className="flex items-center gap-1.5 text-xs text-ink-mute">
-            <CheckCircle className="w-3.5 h-3.5 text-[#059669]" />
+            <CheckCircle className="w-3.5 h-3.5 text-[#10B981]" />
             JWT Bearer Auth required
           </div>
           <div className="flex items-center gap-1.5 text-xs text-ink-mute">
-            <Zap className="w-3.5 h-3.5 style={{ color: '#4F46E5' }}" />
+            <Zap className="w-3.5 h-3.5 style={{ color: '#F97316' }}" />
             Django REST Framework
           </div>
           <div className="flex items-center gap-1.5 text-xs text-ink-mute">
-            <Code2 className="w-3.5 h-3.5 text-[#6D28D9]" />
+            <Code2 className="w-3.5 h-3.5 text-[#A78BFA]" />
             OpenAPI 3.0 Compliant
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function ApiDocs() {
         </div>
         <div className="divide-y divide-line">
           {mockApiEndpoints.map((ep, i) => {
-            const methodStyle = methodColors[ep.method] ?? { bg: '#F1F3F7', text: '#64748B' }
+            const methodStyle = methodColors[ep.method] ?? { bg: '#16181C', text: 'rgba(255,255,255,0.52)' }
             return (
               <div key={i} className="flex flex-wrap md:flex-nowrap items-center gap-4 px-5 py-3.5 hover:bg-surface-mute transition-colors">
                 <span
@@ -86,12 +86,12 @@ export default function ApiDocs() {
       <div
         className="mt-4 p-4 rounded-2xl border"
         style={{
-          background: 'rgba(79,70,229,0.04)',
-          borderColor: 'rgba(79,70,229,0.20)',
+          background: 'rgba(249,115,22,0.04)',
+          borderColor: 'rgba(249,115,22,0.20)',
         }}
       >
         <p className="text-xs text-ink-mute">
-          <span className="font-semibold text-ink">Note:</span> Full interactive Swagger UI and OpenAPI JSON spec will be available at <code className="text-[#6366F1] font-mono">/api/docs/</code> and <code className="text-[#6366F1] font-mono">/api/openapi.json</code> when the Django backend is deployed.
+          <span className="font-semibold text-ink">Note:</span> Full interactive Swagger UI and OpenAPI JSON spec will be available at <code className="text-[#FB923C] font-mono">/api/docs/</code> and <code className="text-[#FB923C] font-mono">/api/openapi.json</code> when the Django backend is deployed.
         </p>
       </div>
     </div>

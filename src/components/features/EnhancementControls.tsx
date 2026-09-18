@@ -34,7 +34,7 @@ export function EnhancementControls({ disabled }: EnhancementControlsProps) {
         />
         <SliderRow
           label="Contrast Boost"
-          icon={<Contrast className="w-3.5 h-3.5 text-violet-700" />}
+          icon={<Contrast className="w-3.5 h-3.5 text-violet-400" />}
           value={contrast}
           onChange={setContrast}
           color="from-violet-600 to-accent"
@@ -64,7 +64,7 @@ function SliderRow({ label, icon, value, onChange, color: _color }: {
         onChange={e => onChange(Number(e.target.value))}
         className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-border"
         style={{
-          background: `linear-gradient(to right, var(--tw-gradient-from) 0%, var(--tw-gradient-to) ${value}%, #E2E8F0 ${value}%)`,
+          background: `linear-gradient(to right, var(--tw-gradient-from) 0%, var(--tw-gradient-to) ${value}%, rgba(255,255,255,0.10) ${value}%)`,
         }}
       />
     </div>

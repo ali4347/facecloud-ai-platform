@@ -35,7 +35,7 @@ export default function Notifications() {
           <span>{list.filter(n => !n.read).length} unread alerts</span>
           <div className="flex gap-4">
             <button onClick={markAllRead} className="hover:text-accent flex items-center gap-1">
-              <CheckCheck className="w-3.5 h-3.5 text-emerald-600" /> Mark all read
+              <CheckCheck className="w-3.5 h-3.5 text-emerald-400" /> Mark all read
             </button>
             <button onClick={clearAll} className="hover:text-accent-soft flex items-center gap-1">
               <Trash2 className="w-3.5 h-3.5 text-accent-soft" /> Clear alerts
@@ -60,7 +60,7 @@ export default function Notifications() {
                   }`}
                 >
                   <div className={`p-2.5 rounded-2xl bg-surface-mute border border-line ${
-                    n.type === 'success' ? 'text-emerald-600' :
+                    n.type === 'success' ? 'text-emerald-400' :
                     n.type === 'error' ? 'text-accent-soft' : 'text-accent'
                   }`}>
                     <n.icon className="w-4 h-4" />

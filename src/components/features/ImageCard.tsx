@@ -18,10 +18,10 @@ export function ImageCard({ image, onView }: ImageCardProps) {
       >
         {/* Mock face SVG */}
         <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
-          <ellipse cx="30" cy="40" rx="22" ry="28" fill="#E6E9EF" stroke="#94A3B8" strokeWidth="1.5" />
-          <circle cx="22" cy="34" r="4" fill="#94A3B8" />
-          <circle cx="38" cy="34" r="4" fill="#94A3B8" />
-          <path d="M22 50 Q30 56 38 50" stroke="#94A3B8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <ellipse cx="30" cy="40" rx="22" ry="28" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.36)" strokeWidth="1.5" />
+          <circle cx="22" cy="34" r="4" fill="rgba(255,255,255,0.36)" />
+          <circle cx="38" cy="34" r="4" fill="rgba(255,255,255,0.36)" />
+          <path d="M22 50 Q30 56 38 50" stroke="rgba(255,255,255,0.36)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
         </svg>
 
         {/* Overlay actions */}

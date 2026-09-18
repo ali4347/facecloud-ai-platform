@@ -21,13 +21,13 @@ export default function Statistics() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '12px', fontSize: '12px' }} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '12px', fontSize: '12px' }} />
               <Legend iconType="circle" iconSize={8} />
               <Area type="monotone" dataKey="uploads" stroke="#2563EB" fill="url(#gu2)" strokeWidth={2} name="Uploads" />
-              <Area type="monotone" dataKey="enhanced" stroke="#7C3AED" fill="none" strokeWidth={2} name="Enhanced" />
-              <Area type="monotone" dataKey="rejected" stroke="#DC2626" fill="none" strokeWidth={1.5} strokeDasharray="4 2" name="Rejected" />
+              <Area type="monotone" dataKey="enhanced" stroke="#8B5CF6" fill="none" strokeWidth={2} name="Enhanced" />
+              <Area type="monotone" dataKey="rejected" stroke="#EF4444" fill="none" strokeWidth={1.5} strokeDasharray="4 2" name="Rejected" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -36,12 +36,12 @@ export default function Statistics() {
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={enhancementSuccessData} barSize={28}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '12px', fontSize: '12px' }} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '12px', fontSize: '12px' }} />
               <Legend iconType="circle" iconSize={8} />
               <Bar dataKey="success" fill="#16A34A" radius={[6, 6, 0, 0]} name="Success %" />
-              <Bar dataKey="failed" fill="#DC2626" radius={[6, 6, 0, 0]} name="Failed %" />
+              <Bar dataKey="failed" fill="#EF4444" radius={[6, 6, 0, 0]} name="Failed %" />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -50,9 +50,9 @@ export default function Statistics() {
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={liveSessionData} barSize={24}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '12px', fontSize: '12px' }} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '12px', fontSize: '12px' }} />
               <Bar dataKey="sessions" fill="#38BDF8" radius={[6, 6, 0, 0]} name="Sessions" />
             </BarChart>
           </ResponsiveContainer>
@@ -62,10 +62,10 @@ export default function Statistics() {
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={storageData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
-              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} unit=" GB" />
-              <Tooltip contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '12px', fontSize: '12px' }} />
-              <Line type="monotone" dataKey="gb" stroke="#7C3AED" strokeWidth={2.5} dot={{ fill: '#7C3AED', r: 4 }} name="Storage (GB)" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} unit=" GB" />
+              <Tooltip contentStyle={{ background: '#fff', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '12px', fontSize: '12px' }} />
+              <Line type="monotone" dataKey="gb" stroke="#8B5CF6" strokeWidth={2.5} dot={{ fill: '#8B5CF6', r: 4 }} name="Storage (GB)" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>

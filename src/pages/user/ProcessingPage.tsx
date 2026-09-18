@@ -41,13 +41,13 @@ export default function ProcessingPage() {
                 <div 
                   key={step.label} 
                   className={`p-4 rounded-2xl border transition-all flex items-start gap-4 ${
-                    step.status === 'done' ? 'bg-emerald-500/5 border-emerald-300/15 text-ink' :
+                    step.status === 'done' ? 'bg-emerald-500/5 border-emerald-500/30/15 text-ink' :
                     step.status === 'active' ? 'bg-accent/5 border-accent/30 text-ink ring-1 ring-accent' :
                     'bg-surface-mute border-line text-ink-mute'
                   }`}
                 >
                   <div className="mt-0.5">
-                    {step.status === 'done' && <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+                    {step.status === 'done' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
                     {step.status === 'active' && <RefreshCw className="w-5 h-5 text-accent animate-spin" />}
                     {step.status === 'pending' && <Circle className="w-5 h-5 text-ink-mute/40" />}
                   </div>
@@ -58,7 +58,7 @@ export default function ProcessingPage() {
                         <span className="text-[10px] text-accent font-bold uppercase tracking-wider animate-pulse">Running</span>
                       )}
                       {step.status === 'done' && (
-                        <span className="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Completed</span>
+                        <span className="text-[10px] text-emerald-400 uppercase font-bold tracking-wider">Completed</span>
                       )}
                     </div>
                     <p className="text-[10px] text-ink-mute mt-0.5">{step.desc}</p>
@@ -93,7 +93,7 @@ export default function ProcessingPage() {
                 </div>
               </div>
 
-              <div className="p-4 rounded-3xl bg-[#4F46E5]/5 border border-[#4F46E5]/10 flex gap-3 text-xs text-ink-mute">
+              <div className="p-4 rounded-3xl bg-[#F97316]/5 border border-[#F97316]/10 flex gap-3 text-xs text-ink-mute">
                 <AlertCircle className="w-5 h-5 text-accent flex-shrink-0" />
                 <p className="leading-relaxed">
                   The client browser session will receive an in-app and email alert immediately when biometric classification clusters complete.

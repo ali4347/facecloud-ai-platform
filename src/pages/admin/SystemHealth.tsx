@@ -14,7 +14,7 @@ export default function SystemHealth() {
 
       {/* Summary banner */}
       <div className={`mb-5 flex items-center gap-3 p-4 rounded-2xl border ${
-        outage > 0 ? 'bg-red-50 border-red-200' : degraded > 0 ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'
+        outage > 0 ? 'bg-red-500/10 border-red-500/30' : degraded > 0 ? 'bg-amber-50 border-amber-500/30' : 'bg-green-50 border-green-200'
       }`}>
         {outage > 0
           ? <XCircle className="w-5 h-5 text-error" />

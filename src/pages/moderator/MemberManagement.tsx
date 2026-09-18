@@ -104,7 +104,7 @@ export default function MemberManagement() {
     <div className="space-y-6 page-enter relative">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#059669]/10 border border-[#059669]/20 text-xs font-bold text-[#059669] flex items-center gap-2 shadow-[0_4px_24px_rgba(5,150,105,0.15)] backdrop-blur-md animate-enter">
+        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#10B981]/10 border border-[#10B981]/20 text-xs font-bold text-[#10B981] flex items-center gap-2 shadow-[0_4px_24px_rgba(16,185,129,0.15)] backdrop-blur-md animate-enter">
           <CheckCircle className="w-4.5 h-4.5" />
           <span>{toastMessage}</span>
         </div>
@@ -161,7 +161,7 @@ export default function MemberManagement() {
                     return (
                       <tr key={member.id} className="hover:bg-surface-mute transition-colors">
                         <td>
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#4338CA] flex items-center justify-center text-[10px] font-bold text-white uppercase">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-[10px] font-bold text-white uppercase">
                             {initials}
                           </div>
                         </td>
@@ -169,8 +169,8 @@ export default function MemberManagement() {
                         <td className="text-ink-mute">{member.email}</td>
                         <td>
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                            member.role === 'admin' ? 'bg-[#4338CA]/10 text-[#6D28D9]' :
-                            member.role === 'moderator' ? 'bg-[#059669]/10 text-[#059669]' :
+                            member.role === 'admin' ? 'bg-[#EA580C]/10 text-[#A78BFA]' :
+                            member.role === 'moderator' ? 'bg-[#10B981]/10 text-[#10B981]' :
                             'bg-surface-mute text-ink-mute'
                           }`}>
                             {member.role}
@@ -178,9 +178,9 @@ export default function MemberManagement() {
                         </td>
                         <td>
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                            member.status === 'active' ? 'bg-[#059669]/10 text-[#059669]' :
-                            member.status === 'pending' ? 'bg-[#6366F1]/10 text-[#6366F1]' :
-                            'bg-[#DC2626]/10 text-[#DC2626]'
+                            member.status === 'active' ? 'bg-[#10B981]/10 text-[#10B981]' :
+                            member.status === 'pending' ? 'bg-[#FB923C]/10 text-[#FB923C]' :
+                            'bg-[#EF4444]/10 text-[#EF4444]'
                           }`}>
                             {member.status}
                           </span>
@@ -195,7 +195,7 @@ export default function MemberManagement() {
                                 Locked
                               </span>
                               {/* Hover Tooltip */}
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#FFFFFF]/95 border border-line rounded-xl text-[9px] text-[#DC2626] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0E0F12]/95 border border-line rounded-xl text-[9px] text-[#EF4444] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
                                 You don't have permission to manage this account.
                               </div>
                             </div>
@@ -230,7 +230,7 @@ export default function MemberManagement() {
                                   ) : (
                                     <button 
                                       onClick={() => handleReactivate(member.id, member.email)}
-                                      className="fc-btn-secondary !py-1 !px-2.5 text-[10px] hover:border-[#059669]/30 text-ink-soft hover:text-ink"
+                                      className="fc-btn-secondary !py-1 !px-2.5 text-[10px] hover:border-[#10B981]/30 text-ink-soft hover:text-ink"
                                     >
                                       Reactivate
                                     </button>
@@ -268,7 +268,7 @@ export default function MemberManagement() {
 
       {/* Invite Member Modal */}
       {inviteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
           <div 
             className="fc-panel-strong w-full max-w-md p-6 relative border border-line"
             style={{ background: 'rgba(10, 13, 20, 0.95)' }}
@@ -302,12 +302,12 @@ export default function MemberManagement() {
                   value={inviteRole}
                   onChange={e => setInviteRole(e.target.value as any)}
                   className="fc-input text-ink"
-                  style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
+                  style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
                   disabled
                 >
-                  <option value="user" className="bg-[#FFFFFF]">User (Standard workspace)</option>
+                  <option value="user" className="bg-[#0E0F12]">User (Standard workspace)</option>
                 </select>
-                <span className="text-[9px] text-[#B45309]/70 mt-1 block">Moderators can only invite standard user accounts.</span>
+                <span className="text-[9px] text-[#FCD34D]/70 mt-1 block">Moderators can only invite standard user accounts.</span>
               </div>
 
               <div className="flex gap-3 pt-4">

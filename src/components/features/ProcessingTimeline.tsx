@@ -16,7 +16,7 @@ const stageConfig = {
   done: { icon: CheckCircle, cls: 'bg-green-100 text-success border-success/30', line: 'bg-success' },
   active: { icon: AlertCircle, cls: 'bg-soft-blue text-accent border-accent/30 animate-pulse', line: 'bg-border' },
   pending: { icon: Clock, cls: 'bg-slate-100 text-ink-mute border-transparent', line: 'bg-border' },
-  failed: { icon: XCircle, cls: 'bg-red-100 text-error border-red-200', line: 'bg-border' },
+  failed: { icon: XCircle, cls: 'bg-red-500/20 text-error border-red-500/30', line: 'bg-border' },
 }
 
 export function ProcessingTimeline({ stages, className }: ProcessingTimelineProps) {

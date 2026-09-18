@@ -17,16 +17,16 @@ const statusConfig = {
   },
   degraded: {
     icon: AlertTriangle,
-    cls: 'bg-amber-50 border-amber-200',
+    cls: 'bg-amber-50 border-amber-500/30',
     iconCls: 'text-warning',
     badge: 'bg-amber-100 text-warning',
     label: 'Degraded',
   },
   outage: {
     icon: XCircle,
-    cls: 'bg-red-50 border-red-200',
+    cls: 'bg-red-500/10 border-red-500/30',
     iconCls: 'text-error',
-    badge: 'bg-red-100 text-error',
+    badge: 'bg-red-500/20 text-error',
     label: 'Outage',
   },
 }

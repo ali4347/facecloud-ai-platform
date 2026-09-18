@@ -32,10 +32,10 @@ export default function ActivityLogs() {
                 onClick={() => setFilter(f)}
                 className="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all capitalize cursor-pointer"
                 style={{
-                  background: isActive ? 'rgba(79,70,229, 0.14)' : '#F1F3F7',
-                  border: isActive ? '1px solid rgba(79,70,229, 0.24)' : '1px solid #E6E9EF',
-                  color: isActive ? '#6366F1' : '#64748B',
-                  boxShadow: isActive ? '0 0 15px rgba(79,70,229, 0.1)' : 'none',
+                  background: isActive ? 'rgba(249,115,22, 0.14)' : '#16181C',
+                  border: isActive ? '1px solid rgba(249,115,22, 0.24)' : '1px solid rgba(255,255,255,0.10)',
+                  color: isActive ? '#FB923C' : 'rgba(255,255,255,0.52)',
+                  boxShadow: isActive ? '0 0 15px rgba(249,115,22, 0.1)' : 'none',
                 }}
               >
                 {f}
@@ -50,9 +50,9 @@ export default function ActivityLogs() {
           {filtered.map(event => (
             <div key={event.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-surface-mute transition-colors">
               <div className="w-2 h-2 rounded-full flex-shrink-0" style={{
-                background: event.status === 'success' ? '#059669' :
-                            event.status === 'error' ? '#DC2626' :
-                            event.status === 'warning' ? '#B45309' : '#6366F1'
+                background: event.status === 'success' ? '#10B981' :
+                            event.status === 'error' ? '#EF4444' :
+                            event.status === 'warning' ? '#FCD34D' : '#FB923C'
               }} />
               <div className="flex-1">
                 <p className="text-sm text-ink-soft">{event.message}</p>

@@ -18,10 +18,10 @@ export default function RejectedImages() {
             <div className="h-36 relative flex items-center justify-center"
               style={{ background: `linear-gradient(135deg, ${item.thumbnail} 0%, ${item.thumbnail}99 100%)` }}>
               <svg width="40" height="52" viewBox="0 0 40 52" fill="none">
-                <ellipse cx="20" cy="26" rx="14" ry="18" fill="#E6E9EF" stroke="#94A3B8" strokeWidth="1.5" />
-                <circle cx="14" cy="21" r="3.5" fill="#94A3B8" />
-                <circle cx="26" cy="21" r="3.5" fill="#94A3B8" />
-                <path d="M13 32 Q20 37 27 32" stroke="#94A3B8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                <ellipse cx="20" cy="26" rx="14" ry="18" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.36)" strokeWidth="1.5" />
+                <circle cx="14" cy="21" r="3.5" fill="rgba(255,255,255,0.36)" />
+                <circle cx="26" cy="21" r="3.5" fill="rgba(255,255,255,0.36)" />
+                <path d="M13 32 Q20 37 27 32" stroke="rgba(255,255,255,0.36)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
               </svg>
               <div className="absolute inset-0 bg-black/0 group-hover:bg-surface-mute transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                 <button className="p-2 bg-surface rounded-xl">
