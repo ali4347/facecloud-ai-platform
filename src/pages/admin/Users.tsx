@@ -39,17 +39,17 @@ export default function UsersPage() {
             { key: 'name', label: 'User', render: row => (
               <div className="flex items-center gap-3">
                 <div 
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-ink text-xs font-bold flex-shrink-0"
                   style={{
-                    background: 'linear-gradient(135deg, #EA580C, #F97316)',
-                    boxShadow: '0 0 10px rgba(249, 115, 22,0.15)',
+                    background: 'linear-gradient(135deg, #4338CA, #4F46E5)',
+                    boxShadow: '0 0 10px rgba(79,70,229,0.15)',
                   }}
                 >
                   {String(row.avatar)}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{String(row.name)}</p>
-                  <p className="text-xs text-white/50">{String(row.email)}</p>
+                  <p className="text-sm font-semibold text-ink">{String(row.name)}</p>
+                  <p className="text-xs text-ink-mute">{String(row.email)}</p>
                 </div>
               </div>
             )},
@@ -57,12 +57,12 @@ export default function UsersPage() {
             { key: 'status', label: 'Status', render: row => (
               <StatusBadge status={row.status === 'active' ? 'success' : 'error'} label={String(row.status).charAt(0).toUpperCase() + String(row.status).slice(1)} />
             )},
-            { key: 'uploads', label: 'Uploads', render: row => <span className="text-sm font-semibold text-white/90">{String(row.uploads)}</span> },
-            { key: 'joinedAt', label: 'Joined', render: row => <span className="text-sm text-white/50">{formatDate(String(row.joinedAt))}</span> },
+            { key: 'uploads', label: 'Uploads', render: row => <span className="text-sm font-semibold text-ink-soft">{String(row.uploads)}</span> },
+            { key: 'joinedAt', label: 'Joined', render: row => <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span> },
             { key: 'actions', label: 'Actions', render: row => (
               <div className="flex gap-2">
-                <button className="text-xs text-[#FB923C] font-medium hover:underline cursor-pointer">View</button>
-                <button className={`text-xs font-medium hover:underline cursor-pointer ${row.status === 'active' ? 'text-[#F87171]' : 'text-[#4FFFB0]'}`}>
+                <button className="text-xs text-[#6366F1] font-medium hover:underline cursor-pointer">View</button>
+                <button className={`text-xs font-medium hover:underline cursor-pointer ${row.status === 'active' ? 'text-[#DC2626]' : 'text-[#059669]'}`}>
                   {row.status === 'active' ? 'Suspend' : 'Activate'}
                 </button>
               </div>

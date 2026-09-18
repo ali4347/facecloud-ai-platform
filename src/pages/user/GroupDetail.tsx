@@ -95,7 +95,7 @@ export default function GroupDetail() {
         <div className="flex items-center gap-3">
           <Link
             to="/dashboard/groups"
-            className="p-2 rounded-xl hover:bg-white/5 border border-white/10 text-muted hover:text-white transition-colors"
+            className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
@@ -103,7 +103,7 @@ export default function GroupDetail() {
           {/* Inline-editable person name */}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-soft-blue flex items-center justify-center flex-shrink-0">
-              <Users className="w-4 h-4 text-primary" />
+              <Users className="w-4 h-4 text-accent" />
             </div>
             {editingName ? (
               <div className="flex items-center gap-2">
@@ -112,15 +112,15 @@ export default function GroupDetail() {
                   value={nameBuffer}
                   onChange={e => setNameBuffer(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') saveEdit(); if (e.key === 'Escape') cancelEdit() }}
-                  className="bg-white/10 border border-primary/40 rounded-lg px-3 py-1.5 text-lg font-bold text-white focus:outline-none focus:border-primary w-52"
+                  className="bg-surface-mute border border-accent/40 rounded-lg px-3 py-1.5 text-lg font-bold text-ink focus:outline-none focus:border-accent w-52"
                 />
-                <button onClick={saveEdit} className="p-1.5 rounded-lg bg-mint/10 border border-mint/30 text-mint hover:bg-mint/20"><Check className="w-4 h-4" /></button>
-                <button onClick={cancelEdit} className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-muted hover:text-white"><X className="w-4 h-4" /></button>
+                <button onClick={saveEdit} className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-300/30 text-emerald-600 hover:bg-emerald-500/20"><Check className="w-4 h-4" /></button>
+                <button onClick={cancelEdit} className="p-1.5 rounded-lg bg-surface-mute border border-line text-ink-mute hover:text-ink"><X className="w-4 h-4" /></button>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-dark">{personName}</h1>
-                <button onClick={startEdit} className="p-1.5 rounded-lg hover:bg-white/8 border border-transparent hover:border-white/10 text-muted hover:text-white transition-all">
+                <h1 className="text-xl font-bold text-ink">{personName}</h1>
+                <button onClick={startEdit} className="p-1.5 rounded-lg hover:bg-surface-mute border border-transparent hover:border-line text-ink-mute hover:text-ink transition-all">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -146,7 +146,7 @@ export default function GroupDetail() {
           </button>
           <button
             onClick={copyLink}
-            className={`fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2 transition-all ${linkCopied ? 'text-mint border-mint/40' : ''}`}
+            className={`fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2 transition-all ${linkCopied ? 'text-emerald-600 border-emerald-300/40' : ''}`}
           >
             {linkCopied ? <CheckCircle className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
             {linkCopied ? 'Copied!' : 'Secure Link'}
@@ -163,8 +163,8 @@ export default function GroupDetail() {
           { label: 'Last Updated', value: formatDate(group.lastUpdated) }
         ].map(stat => (
           <div key={stat.label} className="fc-card p-4">
-            <p className="text-xs text-muted uppercase tracking-wider font-semibold mb-1">{stat.label}</p>
-            <p className="text-xl font-bold text-dark">{stat.value}</p>
+            <p className="text-xs text-ink-mute uppercase tracking-wider font-semibold mb-1">{stat.label}</p>
+            <p className="text-xl font-bold text-ink">{stat.value}</p>
           </div>
         ))}
       </div>
@@ -180,28 +180,28 @@ export default function GroupDetail() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={toggleAll}
-                  className="flex items-center gap-2 text-sm text-muted hover:text-white transition-colors"
+                  className="flex items-center gap-2 text-sm text-ink-mute hover:text-ink transition-colors"
                 >
                   {allSelected
-                    ? <CheckSquare className="w-4 h-4 text-primary" />
+                    ? <CheckSquare className="w-4 h-4 text-accent" />
                     : <Square className="w-4 h-4" />}
                   {allSelected ? 'Deselect all' : 'Select all'}
                 </button>
                 {someSelected && (
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary font-semibold">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-accent/15 text-accent font-semibold">
                     {selected.size} selected
                   </span>
                 )}
               </div>
-              <p className="text-xs text-muted">{images.length} image{images.length !== 1 ? 's' : ''} in this group</p>
+              <p className="text-xs text-ink-mute">{images.length} image{images.length !== 1 ? 's' : ''} in this group</p>
             </div>
 
             {/* Grid */}
             {images.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-                <ImageOff className="w-10 h-10 text-muted/40" />
-                <p className="text-sm font-semibold text-muted">No images in this group yet</p>
-                <p className="text-xs text-muted/60">Images will appear here once they are grouped into this identity folder.</p>
+                <ImageOff className="w-10 h-10 text-ink-mute/40" />
+                <p className="text-sm font-semibold text-ink-mute">No images in this group yet</p>
+                <p className="text-xs text-ink-mute/60">Images will appear here once they are grouped into this identity folder.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -212,8 +212,8 @@ export default function GroupDetail() {
                       key={img.id}
                       className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-150 cursor-pointer group ${
                         isSelected
-                          ? 'border-primary shadow-[0_0_0_1px_rgba(249, 115, 22,0.3)]'
-                          : 'border-white/10 hover:border-white/25'
+                          ? 'border-accent shadow-[0_0_0_1px_rgba(79,70,229,0.3)]'
+                          : 'border-line hover:border-line'
                       }`}
                       onClick={() => toggleOne(img.id)}
                     >
@@ -223,24 +223,24 @@ export default function GroupDetail() {
                         style={{ background: `linear-gradient(135deg, ${img.thumbnail} 0%, ${img.thumbnail}88 100%)` }}
                       >
                         <svg width="40" height="52" viewBox="0 0 56 72" fill="none" className="opacity-50">
-                          <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-                          <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.5)" />
-                          <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.5)" />
-                          <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.6)" strokeWidth="2" fill="none" strokeLinecap="round" />
-                          <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.15)" />
+                          <ellipse cx="28" cy="28" rx="20" ry="24" fill="#94A3B8" stroke="#64748B" strokeWidth="1.5" />
+                          <circle cx="21" cy="24" r="4" fill="#64748B" />
+                          <circle cx="35" cy="24" r="4" fill="#64748B" />
+                          <path d="M18 36 Q28 42 38 36" stroke="#64748B" strokeWidth="2" fill="none" strokeLinecap="round" />
+                          <path d="M8 72 C8 56 48 56 48 72" fill="#E6E9EF" />
                         </svg>
                         {/* Dim overlay + checkbox on hover / selected */}
                         <div className={`absolute inset-0 bg-black/40 transition-opacity duration-150 ${isSelected || false ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
                         {/* Checkbox */}
                         <div className={`absolute top-2 left-2 transition-all duration-150 ${isSelected ? 'opacity-100 scale-100' : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'}`}>
                           {isSelected
-                            ? <CheckSquare className="w-5 h-5 text-primary drop-shadow" />
-                            : <Square className="w-5 h-5 text-white drop-shadow" />
+                            ? <CheckSquare className="w-5 h-5 text-accent drop-shadow" />
+                            : <Square className="w-5 h-5 text-ink drop-shadow" />
                           }
                         </div>
                         {/* Quality badge */}
                         <span className={`absolute top-2 right-2 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                          img.qualityStatus === 'passed' ? 'bg-mint/20 text-mint' : 'bg-red-500/30 text-red-300'
+                          img.qualityStatus === 'passed' ? 'bg-emerald-500/20 text-emerald-600' : 'bg-red-500/30 text-red-300'
                         }`}>
                           {img.qualityStatus}
                         </span>
@@ -255,9 +255,9 @@ export default function GroupDetail() {
                       </div>
 
                       {/* Caption */}
-                      <div className="p-3 bg-white/[0.03]">
-                        <p className="text-xs font-semibold text-dark truncate">{img.filename}</p>
-                        <p className="text-[10px] text-muted mt-0.5">{img.size} · {img.dimensions}</p>
+                      <div className="p-3 bg-surface-mute">
+                        <p className="text-xs font-semibold text-ink truncate">{img.filename}</p>
+                        <p className="text-[10px] text-ink-mute mt-0.5">{img.size} · {img.dimensions}</p>
                       </div>
                     </div>
                   )
@@ -271,7 +271,7 @@ export default function GroupDetail() {
         <div className="lg:col-span-4 space-y-4">
           {/* Group details card */}
           <div className="fc-card p-5 space-y-4">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted">Cluster Details</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Cluster Details</p>
 
             {/* Representative image preview */}
             {repImage && (
@@ -280,11 +280,11 @@ export default function GroupDetail() {
                 style={{ background: `linear-gradient(135deg, ${repImage.thumbnail} 0%, ${repImage.thumbnail}88 100%)` }}
               >
                 <svg width="44" height="56" viewBox="0 0 56 72" fill="none" className="opacity-50">
-                  <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.5)" strokeWidth="1.5" />
-                  <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.5)" />
-                  <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.5)" />
-                  <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.6)" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.15)" />
+                  <ellipse cx="28" cy="28" rx="20" ry="24" fill="#94A3B8" stroke="#64748B" strokeWidth="1.5" />
+                  <circle cx="21" cy="24" r="4" fill="#64748B" />
+                  <circle cx="35" cy="24" r="4" fill="#64748B" />
+                  <path d="M18 36 Q28 42 38 36" stroke="#64748B" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <path d="M8 72 C8 56 48 56 48 72" fill="#E6E9EF" />
                 </svg>
                 <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/40 text-[9px] text-white font-mono">
                   Representative
@@ -292,16 +292,16 @@ export default function GroupDetail() {
               </div>
             )}
 
-            <div className="space-y-2.5 text-xs text-muted">
+            <div className="space-y-2.5 text-xs text-ink-mute">
               {[
                 { k: 'Folder ID', v: group.id },
-                { k: 'Avg. Confidence', v: `${group.matchingConfidence}%`, accent: 'text-mint' },
+                { k: 'Avg. Confidence', v: `${group.matchingConfidence}%`, accent: 'text-emerald-600' },
                 { k: 'Created', v: new Date(group.createdDate).toLocaleDateString() },
                 { k: 'Images linked', v: `${images.length} files` },
               ].map(row => (
                 <div key={row.k} className="flex items-center justify-between">
                   <span>{row.k}</span>
-                  <span className={`font-bold text-dark ${row.accent ?? ''}`}>{row.v}</span>
+                  <span className={`font-bold text-ink ${row.accent ?? ''}`}>{row.v}</span>
                 </div>
               ))}
             </div>
@@ -309,7 +309,7 @@ export default function GroupDetail() {
 
           {/* Actions card */}
           <div className="fc-card p-5 space-y-3">
-            <p className="text-xs font-bold uppercase tracking-wider text-muted">Actions</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-mute">Actions</p>
             <button
               onClick={() => triggerDownload('all')}
               disabled={zipState === 'loading'}
@@ -326,7 +326,7 @@ export default function GroupDetail() {
               onClick={copyLink}
               className="fc-btn-secondary w-full justify-center text-xs py-2.5 flex items-center gap-2"
             >
-              {linkCopied ? <CheckCircle className="w-4 h-4 text-mint" /> : <Link2 className="w-4 h-4" />}
+              {linkCopied ? <CheckCircle className="w-4 h-4 text-emerald-600" /> : <Link2 className="w-4 h-4" />}
               {linkCopied ? 'Copied!' : 'Copy Secure Link'}
             </button>
           </div>
@@ -335,15 +335,15 @@ export default function GroupDetail() {
 
       {/* ── Floating selection action bar ──────────────────────────────────── */}
       <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${someSelected ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0D1B3E]/95 border border-primary/30 shadow-2xl backdrop-blur-xl">
-          <span className="text-sm font-semibold text-white">
+        <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-[#0D1B3E]/95 border border-accent/30 shadow-2xl backdrop-blur-xl">
+          <span className="text-sm font-semibold text-ink">
             {selected.size} image{selected.size !== 1 ? 's' : ''} selected
           </span>
-          <div className="w-px h-5 bg-white/15" />
+          <div className="w-px h-5 bg-surface-mute" />
           <button
             onClick={() => triggerDownload('selected')}
             disabled={zipState === 'loading'}
-            className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-400 transition-colors disabled:opacity-60"
+            className="flex items-center gap-1.5 text-sm font-semibold text-accent hover:text-accent-soft transition-colors disabled:opacity-60"
           >
             {zipState === 'loading' && zipTarget === 'selected' ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -356,7 +356,7 @@ export default function GroupDetail() {
           </button>
           <button
             onClick={clearSelection}
-            className="flex items-center gap-1 text-sm text-muted hover:text-white transition-colors"
+            className="flex items-center gap-1 text-sm text-ink-mute hover:text-ink transition-colors"
           >
             <X className="w-4 h-4" />
             Clear

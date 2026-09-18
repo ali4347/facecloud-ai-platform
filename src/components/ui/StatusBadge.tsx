@@ -7,21 +7,23 @@ interface StatusBadgeProps {
   className?: string
 }
 
+/* Light-surface badge palette: a soft tint, a matching hairline, and text dark
+   enough to clear AA against the tint. */
 const statusConfig = {
-  success:    { bg: 'rgba(79,255,176,0.10)',   border: 'rgba(79,255,176,0.25)',   text: '#4FFFB0',           dot: '#4FFFB0' },
-  warning:    { bg: 'rgba(245,158,11,0.12)',   border: 'rgba(245,158,11,0.25)',   text: '#FCD34D',           dot: '#F59E0B' },
-  error:      { bg: 'rgba(239,68,68,0.12)',    border: 'rgba(239,68,68,0.25)',    text: '#F87171',           dot: '#EF4444' },
-  info:       { bg: 'rgba(249, 115, 22,0.12)',    border: 'rgba(249, 115, 22,0.25)',   text: '#FB923C',           dot: '#F97316' },
-  purple:     { bg: 'rgba(234, 88, 12,0.12)',   border: 'rgba(234, 88, 12,0.25)',   text: '#A78BFA',           dot: '#EA580C' },
-  muted:      { bg: 'rgba(255,255,255,0.06)',  border: 'rgba(255,255,255,0.12)',  text: 'rgba(255,255,255,0.52)', dot: 'rgba(255,255,255,0.35)' },
-  processing: { bg: 'rgba(249, 115, 22,0.12)',    border: 'rgba(249, 115, 22,0.25)',   text: '#FB923C',           dot: '#F97316' },
+  success:    { bg: '#ECFDF5', border: '#A7F3D0', text: '#047857', dot: '#059669' },
+  warning:    { bg: '#FFFBEB', border: '#FDE68A', text: '#B45309', dot: '#D97706' },
+  error:      { bg: '#FEF2F2', border: '#FECACA', text: '#B91C1C', dot: '#DC2626' },
+  info:       { bg: '#EEF0FE', border: '#C7CBFB', text: '#4338CA', dot: '#4F46E5' },
+  purple:     { bg: '#F5F3FF', border: '#DDD6FE', text: '#6D28D9', dot: '#7C3AED' },
+  muted:      { bg: '#F1F3F7', border: '#E6E9EF', text: '#64748B', dot: '#94A3B8' },
+  processing: { bg: '#EEF0FE', border: '#C7CBFB', text: '#4338CA', dot: '#4F46E5' },
 }
 
 export function StatusBadge({ status, label, dot = true, className }: StatusBadgeProps) {
   const cfg = statusConfig[status]
   return (
     <span
-      className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold', className)}
+      className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold', className)}
       style={{ background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.text }}
     >
       {dot && (

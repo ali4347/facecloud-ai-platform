@@ -8,16 +8,16 @@ interface ActivityTimelineProps {
 }
 
 const typeConfig = {
-  upload: { icon: Upload, color: 'bg-primary/10 text-primary' },
-  enhance: { icon: Zap, color: 'bg-[#EA580C]/15 text-[#EA580C]' },
-  validate: { icon: CheckCircle, color: 'bg-[#10B981]/15 text-[#10B981]' },
-  download: { icon: Download, color: 'bg-[#FB923C]/15 text-[#FB923C]' },
-  live: { icon: Camera, color: 'bg-[#F59E0B]/15 text-[#F59E0B]' },
-  group: { icon: Users, color: 'bg-[#F97316]/15 text-[#F97316]' },
-  reject: { icon: XCircle, color: 'bg-[#EF4444]/15 text-[#EF4444]' },
-  login: { icon: LogIn, color: 'bg-white/[0.05] text-white/50' },
-  admin: { icon: Shield, color: 'bg-[#EA580C]/15 text-[#EA580C]' },
-  email: { icon: Mail, color: 'bg-[#FB923C]/15 text-[#FB923C]' },
+  upload: { icon: Upload, color: 'bg-accent/10 text-accent' },
+  enhance: { icon: Zap, color: 'bg-[#4338CA]/15 text-[#4338CA]' },
+  validate: { icon: CheckCircle, color: 'bg-[#059669]/15 text-[#059669]' },
+  download: { icon: Download, color: 'bg-[#6366F1]/15 text-[#6366F1]' },
+  live: { icon: Camera, color: 'bg-[#D97706]/15 text-[#D97706]' },
+  group: { icon: Users, color: 'bg-[#4F46E5]/15 text-[#4F46E5]' },
+  reject: { icon: XCircle, color: 'bg-[#DC2626]/15 text-[#DC2626]' },
+  login: { icon: LogIn, color: 'bg-surface-mute text-ink-mute' },
+  admin: { icon: Shield, color: 'bg-[#4338CA]/15 text-[#4338CA]' },
+  email: { icon: Mail, color: 'bg-[#6366F1]/15 text-[#6366F1]' },
 }
 
 export function ActivityTimeline({ events }: ActivityTimelineProps) {
@@ -34,8 +34,8 @@ export function ActivityTimeline({ events }: ActivityTimelineProps) {
                 <IconComp className="w-4 h-4" />
               </div>
               <div className="flex-1 pb-4">
-                <p className="text-sm text-dark leading-snug">{event.message}</p>
-                <p className="text-xs text-muted mt-0.5">{formatDateTime(event.timestamp)}</p>
+                <p className="text-sm text-ink leading-snug">{event.message}</p>
+                <p className="text-xs text-ink-mute mt-0.5">{formatDateTime(event.timestamp)}</p>
               </div>
             </div>
           )

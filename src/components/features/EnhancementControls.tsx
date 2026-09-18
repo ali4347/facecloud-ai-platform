@@ -13,17 +13,17 @@ export function EnhancementControls({ disabled }: EnhancementControlsProps) {
   return (
     <div className="fc-card p-4">
       <div className="flex items-center gap-2 mb-4">
-        <Sliders className="w-4 h-4 text-primary" />
-        <span className="text-sm font-semibold text-dark">Enhancement Controls</span>
-        {disabled && <span className="text-xs text-muted ml-auto">Start camera to adjust</span>}
+        <Sliders className="w-4 h-4 text-accent" />
+        <span className="text-sm font-semibold text-ink">Enhancement Controls</span>
+        {disabled && <span className="text-xs text-ink-mute ml-auto">Start camera to adjust</span>}
       </div>
       <div className={`space-y-4 ${disabled ? 'opacity-40 pointer-events-none' : ''}`}>
         <SliderRow
           label="Enhancement Strength"
-          icon={<Sliders className="w-3.5 h-3.5 text-primary" />}
+          icon={<Sliders className="w-3.5 h-3.5 text-accent" />}
           value={strength}
           onChange={setStrength}
-          color="from-primary-600 to-sky-400"
+          color="from-accent to-accent-soft"
         />
         <SliderRow
           label="Brightness Correction"
@@ -34,10 +34,10 @@ export function EnhancementControls({ disabled }: EnhancementControlsProps) {
         />
         <SliderRow
           label="Contrast Boost"
-          icon={<Contrast className="w-3.5 h-3.5 text-purple-600" />}
+          icon={<Contrast className="w-3.5 h-3.5 text-violet-700" />}
           value={contrast}
           onChange={setContrast}
-          color="from-purple-600 to-primary-600"
+          color="from-violet-600 to-accent"
         />
       </div>
     </div>
@@ -50,11 +50,11 @@ function SliderRow({ label, icon, value, onChange, color: _color }: {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5 text-xs font-medium text-muted">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-ink-mute">
           {icon}
           {label}
         </div>
-        <span className="text-xs font-bold text-dark">{value}%</span>
+        <span className="text-xs font-bold text-ink">{value}%</span>
       </div>
       <input
         type="range"

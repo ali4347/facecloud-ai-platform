@@ -77,10 +77,10 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
   }
 
   const dotColor = (status: string) => {
-    if (status === 'success') return '#4FFFB0'
-    if (status === 'error')   return '#F87171'
-    if (status === 'warning') return '#FCD34D'
-    return '#FB923C'
+    if (status === 'success') return '#059669'
+    if (status === 'error')   return '#DC2626'
+    if (status === 'warning') return '#D97706'
+    return '#4F46E5'
   }
 
   return (
@@ -88,18 +88,16 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
       <button
         ref={btnRef}
         onClick={handleToggle}
-        className="relative p-2.5 rounded-xl hover:bg-white/[0.06] transition-colors"
+        className="fc-icon-btn relative"
         id="notification-btn"
+        type="button"
         aria-expanded={open}
         aria-controls="dashboard-notification-panel"
         aria-haspopup="dialog"
         aria-label="Notifications"
       >
-        <Bell className="w-4.5 h-4.5" style={{ color: 'rgba(255,255,255,0.55)', width: 18, height: 18 }} />
-        <span
-          className="absolute top-2 right-2 w-2 h-2 rounded-full ring-2 ring-black"
-          style={{ background: '#EF4444', boxShadow: '0 0 8px rgba(239,68,68,0.6)' }}
-        />
+        <Bell className="w-[18px] h-[18px]" />
+        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
       </button>
 
       {open && (
@@ -108,37 +106,25 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
           id="dashboard-notification-panel"
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 top-12 z-50 w-80 rounded-3xl overflow-hidden"
-          style={{
-            background: 'rgba(5,7,10,0.96)',
-            border: '1px solid rgba(249, 115, 22,0.28)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            boxShadow: '0 24px 90px rgba(0,0,0,0.65), 0 0 50px rgba(249, 115, 22,0.16)',
-            animation: 'dropdownFadeIn 0.18s ease-out both',
-          }}
+          className="absolute right-0 top-12 z-50 w-80 rounded-2xl overflow-hidden bg-surface border border-line shadow-soft-lg"
+          style={{ animation: 'dropdownFadeIn 0.18s ease-out both' }}
         >
           {/* Header */}
-          <div
-            className="flex items-center justify-between px-4 py-3.5"
-            style={{ borderBottom: '1px solid rgba(249, 115, 22,0.16)' }}
-          >
+          <div className="flex items-center justify-between px-4 py-3.5 border-b border-line-soft">
             <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4" style={{ color: '#FB923C' }} />
-              <span className="text-sm font-bold text-white">Notifications</span>
-              <span
-                className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                style={{ background: 'rgba(249, 115, 22,0.18)', color: '#FB923C' }}
-              >
+              <Bell className="w-4 h-4 text-accent" />
+              <span className="text-[13px] font-semibold text-ink">Notifications</span>
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-accent-tint text-accent-deep">
                 {notifications.length}
               </span>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="p-1 hover:bg-white/[0.06] rounded-lg transition-colors"
+              type="button"
+              className="p-1 rounded-lg text-ink-faint hover:bg-surface-mute hover:text-ink transition-colors"
               aria-label="Close notifications"
             >
-              <X className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.45)' }} />
+              <X className="w-4 h-4" />
             </button>
           </div>
 
@@ -147,27 +133,15 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
             {notifications.map(n => (
               <div
                 key={n.id}
-                className="flex gap-3 px-3 py-3 rounded-2xl cursor-pointer transition-all duration-150"
-                style={{
-                  background: 'rgba(255,255,255,0.045)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(249, 115, 22,0.10)'
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(249, 115, 22,0.20)'
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.045)'
-                  ;(e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'
-                }}
+                className="flex gap-3 px-3 py-3 rounded-xl cursor-pointer transition-colors duration-150 hover:bg-surface-mute"
               >
                 <div
                   className="w-2 h-2 mt-1.5 rounded-full flex-shrink-0"
                   style={{ background: dotColor(n.status) }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-white leading-snug">{n.message}</p>
-                  <p className="text-[10px] mt-0.5 font-mono" style={{ color: 'rgba(255,255,255,0.38)' }}>
+                  <p className="text-[12px] font-medium text-ink-soft leading-snug">{n.message}</p>
+                  <p className="text-[10px] mt-1 font-mono text-ink-faint">
                     {formatDateTime(n.timestamp)}
                   </p>
                 </div>
@@ -176,15 +150,10 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
           </div>
 
           {/* Footer */}
-          <div
-            className="px-4 py-3"
-            style={{ borderTop: '1px solid rgba(249, 115, 22,0.16)' }}
-          >
+          <div className="px-4 py-3 border-t border-line-soft">
             <button
-              className="flex items-center gap-1.5 text-xs font-semibold transition-colors"
-              style={{ color: '#FB923C' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = '#4FFFB0'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = '#FB923C'}
+              type="button"
+              className="flex items-center gap-1.5 text-[12px] font-semibold text-accent hover:text-accent-deep transition-colors"
             >
               <Check className="w-3.5 h-3.5" />
               Mark all as read

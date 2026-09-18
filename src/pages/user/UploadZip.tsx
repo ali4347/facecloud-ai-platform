@@ -40,7 +40,7 @@ export default function UploadZip() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-white/5 border border-white/10 text-muted hover:text-white">
+        <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <PageHeader
@@ -61,11 +61,11 @@ export default function UploadZip() {
                 <label className="upload-dropzone block cursor-pointer">
                   <input type="file" onChange={handleZipChange} className="hidden" accept=".zip" />
                   <div className="flex flex-col items-center gap-3">
-                    <div className="p-4 rounded-full bg-primary/10 border border-primary/20 text-primary">
+                    <div className="p-4 rounded-full bg-accent/10 border border-accent/20 text-accent">
                       <FileArchive className="w-6 h-6 animate-pulse" />
                     </div>
-                    <span className="text-xs font-bold text-dark">Click to browse or drop ZIP file here</span>
-                    <span className="text-[10px] text-muted">Supports ZIP folders up to 200 MB</span>
+                    <span className="text-xs font-bold text-ink">Click to browse or drop ZIP file here</span>
+                    <span className="text-[10px] text-ink-mute">Supports ZIP folders up to 200 MB</span>
                   </div>
                 </label>
               )}
@@ -74,26 +74,26 @@ export default function UploadZip() {
               {stage === 'preview' && zipFile && (
                 <div className="space-y-5">
                   {/* File card */}
-                  <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex items-center gap-4">
-                    <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary shrink-0">
+                  <div className="p-5 rounded-3xl bg-surface-mute border border-line flex items-center gap-4">
+                    <div className="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shrink-0">
                       <FileArchive className="w-6 h-6" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-dark truncate">{zipFile.name}</p>
-                      <p className="text-[10px] text-muted mt-0.5">{fileSizeMB} MB</p>
+                      <p className="font-bold text-ink truncate">{zipFile.name}</p>
+                      <p className="text-[10px] text-ink-mute mt-0.5">{fileSizeMB} MB</p>
                     </div>
                     <button
                       onClick={reset}
-                      className="w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-muted hover:text-white hover:bg-red-500/20 transition-colors"
+                      className="w-7 h-7 rounded-full bg-surface-mute border border-line flex items-center justify-center text-ink-mute hover:text-ink hover:bg-red-500/20 transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
                   {/* Info note */}
-                  <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium space-y-1">
+                  <div className="p-4 rounded-2xl bg-[#4F46E5]/[0.06] border border-[#4F46E5]/20 text-xs text-[#6366F1] font-medium space-y-1">
                     <p className="font-bold">What happens next?</p>
-                    <ul className="space-y-0.5 text-[#FB923C]/70 list-disc list-inside">
+                    <ul className="space-y-0.5 text-[#6366F1]/70 list-disc list-inside">
                       <li>Photos are extracted from the ZIP</li>
                       <li>Each photo is enhanced and validated</li>
                       <li>Accepted photos are grouped by person</li>
@@ -118,16 +118,16 @@ export default function UploadZip() {
               {stage === 'processing' && (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-primary font-bold animate-pulse">Processing your archive…</span>
-                    <span className="text-muted">{progress}%</span>
+                    <span className="text-accent font-bold animate-pulse">Processing your archive…</span>
+                    <span className="text-ink-mute">{progress}%</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
+                  <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
+                    <div className="h-full bg-accent transition-all duration-300 rounded-full" style={{ width: `${progress}%` }} />
                   </div>
-                  <div className="text-[10px] text-muted space-y-1 bg-black/15 p-3 rounded-2xl border border-white/5">
+                  <div className="text-[10px] text-ink-mute space-y-1 bg-surface-mute p-3 rounded-2xl border border-line">
                     <div>Unpacking archive…</div>
-                    {progress >= 40 && <div className="text-primary">Found 14 image files</div>}
-                    {progress >= 80 && <div className="text-mint">Enhancement and quality checks running…</div>}
+                    {progress >= 40 && <div className="text-accent">Found 14 image files</div>}
+                    {progress >= 80 && <div className="text-emerald-600">Enhancement and quality checks running…</div>}
                   </div>
                 </div>
               )}
@@ -143,11 +143,11 @@ export default function UploadZip() {
               title={stage === 'processing' ? 'Processing…' : 'Results'}
               subtitle={stage === 'processing' ? 'Enhancing and validating photos' : 'Will appear here when processing finishes'}
             >
-              <div className="h-64 flex flex-col items-center justify-center text-center text-muted gap-2">
+              <div className="h-64 flex flex-col items-center justify-center text-center text-ink-mute gap-2">
                 {stage === 'processing' ? (
-                  <FileArchive className="w-8 h-8 text-primary animate-spin" />
+                  <FileArchive className="w-8 h-8 text-accent animate-spin" />
                 ) : (
-                  <HelpCircle className="w-8 h-8 text-muted opacity-40" />
+                  <HelpCircle className="w-8 h-8 text-ink-mute opacity-40" />
                 )}
                 <p className="text-xs font-semibold">
                   {stage === 'processing' ? 'Processing your archive, please wait…' : 'Upload a ZIP to see results here.'}
@@ -159,28 +159,28 @@ export default function UploadZip() {
           {stage === 'done' && (
             <ChartCard title="Processing Complete" subtitle="Your archive has been processed">
               <div className="space-y-5">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3 text-xs text-muted">
-                  <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                <div className="p-4 rounded-2xl bg-surface-mute border border-line space-y-3 text-xs text-ink-mute">
+                  <div className="flex justify-between items-center pb-2 border-b border-line">
                     <span className="font-bold text-[10px] uppercase tracking-wider">Results</span>
-                    <span className="text-mint font-bold flex items-center gap-1">
+                    <span className="text-emerald-600 font-bold flex items-center gap-1">
                       <CheckCircle className="w-3.5 h-3.5" /> Done
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Photos found in ZIP:</span>
-                    <span className="font-bold text-dark">14 files</span>
+                    <span className="font-bold text-ink">14 files</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Photos accepted:</span>
-                    <span className="font-bold text-mint">12 photos</span>
+                    <span className="font-bold text-emerald-600">12 photos</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Photos rejected:</span>
-                    <span className="font-bold text-pink">2 photos</span>
+                    <span className="font-bold text-accent-soft">2 photos</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Person groups created:</span>
-                    <span className="font-bold text-dark">3 groups</span>
+                    <span className="font-bold text-ink">3 groups</span>
                   </div>
                 </div>
 

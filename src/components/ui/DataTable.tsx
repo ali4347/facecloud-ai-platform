@@ -34,11 +34,7 @@ export function DataTable<T extends Record<string, unknown>>({
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td
-                colSpan={columns.length}
-                className="text-center py-12 text-sm"
-                style={{ color: 'rgba(255,255,255,0.35)' }}
-              >
+              <td colSpan={columns.length} className="text-center py-12 text-sm text-ink-faint">
                 {emptyMessage}
               </td>
             </tr>

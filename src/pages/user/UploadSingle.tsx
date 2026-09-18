@@ -219,7 +219,7 @@ export default function UploadSingle() {
   return (
     <div className="space-y-6 page-enter">
       <div className="flex items-center gap-3">
-        <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-white/5 border border-white/10 text-muted hover:text-white">
+        <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <PageHeader 
@@ -240,20 +240,20 @@ export default function UploadSingle() {
                 <label className="upload-dropzone block cursor-pointer">
                   <input type="file" onChange={handleFileChange} className="hidden" accept="image/*" />
                   <div className="flex flex-col items-center gap-3">
-                    <div className="p-4 rounded-full bg-[#F97316]/10 border border-[#F97316]/25 text-[#F97316]">
+                    <div className="p-4 rounded-full bg-[#4F46E5]/10 border border-[#4F46E5]/25 text-[#4F46E5]">
                       <Upload className="w-6 h-6 animate-pulse" />
                     </div>
-                    <span className="text-xs font-bold text-white">Click to browse or drop file here</span>
-                    <span className="text-[10px] text-white/40">Supports JPG, JPEG, PNG up to 50MB</span>
+                    <span className="text-xs font-bold text-ink">Click to browse or drop file here</span>
+                    <span className="text-[10px] text-ink-faint">Supports JPG, JPEG, PNG up to 50MB</span>
                   </div>
                 </label>
               ) : (
-                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-white/[0.08] bg-black/20 flex items-center justify-center">
+                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-line bg-surface-mute flex items-center justify-center">
                   <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
                   {status === 'idle' && (
                     <button 
                       onClick={resetPipeline}
-                      className="absolute top-4 right-4 p-2.5 rounded-xl bg-black/60 border border-white/10 hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                      className="absolute top-4 right-4 p-2.5 rounded-xl bg-black/60 border border-white/20 hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                     >
                       <RefreshCw className="w-3.5 h-3.5" /> Re-select
                     </button>
@@ -263,7 +263,7 @@ export default function UploadSingle() {
 
               {/* Explainer caption */}
               {selectedFile && status === 'idle' && (
-                <p className="text-[10px] text-white/40 font-medium">
+                <p className="text-[10px] text-ink-faint font-medium">
                   FaceCloud will automatically analyze image quality, detect faces, enhance the image, and assign person folders.
                 </p>
               )}
@@ -279,12 +279,12 @@ export default function UploadSingle() {
               {status === 'processing' && (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-[#FB923C] font-bold">Processing pipeline executing...</span>
-                    <span className="text-white/50 font-mono font-bold">{Math.round((currentStep / pipelineSteps.length) * 100)}%</span>
+                    <span className="text-[#6366F1] font-bold">Processing pipeline executing...</span>
+                    <span className="text-ink-mute font-mono font-bold">{Math.round((currentStep / pipelineSteps.length) * 100)}%</span>
                   </div>
-                  <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-full h-1 bg-surface-mute rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-gradient-to-r from-[#F97316] to-[#4FFFB0] transition-all duration-300"
+                      className="h-full bg-gradient-to-r from-[#4F46E5] to-[#059669] transition-all duration-300"
                       style={{ width: `${((currentStep + 1) / pipelineSteps.length) * 100}%` }}
                     />
                   </div>
@@ -292,15 +292,15 @@ export default function UploadSingle() {
                     {pipelineSteps.map((step, idx) => (
                       <div key={step.label} className="flex gap-3 items-start text-xs" style={{ opacity: idx > currentStep ? 0.3 : 1 }}>
                         <div className={`w-5 h-5 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0 text-[10px] font-bold ${
-                          idx < currentStep ? 'bg-[#4FFFB0]/10 text-[#4FFFB0] border border-[#4FFFB0]/20' :
-                          idx === currentStep ? 'bg-[#F97316]/20 text-[#FB923C] border border-[#F97316]/30 animate-pulse' :
-                          'bg-white/5 text-white/30 border border-white/10'
+                          idx < currentStep ? 'bg-[#059669]/10 text-[#059669] border border-[#059669]/20' :
+                          idx === currentStep ? 'bg-[#4F46E5]/20 text-[#6366F1] border border-[#4F46E5]/30 animate-pulse' :
+                          'bg-surface-mute text-ink-faint border border-line'
                         }`}>
                           {idx < currentStep ? '✓' : idx + 1}
                         </div>
                         <div>
-                          <p className={`font-bold ${idx === currentStep ? 'text-[#FB923C]' : 'text-white'}`}>{step.label}</p>
-                          <p className="text-[10px] text-white/40 mt-0.5">{step.desc}</p>
+                          <p className={`font-bold ${idx === currentStep ? 'text-[#6366F1]' : 'text-ink'}`}>{step.label}</p>
+                          <p className="text-[10px] text-ink-faint mt-0.5">{step.desc}</p>
                         </div>
                       </div>
                     ))}
@@ -318,8 +318,8 @@ export default function UploadSingle() {
             
             {status === 'idle' && (
               <ChartCard title="Photo Preview" subtitle="Your photo will appear here">
-                <div className="h-64 flex flex-col items-center justify-center text-center text-white/35 gap-2">
-                  <Upload className="w-10 h-10 text-white/20 opacity-40 animate-bounce" />
+                <div className="h-64 flex flex-col items-center justify-center text-center text-ink-faint gap-2">
+                  <Upload className="w-10 h-10 text-ink-faint opacity-40 animate-bounce" />
                   <p className="text-xs font-semibold">Select a photo and confirm to start processing.</p>
                 </div>
               </ChartCard>
@@ -328,11 +328,11 @@ export default function UploadSingle() {
             {status === 'processing' && (
               <ChartCard title="Biometrics Restorations" subtitle="Real-time pipeline analytics">
                 <div className="space-y-6">
-                  <div className="aspect-[4/3] rounded-3xl bg-black/20 overflow-hidden flex items-center justify-center relative border border-white/[0.06]">
+                  <div className="aspect-[4/3] rounded-3xl bg-surface-mute overflow-hidden flex items-center justify-center relative border border-line">
                     <img src={previewUrl} alt="Restoring" className="w-full h-full object-cover blur-[2px] opacity-40" />
                     <div className="absolute inset-0 bg-[#0D0F14]/50 flex items-center justify-center flex-col gap-2">
-                      <Sparkles className="w-8 h-8 text-[#F97316] animate-spin" />
-                      <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">Compiling CNN illumination matrix...</span>
+                      <Sparkles className="w-8 h-8 text-[#4F46E5] animate-spin" />
+                      <span className="text-xs font-mono font-bold text-ink uppercase tracking-wider">Compiling CNN illumination matrix...</span>
                     </div>
                   </div>
                 </div>
@@ -343,7 +343,7 @@ export default function UploadSingle() {
               <ChartCard title="Processing Complete" subtitle="Image approved by AI system">
                 <div className="space-y-6">
                   {/* Before / After comparison slider */}
-                  <div className="aspect-[4/3] rounded-3xl overflow-hidden relative border border-white/[0.08] bg-black">
+                  <div className="aspect-[4/3] rounded-3xl overflow-hidden relative border border-line bg-surface-sunk">
                     <BeforeAfterSlider 
                       beforeSrc={previewUrl}
                       afterSrc={enhancedPreviewUrl || previewUrl}
@@ -360,57 +360,57 @@ export default function UploadSingle() {
                       { l: 'Brightness', v: `${result.brightnessScore}%`, ok: result.brightnessScore > 50 },
                       { l: 'Face Size', v: `${result.faceSizeScore}%`, ok: result.faceSizeScore > 40 }
                     ].map(stat => (
-                      <div key={stat.l} className="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
-                        <span className="block text-[8px] text-white/40 font-bold uppercase tracking-wider">{stat.l}</span>
-                        <span className="block text-sm font-bold mt-1 text-[#4FFFB0]">{stat.v}</span>
+                      <div key={stat.l} className="p-3 rounded-2xl bg-surface-mute border border-line text-center">
+                        <span className="block text-[8px] text-ink-faint font-bold uppercase tracking-wider">{stat.l}</span>
+                        <span className="block text-sm font-bold mt-1 text-[#059669]">{stat.v}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Multi-face notice / folder match panel */}
-                  <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-3 text-xs">
+                  <div className="p-4 rounded-2xl bg-surface-mute border border-line space-y-3 text-xs">
                     {result.faceCount > 1 ? (
                       <>
-                        <div className="flex items-center gap-2 text-[#4FFFB0] font-bold">
+                        <div className="flex items-center gap-2 text-[#059669] font-bold">
                           <FolderHeart className="w-4 h-4" />
                           <span>Multiple faces detected ({result.faceCount} faces)</span>
                         </div>
-                        <p className="text-[11px] text-white/60 leading-relaxed font-medium">
+                        <p className="text-[11px] text-ink-mute leading-relaxed font-medium">
                           FaceCloud detected multiple faces and saved the enhanced image to each matched person folder.
                         </p>
-                        <div className="space-y-2 pt-2 border-t border-white/[0.08]">
-                          <span className="block text-[9px] text-white/40 font-bold uppercase tracking-wider">Matched Folders ({result.matchedPersonFolders.length})</span>
+                        <div className="space-y-2 pt-2 border-t border-line">
+                          <span className="block text-[9px] text-ink-faint font-bold uppercase tracking-wider">Matched Folders ({result.matchedPersonFolders.length})</span>
                           {result.matchedPersonFolders.map(folder => (
                             <Link 
                               key={folder.id} 
                               to="/dashboard/groups" 
-                              className="flex items-center justify-between p-2 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/20 transition-all font-semibold text-white/80 hover:text-white"
+                              className="flex items-center justify-between p-2 rounded-xl bg-surface-mute border border-line hover:border-line transition-all font-semibold text-ink-soft hover:text-ink"
                             >
                               <span className="flex items-center gap-1.5">
-                                <FolderOpen className="w-3.5 h-3.5 text-[#F97316]" />
+                                <FolderOpen className="w-3.5 h-3.5 text-[#4F46E5]" />
                                 {folder.name}
                               </span>
-                              <span className="text-[10px] text-[#4FFFB0] font-bold">{folder.confidence}% match</span>
+                              <span className="text-[10px] text-[#059669] font-bold">{folder.confidence}% match</span>
                             </Link>
                           ))}
                         </div>
-                        <p className="text-[10px] text-white/40 italic">
+                        <p className="text-[10px] text-ink-faint italic">
                           Multi-face images are allowed. FaceCloud stores the enhanced image in every matched person folder.
                         </p>
                       </>
                     ) : (
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="block text-[9px] text-white/40 uppercase font-bold tracking-wider">Identity Match</span>
+                          <span className="block text-[9px] text-ink-faint uppercase font-bold tracking-wider">Identity Match</span>
                           {result.matchedPersonFolders[0] ? (
-                            <Link to="/dashboard/groups" className="text-[#F97316] font-bold hover:underline flex items-center gap-1 mt-0.5">
+                            <Link to="/dashboard/groups" className="text-[#4F46E5] font-bold hover:underline flex items-center gap-1 mt-0.5">
                               {result.matchedPersonFolders[0].name} <Link2 className="w-3.5 h-3.5" />
                             </Link>
                           ) : (
-                            <span className="text-white/50 block mt-0.5">No match found</span>
+                            <span className="text-ink-mute block mt-0.5">No match found</span>
                           )}
                         </div>
-                        <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-[#4FFFB0]/10 border border-[#4FFFB0]/25 text-[#4FFFB0]">ACCEPTED</span>
+                        <span className="px-2.5 py-1 text-[10px] font-bold rounded-full bg-[#059669]/10 border border-[#059669]/25 text-[#059669]">ACCEPTED</span>
                       </div>
                     )}
                   </div>
@@ -429,7 +429,7 @@ export default function UploadSingle() {
                         to="/dashboard/groups"
                         className="fc-btn-secondary flex-1 justify-center py-3 text-xs font-bold cursor-pointer"
                       >
-                        <FolderOpen className="w-4 h-4 text-[#F97316]" /> View Person Folders
+                        <FolderOpen className="w-4 h-4 text-[#4F46E5]" /> View Person Folders
                       </Link>
                     ) : (
                       <button 
@@ -445,15 +445,15 @@ export default function UploadSingle() {
                   </div>
 
                   {/* Demo disclaimer */}
-                  <div className="p-3.5 rounded-2xl flex items-start gap-2.5 bg-[#F97316]/5 border border-[#F97316]/15">
-                    <Info className="w-4 h-4 text-[#FB923C] flex-shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-white/50 leading-relaxed font-medium">
+                  <div className="p-3.5 rounded-2xl flex items-start gap-2.5 bg-[#4F46E5]/5 border border-[#4F46E5]/15">
+                    <Info className="w-4 h-4 text-[#6366F1] flex-shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-ink-mute leading-relaxed font-medium">
                       Frontend demo enhancement. Production backend can connect Zero-DCE/GFPGAN/CodeFormer for real AI restoration.
                     </p>
                   </div>
 
                   {/* Start another image option */}
-                  <button onClick={resetPipeline} className="w-full py-2 text-center text-xs font-semibold text-white/30 hover:text-white/60 hover:underline cursor-pointer">
+                  <button onClick={resetPipeline} className="w-full py-2 text-center text-xs font-semibold text-ink-faint hover:text-ink-mute hover:underline cursor-pointer">
                     Try Another Image
                   </button>
                 </div>
@@ -465,48 +465,48 @@ export default function UploadSingle() {
                 <div className="space-y-6">
                   
                   {/* Error Card */}
-                  <div className="p-4 rounded-3xl bg-[#EF4444]/10 border border-[#EF4444]/25 space-y-3">
+                  <div className="p-4 rounded-3xl bg-[#DC2626]/10 border border-[#DC2626]/25 space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-[#EF4444]/20 border border-[#EF4444]/35 flex items-center justify-center text-[#F87171]">
+                      <div className="w-8 h-8 rounded-full bg-[#DC2626]/20 border border-[#DC2626]/35 flex items-center justify-center text-[#DC2626]">
                         <AlertTriangle className="w-4.5 h-4.5" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-[#F87171] uppercase tracking-wider">
+                        <h4 className="text-xs font-bold text-[#DC2626] uppercase tracking-wider">
                           {result.rejectionReason}
                         </h4>
-                        <p className="text-[10px] text-white/40 mt-0.5">Rejected by Face Detection node</p>
+                        <p className="text-[10px] text-ink-faint mt-0.5">Rejected by Face Detection node</p>
                       </div>
                     </div>
-                    <p className="text-xs text-white/80 leading-relaxed font-medium">
+                    <p className="text-xs text-ink-soft leading-relaxed font-medium">
                       {result.feedback}
                     </p>
                   </div>
 
                   {/* Verification Trace info */}
-                  <div className="space-y-3.5 p-4 rounded-3xl bg-white/5 border border-white/10 text-xs text-white/60">
-                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-white/5">
+                  <div className="space-y-3.5 p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-mute">
+                    <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-line">
                       <span>Pipeline Trace Info</span>
-                      <span className="text-[#F87171]">Failed at Step 7</span>
+                      <span className="text-[#DC2626]">Failed at Step 7</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Face Detected:</span>
-                      <span className="font-bold text-white">{result.faceCount > 0 ? `Yes (${result.faceCount} face${result.faceCount > 1 ? 's' : ''})` : 'No'}</span>
+                      <span className="font-bold text-ink">{result.faceCount > 0 ? `Yes (${result.faceCount} face${result.faceCount > 1 ? 's' : ''})` : 'No'}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Blur Score:</span>
-                      <span className={`font-bold ${result.blurScore < 45 ? 'text-[#F87171]' : 'text-[#4FFFB0]'}`}>
+                      <span className={`font-bold ${result.blurScore < 45 ? 'text-[#DC2626]' : 'text-[#059669]'}`}>
                         {result.blurScore}/100 {result.blurScore < 45 && '(Failed)'}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Brightness Score:</span>
-                      <span className={`font-bold ${result.brightnessScore < 25 ? 'text-[#F87171]' : 'text-[#4FFFB0]'}`}>
+                      <span className={`font-bold ${result.brightnessScore < 25 ? 'text-[#DC2626]' : 'text-[#059669]'}`}>
                         {result.brightnessScore}/100 {result.brightnessScore < 25 && '(Failed)'}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span>Face Size Score:</span>
-                      <span className={`font-bold ${result.faceSizeScore < 40 ? 'text-[#F87171]' : 'text-[#4FFFB0]'}`}>
+                      <span className={`font-bold ${result.faceSizeScore < 40 ? 'text-[#DC2626]' : 'text-[#059669]'}`}>
                         {result.faceSizeScore}/100 {result.faceSizeScore < 40 && '(Failed)'}
                       </span>
                     </div>

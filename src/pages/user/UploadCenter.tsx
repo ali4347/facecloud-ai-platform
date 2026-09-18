@@ -11,7 +11,7 @@ export default function UploadCenter() {
       path: '/dashboard/upload/single',
       icon: FileImage,
       badge: 'Interactive Restores',
-      color: 'border-primary/20 text-primary hover:border-primary'
+      color: 'border-accent/20 text-accent hover:border-accent'
     },
     {
       title: 'Multiple Batch Upload',
@@ -19,7 +19,7 @@ export default function UploadCenter() {
       path: '/dashboard/upload/multiple',
       icon: Files,
       badge: 'Batch Queue',
-      color: 'border-mint/20 text-mint hover:border-mint'
+      color: 'border-emerald-300/20 text-emerald-600 hover:border-emerald-300'
     },
     {
       title: 'ZIP Archive Upload',
@@ -27,7 +27,7 @@ export default function UploadCenter() {
       path: '/dashboard/upload/zip',
       icon: FolderArchive,
       badge: 'Automated Folders',
-      color: 'border-violet/20 text-violet hover:border-violet'
+      color: 'border-violet-300/20 text-violet-600 hover:border-violet-300'
     }
   ]
 
@@ -43,14 +43,14 @@ export default function UploadCenter() {
           <div key={opt.title} className="fc-card p-6 flex flex-col justify-between aspect-square hover:-translate-y-1">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <div className={`p-3 rounded-2xl bg-white/5 border border-white/10`}>
-                  <opt.icon className="w-6 h-6 text-primary" />
+                <div className={`p-3 rounded-2xl bg-surface-mute border border-line`}>
+                  <opt.icon className="w-6 h-6 text-accent" />
                 </div>
-                <span className="text-[10px] font-bold text-muted uppercase tracking-wider bg-white/5 px-2 py-0.5 rounded-full border border-white/10">{opt.badge}</span>
+                <span className="text-[10px] font-bold text-ink-mute uppercase tracking-wider bg-surface-mute px-2 py-0.5 rounded-full border border-line">{opt.badge}</span>
               </div>
               <div className="space-y-2">
-                <h3 className="text-base font-bold text-dark">{opt.title}</h3>
-                <p className="text-xs text-muted leading-relaxed">{opt.desc}</p>
+                <h3 className="text-base font-bold text-ink">{opt.title}</h3>
+                <p className="text-xs text-ink-mute leading-relaxed">{opt.desc}</p>
               </div>
             </div>
             <Link to={opt.path} className="fc-btn-primary w-full text-xs font-bold py-3 mt-4">
@@ -71,17 +71,17 @@ export default function UploadCenter() {
               { text: 'Image resolution must not display excessive motion blur or noise indicators', ok: false }
             ].map((g, i) => (
               <div key={i} className="flex items-start gap-2.5">
-                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${g.ok ? 'bg-mint/10 text-mint' : 'bg-orange/10 text-orange'} mt-0.5 flex-shrink-0`}>
+                <div className={`w-4 h-4 rounded-full flex items-center justify-center ${g.ok ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'} mt-0.5 flex-shrink-0`}>
                   <CheckCircle className="w-3 h-3" />
                 </div>
-                <span className="text-xs text-dark">{g.text}</span>
+                <span className="text-xs text-ink">{g.text}</span>
               </div>
             ))}
           </div>
         </ChartCard>
 
         <ChartCard title="Methodology Trace Steps" subtitle="Active pipeline stages">
-          <div className="grid grid-cols-2 gap-3 text-[11px] text-muted">
+          <div className="grid grid-cols-2 gap-3 text-[11px] text-ink-mute">
             {[
               '1. Select upload type',
               '8. Accept or Reject',
@@ -98,7 +98,7 @@ export default function UploadCenter() {
               '7. Quality verification checks'
             ].map((step, i) => (
               <div key={i} className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <div className="w-1.5 h-1.5 rounded-full bg-accent" />
                 <span>{step}</span>
               </div>
             ))}

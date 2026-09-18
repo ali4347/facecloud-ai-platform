@@ -33,8 +33,20 @@ export function AppShell({ role }: AppShellProps) {
     }
   }, [sidebarOpen])
 
+  /* The document body is painted black for the marketing site. The shell is
+     light, so repaint the body while it is mounted — otherwise overscroll and
+     the area beneath short pages flash black. Restored on unmount so logging
+     out returns to the dark public pages cleanly. */
+  useEffect(() => {
+    const previousBg = document.body.style.backgroundColor
+    document.body.style.backgroundColor = '#F7F8FA'
+    return () => {
+      document.body.style.backgroundColor = previousBg
+    }
+  }, [])
+
   return (
-    <div className="dark-dashboard min-h-screen text-[#F0F4FF] fc-app-bg relative">
+    <div className="fc-light min-h-screen relative">
       {/* Sidebar */}
       <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -43,20 +55,20 @@ export function AppShell({ role }: AppShellProps) {
         <button
           type="button"
           aria-label="Close sidebar"
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden cursor-default w-full h-full text-left"
+          className="fixed inset-0 z-40 bg-ink/25 backdrop-blur-[2px] lg:hidden cursor-default w-full h-full text-left"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Main content */}
-      <div className="lg:pl-64 flex flex-col min-h-screen relative z-10">
+      <div className="lg:pl-[280px] flex flex-col min-h-screen relative z-10">
         <Topbar
           role={role}
           sidebarOpen={sidebarOpen}
           onMenuClick={() => setSidebarOpen(o => !o)}
           onCloseSidebar={() => setSidebarOpen(false)}
         />
-        <main className="flex-1 p-6 page-enter">
+        <main className="flex-1 px-4 sm:px-6 lg:px-7 py-6 page-enter">
           <Outlet />
         </main>
       </div>

@@ -32,17 +32,17 @@ export default function ImageMonitoring() {
                 <tr key={img.id}>
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg border border-white/[0.08] flex-shrink-0" style={{ backgroundColor: img.thumbnail }} />
+                      <div className="w-8 h-8 rounded-lg border border-line flex-shrink-0" style={{ backgroundColor: img.thumbnail }} />
                       <div className="min-w-0">
-                        <p className="font-bold text-white truncate max-w-[200px]">{img.filename}</p>
-                        <p className="text-[10px] text-white/40">ID: {img.id}</p>
+                        <p className="font-bold text-ink truncate max-w-[200px]">{img.filename}</p>
+                        <p className="text-[10px] text-ink-faint">ID: {img.id}</p>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <div className="text-xs text-white/80 space-y-0.5">
+                    <div className="text-xs text-ink-soft space-y-0.5">
                       <p>Size: {img.size}</p>
-                      <p className="text-[10px] text-white/40 font-mono">{img.dimensions}</p>
+                      <p className="text-[10px] text-ink-faint font-mono">{img.dimensions}</p>
                     </div>
                   </td>
                   <td>
@@ -53,15 +53,15 @@ export default function ImageMonitoring() {
                     </span>
                   </td>
                   <td>
-                    <div className="text-xs text-white/80">
-                      <p>Blur Score: <strong className={img.blurScore >= 60 ? 'text-[#4FFFB0]' : 'text-[#F87171]'}>{img.blurScore}</strong></p>
-                      <p className="text-[10px] text-white/40">Brightness: {img.brightnessScore}</p>
+                    <div className="text-xs text-ink-soft">
+                      <p>Blur Score: <strong className={img.blurScore >= 60 ? 'text-[#059669]' : 'text-[#DC2626]'}>{img.blurScore}</strong></p>
+                      <p className="text-[10px] text-ink-faint">Brightness: {img.brightnessScore}</p>
                     </div>
                   </td>
                   <td>
                     <Link 
                       to={`/dashboard/images/${img.id}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#6366F1] hover:underline"
                     >
                       Audit Details <ArrowRight className="w-3.5 h-3.5" />
                     </Link>

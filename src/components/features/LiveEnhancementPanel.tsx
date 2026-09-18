@@ -248,13 +248,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       const x = canvasW - rawX - width
 
       // Draw bounding box (mint)
-      ctx.strokeStyle = '#4FFFB0'
+      ctx.strokeStyle = '#059669'
       ctx.lineWidth = 2
       ctx.strokeRect(x, y, width, height)
 
       // Corner brackets (bright blue)
       const bracketLength = Math.min(15, width * 0.2)
-      ctx.strokeStyle = '#F97316'
+      ctx.strokeStyle = '#4F46E5'
       ctx.lineWidth = 3
 
       // Top-Left
@@ -325,8 +325,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
       const parts: { text: string; color: string; sizeMultiplier?: number }[] = []
       parts.push({ text: `Face ${index + 1}`, color: '#FFFFFF' })
-      parts.push({ text: ' • ', color: 'rgba(255,255,255,0.4)' })
-      parts.push({ text: `${detectionConf}%`, color: '#FB923C', sizeMultiplier: 0.9 })
+      parts.push({ text: ' • ', color: '#94A3B8' })
+      parts.push({ text: `${detectionConf}%`, color: '#6366F1', sizeMultiplier: 0.9 })
 
       // Calculate label width
       let totalWidth = 0
@@ -355,7 +355,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       }
 
       // Draw dark glass label background
-      drawRoundedRect(ctx, labelX, labelY, labelW, labelH, radius, 'rgba(0, 0, 0, 0.65)', 'rgba(79, 255, 176, 0.35)')
+      drawRoundedRect(ctx, labelX, labelY, labelW, labelH, radius, 'rgba(15,23,42,0.08)', 'rgba(5,150,105, 0.35)')
 
       // Draw text parts
       let currentX = labelX + paddingX
@@ -370,7 +370,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
       // Keypoints (small cyan dots)
       if (det.keypoints) {
-        ctx.fillStyle = '#FB923C'
+        ctx.fillStyle = '#6366F1'
         det.keypoints.forEach((kp: any) => {
           const rawKpX = kp.x * videoW * scale + offsetX
           const kpY = kp.y * videoH * scale + offsetY
@@ -743,53 +743,53 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           transform: toastMessage ? 'translateY(0)' : 'translateY(-10px)'
         }}
       >
-        <div className="fc-panel px-5 py-3 rounded-2xl border border-white/10 bg-black/90 text-xs font-bold text-white shadow-2xl flex items-center gap-2">
-          <Zap className="w-3.5 h-3.5 text-[#F97316]" />
+        <div className="fc-panel px-5 py-3 rounded-2xl border border-line bg-black/90 text-xs font-bold text-white shadow-2xl flex items-center gap-2">
+          <Zap className="w-3.5 h-3.5 text-[#4F46E5]" />
           <span>{toastMessage}</span>
         </div>
       </div>
 
       {/* Model Loader Warnings */}
       {detectorStatus === 'loading' && (
-        <div className="mb-4 p-4 rounded-2xl bg-[#F97316]/10 border border-[#F97316]/20 text-xs text-[#FB923C] font-semibold flex items-center gap-2">
+        <div className="mb-4 p-4 rounded-2xl bg-[#4F46E5]/10 border border-[#4F46E5]/20 text-xs text-[#6366F1] font-semibold flex items-center gap-2">
           <Info className="w-4.5 h-4.5 flex-shrink-0 animate-spin" />
           <span>Loading face detection model...</span>
         </div>
       )}
       {detectorStatus === 'error' && (
-        <div className="mb-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#F87171] font-semibold flex flex-col gap-1">
+        <div className="mb-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#DC2626] font-semibold flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Info className="w-4.5 h-4.5 flex-shrink-0" />
             <span>Face detection model failed to load. Camera feed is active, but detection is unavailable.</span>
           </div>
-          <span className="text-[10px] text-white/40 ml-6 font-medium">Check internet connection, MediaPipe WASM path, and model asset URL.</span>
+          <span className="text-[10px] text-ink-faint ml-6 font-medium">Check internet connection, MediaPipe WASM path, and model asset URL.</span>
         </div>
       )}
       {detectorFallbackMsg && (
-        <div className="mb-4 p-4 rounded-2xl flex items-start gap-2 text-xs font-semibold" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)', color: '#FCD34D' }}>
+        <div className="mb-4 p-4 rounded-2xl flex items-start gap-2 text-xs font-semibold" style={{ background: 'rgba(217,119,6,0.08)', border: '1px solid rgba(217,119,6,0.25)', color: '#B45309' }}>
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>{detectorFallbackMsg}</span>
         </div>
       )}
       {camState === 'active' && smallFaceWarning && (
-        <div className="mb-4 p-3 rounded-2xl flex items-center gap-2 text-[11px] font-semibold" style={{ background: 'rgba(249, 115, 22,0.06)', border: '1px solid rgba(249, 115, 22,0.18)', color: '#FB923C' }}>
+        <div className="mb-4 p-3 rounded-2xl flex items-center gap-2 text-[11px] font-semibold" style={{ background: 'rgba(79,70,229,0.06)', border: '1px solid rgba(79,70,229,0.18)', color: '#6366F1' }}>
           <Info className="w-3.5 h-3.5 flex-shrink-0" />
           <span>Small/distant face detected — move closer for better enhancement quality.</span>
         </div>
       )}
 
       {/* ─── Mode Tabs ─── */}
-      <div className="mb-5 flex items-center gap-1 p-1 rounded-2xl w-fit" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="mb-5 flex items-center gap-1 p-1 rounded-2xl w-fit" style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}>
         <button
           onClick={() => setActiveTab('live')}
           className="px-5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
           style={activeTab === 'live' ? {
-            background: 'linear-gradient(135deg, rgba(249, 115, 22,0.25), rgba(249, 115, 22,0.10))',
-            color: '#FB923C',
-            border: '1px solid rgba(249, 115, 22,0.35)',
-            boxShadow: '0 0 20px rgba(249, 115, 22,0.15)',
+            background: 'linear-gradient(135deg, rgba(79,70,229,0.25), rgba(79,70,229,0.10))',
+            color: '#6366F1',
+            border: '1px solid rgba(79,70,229,0.35)',
+            boxShadow: '0 0 20px rgba(79,70,229,0.15)',
           } : {
-            color: 'rgba(255,255,255,0.45)',
+            color: '#64748B',
             border: '1px solid transparent',
           }}
         >
@@ -800,12 +800,12 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           onClick={() => setActiveTab('snapshot')}
           className="px-5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
           style={activeTab === 'snapshot' ? {
-            background: 'linear-gradient(135deg, rgba(249, 115, 22,0.25), rgba(249, 115, 22,0.10))',
-            color: '#FB923C',
-            border: '1px solid rgba(249, 115, 22,0.35)',
-            boxShadow: '0 0 20px rgba(249, 115, 22,0.15)',
+            background: 'linear-gradient(135deg, rgba(79,70,229,0.25), rgba(79,70,229,0.10))',
+            color: '#6366F1',
+            border: '1px solid rgba(79,70,229,0.35)',
+            boxShadow: '0 0 20px rgba(79,70,229,0.15)',
           } : {
-            color: 'rgba(255,255,255,0.45)',
+            color: '#64748B',
             border: '1px solid transparent',
           }}
         >
@@ -818,13 +818,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       {activeTab === 'live' && (
         <div className="mb-4 flex items-center gap-2">
           <StatusBadge status="info" label="Live Preview Mode" />
-          <span className="text-[10px] text-white/40 font-medium">Real-time preview uses browser filters for fast feedback.</span>
+          <span className="text-[10px] text-ink-faint font-medium">Real-time preview uses browser filters for fast feedback.</span>
         </div>
       )}
       {activeTab === 'snapshot' && (
         <div className="mb-4 flex items-center gap-2">
           <StatusBadge status="purple" label="AI Snapshot Enhance" />
-          <span className="text-[10px] text-white/40 font-medium">Capture a frame and run FaceCloud AI face restoration pipeline.</span>
+          <span className="text-[10px] text-ink-faint font-medium">Capture a frame and run FaceCloud AI face restoration pipeline.</span>
         </div>
       )}
 
@@ -833,15 +833,15 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         
         {/* Original Camera Feed */}
         <div className="fc-card overflow-hidden flex flex-col justify-between">
-          <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
+          <div className="px-4 py-3 border-b border-line flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Camera className="w-4 h-4 text-white/50" />
-              <span className="text-sm font-semibold text-white">Original Feed</span>
+              <Camera className="w-4 h-4 text-ink-mute" />
+              <span className="text-sm font-semibold text-ink">Original Feed</span>
             </div>
             {getPanelBadge()}
           </div>
 
-          <div className="relative bg-black aspect-video flex items-center justify-center border-b border-white/[0.04] overflow-hidden min-h-[320px]">
+          <div className="relative bg-surface-sunk aspect-video flex items-center justify-center border-b border-line overflow-hidden min-h-[320px]">
             <video 
               ref={originalVideoRef}
               autoPlay 
@@ -860,15 +860,15 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                 <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/20 via-transparent to-black/10" />
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-red-500/90 rounded-full z-20">
                   <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                  <span className="text-[10px] text-white font-bold tracking-wider font-mono">REC {formatElapsed(elapsed)}</span>
+                  <span className="text-[10px] text-ink font-bold tracking-wider font-mono">REC {formatElapsed(elapsed)}</span>
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center gap-3 text-white/30 text-center p-4 z-20">
-                <Camera className="w-12 h-12 text-white/20" />
+              <div className="flex flex-col items-center gap-3 text-ink-faint text-center p-4 z-20">
+                <Camera className="w-12 h-12 text-ink-faint" />
                 <div>
-                  <p className="text-xs font-semibold text-white/50">Camera is off</p>
-                  <p className="text-[10px] text-white/30 mt-1 max-w-[200px]">Click Start Camera below to request browser media access.</p>
+                  <p className="text-xs font-semibold text-ink-mute">Camera is off</p>
+                  <p className="text-[10px] text-ink-faint mt-1 max-w-[200px]">Click Start Camera below to request browser media access.</p>
                 </div>
               </div>
             )}
@@ -878,10 +878,10 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         {/* AI Enhanced Output Panel — only visible in Live Preview mode */}
         {activeTab === 'live' && (
           <div className="fc-card overflow-hidden flex flex-col justify-between">
-            <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
+            <div className="px-4 py-3 border-b border-line flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#F97316]" />
-                <span className="text-sm font-semibold text-white">AI Enhanced Output</span>
+                <Zap className="w-4 h-4 text-[#4F46E5]" />
+                <span className="text-sm font-semibold text-ink">AI Enhanced Output</span>
               </div>
               <StatusBadge 
                 status={
@@ -895,7 +895,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               />
             </div>
 
-            <div className="relative bg-black aspect-video flex items-center justify-center border-b border-white/[0.04] overflow-hidden min-h-[320px]">
+            <div className="relative bg-surface-sunk aspect-video flex items-center justify-center border-b border-line overflow-hidden min-h-[320px]">
               <video 
                 ref={enhancedVideoRef}
                 autoPlay 
@@ -909,14 +909,14 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {camState === 'active' ? (
                 <>
                   <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/20 via-transparent to-black/10" />
-                  <div className="absolute inset-0 pointer-events-none border border-[#F97316]/25 shadow-[inset_0_0_40px_rgba(249, 115, 22,0.15)] z-20" />
+                  <div className="absolute inset-0 pointer-events-none border border-[#4F46E5]/25 shadow-[inset_0_0_40px_rgba(79,70,229,0.15)] z-20" />
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-3 text-[#F97316]/40 text-center p-4 z-20">
-                  <Zap className="w-12 h-12 text-[#F97316]/20" />
+                <div className="flex flex-col items-center gap-3 text-[#4F46E5]/40 text-center p-4 z-20">
+                  <Zap className="w-12 h-12 text-[#4F46E5]/20" />
                   <div>
-                    <p className="text-xs font-semibold text-[#F97316]/50">Enhancement inactive</p>
-                    <p className="text-[10px] text-white/30 mt-1 max-w-[200px]">Simulated Zero-DCE correction turns on with active stream.</p>
+                    <p className="text-xs font-semibold text-[#4F46E5]/50">Enhancement inactive</p>
+                    <p className="text-[10px] text-ink-faint mt-1 max-w-[200px]">Simulated Zero-DCE correction turns on with active stream.</p>
                   </div>
                 </div>
               )}
@@ -927,10 +927,10 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         {/* Snapshot Capture Panel — only visible in Snapshot Enhance mode */}
         {activeTab === 'snapshot' && (
           <div className="fc-card overflow-hidden flex flex-col justify-between">
-            <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
+            <div className="px-4 py-3 border-b border-line flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Aperture className="w-4 h-4 text-[#A78BFA]" />
-                <span className="text-sm font-semibold text-white">Snapshot Preview</span>
+                <Aperture className="w-4 h-4 text-[#6D28D9]" />
+                <span className="text-sm font-semibold text-ink">Snapshot Preview</span>
               </div>
               {snapshotDataUrl ? (
                 <StatusBadge status="success" label="Frame Captured" />
@@ -939,15 +939,15 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               )}
             </div>
 
-            <div className="relative bg-black aspect-video flex items-center justify-center border-b border-white/[0.04] overflow-hidden min-h-[320px]">
+            <div className="relative bg-surface-sunk aspect-video flex items-center justify-center border-b border-line overflow-hidden min-h-[320px]">
               {snapshotDataUrl ? (
                 <img src={snapshotDataUrl} alt="Captured snapshot" className="absolute inset-0 w-full h-full object-contain" />
               ) : (
-                <div className="flex flex-col items-center gap-3 text-white/30 text-center p-4 z-20">
-                  <ImageIcon className="w-12 h-12 text-white/15" />
+                <div className="flex flex-col items-center gap-3 text-ink-faint text-center p-4 z-20">
+                  <ImageIcon className="w-12 h-12 text-ink-faint" />
                   <div>
-                    <p className="text-xs font-semibold text-white/45">No snapshot captured</p>
-                    <p className="text-[10px] text-white/30 mt-1 max-w-[240px]">Capture a frame to run AI face restoration.</p>
+                    <p className="text-xs font-semibold text-ink-mute">No snapshot captured</p>
+                    <p className="text-[10px] text-ink-faint mt-1 max-w-[240px]">Capture a frame to run AI face restoration.</p>
                   </div>
                 </div>
               )}
@@ -958,7 +958,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
       {/* Connection & state notifications */}
       {camState === 'error' && (
-        <div className="mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#F87171] font-semibold flex items-center gap-2">
+        <div className="mt-4 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#DC2626] font-semibold flex items-center gap-2">
           <Info className="w-4.5 h-4.5 flex-shrink-0" />
           <span>{errorMessage}</span>
         </div>
@@ -991,10 +991,10 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
         {/* Live Debug Pill */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="px-3 py-1 bg-white/[0.04] border border-white/[0.08] rounded-full text-[10px] text-white/60 font-semibold font-mono">
+          <div className="px-3 py-1 bg-surface-mute border border-line rounded-full text-[10px] text-ink-mute font-semibold font-mono">
             Detector: {detectorStatus.toUpperCase()} • Model: {detectorModel === 'full-range' ? 'Full Range' : detectorModel === 'short-range' ? 'Short Range' : '—'} • Faces: {faceCount} • Video: {resolution}
           </div>
-          <div className="text-[10px] text-white/30 font-medium">
+          <div className="text-[10px] text-ink-faint font-medium">
             Camera access works only on localhost or HTTPS.
           </div>
         </div>
@@ -1005,13 +1005,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         <>
           {/* Control Sliders Panel */}
           <div className="mt-6 fc-card p-6 space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
               <div className="flex items-center gap-2">
-                <Settings className="w-4.5 h-4.5 text-[#F97316]" />
-                <h3 className="text-sm font-semibold text-white">AI Enhancement Controls</h3>
+                <Settings className="w-4.5 h-4.5 text-[#4F46E5]" />
+                <h3 className="text-sm font-semibold text-ink">AI Enhancement Controls</h3>
               </div>
               <div className="flex gap-2">
-                <button onClick={resetControls} className="px-3 py-1.5 text-[10px] font-bold text-white/50 border border-white/[0.08] hover:border-white/30 rounded-xl cursor-pointer">
+                <button onClick={resetControls} className="px-3 py-1.5 text-[10px] font-bold text-ink-mute border border-line hover:border-line rounded-xl cursor-pointer">
                   Reset Controls
                 </button>
               </div>
@@ -1019,12 +1019,12 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
             {/* Presets Row */}
             <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider pr-2">Presets:</span>
+              <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider pr-2">Presets:</span>
               {['natural', 'bright', 'sharp', 'low'].map(pr => (
                 <button
                   key={pr}
                   onClick={() => applyPreset(pr as any)}
-                  className="px-3.5 py-1.5 bg-white/[0.03] border border-white/[0.08] text-[10px] font-bold rounded-xl text-white/60 hover:text-white hover:border-[#F97316]/40 cursor-pointer capitalize"
+                  className="px-3.5 py-1.5 bg-surface-mute border border-line text-[10px] font-bold rounded-xl text-ink-mute hover:text-ink hover:border-[#4F46E5]/40 cursor-pointer capitalize"
                 >
                   {pr === 'low' ? 'Low Light' : pr}
                 </button>
@@ -1078,13 +1078,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                 <div key={sld.label} className="space-y-1.5">
                   <div className="flex justify-between text-xs">
                     <div>
-                      <span className="font-bold text-white block">{sld.label}</span>
-                      <span className="text-[10px] text-white/40 block mt-0.5">{sld.sub}</span>
+                      <span className="font-bold text-ink block">{sld.label}</span>
+                      <span className="text-[10px] text-ink-faint block mt-0.5">{sld.sub}</span>
                     </div>
-                    <span className="font-mono text-xs font-bold text-[#FB923C]">{sld.val}%</span>
+                    <span className="font-mono text-xs font-bold text-[#6366F1]">{sld.val}%</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[9px] text-white/30 font-bold uppercase w-10">{sld.l}</span>
+                    <span className="text-[9px] text-ink-faint font-bold uppercase w-10">{sld.l}</span>
                     <div className="flex-1 relative flex items-center">
                       <input
                         type="range"
@@ -1094,11 +1094,11 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                         onChange={e => sld.set(Number(e.target.value))}
                         className="fc-range-slider w-full cursor-pointer h-1 rounded-full appearance-none animate-none"
                         style={{
-                          background: `linear-gradient(to right, #F97316 0%, #4FFFB0 ${sld.val}%, rgba(255,255,255,0.08) ${sld.val}%)`
+                          background: `linear-gradient(to right, #4F46E5 0%, #059669 ${sld.val}%, #E6E9EF ${sld.val}%)`
                         }}
                       />
                     </div>
-                    <span className="text-[9px] text-white/30 font-bold uppercase w-12 text-right">{sld.r}</span>
+                    <span className="text-[9px] text-ink-faint font-bold uppercase w-12 text-right">{sld.r}</span>
                   </div>
                 </div>
               ))}
@@ -1110,23 +1110,23 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
             
             {/* Real-time metrics list */}
             <div className="fc-card p-5 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider border-b border-white/[0.08] pb-2">Live System Metrics</h4>
-              <div className="space-y-2 text-[11px] font-medium text-white/60">
+              <h4 className="text-xs font-bold text-ink uppercase tracking-wider border-b border-line pb-2">Live System Metrics</h4>
+              <div className="space-y-2 text-[11px] font-medium text-ink-mute">
                 <div className="flex justify-between">
                   <span>Camera Status:</span>
-                  <span className={`font-bold capitalize ${camState === 'active' ? 'text-[#4FFFB0]' : 'text-white/45'}`}>{camState}</span>
+                  <span className={`font-bold capitalize ${camState === 'active' ? 'text-[#059669]' : 'text-ink-mute'}`}>{camState}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Detection FPS:</span>
-                  <span className="text-white font-bold">{fps ? `${fps} FPS` : 'N/A'}</span>
+                  <span className="text-ink font-bold">{fps ? `${fps} FPS` : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Frame Latency:</span>
-                  <span className="text-white font-bold">{latency ? `${latency}ms` : 'N/A'}</span>
+                  <span className="text-ink font-bold">{latency ? `${latency}ms` : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Faces Detected:</span>
-                  <span className={`font-bold ${faceCount > 0 ? 'text-[#4FFFB0]' : 'text-white/40'}`}>
+                  <span className={`font-bold ${faceCount > 0 ? 'text-[#059669]' : 'text-ink-faint'}`}>
                     {faceCount === 1 ? '1 Face' : faceCount > 1 ? `${faceCount} Faces` : '0 Faces'}
                   </span>
                 </div>
@@ -1135,53 +1135,53 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
             {/* Face Detection Status */}
             <div className="fc-card p-5 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider border-b border-white/[0.08] pb-2">Detection Status</h4>
-              <div className="space-y-2 text-[11px] font-medium text-white/60">
+              <h4 className="text-xs font-bold text-ink uppercase tracking-wider border-b border-line pb-2">Detection Status</h4>
+              <div className="space-y-2 text-[11px] font-medium text-ink-mute">
                 <div className="flex justify-between">
                   <span>Detector:</span>
-                  <span className={`font-bold ${detectorStatus === 'ready' ? 'text-[#4FFFB0]' : 'text-white/45'}`}>{detectorStatus === 'ready' ? 'Ready' : detectorStatus.charAt(0).toUpperCase() + detectorStatus.slice(1)}</span>
+                  <span className={`font-bold ${detectorStatus === 'ready' ? 'text-[#059669]' : 'text-ink-mute'}`}>{detectorStatus === 'ready' ? 'Ready' : detectorStatus.charAt(0).toUpperCase() + detectorStatus.slice(1)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Detection Model:</span>
-                  <span className="text-white font-bold">{detectorModel === 'full-range' ? 'Full Range' : detectorModel === 'short-range' ? 'Short Range' : '—'}</span>
+                  <span className="text-ink font-bold">{detectorModel === 'full-range' ? 'Full Range' : detectorModel === 'short-range' ? 'Short Range' : '—'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Faces Detected:</span>
-                  <span className={`font-bold ${faceCount > 0 ? 'text-[#4FFFB0]' : 'text-white/40'}`}>{faceCount}</span>
+                  <span className={`font-bold ${faceCount > 0 ? 'text-[#059669]' : 'text-ink-faint'}`}>{faceCount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Validation:</span>
                   <span className={`font-bold ${
-                    validation.label === 'Pass' ? 'text-[#4FFFB0]' :
-                    validation.label === 'Failed' ? 'text-[#F87171]' :
-                    'text-white/40'
+                    validation.label === 'Pass' ? 'text-[#059669]' :
+                    validation.label === 'Failed' ? 'text-[#DC2626]' :
+                    'text-ink-faint'
                   }`}>
                     {validation.text}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Primary Face Confidence:</span>
-                  <span className="text-white font-bold">{confidence ? `${confidence}%` : 'N/A'}</span>
+                  <span className="text-ink font-bold">{confidence ? `${confidence}%` : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Smallest Face Confidence:</span>
-                  <span className="text-white font-bold">{smallestConfidence ? `${smallestConfidence}%` : 'N/A'}</span>
+                  <span className="text-ink font-bold">{smallestConfidence ? `${smallestConfidence}%` : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Saved Snapshots:</span>
-                  <span className="text-white font-bold">{snapshotsCount} saved</span>
+                  <span className="text-ink font-bold">{snapshotsCount} saved</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Video Resolution:</span>
-                  <span className="text-white font-bold font-mono">{resolution}</span>
+                  <span className="text-ink font-bold font-mono">{resolution}</span>
                 </div>
               </div>
             </div>
 
             {/* Explainer card */}
             <div className="fc-card p-5 space-y-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider border-b border-white/[0.08] pb-2">How this demo works</h4>
-              <p className="text-[11px] text-white/50 leading-relaxed font-medium">
+              <h4 className="text-xs font-bold text-ink uppercase tracking-wider border-b border-line pb-2">How this demo works</h4>
+              <p className="text-[11px] text-ink-mute leading-relaxed font-medium">
                 This demo uses your browser camera for the original feed and applies frontend visual filters to simulate AI enhancement. Face detection runs locally on-device using a MediaPipe full-range model that detects both close and distant faces.
               </p>
             </div>
@@ -1198,9 +1198,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           {camState === 'active' && snapshotValidationMsg && (
             <div className="p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold"
               style={{
-                background: faceCount > 1 ? 'rgba(239,68,68,0.08)' : 'rgba(245,158,11,0.08)',
-                border: `1px solid ${faceCount > 1 ? 'rgba(239,68,68,0.25)' : 'rgba(245,158,11,0.25)'}`,
-                color: faceCount > 1 ? '#F87171' : '#FCD34D',
+                background: faceCount > 1 ? 'rgba(239,68,68,0.08)' : 'rgba(217,119,6,0.08)',
+                border: `1px solid ${faceCount > 1 ? 'rgba(239,68,68,0.25)' : 'rgba(217,119,6,0.25)'}`,
+                color: faceCount > 1 ? '#DC2626' : '#B45309',
               }}
             >
               <AlertTriangle className="w-4 h-4 flex-shrink-0" />
@@ -1213,8 +1213,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
             <div className="fc-card p-6 space-y-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ScanFace className="w-5 h-5 text-[#A78BFA]" />
-                  <h3 className="text-sm font-semibold text-white">FaceCloud AI Face Restoration</h3>
+                  <ScanFace className="w-5 h-5 text-[#6D28D9]" />
+                  <h3 className="text-sm font-semibold text-ink">FaceCloud AI Face Restoration</h3>
                 </div>
                 <StatusBadge status="purple" label="Zero-DCE + Face Detail Recovery" dot={false} />
               </div>
@@ -1237,8 +1237,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {snapshotProcessing && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-2 h-2 bg-[#F97316] rounded-full animate-pulse" />
-                    <span className="text-xs font-bold text-[#FB923C]">Running AI Enhancement Pipeline...</span>
+                    <div className="w-2 h-2 bg-[#4F46E5] rounded-full animate-pulse" />
+                    <span className="text-xs font-bold text-[#6366F1]">Running AI Enhancement Pipeline...</span>
                   </div>
                   {PIPELINE_STEPS.map((step, i) => {
                     const isComplete = i < pipelineStep
@@ -1250,20 +1250,20 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                         <div
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 transition-all duration-300"
                           style={{
-                            background: isComplete ? 'rgba(79,255,176,0.15)' : isCurrent ? 'rgba(249, 115, 22,0.20)' : 'rgba(255,255,255,0.04)',
-                            border: `1px solid ${isComplete ? 'rgba(79,255,176,0.30)' : isCurrent ? 'rgba(249, 115, 22,0.40)' : 'rgba(255,255,255,0.08)'}`,
+                            background: isComplete ? 'rgba(5,150,105,0.15)' : isCurrent ? 'rgba(79,70,229,0.20)' : '#F1F3F7',
+                            border: `1px solid ${isComplete ? 'rgba(5,150,105,0.30)' : isCurrent ? 'rgba(79,70,229,0.40)' : '#E6E9EF'}`,
                           }}
                         >
                           {isComplete ? (
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#4FFFB0]" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
                           ) : isCurrent ? (
-                            <div className="w-2.5 h-2.5 border-2 border-[#F97316] border-t-transparent rounded-full animate-spin" />
+                            <div className="w-2.5 h-2.5 border-2 border-[#4F46E5] border-t-transparent rounded-full animate-spin" />
                           ) : (
                             <span className="text-[10px]">{step.icon}</span>
                           )}
                         </div>
                         <span className={`text-xs font-medium transition-colors duration-300 ${
-                          isComplete ? 'text-[#4FFFB0]' : isCurrent ? 'text-[#FB923C]' : 'text-white/30'
+                          isComplete ? 'text-[#059669]' : isCurrent ? 'text-[#6366F1]' : 'text-ink-faint'
                         }`}>
                           {step.label}
                         </span>
@@ -1272,12 +1272,12 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   })}
 
                   {/* Progress bar */}
-                  <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: '#F1F3F7' }}>
                     <div
                       className="h-full rounded-full transition-all duration-500 ease-out"
                       style={{
                         width: `${((pipelineStep + 1) / PIPELINE_STEPS.length) * 100}%`,
-                        background: 'linear-gradient(90deg, #F97316, #4FFFB0)',
+                        background: 'linear-gradient(90deg, #4F46E5, #059669)',
                       }}
                     />
                   </div>
@@ -1293,21 +1293,21 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               {/* Face Restored Badge */}
               <div className="flex items-center gap-3 flex-wrap">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl" style={{
-                  background: 'linear-gradient(135deg, rgba(79,255,176,0.12), rgba(249, 115, 22,0.08))',
-                  border: '1px solid rgba(79,255,176,0.25)',
+                  background: 'linear-gradient(135deg, rgba(5,150,105,0.12), rgba(79,70,229,0.08))',
+                  border: '1px solid rgba(5,150,105,0.25)',
                 }}>
-                  <CheckCircle2 className="w-4 h-4 text-[#4FFFB0]" />
-                  <span className="text-xs font-bold text-[#4FFFB0]">Face Restored</span>
+                  <CheckCircle2 className="w-4 h-4 text-[#059669]" />
+                  <span className="text-xs font-bold text-[#059669]">Face Restored</span>
                 </div>
                 <StatusBadge status="info" label="AI Snapshot Enhancement" dot={false} />
               </div>
 
               {/* Before / After Slider */}
               <div className="fc-card overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
+                <div className="px-4 py-3 border-b border-line flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-[#A78BFA]" />
-                    <span className="text-sm font-semibold text-white">Before / After Comparison</span>
+                    <Sparkles className="w-4 h-4 text-[#6D28D9]" />
+                    <span className="text-sm font-semibold text-ink">Before / After Comparison</span>
                   </div>
                 </div>
                 <div className="p-4">
@@ -1323,20 +1323,20 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
 
               {/* Quality Metrics */}
               <div className="fc-card p-5 space-y-4">
-                <div className="flex items-center gap-2 border-b border-white/[0.08] pb-3">
-                  <Zap className="w-4 h-4 text-[#F97316]" />
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Enhancement Metrics</h4>
+                <div className="flex items-center gap-2 border-b border-line pb-3">
+                  <Zap className="w-4 h-4 text-[#4F46E5]" />
+                  <h4 className="text-xs font-bold text-ink uppercase tracking-wider">Enhancement Metrics</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {[
-                    { label: 'Enhancement Confidence', value: `${enhancementMetrics.confidence}%`, color: '#4FFFB0' },
-                    { label: 'Brightness Improved', value: `+${enhancementMetrics.brightness}%`, color: '#FB923C' },
-                    { label: 'Detail Recovery', value: `+${enhancementMetrics.detail}%`, color: '#A78BFA' },
-                    { label: 'Face Validation', value: enhancementMetrics.validation, color: '#4FFFB0' },
-                    { label: 'Output Resolution', value: enhancementMetrics.resolution, color: '#FB923C' },
+                    { label: 'Enhancement Confidence', value: `${enhancementMetrics.confidence}%`, color: '#059669' },
+                    { label: 'Brightness Improved', value: `+${enhancementMetrics.brightness}%`, color: '#6366F1' },
+                    { label: 'Detail Recovery', value: `+${enhancementMetrics.detail}%`, color: '#6D28D9' },
+                    { label: 'Face Validation', value: enhancementMetrics.validation, color: '#059669' },
+                    { label: 'Output Resolution', value: enhancementMetrics.resolution, color: '#6366F1' },
                   ].map(metric => (
-                    <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <p className="text-[10px] text-white/40 font-semibold uppercase tracking-wider">{metric.label}</p>
+                    <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: '#F1F3F7', border: '1px solid #F1F3F7' }}>
+                      <p className="text-[10px] text-ink-faint font-semibold uppercase tracking-wider">{metric.label}</p>
                       <p className="text-sm font-bold font-mono" style={{ color: metric.color }}>{metric.value}</p>
                     </div>
                   ))}
@@ -1374,9 +1374,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               </div>
 
               {/* Demo disclaimer */}
-              <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(249, 115, 22,0.04)', border: '1px solid rgba(249, 115, 22,0.15)' }}>
-                <Info className="w-4 h-4 text-[#FB923C] flex-shrink-0 mt-0.5" />
-                <p className="text-[11px] text-white/50 leading-relaxed font-medium">
+              <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(79,70,229,0.04)', border: '1px solid rgba(79,70,229,0.15)' }}>
+                <Info className="w-4 h-4 text-[#6366F1] flex-shrink-0 mt-0.5" />
+                <p className="text-[11px] text-ink-mute leading-relaxed font-medium">
                   This frontend demo simulates AI restoration. Production can connect GFPGAN/CodeFormer/Real-ESRGAN backend models for Remini-style results.
                 </p>
               </div>
@@ -1387,11 +1387,11 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           {!snapshotDataUrl && (
             <div className="fc-card p-8 flex flex-col items-center justify-center gap-4 text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(167,139,250,0.08)', border: '1px solid rgba(167,139,250,0.15)' }}>
-                <ScanFace className="w-8 h-8 text-[#A78BFA]/50" />
+                <ScanFace className="w-8 h-8 text-[#6D28D9]/50" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white/60">No snapshot captured</p>
-                <p className="text-xs text-white/35 mt-1 max-w-xs">Capture a frame to run AI face restoration. Start your camera and click Capture Snapshot.</p>
+                <p className="text-sm font-semibold text-ink-mute">No snapshot captured</p>
+                <p className="text-xs text-ink-faint mt-1 max-w-xs">Capture a frame to run AI face restoration. Start your camera and click Capture Snapshot.</p>
               </div>
             </div>
           )}
@@ -1400,20 +1400,20 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
           <div className="fc-card overflow-hidden">
             <button
               onClick={() => setDevInfoOpen(v => !v)}
-              className="w-full px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-colors"
+              className="w-full px-5 py-3.5 flex items-center justify-between cursor-pointer hover:bg-surface-mute transition-colors"
             >
               <div className="flex items-center gap-2">
-                <Settings className="w-4 h-4 text-white/30" />
-                <span className="text-xs font-bold text-white/50 uppercase tracking-wider">Production AI Model Options</span>
+                <Settings className="w-4 h-4 text-ink-faint" />
+                <span className="text-xs font-bold text-ink-mute uppercase tracking-wider">Production AI Model Options</span>
               </div>
               {devInfoOpen ? (
-                <ChevronUp className="w-4 h-4 text-white/30" />
+                <ChevronUp className="w-4 h-4 text-ink-faint" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-white/30" />
+                <ChevronDown className="w-4 h-4 text-ink-faint" />
               )}
             </button>
             {devInfoOpen && (
-              <div className="px-5 pb-4 space-y-2.5 border-t border-white/[0.06] pt-3">
+              <div className="px-5 pb-4 space-y-2.5 border-t border-line pt-3">
                 {[
                   { name: 'Zero-DCE', desc: 'Low-light enhancement' },
                   { name: 'GFPGAN or CodeFormer', desc: 'Face restoration' },
@@ -1421,9 +1421,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   { name: 'InsightFace', desc: 'Identity embeddings' },
                 ].map(m => (
                   <div key={m.name} className="flex items-center gap-3 text-[11px]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#A78BFA]/50 flex-shrink-0" />
-                    <span className="font-bold text-white/60">{m.name}</span>
-                    <span className="text-white/30">— {m.desc}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#6D28D9]/50 flex-shrink-0" />
+                    <span className="font-bold text-ink-mute">{m.name}</span>
+                    <span className="text-ink-faint">— {m.desc}</span>
                   </div>
                 ))}
               </div>

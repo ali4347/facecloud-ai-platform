@@ -31,14 +31,14 @@ export default function Notifications() {
       <div className="max-w-4xl mx-auto space-y-4">
         
         {/* Controls */}
-        <div className="flex justify-between items-center text-xs font-bold text-muted">
+        <div className="flex justify-between items-center text-xs font-bold text-ink-mute">
           <span>{list.filter(n => !n.read).length} unread alerts</span>
           <div className="flex gap-4">
-            <button onClick={markAllRead} className="hover:text-primary flex items-center gap-1">
-              <CheckCheck className="w-3.5 h-3.5 text-mint" /> Mark all read
+            <button onClick={markAllRead} className="hover:text-accent flex items-center gap-1">
+              <CheckCheck className="w-3.5 h-3.5 text-emerald-600" /> Mark all read
             </button>
-            <button onClick={clearAll} className="hover:text-pink flex items-center gap-1">
-              <Trash2 className="w-3.5 h-3.5 text-pink" /> Clear alerts
+            <button onClick={clearAll} className="hover:text-accent-soft flex items-center gap-1">
+              <Trash2 className="w-3.5 h-3.5 text-accent-soft" /> Clear alerts
             </button>
           </div>
         </div>
@@ -46,8 +46,8 @@ export default function Notifications() {
         {/* Alerts List */}
         <ChartCard title="System Alerts Feed" subtitle="Real-time alert queues">
           {list.length === 0 ? (
-            <div className="h-64 flex flex-col items-center justify-center text-center text-muted gap-2">
-              <Bell className="w-8 h-8 text-muted opacity-40 animate-bounce" />
+            <div className="h-64 flex flex-col items-center justify-center text-center text-ink-mute gap-2">
+              <Bell className="w-8 h-8 text-ink-mute opacity-40 animate-bounce" />
               <p className="text-xs font-semibold">You have no notification logs at present.</p>
             </div>
           ) : (
@@ -56,20 +56,20 @@ export default function Notifications() {
                 <div 
                   key={n.id} 
                   className={`p-4 rounded-3xl border transition-all flex items-start gap-4 ${
-                    !n.read ? 'bg-primary/5 border-primary/20 ring-1 ring-primary/10' : 'bg-white/2 border-white/5 opacity-80'
+                    !n.read ? 'bg-accent/5 border-accent/20 ring-1 ring-accent/10' : 'bg-surface-mute border-line opacity-80'
                   }`}
                 >
-                  <div className={`p-2.5 rounded-2xl bg-white/5 border border-white/10 ${
-                    n.type === 'success' ? 'text-mint' :
-                    n.type === 'error' ? 'text-pink' : 'text-primary'
+                  <div className={`p-2.5 rounded-2xl bg-surface-mute border border-line ${
+                    n.type === 'success' ? 'text-emerald-600' :
+                    n.type === 'error' ? 'text-accent-soft' : 'text-accent'
                   }`}>
                     <n.icon className="w-4 h-4" />
                   </div>
                   
                   <div className="flex-1 text-xs">
                     <div className="flex justify-between items-center">
-                      <h4 className="font-bold text-dark">{n.title}</h4>
-                      <span className="text-[10px] text-muted">{n.time}</span>
+                      <h4 className="font-bold text-ink">{n.title}</h4>
+                      <span className="text-[10px] text-ink-mute">{n.time}</span>
                     </div>
                     <p className="text-[#8A96AD] mt-1 leading-relaxed">{n.msg}</p>
                   </div>

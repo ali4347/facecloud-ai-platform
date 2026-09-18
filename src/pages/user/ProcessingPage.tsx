@@ -22,7 +22,7 @@ export default function ProcessingPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link to="/dashboard/jobs" className="p-2 rounded-xl hover:bg-white/5 border border-white/10 text-muted hover:text-white">
+        <Link to="/dashboard/jobs" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <PageHeader 
@@ -41,27 +41,27 @@ export default function ProcessingPage() {
                 <div 
                   key={step.label} 
                   className={`p-4 rounded-2xl border transition-all flex items-start gap-4 ${
-                    step.status === 'done' ? 'bg-mint/5 border-mint/15 text-dark' :
-                    step.status === 'active' ? 'bg-primary/5 border-primary/30 text-dark ring-1 ring-primary' :
-                    'bg-white/2 border-white/5 text-muted'
+                    step.status === 'done' ? 'bg-emerald-500/5 border-emerald-300/15 text-ink' :
+                    step.status === 'active' ? 'bg-accent/5 border-accent/30 text-ink ring-1 ring-accent' :
+                    'bg-surface-mute border-line text-ink-mute'
                   }`}
                 >
                   <div className="mt-0.5">
-                    {step.status === 'done' && <CheckCircle2 className="w-5 h-5 text-mint" />}
-                    {step.status === 'active' && <RefreshCw className="w-5 h-5 text-primary animate-spin" />}
-                    {step.status === 'pending' && <Circle className="w-5 h-5 text-muted/40" />}
+                    {step.status === 'done' && <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+                    {step.status === 'active' && <RefreshCw className="w-5 h-5 text-accent animate-spin" />}
+                    {step.status === 'pending' && <Circle className="w-5 h-5 text-ink-mute/40" />}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center">
                       <h4 className="text-xs font-bold">{step.label}</h4>
                       {step.status === 'active' && (
-                        <span className="text-[10px] text-primary font-bold uppercase tracking-wider animate-pulse">Running</span>
+                        <span className="text-[10px] text-accent font-bold uppercase tracking-wider animate-pulse">Running</span>
                       )}
                       {step.status === 'done' && (
-                        <span className="text-[10px] text-mint uppercase font-bold tracking-wider">Completed</span>
+                        <span className="text-[10px] text-emerald-600 uppercase font-bold tracking-wider">Completed</span>
                       )}
                     </div>
-                    <p className="text-[10px] text-muted mt-0.5">{step.desc}</p>
+                    <p className="text-[10px] text-ink-mute mt-0.5">{step.desc}</p>
                   </div>
                 </div>
               ))}
@@ -74,27 +74,27 @@ export default function ProcessingPage() {
           <ChartCard title="Job Parameters" subtitle="Execution details">
             <div className="space-y-6">
               
-              <div className="p-4 rounded-3xl bg-white/5 border border-white/10 text-xs text-muted space-y-3.5">
+              <div className="p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-mute space-y-3.5">
                 <div className="flex justify-between">
                   <span>Job ID:</span>
-                  <span className="font-bold text-dark">{id || 'job-002'}</span>
+                  <span className="font-bold text-ink">{id || 'job-002'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Target Image:</span>
-                  <span className="font-bold text-dark">face_underexposed_002.jpg</span>
+                  <span className="font-bold text-ink">face_underexposed_002.jpg</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Pipeline Model:</span>
-                  <span className="font-bold text-primary">Zero-DCE (CNN Restorer)</span>
+                  <span className="font-bold text-accent">Zero-DCE (CNN Restorer)</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Status:</span>
-                  <span className="text-primary font-bold animate-pulse">Enhancing...</span>
+                  <span className="text-accent font-bold animate-pulse">Enhancing...</span>
                 </div>
               </div>
 
-              <div className="p-4 rounded-3xl bg-[#F97316]/5 border border-[#F97316]/10 flex gap-3 text-xs text-muted">
-                <AlertCircle className="w-5 h-5 text-primary flex-shrink-0" />
+              <div className="p-4 rounded-3xl bg-[#4F46E5]/5 border border-[#4F46E5]/10 flex gap-3 text-xs text-ink-mute">
+                <AlertCircle className="w-5 h-5 text-accent flex-shrink-0" />
                 <p className="leading-relaxed">
                   The client browser session will receive an in-app and email alert immediately when biometric classification clusters complete.
                 </p>

@@ -18,42 +18,42 @@ export function ImageCard({ image, onView }: ImageCardProps) {
       >
         {/* Mock face SVG */}
         <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
-          <ellipse cx="30" cy="40" rx="22" ry="28" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
-          <circle cx="22" cy="34" r="4" fill="rgba(255,255,255,0.4)" />
-          <circle cx="38" cy="34" r="4" fill="rgba(255,255,255,0.4)" />
-          <path d="M22 50 Q30 56 38 50" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <ellipse cx="30" cy="40" rx="22" ry="28" fill="#E6E9EF" stroke="#94A3B8" strokeWidth="1.5" />
+          <circle cx="22" cy="34" r="4" fill="#94A3B8" />
+          <circle cx="38" cy="34" r="4" fill="#94A3B8" />
+          <path d="M22 50 Q30 56 38 50" stroke="#94A3B8" strokeWidth="1.5" fill="none" strokeLinecap="round" />
         </svg>
 
         {/* Overlay actions */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-          <button onClick={onView} className="p-2 bg-white/90 rounded-xl hover:bg-white shadow-sm">
-            <Eye className="w-4 h-4 text-dark" />
+          <button onClick={onView} className="p-2 bg-surface rounded-xl hover:bg-white shadow-sm">
+            <Eye className="w-4 h-4 text-ink" />
           </button>
-          <button className="p-2 bg-white/90 rounded-xl hover:bg-white shadow-sm">
-            <Download className="w-4 h-4 text-dark" />
+          <button className="p-2 bg-surface rounded-xl hover:bg-white shadow-sm">
+            <Download className="w-4 h-4 text-ink" />
           </button>
         </div>
 
         {/* Enhanced badge */}
         {image.enhanced && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-primary/90 rounded-full">
-            <ZapIcon className="w-3 h-3 text-white" />
-            <span className="text-[10px] text-white font-semibold">Enhanced</span>
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-accent/90 rounded-full">
+            <ZapIcon className="w-3 h-3 text-ink" />
+            <span className="text-[10px] text-ink font-semibold">Enhanced</span>
           </div>
         )}
       </div>
 
       {/* Info */}
       <div className="p-3">
-        <p className="text-sm font-semibold text-dark truncate mb-1">{image.filename}</p>
+        <p className="text-sm font-semibold text-ink truncate mb-1">{image.filename}</p>
         <div className="flex items-center justify-between">
           {uploadStatusBadge(image.status)}
-          <span className="text-xs text-muted">{image.size}</span>
+          <span className="text-xs text-ink-mute">{image.size}</span>
         </div>
         {image.rejectionReason && (
           <p className="text-xs text-error mt-1.5 truncate">⚠ {image.rejectionReason}</p>
         )}
-        <p className="text-xs text-muted mt-1">{formatDateTime(image.uploadedAt)}</p>
+        <p className="text-xs text-ink-mute mt-1">{formatDateTime(image.uploadedAt)}</p>
       </div>
     </div>
   )

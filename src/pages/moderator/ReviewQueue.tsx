@@ -55,10 +55,10 @@ export default function ReviewQueue() {
       />
 
       {/* Filter Toolbar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 rounded-3xl bg-white/[0.03] border border-white/[0.08] text-xs text-white/80">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-soft">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-3 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-3 w-4 h-4 text-ink-faint" />
           <input 
             type="text" 
             placeholder="Search filename or user..."
@@ -72,52 +72,52 @@ export default function ReviewQueue() {
         <select 
           value={filterType}
           onChange={e => setFilterType(e.target.value as any)}
-          className="fc-input text-white"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+          className="fc-input text-ink"
+          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
         >
-          <option value="all" className="bg-[#05070A]">All Queue Types</option>
-          <option value="rejected" className="bg-[#05070A]">Rejections Only</option>
-          <option value="duplicate" className="bg-[#05070A]">Duplicates Only</option>
+          <option value="all" className="bg-[#FFFFFF]">All Queue Types</option>
+          <option value="rejected" className="bg-[#FFFFFF]">Rejections Only</option>
+          <option value="duplicate" className="bg-[#FFFFFF]">Duplicates Only</option>
         </select>
 
         {/* Filter Reason */}
         <select 
           value={filterReason}
           onChange={e => setFilterReason(e.target.value)}
-          className="fc-input text-white"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+          className="fc-input text-ink"
+          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
         >
-          <option value="all" className="bg-[#05070A]">All Flags/Reasons</option>
-          <option value="blurry" className="bg-[#05070A]">Too Blurry</option>
-          <option value="dark" className="bg-[#05070A]">Too Dark</option>
-          <option value="multiple" className="bg-[#05070A]">Multiple Faces</option>
-          <option value="not detected" className="bg-[#05070A]">Face Not Detected</option>
-          <option value="duplicate" className="bg-[#05070A]">Duplicate Upload</option>
+          <option value="all" className="bg-[#FFFFFF]">All Flags/Reasons</option>
+          <option value="blurry" className="bg-[#FFFFFF]">Too Blurry</option>
+          <option value="dark" className="bg-[#FFFFFF]">Too Dark</option>
+          <option value="multiple" className="bg-[#FFFFFF]">Multiple Faces</option>
+          <option value="not detected" className="bg-[#FFFFFF]">Face Not Detected</option>
+          <option value="duplicate" className="bg-[#FFFFFF]">Duplicate Upload</option>
         </select>
 
         {/* Filter Risk */}
         <select 
           value={filterRisk}
           onChange={e => setFilterRisk(e.target.value)}
-          className="fc-input text-white"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+          className="fc-input text-ink"
+          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
         >
-          <option value="all" className="bg-[#05070A]">All Risk Levels</option>
-          <option value="low" className="bg-[#05070A]">Low Risk</option>
-          <option value="medium" className="bg-[#05070A]">Medium Risk</option>
-          <option value="high" className="bg-[#05070A]">High Risk</option>
-          <option value="critical" className="bg-[#05070A]">Critical Risk</option>
+          <option value="all" className="bg-[#FFFFFF]">All Risk Levels</option>
+          <option value="low" className="bg-[#FFFFFF]">Low Risk</option>
+          <option value="medium" className="bg-[#FFFFFF]">Medium Risk</option>
+          <option value="high" className="bg-[#FFFFFF]">High Risk</option>
+          <option value="critical" className="bg-[#FFFFFF]">Critical Risk</option>
         </select>
 
         {/* Sort */}
         <select 
           value={sortOrder}
           onChange={e => setSortOrder(e.target.value as any)}
-          className="fc-input text-white"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+          className="fc-input text-ink"
+          style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
         >
-          <option value="newest" className="bg-[#05070A]">Sort: Newest First</option>
-          <option value="oldest" className="bg-[#05070A]">Sort: Oldest First</option>
+          <option value="newest" className="bg-[#FFFFFF]">Sort: Newest First</option>
+          <option value="oldest" className="bg-[#FFFFFF]">Sort: Oldest First</option>
         </select>
       </div>
 
@@ -137,55 +137,55 @@ export default function ReviewQueue() {
             </thead>
             <tbody>
               {filtered.map(row => (
-                <tr key={row.id} className="hover:bg-white/[0.01] transition-colors">
+                <tr key={row.id} className="hover:bg-surface-mute transition-colors">
                   <td>
-                    <div className="w-10 h-10 rounded-xl border border-white/[0.08]" style={{ backgroundColor: row.thumbnail }} />
+                    <div className="w-10 h-10 rounded-xl border border-line" style={{ backgroundColor: row.thumbnail }} />
                   </td>
                   <td>
-                    <div className="text-xs text-white/80 min-w-0 pr-2">
-                      <p className="font-bold truncate max-w-[200px] text-white">{row.filename}</p>
-                      <p className="text-[10px] text-white/40 mt-0.5">Uploaded: {formatDateTime(row.uploadedAt)}</p>
+                    <div className="text-xs text-ink-soft min-w-0 pr-2">
+                      <p className="font-bold truncate max-w-[200px] text-ink">{row.filename}</p>
+                      <p className="text-[10px] text-ink-faint mt-0.5">Uploaded: {formatDateTime(row.uploadedAt)}</p>
                     </div>
                   </td>
                   <td>
                     {row.isDuplicate ? (
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                        <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-violet-500/10 text-violet-700 border border-violet-300/20">
                           Duplicate
                         </span>
-                        <span className="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-white/[0.05] text-white/60">
+                        <span className="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-surface-mute text-ink-mute">
                           {row.similarityScore}% match
                         </span>
                       </div>
                     ) : (
-                      <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-[#EF4444]/10 text-red-400 border border-[#EF4444]/20">
+                      <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider bg-[#DC2626]/10 text-red-400 border border-[#DC2626]/20">
                         {row.rejectionReason}
                       </span>
                     )}
                   </td>
                   <td>
                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
-                      row.riskLevel === 'critical' ? 'bg-[#EF4444]/10 text-[#EF4444]' :
-                      row.riskLevel === 'high' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
-                      'bg-[#F97316]/10 text-[#FB923C]'
+                      row.riskLevel === 'critical' ? 'bg-[#DC2626]/10 text-[#DC2626]' :
+                      row.riskLevel === 'high' ? 'bg-[#D97706]/10 text-[#D97706]' :
+                      'bg-[#4F46E5]/10 text-[#6366F1]'
                     }`}>
                       {row.riskLevel} risk
                     </span>
                   </td>
                   <td>
-                    <span className="text-xs text-white/70">{row.uploadedBy}</span>
+                    <span className="text-xs text-ink-soft">{row.uploadedBy}</span>
                   </td>
                   <td>
                     {row.status === 'pending' ? (
                       <Link 
                         to={`/moderator/images/${row.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#6366F1] hover:underline"
                       >
                         Open Review <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     ) : (
                       <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                        row.status === 'approved' ? 'text-[#4FFFB0]' : 'text-[#EF4444]'
+                        row.status === 'approved' ? 'text-[#059669]' : 'text-[#DC2626]'
                       }`}>
                         {row.status}
                       </span>
@@ -198,10 +198,10 @@ export default function ReviewQueue() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="text-center py-16 text-white/40">
+          <div className="text-center py-16 text-ink-faint">
             <Eye className="w-8 h-8 mx-auto mb-3 opacity-30 animate-pulse" />
             <p className="text-xs font-semibold">Review queue is empty.</p>
-            <p className="text-[10px] text-white/20 mt-1">All quality pipeline alerts have been cleared.</p>
+            <p className="text-[10px] text-ink-faint mt-1">All quality pipeline alerts have been cleared.</p>
           </div>
         )}
       </ChartCard>

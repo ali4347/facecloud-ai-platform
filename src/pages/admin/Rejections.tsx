@@ -21,11 +21,11 @@ export default function Rejections() {
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full" style={{ background: item.color }} />
-                    <span className="text-sm text-dark">{item.name}</span>
+                    <span className="text-sm text-ink">{item.name}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted">{Math.round(total * item.value / 100)} images</span>
-                    <span className="text-sm font-bold text-dark">{item.value}%</span>
+                    <span className="text-xs text-ink-mute">{Math.round(total * item.value / 100)} images</span>
+                    <span className="text-sm font-bold text-ink">{item.value}%</span>
                   </div>
                 </div>
                 <div className="h-2 bg-border rounded-full overflow-hidden">
@@ -36,8 +36,8 @@ export default function Rejections() {
           </div>
 
           <div className="mt-5 p-4 bg-background rounded-2xl">
-            <p className="text-xs font-semibold text-dark mb-2">Top Rejection Actions</p>
-            <ul className="space-y-1.5 text-xs text-muted">
+            <p className="text-xs font-semibold text-ink mb-2">Top Rejection Actions</p>
+            <ul className="space-y-1.5 text-xs text-ink-mute">
               <li>• Ensure images are well-lit before uploading</li>
               <li>• Upload one face per image only</li>
               <li>• Use min. 480×640px resolution images</li>

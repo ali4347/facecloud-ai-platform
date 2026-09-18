@@ -23,10 +23,10 @@ export default function SystemHealth() {
           : <CheckCircle className="w-5 h-5 text-success" />
         }
         <div>
-          <p className="text-sm font-semibold text-dark">
+          <p className="text-sm font-semibold text-ink">
             {outage > 0 ? `${outage} service(s) down` : degraded > 0 ? `${degraded} service(s) degraded` : 'All systems operational'}
           </p>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-ink-mute">
             {operational} operational · {degraded} degraded · {outage} outage · Last updated just now
           </p>
         </div>

@@ -27,7 +27,7 @@ export function RejectionReasonChart({ data = rejectionReasonsData }: RejectionR
             background: '#fff',
             border: '1px solid #E2E8F0',
             borderRadius: '12px',
-            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+            boxShadow: '0 4px 6px -1px rgba(15,23,42,0.08)',
           }}
           formatter={(value) => [`${value}%`, 'Share']}
         />

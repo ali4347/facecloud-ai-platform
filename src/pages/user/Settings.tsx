@@ -23,7 +23,7 @@ export default function Settings() {
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition-all ${
-                tab === t.id ? 'bg-soft-blue text-primary font-semibold' : 'text-muted hover:bg-background'
+                tab === t.id ? 'bg-soft-blue text-accent font-semibold' : 'text-ink-mute hover:bg-background'
               }`}>
               <t.icon className="w-4 h-4" />
               {t.label}
@@ -46,13 +46,13 @@ export default function Settings() {
 function ProfileSettings() {
   return (
     <div className="space-y-5">
-      <h2 className="text-base font-bold text-dark">Profile Settings</h2>
+      <h2 className="text-base font-bold text-ink">Profile Settings</h2>
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-600 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">AH</div>
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-violet-600 flex items-center justify-center text-white text-2xl font-bold">AH</div>
         <div>
-          <p className="text-sm font-semibold text-dark">Ali Hassan</p>
-          <p className="text-xs text-muted">ali@facecloud.io · User</p>
-          <button className="text-xs text-primary font-medium mt-1 hover:underline">Change avatar</button>
+          <p className="text-sm font-semibold text-ink">Ali Hassan</p>
+          <p className="text-xs text-ink-mute">ali@facecloud.io · User</p>
+          <button className="text-xs text-accent font-medium mt-1 hover:underline">Change avatar</button>
         </div>
       </div>
       {[
@@ -62,7 +62,7 @@ function ProfileSettings() {
         { label: 'Department', value: 'Department of Computer Sciences', id: 'profile-dept' },
       ].map(f => (
         <div key={f.id}>
-          <label className="text-xs font-semibold text-dark block mb-1.5">{f.label}</label>
+          <label className="text-xs font-semibold text-ink block mb-1.5">{f.label}</label>
           <input id={f.id} type="text" defaultValue={f.value} className="fc-input" />
         </div>
       ))}
@@ -74,26 +74,26 @@ function ProfileSettings() {
 function SecuritySettings() {
   return (
     <div className="space-y-5">
-      <h2 className="text-base font-bold text-dark">Security Settings</h2>
+      <h2 className="text-base font-bold text-ink">Security Settings</h2>
       {[
         { label: 'Current Password', id: 'sec-cur', placeholder: 'Enter current password' },
         { label: 'New Password', id: 'sec-new', placeholder: 'Min. 8 characters' },
         { label: 'Confirm New Password', id: 'sec-confirm', placeholder: 'Repeat new password' },
       ].map(f => (
         <div key={f.id}>
-          <label className="text-xs font-semibold text-dark block mb-1.5">{f.label}</label>
+          <label className="text-xs font-semibold text-ink block mb-1.5">{f.label}</label>
           <input id={f.id} type="password" placeholder={f.placeholder} className="fc-input" />
         </div>
       ))}
       <GradientButton variant="secondary">Update Password</GradientButton>
-      <div className="border-t border-border pt-5">
-        <h3 className="text-sm font-semibold text-dark mb-3">Active Sessions</h3>
+      <div className="border-t border-line pt-5">
+        <h3 className="text-sm font-semibold text-ink mb-3">Active Sessions</h3>
         {[{ device: 'Chrome on macOS', ip: '192.168.1.1', time: 'Active now' },
           { device: 'Firefox on Windows', ip: '192.168.1.15', time: '2 days ago' }].map(s => (
-          <div key={s.device} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
+          <div key={s.device} className="flex items-center justify-between py-2.5 border-b border-line last:border-0">
             <div>
-              <p className="text-sm font-medium text-dark">{s.device}</p>
-              <p className="text-xs text-muted">{s.ip} · {s.time}</p>
+              <p className="text-sm font-medium text-ink">{s.device}</p>
+              <p className="text-xs text-ink-mute">{s.ip} · {s.time}</p>
             </div>
             {s.time !== 'Active now' && <button className="text-xs text-error hover:underline">Revoke</button>}
           </div>
@@ -132,30 +132,30 @@ function NotificationSettings() {
   ]
   return (
     <div className="space-y-5">
-      <h2 className="text-base font-bold text-dark">Notification Settings</h2>
+      <h2 className="text-base font-bold text-ink">Notification Settings</h2>
 
       {/* Rejection email note */}
       <div
         className="p-4 rounded-2xl text-xs font-medium space-y-1"
         style={{
-          background: 'rgba(79,255,176,0.04)',
-          border: '1px solid rgba(79,255,176,0.15)',
-          color: 'rgba(255,255,255,0.55)',
+          background: 'rgba(5,150,105,0.04)',
+          border: '1px solid rgba(5,150,105,0.15)',
+          color: '#64748B',
         }}
       >
-        <p className="font-bold" style={{ color: '#4FFFB0' }}>Rejection emails are enabled by default</p>
+        <p className="font-bold" style={{ color: '#059669' }}>Rejection emails are enabled by default</p>
         <p>When one of your photos is rejected, you'll receive an email with the specific reason — such as "Image too blurry" or "No face detected" — so you know exactly what to fix before re-uploading.</p>
       </div>
 
       {items.map((item, i) => (
-        <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+        <div key={i} className="flex items-center justify-between py-2 border-b border-line last:border-0">
           <div>
-            <p className="text-sm font-semibold text-dark">{item.label}</p>
-            <p className="text-xs text-muted">{item.desc}</p>
+            <p className="text-sm font-semibold text-ink">{item.label}</p>
+            <p className="text-xs text-ink-mute">{item.desc}</p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" defaultChecked={i < 4} className="sr-only peer" />
-            <div className="w-10 h-6 bg-border peer-checked:bg-primary rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4" />
+            <div className="w-10 h-6 bg-border peer-checked:bg-accent rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4" />
           </label>
         </div>
       ))}
@@ -167,28 +167,28 @@ function NotificationSettings() {
 function CameraSettings() {
   return (
     <div className="space-y-5">
-      <h2 className="text-base font-bold text-dark">Camera & Privacy Settings</h2>
+      <h2 className="text-base font-bold text-ink">Camera & Privacy Settings</h2>
       {[
         { label: 'Allow camera access', desc: 'Required for live enhancement sessions' },
         { label: 'Auto-save snapshots', desc: 'Automatically save enhanced live snapshots' },
         { label: 'Face detection overlay', desc: 'Show face scan overlay on live feed' },
         { label: 'Save session logs', desc: 'Log live enhancement sessions for history' },
       ].map((item, i) => (
-        <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+        <div key={i} className="flex items-center justify-between py-2 border-b border-line last:border-0">
           <div>
-            <p className="text-sm font-semibold text-dark">{item.label}</p>
-            <p className="text-xs text-muted">{item.desc}</p>
+            <p className="text-sm font-semibold text-ink">{item.label}</p>
+            <p className="text-xs text-ink-mute">{item.desc}</p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" defaultChecked={i < 3} className="sr-only peer" />
-            <div className="w-10 h-6 bg-border peer-checked:bg-primary rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4" />
+            <div className="w-10 h-6 bg-border peer-checked:bg-accent rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4" />
           </label>
         </div>
       ))}
       <div>
-        <label className="text-xs font-semibold text-dark block mb-1.5">Default Enhancement Strength</label>
+        <label className="text-xs font-semibold text-ink block mb-1.5">Default Enhancement Strength</label>
         <input type="range" min={0} max={100} defaultValue={75} className="w-full" />
-        <p className="text-xs text-muted mt-1">Higher values increase processing time</p>
+        <p className="text-xs text-ink-mute mt-1">Higher values increase processing time</p>
       </div>
       <GradientButton leftIcon={<Save className="w-4 h-4" />}>Save Settings</GradientButton>
     </div>

@@ -51,13 +51,13 @@ export default function ApiTest() {
 
       {/* Presets Row */}
       <div className="space-y-2">
-        <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block">API Endpoint Presets</label>
+        <label className="text-[10px] font-bold text-ink-faint uppercase tracking-wider block">API Endpoint Presets</label>
         <div className="flex flex-wrap gap-2.5">
           {mockApiEndpoints.map((ep, idx) => (
             <button 
               key={idx}
               onClick={() => selectPreset(idx)}
-              className="py-2 px-4 rounded-xl border border-white/[0.08] bg-white/[0.03] text-xs font-bold text-white/60 hover:border-[#F97316]/40 hover:text-[#FB923C] transition-all cursor-pointer"
+              className="py-2 px-4 rounded-xl border border-line bg-surface-mute text-xs font-bold text-ink-mute hover:border-[#4F46E5]/40 hover:text-[#6366F1] transition-all cursor-pointer"
             >
               {ep.method} {ep.path}
             </button>
@@ -78,13 +78,13 @@ export default function ApiTest() {
                   <select 
                     value={method} 
                     onChange={e => setMethod(e.target.value as any)}
-                    className="fc-input !py-3 !px-2 text-xs text-white"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    className="fc-input !py-3 !px-2 text-xs text-ink"
+                    style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
                   >
-                    <option value="GET" className="bg-[#05070A] text-white">GET</option>
-                    <option value="POST" className="bg-[#05070A] text-white">POST</option>
-                    <option value="PATCH" className="bg-[#05070A] text-white">PATCH</option>
-                    <option value="DELETE" className="bg-[#05070A] text-white">DELETE</option>
+                    <option value="GET" className="bg-white text-ink">GET</option>
+                    <option value="POST" className="bg-white text-ink">POST</option>
+                    <option value="PATCH" className="bg-white text-ink">PATCH</option>
+                    <option value="DELETE" className="bg-white text-ink">DELETE</option>
                   </select>
                 </div>
                 {/* Path input */}
@@ -102,11 +102,11 @@ export default function ApiTest() {
               {/* Request body text area */}
               {method !== 'GET' && (
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-white/40 uppercase tracking-wider block">JSON Request Body</label>
+                  <label className="text-[10px] font-bold text-ink-faint uppercase tracking-wider block">JSON Request Body</label>
                   <textarea 
                     value={reqBody}
                     onChange={e => setReqBody(e.target.value)}
-                    className="w-full h-40 font-mono text-[10px] bg-black/40 border border-white/10 rounded-2xl p-4 text-white focus:outline-none focus:ring-1 focus:ring-[#F97316] focus:border-[#F97316]"
+                    className="w-full h-40 font-mono text-[10px] bg-surface-mute border border-line rounded-2xl p-4 text-ink focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5]"
                     placeholder="{}"
                   />
                 </div>
@@ -130,26 +130,26 @@ export default function ApiTest() {
         <div className="lg:col-span-6 space-y-6">
           <ChartCard title="Response Payload" subtitle="Returned JSON structure mapping">
             {!resStatus ? (
-              <div className="h-64 flex flex-col items-center justify-center text-center text-white/40 gap-2">
-                <FileCode className="w-8 h-8 text-white/20" />
+              <div className="h-64 flex flex-col items-center justify-center text-center text-ink-faint gap-2">
+                <FileCode className="w-8 h-8 text-ink-faint" />
                 <p className="text-xs font-semibold">Ready to trigger mock endpoints.</p>
               </div>
             ) : (
               <div className="space-y-4">
                 
                 {/* Stats */}
-                <div className="flex justify-between items-center text-xs text-white/50 border-b border-white/10 pb-3">
+                <div className="flex justify-between items-center text-xs text-ink-mute border-b border-line pb-3">
                   <div className="flex gap-4">
-                    <span>Status: <strong className={resStatus.startsWith('2') ? 'text-[#4FFFB0]' : 'text-[#F87171]'}>{resStatus}</strong></span>
-                    <span>Latency: <strong className="text-white">{resTime}</strong></span>
+                    <span>Status: <strong className={resStatus.startsWith('2') ? 'text-[#059669]' : 'text-[#DC2626]'}>{resStatus}</strong></span>
+                    <span>Latency: <strong className="text-ink">{resTime}</strong></span>
                   </div>
-                  <button onClick={() => { setResStatus(''); setResBody(''); }} className="p-1 hover:bg-white/5 rounded-lg">
+                  <button onClick={() => { setResStatus(''); setResBody(''); }} className="p-1 hover:bg-surface-mute rounded-lg">
                     <RotateCcw className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
                 {/* Body code blocks */}
-                <pre className="w-full h-56 font-mono text-[9px] bg-black/40 border border-white/5 rounded-2xl p-4 overflow-auto text-[#4FFFB0]">
+                <pre className="w-full h-56 font-mono text-[9px] bg-surface-mute border border-line rounded-2xl p-4 overflow-auto text-emerald-700">
                   {resBody}
                 </pre>
 

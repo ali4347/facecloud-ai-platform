@@ -72,7 +72,7 @@ export default function ReportsExports() {
     <div className="space-y-6 page-enter relative">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#4FFFB0]/10 border border-[#4FFFB0]/20 text-xs font-bold text-[#4FFFB0] flex items-center gap-2 shadow-[0_4px_24px_rgba(79,255,176,0.15)] backdrop-blur-md animate-enter">
+        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#059669]/10 border border-[#059669]/20 text-xs font-bold text-[#059669] flex items-center gap-2 shadow-[0_4px_24px_rgba(5,150,105,0.15)] backdrop-blur-md animate-enter">
           <CheckCircle className="w-4.5 h-4.5" />
           <span>{toastMessage}</span>
         </div>
@@ -92,7 +92,7 @@ export default function ReportsExports() {
               
               {/* Type Selection Cards */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">1. Select Report Type</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">1. Select Report Type</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {REPORT_TYPES.map(type => {
                     const isSelected = selectedType === type.id
@@ -104,18 +104,18 @@ export default function ReportsExports() {
                         onClick={() => setSelectedType(type.id)}
                         className={`p-4 rounded-3xl border transition-all cursor-pointer text-left flex gap-3.5 items-start ${
                           isSelected 
-                            ? 'bg-[#F97316]/[0.06] border-[#F97316]/40 shadow-[0_4px_20px_rgba(249, 115, 22,0.05)]' 
-                            : 'bg-white/5 border-white/10 hover:border-white/20'
+                            ? 'bg-[#4F46E5]/[0.06] border-[#4F46E5]/40 shadow-[0_4px_20px_rgba(79,70,229,0.05)]' 
+                            : 'bg-surface-mute border-line hover:border-line'
                         }`}
                       >
                         <div className={`p-2.5 rounded-2xl border shrink-0 ${
-                          isSelected ? 'bg-[#F97316]/10 border-[#F97316]/20 text-[#FB923C]' : 'bg-white/5 border-white/10 text-white/40'
+                          isSelected ? 'bg-[#4F46E5]/10 border-[#4F46E5]/20 text-[#6366F1]' : 'bg-surface-mute border-line text-ink-faint'
                         }`}>
                           <Icon className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-white/80'}`}>{type.label}</h4>
-                          <p className="text-[10px] text-white/45 mt-1 leading-relaxed font-medium">{type.desc}</p>
+                          <h4 className={`text-xs font-bold ${isSelected ? 'text-ink' : 'text-ink-soft'}`}>{type.label}</h4>
+                          <p className="text-[10px] text-ink-mute mt-1 leading-relaxed font-medium">{type.desc}</p>
                         </div>
                       </div>
                     )
@@ -125,10 +125,10 @@ export default function ReportsExports() {
 
               {/* Date Inputs */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">2. Select Date Range</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">2. Select Date Range</label>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
-                    <Calendar className="absolute left-3.5 top-3.5 w-4 h-4 text-white/40 pointer-events-none" />
+                    <Calendar className="absolute left-3.5 top-3.5 w-4 h-4 text-ink-faint pointer-events-none" />
                     <input 
                       type="date"
                       value={startDate}
@@ -138,7 +138,7 @@ export default function ReportsExports() {
                     />
                   </div>
                   <div className="relative">
-                    <Calendar className="absolute left-3.5 top-3.5 w-4 h-4 text-white/40 pointer-events-none" />
+                    <Calendar className="absolute left-3.5 top-3.5 w-4 h-4 text-ink-faint pointer-events-none" />
                     <input 
                       type="date"
                       value={endDate}
@@ -152,8 +152,8 @@ export default function ReportsExports() {
 
               {/* Format Selector Tabs */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">3. Output Export Format</label>
-                <div className="flex gap-2 p-1 bg-white/5 border border-white/10 rounded-2xl w-fit">
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">3. Output Export Format</label>
+                <div className="flex gap-2 p-1 bg-surface-mute border border-line rounded-2xl w-fit">
                   {(['PDF', 'CSV', 'JSON'] as const).map(fmt => {
                     const isFmtSelected = selectedFormat === fmt
                     return (
@@ -162,7 +162,7 @@ export default function ReportsExports() {
                         type="button"
                         onClick={() => setSelectedFormat(fmt)}
                         className={`px-5 py-2 rounded-xl text-xs font-bold transition-all ${
-                          isFmtSelected ? 'bg-[#F97316] text-white shadow-lg' : 'text-white/60 hover:text-white'
+                          isFmtSelected ? 'bg-[#4F46E5] text-white shadow-lg' : 'text-ink-mute hover:text-ink'
                         }`}
                       >
                         {fmt}
@@ -191,23 +191,23 @@ export default function ReportsExports() {
               {reports.map(rep => (
                 <div 
                   key={rep.id} 
-                  className="p-4 rounded-3xl border border-white/10 bg-white/5 space-y-4"
+                  className="p-4 rounded-3xl border border-line bg-surface-mute space-y-4"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-white truncate">{rep.type}</h4>
-                      <p className="text-[9px] text-white/40 mt-0.5">{rep.dateRange}</p>
+                      <h4 className="text-xs font-bold text-ink truncate">{rep.type}</h4>
+                      <p className="text-[9px] text-ink-faint mt-0.5">{rep.dateRange}</p>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase bg-white/10 text-white/80 shrink-0">
+                    <span className="px-2 py-0.5 rounded text-[8px] font-bold uppercase bg-surface-mute text-ink-soft shrink-0">
                       {rep.format}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-[10px] text-white/40 pt-2 border-t border-white/5">
+                  <div className="flex justify-between items-center text-[10px] text-ink-faint pt-2 border-t border-line">
                     <span>By {rep.generatedBy}</span>
                     <button
                       onClick={() => handleDownloadReport(rep)}
-                      className="inline-flex items-center gap-1 font-bold text-[#FB923C] hover:underline"
+                      className="inline-flex items-center gap-1 font-bold text-[#6366F1] hover:underline"
                     >
                       <Download className="w-3.5 h-3.5" /> Download
                     </button>
@@ -216,7 +216,7 @@ export default function ReportsExports() {
               ))}
 
               {reports.length === 0 && (
-                <p className="text-center py-12 text-xs text-white/35">No reports have been generated yet.</p>
+                <p className="text-center py-12 text-xs text-ink-faint">No reports have been generated yet.</p>
               )}
             </div>
           </ChartCard>

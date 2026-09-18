@@ -15,11 +15,11 @@ function getCategory(action: string): 'member' | 'review' | 'batch' | 'report' |
 }
 
 const CATEGORY_COLORS = {
-  member: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
-  review: 'bg-[#F97316]/10 text-[#FB923C] border-[#F97316]/20',
-  batch: 'bg-[#4FFFB0]/10 text-[#4FFFB0] border-[#4FFFB0]/20',
-  report: 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20',
-  system: 'bg-white/5 text-white/50 border-white/10'
+  member: 'bg-violet-500/10 text-violet-700 border-violet-300/20',
+  review: 'bg-[#4F46E5]/10 text-[#6366F1] border-[#4F46E5]/20',
+  batch: 'bg-[#059669]/10 text-[#059669] border-[#059669]/20',
+  report: 'bg-[#D97706]/10 text-[#D97706] border-[#D97706]/20',
+  system: 'bg-surface-mute text-ink-mute border-line'
 }
 
 export default function ModeratorAudit() {
@@ -51,12 +51,12 @@ export default function ModeratorAudit() {
                 const badgeColor = CATEGORY_COLORS[category]
 
                 return (
-                  <tr key={log.id} className="hover:bg-white/[0.01] transition-colors">
+                  <tr key={log.id} className="hover:bg-surface-mute transition-colors">
                     <td>
-                      <span className="text-xs text-white/40 font-mono">{formatDateTime(log.timestamp)}</span>
+                      <span className="text-xs text-ink-faint font-mono">{formatDateTime(log.timestamp)}</span>
                     </td>
                     <td>
-                      <span className="text-xs font-bold text-white">{log.moderatorName}</span>
+                      <span className="text-xs font-bold text-ink">{log.moderatorName}</span>
                     </td>
                     <td>
                       <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider border ${badgeColor}`}>
@@ -64,13 +64,13 @@ export default function ModeratorAudit() {
                       </span>
                     </td>
                     <td>
-                      <span className="text-xs font-semibold text-white/80">{log.action}</span>
+                      <span className="text-xs font-semibold text-ink-soft">{log.action}</span>
                     </td>
                     <td>
-                      <span className="text-xs font-mono text-white/60">{log.filename || '—'}</span>
+                      <span className="text-xs font-mono text-ink-mute">{log.filename || '—'}</span>
                     </td>
                     <td>
-                      <p className="text-xs text-white/50 leading-relaxed max-w-xs">{log.reason}</p>
+                      <p className="text-xs text-ink-mute leading-relaxed max-w-xs">{log.reason}</p>
                     </td>
                   </tr>
                 )}
@@ -80,7 +80,7 @@ export default function ModeratorAudit() {
         </div>
 
         {logs.length === 0 && (
-          <div className="text-center py-16 text-white/40">
+          <div className="text-center py-16 text-ink-faint">
             <ShieldCheck className="w-8 h-8 mx-auto mb-3 opacity-30 animate-pulse" />
             <p className="text-xs font-semibold">Audit trail is empty.</p>
           </div>

@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { Link } from 'react-router-dom'
 import { cn } from '../../lib/utils'
 
@@ -11,7 +12,32 @@ export interface FaceCloudLogoProps {
   href?: string
   priority?: boolean
   decorative?: boolean
+  /** Surface the logo sits on. 'light' is used inside the dashboard shell. */
+  tone?: 'dark' | 'light'
 }
+
+/* Two tones so the same mark works on the black marketing pages and on the
+   light app shell. Only colour changes — the shapes are identical. */
+const toneConfig = {
+  dark: {
+    cloudFrom: '#F97316', cloudTo: '#EA580C',
+    faceFrom:  '#FB923C', faceTo:  '#FDBA74',
+    faceText:  'text-white',
+    cloudText: 'bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent',
+    subText:   'text-white/35',
+    roleText:  'bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent',
+    ring:      'focus-visible:ring-[#F97316] hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]',
+  },
+  light: {
+    cloudFrom: '#4F46E5', cloudTo: '#4338CA',
+    faceFrom:  '#6366F1', faceTo:  '#818CF8',
+    faceText:  'text-ink',
+    cloudText: 'text-accent',
+    subText:   'text-ink-faint',
+    roleText:  'text-accent',
+    ring:      'focus-visible:ring-accent',
+  },
+} as const
 
 // Map size to classes for outer container and SVG dimensions
 const sizeClasses = {
@@ -50,7 +76,15 @@ export function FaceCloudLogo({
   className,
   href,
   decorative = false,
+  tone = 'dark',
 }: FaceCloudLogoProps) {
+
+  const t = toneConfig[tone]
+  /* Gradient ids must be unique per instance: two logos of different tones on
+     one page would otherwise share a single <defs> and render the same colour. */
+  const uid = useId().replace(/:/g, '')
+  const cloudGradId = `fcCloud-${uid}`
+  const faceGradId = `fcFace-${uid}`
 
   // Active variant determination
   let activeVariant = variant
@@ -70,34 +104,34 @@ export function FaceCloudLogo({
       aria-hidden={decorative ? "true" : undefined}
     >
       <defs>
-        <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#F97316" />
-          <stop offset="100%" stopColor="#EA580C" />
+        <linearGradient id={cloudGradId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={t.cloudFrom} />
+          <stop offset="100%" stopColor={t.cloudTo} />
         </linearGradient>
-        <linearGradient id="faceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FB923C" />
-          <stop offset="100%" stopColor="#FDBA74" />
+        <linearGradient id={faceGradId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={t.faceFrom} />
+          <stop offset="100%" stopColor={t.faceTo} />
         </linearGradient>
       </defs>
       
       {/* Cloud Outline */}
       <path
         d="M28.5 28.5A5.5 5.5 0 0 0 34 23c0-2.45-1.63-4.52-3.92-5.16A7.5 7.5 0 0 0 16.5 14.5c0 .43.04.86.12 1.28A5.5 5.5 0 0 0 11 21c0 2.68 1.95 4.9 4.58 5.38"
-        stroke="url(#cloudGrad)"
+        stroke={`url(#${cloudGradId})`}
         strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       
       {/* Face Scan Brackets */}
-      <path d="M12 16h-3v-3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
-      <path d="M28 16h3v-3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
-      <path d="M12 28h-3v3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
-      <path d="M28 28h3v3" stroke="url(#faceGrad)" strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 16h-3v-3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
+      <path d="M28 16h3v-3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
+      <path d="M12 28h-3v3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
+      <path d="M28 28h3v3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
       
       {/* Stylized Center Face Scan Target */}
-      <circle cx="20" cy="22" r="5" stroke="url(#faceGrad)" strokeWidth="1.5" strokeDasharray="3 3" />
-      <path d="M20 14v16M12 22h16" stroke="url(#faceGrad)" strokeWidth="1" strokeOpacity="0.4" />
+      <circle cx="20" cy="22" r="5" stroke={`url(#${faceGradId})`} strokeWidth="1.5" strokeDasharray="3 3" />
+      <path d="M20 14v16M12 22h16" stroke={`url(#${faceGradId})`} strokeWidth="1" strokeOpacity="0.4" />
     </svg>
   )
 
@@ -108,15 +142,15 @@ export function FaceCloudLogo({
       activeVariant === 'full' ? "items-center text-center mt-2.5" : "items-start ml-3"
     )}>
       <div className="flex items-baseline">
-        <span className={cn("font-extrabold tracking-tight text-white", textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
+        <span className={cn("font-extrabold tracking-tight", t.faceText, textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
           Face
         </span>
-        <span className={cn("font-medium tracking-tight bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent", textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
+        <span className={cn("font-medium tracking-tight", t.cloudText, textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
           Cloud
         </span>
       </div>
       {showSubtitle && (
-        <span className={cn("font-bold tracking-[0.25em] uppercase text-white/35 font-mono", subTextSizes[size])}>
+        <span className={cn("font-bold tracking-[0.25em] uppercase font-mono", t.subText, subTextSizes[size])}>
           AI Platform
         </span>
       )}
@@ -155,7 +189,8 @@ export function FaceCloudLogo({
       {renderLayout()}
       {roleLabel && (
         <span className={cn(
-          "block font-bold tracking-wider uppercase bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent leading-none font-mono",
+          "block font-bold tracking-wider uppercase leading-none font-mono",
+          t.roleText,
           activeVariant === 'full' ? "mt-2.5 text-[10px]" : "mt-1.5 text-[10px]"
         )}>
           {roleLabel}
@@ -169,7 +204,8 @@ export function FaceCloudLogo({
       <Link
         to={href}
         className={cn(
-          "inline-flex flex-col focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F97316] rounded-xl transition-all duration-300 hover:opacity-90 hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]",
+          "inline-flex flex-col focus-visible:outline-none focus-visible:ring-2 rounded-xl transition-all duration-300 hover:opacity-90",
+          t.ring,
           activeVariant === 'full' ? "items-center" : "items-start",
           className
         )}

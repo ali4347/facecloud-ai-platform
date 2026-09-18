@@ -14,20 +14,20 @@ export default function SystemMonitoring() {
       {/* General Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { title: 'Global CPU Load', value: '42.8%', detail: '8 Core Thread allocation', icon: Cpu, color: '#FB923C' },
-          { title: 'Memory Allocated', value: '11.8 GB / 16 GB', detail: 'RAM buffer allocation', icon: HardDrive, color: '#A78BFA' },
-          { title: 'Global Uptime', value: '99.94%', detail: 'Calculated over 30 days', icon: CheckCircle2, color: '#4FFFB0' },
-          { title: 'Active Processing Queue', value: '14 files', detail: 'Queue buffer queue count', icon: RefreshCw, color: '#FB923C' }
+          { title: 'Global CPU Load', value: '42.8%', detail: '8 Core Thread allocation', icon: Cpu, color: '#6366F1' },
+          { title: 'Memory Allocated', value: '11.8 GB / 16 GB', detail: 'RAM buffer allocation', icon: HardDrive, color: '#6D28D9' },
+          { title: 'Global Uptime', value: '99.94%', detail: 'Calculated over 30 days', icon: CheckCircle2, color: '#059669' },
+          { title: 'Active Processing Queue', value: '14 files', detail: 'Queue buffer queue count', icon: RefreshCw, color: '#6366F1' }
         ].map(stat => (
           <div key={stat.title} className="fc-card p-6 flex items-center justify-between">
             <div className="space-y-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider block text-white/50">{stat.title}</span>
-              <span className="text-lg font-bold text-white block">{stat.value}</span>
-              <span className="text-[10px] text-white/30 block">{stat.detail}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider block text-ink-mute">{stat.title}</span>
+              <span className="text-lg font-bold text-ink block">{stat.value}</span>
+              <span className="text-[10px] text-ink-faint block">{stat.detail}</span>
             </div>
             <div
               className="p-3 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+              style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
             >
               <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
             </div>
@@ -41,23 +41,23 @@ export default function SystemMonitoring() {
           {mockServices.map(service => (
             <div 
               key={service.name} 
-              className="p-4 rounded-3xl bg-white/[0.03] border border-white/[0.08] flex items-start justify-between gap-4"
+              className="p-4 rounded-3xl bg-surface-mute border border-line flex items-start justify-between gap-4"
             >
               <div className="flex gap-3 text-xs">
                 <div className="mt-0.5">
-                  {service.status === 'operational' && <CheckCircle2 className="w-5 h-5 text-[#4FFFB0]" />}
-                  {service.status === 'degraded' && <AlertTriangle className="w-5 h-5 text-[#FCD34D]" />}
-                  {service.status === 'outage' && <AlertOctagon className="w-5 h-5 text-[#F87171]" />}
+                  {service.status === 'operational' && <CheckCircle2 className="w-5 h-5 text-[#059669]" />}
+                  {service.status === 'degraded' && <AlertTriangle className="w-5 h-5 text-[#B45309]" />}
+                  {service.status === 'outage' && <AlertOctagon className="w-5 h-5 text-[#DC2626]" />}
                 </div>
                 
                 <div className="space-y-1">
-                  <h4 className="font-bold text-white">{service.name}</h4>
-                  <div className="flex gap-3 text-[10px] text-white/40">
+                  <h4 className="font-bold text-ink">{service.name}</h4>
+                  <div className="flex gap-3 text-[10px] text-ink-faint">
                     <span>Latency: {service.latency || 'N/A'}</span>
                     <span>CPU: {service.cpuUsage || 'N/A'}</span>
                     <span>RAM: {service.memUsage || 'N/A'}</span>
                   </div>
-                  <p className="text-[9px] text-white/30">Uptime: {service.uptime} &bull; Queue Size: {service.queueSize || 0}</p>
+                  <p className="text-[9px] text-ink-faint">Uptime: {service.uptime} &bull; Queue Size: {service.queueSize || 0}</p>
                 </div>
               </div>
 

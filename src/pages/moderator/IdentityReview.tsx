@@ -12,8 +12,8 @@ export default function IdentityReview() {
       {/* Suggested merges */}
       <div className="fc-card p-5 mb-5">
         <div className="flex items-center gap-2 mb-4">
-          <GitMerge className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold text-dark">Suggested Group Merges</h2>
+          <GitMerge className="w-4 h-4 text-accent" />
+          <h2 className="text-sm font-semibold text-ink">Suggested Group Merges</h2>
           <StatusBadge status="warning" label="2 suggestions" dot={false} />
         </div>
         <div className="space-y-3">
@@ -21,16 +21,16 @@ export default function IdentityReview() {
             { g1: 'Person 1', g2: 'Person 7', similarity: 94 },
             { g1: 'Person 3', g2: 'Person 9', similarity: 87 },
           ].map((merge, i) => (
-            <div key={i} className="flex items-center gap-4 p-3 bg-background rounded-2xl border border-border">
-              <span className="text-sm font-semibold text-dark">{merge.g1}</span>
+            <div key={i} className="flex items-center gap-4 p-3 bg-background rounded-2xl border border-line">
+              <span className="text-sm font-semibold text-ink">{merge.g1}</span>
               <div className="flex items-center gap-2">
-                <MoveRight className="w-4 h-4 text-muted" />
+                <MoveRight className="w-4 h-4 text-ink-mute" />
                 <span className="px-2 py-0.5 bg-amber-100 text-warning text-xs font-bold rounded-full">
                   {merge.similarity}% similar
                 </span>
-                <MoveRight className="w-4 h-4 text-muted" />
+                <MoveRight className="w-4 h-4 text-ink-mute" />
               </div>
-              <span className="text-sm font-semibold text-dark">{merge.g2}</span>
+              <span className="text-sm font-semibold text-ink">{merge.g2}</span>
               <div className="flex-1" />
               <GradientButton size="sm">Merge Groups</GradientButton>
               <GradientButton variant="secondary" size="sm">Dismiss</GradientButton>
@@ -40,7 +40,7 @@ export default function IdentityReview() {
       </div>
 
       {/* Groups grid */}
-      <h2 className="text-sm font-semibold text-dark mb-3">All Identity Groups</h2>
+      <h2 className="text-sm font-semibold text-ink mb-3">All Identity Groups</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {mockGroups.map(group => (
           <div key={group.id} className="fc-card p-4">
@@ -51,8 +51,8 @@ export default function IdentityReview() {
                 ))}
               </div>
               <div className="ml-1">
-                <p className="text-sm font-bold text-dark">{group.label}</p>
-                <p className="text-xs text-muted">{group.imageCount} images</p>
+                <p className="text-sm font-bold text-ink">{group.label}</p>
+                <p className="text-xs text-ink-mute">{group.imageCount} images</p>
               </div>
             </div>
             <div className="flex gap-2">

@@ -26,9 +26,9 @@ export default function IdentityGroups() {
         </div>
       )}
 
-      <div className="mt-6 p-4 bg-soft-blue rounded-2xl border border-primary-100">
-        <p className="text-sm font-semibold text-dark mb-1">How identity grouping works</p>
-        <p className="text-xs text-muted leading-relaxed">
+      <div className="mt-6 p-4 bg-soft-blue rounded-2xl border border-accent/30">
+        <p className="text-sm font-semibold text-ink mb-1">How identity grouping works</p>
+        <p className="text-xs text-ink-mute leading-relaxed">
           FaceCloud uses FaceNet/ArcFace to extract facial embeddings from each validated image.
           Images of the same person are automatically clustered together. The moderator can review
           and correct any grouping errors.

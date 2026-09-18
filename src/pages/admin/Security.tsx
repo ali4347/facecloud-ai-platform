@@ -24,8 +24,8 @@ export default function Security() {
         <div className="lg:col-span-8 space-y-6">
           <ChartCard title="Security Events Registry" subtitle="Real-time network security logs">
             {alerts.length === 0 ? (
-              <div className="h-64 flex flex-col items-center justify-center text-center text-white/50 gap-2">
-                <CheckCircle className="w-8 h-8 text-[#4FFFB0] animate-bounce" />
+              <div className="h-64 flex flex-col items-center justify-center text-center text-ink-mute gap-2">
+                <CheckCircle className="w-8 h-8 text-[#059669] animate-bounce" />
                 <p className="text-xs font-semibold">Zero security threats detected inside current firewall buffer.</p>
               </div>
             ) : (
@@ -35,8 +35,8 @@ export default function Security() {
                     key={a.id} 
                     className="p-4 rounded-3xl border transition-all flex items-start justify-between gap-4"
                     style={{
-                      background: a.risk === 'critical' ? 'rgba(239,68,68,0.06)' : a.risk === 'high' ? 'rgba(245,158,11,0.06)' : 'rgba(255,255,255,0.03)',
-                      borderColor: a.risk === 'critical' ? 'rgba(239,68,68,0.20)' : a.risk === 'high' ? 'rgba(245,158,11,0.20)' : 'rgba(255,255,255,0.08)'
+                      background: a.risk === 'critical' ? 'rgba(239,68,68,0.06)' : a.risk === 'high' ? 'rgba(217,119,6,0.06)' : '#F1F3F7',
+                      borderColor: a.risk === 'critical' ? 'rgba(239,68,68,0.20)' : a.risk === 'high' ? 'rgba(217,119,6,0.20)' : '#E6E9EF'
                     }}
                   >
                     <div className="flex gap-3 text-xs">
@@ -45,16 +45,16 @@ export default function Security() {
                           a.risk === 'critical' || a.risk === 'high' ? 'animate-pulse' : ''
                         }`}
                         style={{
-                          background: 'rgba(255,255,255,0.04)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                          color: a.risk === 'critical' || a.risk === 'high' ? '#F87171' : 'rgba(255,255,255,0.5)'
+                          background: '#F1F3F7',
+                          border: '1px solid #E6E9EF',
+                          color: a.risk === 'critical' || a.risk === 'high' ? '#DC2626' : '#64748B'
                         }}
                       >
                         {a.type === 'failed_login' ? <Lock className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-bold text-white">{a.message}</h4>
+                          <h4 className="font-bold text-ink">{a.message}</h4>
                           <span className={`badge text-[9px] ${
                             a.risk === 'critical' ? 'badge-error' :
                             a.risk === 'high' ? 'badge-warning' : 'badge-info'
@@ -62,7 +62,7 @@ export default function Security() {
                             {a.risk} risk
                           </span>
                         </div>
-                        <p className="text-[10px] text-white/40">IP Address: {a.ip} &bull; Timestamp: {new Date(a.timestamp).toLocaleString()}</p>
+                        <p className="text-[10px] text-ink-faint">IP Address: {a.ip} &bull; Timestamp: {new Date(a.timestamp).toLocaleString()}</p>
                       </div>
                     </div>
 
@@ -84,26 +84,26 @@ export default function Security() {
           <ChartCard title="Firewall Shield Status" subtitle="Active threat counters">
             <div className="space-y-6">
               
-              <div className="p-4 rounded-3xl bg-white/[0.03] border border-white/[0.08] text-xs text-white/60 space-y-3.5">
-                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-white/[0.08] text-white/40">
+              <div className="p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-mute space-y-3.5">
+                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-line text-ink-faint">
                   <span>Audit Parameter</span>
                   <span>Shield Status</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Failed Authentications:</span>
-                  <span className="font-bold text-white">
+                  <span className="font-bold text-ink">
                     {alerts.filter(a => a.type === 'failed_login').length} logs
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Rate limits tripped:</span>
-                  <span className="font-bold text-white">
+                  <span className="font-bold text-ink">
                     {alerts.filter(a => a.type === 'rate_limit').length} events
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Current Threat Index:</span>
-                  <span className={`font-bold ${alerts.some(a => a.risk === 'critical') ? 'text-[#F87171]' : 'text-[#4FFFB0]'}`}>
+                  <span className={`font-bold ${alerts.some(a => a.risk === 'critical') ? 'text-[#DC2626]' : 'text-[#059669]'}`}>
                     {alerts.some(a => a.risk === 'critical') ? 'CRITICAL' : 'SECURE'}
                   </span>
                 </div>
@@ -112,12 +112,12 @@ export default function Security() {
               <div
                 className="p-4 rounded-3xl flex gap-3 text-xs"
                 style={{
-                  background: 'rgba(245,158,11,0.06)',
-                  borderColor: 'rgba(245,158,11,0.20)',
-                  color: 'rgba(255,255,255,0.6)'
+                  background: 'rgba(217,119,6,0.06)',
+                  borderColor: 'rgba(217,119,6,0.20)',
+                  color: '#64748B'
                 }}
               >
-                <AlertOctagon className="w-5 h-5 text-[#FCD34D] flex-shrink-0" />
+                <AlertOctagon className="w-5 h-5 text-[#B45309] flex-shrink-0" />
                 <p className="leading-relaxed">
                   Firewall rates limit locks IP addresses automatically on encountering 15 failed logins in a 10-second window.
                 </p>

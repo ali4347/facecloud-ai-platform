@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-09-17
+**Last updated:** 2026-09-18
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://www.facecloudai.pro (Vercel)
 
@@ -26,14 +26,14 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete (mock) | Queue, image review, members, batches, notifications, reports, audit, settings |
-| Branding + design system | ✅ Done | Official logo set, black / orange `#F97316` / monospace (Space Mono, JetBrains Mono, Silkscreen) |
+| Branding + design system | ✅ Done | Two scopes: public pages stay black / orange `#F97316` / monospace; the authenticated dashboards use a light theme (white cards on `#F7F8FA`, indigo `#4F46E5` accent, Inter) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Vercel | `vercel.json` SPA rewrite that skips files with extensions (so `/videos/*.mp4` serve) |
 | Backend database (PostgreSQL 16 + Prisma 5.22) | ✅ Schema + migration + seed | 15 models, 8 enums, migration `20260714_init`, 3 seeded accounts |
 | Backend API server (NestJS/Express) | ❌ Not started | Planned in README_BACKEND_ROADMAP.md §3 |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
-| Build health | ✅ `npm run build` passes (checked 2026-09-17) | JS bundle 2.28 MB minified, chunk-size warning, no code splitting |
+| Build health | ⚠️ Type-check passes; bundle not verifiable locally | `tsc -b` clean and Tailwind compiles (2026-09-18). `npm run build` could not run: Node is no longer on this machine's PATH — see §7 |
 
 **Tooling:** `npm run dev` (Vite, port 5173) · `npm run build` (`tsc -b && vite build`) · `npm run lint` (oxlint) ·
 backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker compose up -d`.
@@ -45,6 +45,35 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-09-18 — Dashboard interface restyled to a light theme
+*Status: committed (this commit)*
+- Reskinned the three authenticated dashboards (user, admin, moderator) to the light interface style the owner
+  supplied as a reference: white cards on a light grey page, hairline borders, close soft shadows, large corner radii,
+  indigo `#4F46E5` reserved for action and active state, Inter instead of the monospace display face.
+- **Styling only.** No route, nav item, feature, copy, mock data or behaviour was changed anywhere.
+- **Scoped, not global.** The shell root carries a `.fc-light` class; `src/index.css` re-declares the shared component
+  classes (`.fc-card`, `.fc-panel`, `.fc-input`, `.fc-btn-*`, `.fc-table`, `.badge-*`, `.sidebar-item*`,
+  `.upload-dropzone`) inside that scope. Public marketing pages, the three login pages and the moderator
+  access-denied screen are outside it and still render the black / orange theme.
+- `tailwind.config.ts`: added light-theme tokens — `ink` / `ink-soft` / `ink-mute` / `ink-faint`, `line` (+ soft,
+  strong), `surface` (+ soft, mute, sunk), `accent` (+ soft, deep, tint) — and `shadow-soft / soft-md / soft-lg / pill`.
+- `src/index.css`: added the scoped light block plus three new building blocks used by the shell — `.fc-seg`
+  (segmented control), `.fc-icon-btn` (round topbar button) and `.fc-kbd` (the ⌘K chip).
+- Rewritten by hand: `AppShell` (light ground, repaints `document.body` while mounted so overscroll is not black),
+  `Sidebar` (stacked white cards: brand, navigation with a raised white pill for the active row, model status,
+  account card with logout), `Topbar` (⌘K-focusable search, round icon buttons), `PageHeader`, and the shared
+  components `StatCard`, `ChartCard`, `DataTable`, `StatusBadge`, `SearchInput`, `EmptyState`, `GradientButton`,
+  `UserMenu`, `NotificationDropdown`.
+- `FaceCloudLogo`: added an optional `tone` prop (`dark` default, `light` for the shell) and gave each instance
+  unique SVG gradient ids, so two logos of different tones on one page cannot share one `<defs>`.
+- Converted 50 dashboard page and feature files by script: dark utilities to the new tokens, brand hex and `rgba()`
+  values remapped, and a second pass for the Tailwind config aliases (`primary`, `mint`, `pink`, `sky`, `violet`,
+  `orange`, `purple`) that the 2026-08 rebrand had pointed at orange. White text was kept wherever it sits on a
+  coloured button or a scrim over a photo.
+- Verification: `tsc -b --force` exits clean; the Tailwind CLI compiles `src/index.css` and all 55 new-token classes
+  used in source appear in the output; a static render of the shell markup against the compiled CSS was screenshotted
+  and matches the reference layout. The Vite bundle was **not** built — see §7.
 
 ### 2026-09-17 — Project work log + auto-update rule set up; uncommitted landing v3 discarded
 *Status: committed (this commit)*
@@ -177,6 +206,7 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
 | 4 | 2026-08-02 → 08-05 | Rebrand + polish + SEO | Black/orange/mono design system, hero video loop, nav fixes, SEO, analytics |
 | 5 | 2026-09-16 → 09-17 | Landing v3 attempt (discarded) | Monochrome landing system prototype; discarded uncommitted on 2026-09-17 |
 | 6 | 2026-09-17 | Documentation | WORK_LOG.md, CLAUDE.md, Stop hook for automatic log updates |
+| 7 | 2026-09-18 | Dashboard light theme | Scoped light interface for the three authenticated portals |
 
 ---
 
@@ -190,6 +220,10 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
 - Admin `/admin` (11): index, `users`, `audit-logs`, `security`, `api-docs`, `api-test`, `system`, `upload-statistics`,
   `rejection-summary`, `images`, `logs`→`audit-logs`.
 - Moderator `/moderator` (9): index, `members`, `queue`, `images/:id`, `batches`, `notifications`, `reports`, `audit`, `settings`.
+
+**Design scopes:** public marketing pages use the black / orange / monospace system; everything inside the
+authenticated `AppShell` uses the light theme scoped under `.fc-light` (see the 2026-09-18 entry). The login pages
+and the moderator access-denied screen sit outside the shell and remain dark.
 
 **Components (`src/components/`):** animation (4: CountUp, RevealOnScroll, ScrambleText, StaggerChildren) ·
 branding (FaceCloudLogo) · features (9: ActivityTimeline, BeforeAfterSlider, EnhancementControls, IdentityGroupCard,
@@ -238,6 +272,13 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - `docker-compose.yml` defaults the database name to `facecloud_db` while README §15 uses `facecloud` in `DATABASE_URL`;
   confirm which one the local `.env` uses.
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
+- **Node is not installed on the development machine any more** (it was present on 2026-09-17). `npm`, `node` and
+  `npx` are all absent from PATH, so `npm run build`, `npm run lint` and the dev server cannot be run locally.
+  Type-checking and Tailwind compilation were run through the Node runtime bundled inside VS Code; that runtime
+  cannot load the project's native binaries (`rolldown`, `oxlint`) because macOS rejects the code signature across
+  Team IDs. Reinstall Node 18+ to restore the normal build.
+- The three login pages and the moderator access-denied screen are still dark while the dashboards behind them are
+  light. Intentional for now — the restyle was scoped to the dashboards — but the transition is abrupt.
 - Vite 8 / rolldown chunk warning: consider `build.chunkSizeWarningLimit` or dynamic imports for portals.
 
 ---

@@ -15,15 +15,15 @@ export function ChartCard({ title, subtitle, action, children, className, delay 
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay, ease: [0.16,1,0.3,1] }}
-      className={cn('fc-panel p-6', className)}
+      transition={{ duration: 0.45, delay, ease: [0.16, 1, 0.3, 1] }}
+      className={cn('fc-card p-6', className)}
     >
-      <div className="flex items-start justify-between mb-5">
-        <div>
-          <h3 className="text-sm font-semibold text-white">{title}</h3>
-          {subtitle && <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.48)' }}>{subtitle}</p>}
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+        <div className="min-w-0">
+          <h3 className="text-[15px] font-semibold text-ink leading-tight">{title}</h3>
+          {subtitle && <p className="text-[12px] mt-1 text-ink-mute leading-snug">{subtitle}</p>}
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="flex-shrink-0">{action}</div>}
       </div>
       {children}
     </motion.div>

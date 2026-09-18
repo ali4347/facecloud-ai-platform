@@ -27,7 +27,7 @@ export default function Statistics() {
               <Legend iconType="circle" iconSize={8} />
               <Area type="monotone" dataKey="uploads" stroke="#2563EB" fill="url(#gu2)" strokeWidth={2} name="Uploads" />
               <Area type="monotone" dataKey="enhanced" stroke="#7C3AED" fill="none" strokeWidth={2} name="Enhanced" />
-              <Area type="monotone" dataKey="rejected" stroke="#EF4444" fill="none" strokeWidth={1.5} strokeDasharray="4 2" name="Rejected" />
+              <Area type="monotone" dataKey="rejected" stroke="#DC2626" fill="none" strokeWidth={1.5} strokeDasharray="4 2" name="Rejected" />
             </AreaChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -41,7 +41,7 @@ export default function Statistics() {
               <Tooltip contentStyle={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '12px', fontSize: '12px' }} />
               <Legend iconType="circle" iconSize={8} />
               <Bar dataKey="success" fill="#16A34A" radius={[6, 6, 0, 0]} name="Success %" />
-              <Bar dataKey="failed" fill="#EF4444" radius={[6, 6, 0, 0]} name="Failed %" />
+              <Bar dataKey="failed" fill="#DC2626" radius={[6, 6, 0, 0]} name="Failed %" />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

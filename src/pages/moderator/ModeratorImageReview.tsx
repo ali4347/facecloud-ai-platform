@@ -123,7 +123,7 @@ export default function ModeratorImageReview() {
   return (
     <div className="space-y-6 page-enter relative">
       <div className="flex items-center gap-3">
-        <Link to="/moderator/queue" className="p-2 rounded-xl hover:bg-white/5 border border-white/10 text-muted hover:text-white">
+        <Link to="/moderator/queue" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <PageHeader 
@@ -133,7 +133,7 @@ export default function ModeratorImageReview() {
       </div>
 
       {toastMsg && (
-        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#4FFFB0]/10 border border-[#4FFFB0]/20 text-xs font-bold text-[#4FFFB0] flex items-center justify-center gap-2 shadow-[0_4px_24px_rgba(79,255,176,0.15)] backdrop-blur-md animate-enter">
+        <div className="fixed top-6 right-6 z-50 p-4 rounded-3xl bg-[#059669]/10 border border-[#059669]/20 text-xs font-bold text-[#059669] flex items-center justify-center gap-2 shadow-[0_4px_24px_rgba(5,150,105,0.15)] backdrop-blur-md animate-enter">
           <CheckCircle className="w-4.5 h-4.5" />
           <span>{toastMsg}</span>
         </div>
@@ -149,26 +149,26 @@ export default function ModeratorImageReview() {
               {/* Side-by-Side Swatches */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5 text-center">
-                  <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider block">Original Image</span>
-                  <div className="aspect-[4/3] rounded-3xl border border-white/10 flex items-center justify-center relative overflow-hidden"
-                    style={{ background: `radial-gradient(circle, rgba(255,255,255,0.05), transparent), ${record.thumbnail}` }}
+                  <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider block">Original Image</span>
+                  <div className="aspect-[4/3] rounded-3xl border border-line flex items-center justify-center relative overflow-hidden"
+                    style={{ background: `radial-gradient(circle, #F1F3F7, transparent), ${record.thumbnail}` }}
                   >
                     {record.isDuplicate && (
-                      <div className="absolute top-3 left-3 p-1.5 bg-[#EF4444]/90 border border-red-500/30 rounded-xl text-[9px] font-bold text-white uppercase shadow-lg">
+                      <div className="absolute top-3 left-3 p-1.5 bg-[#DC2626]/90 border border-red-500/30 rounded-xl text-[9px] font-bold text-white uppercase shadow-lg">
                         Duplicate Flag
                       </div>
                     )}
-                    <span className="text-white/20 font-bold text-xs">Original Photo</span>
+                    <span className="text-ink-faint font-bold text-xs">Original Photo</span>
                   </div>
                 </div>
 
                 <div className="space-y-1.5 text-center">
-                  <span className="text-[10px] text-white/40 font-bold uppercase tracking-wider block">Enhanced Image</span>
-                  <div className="aspect-[4/3] rounded-3xl border border-white/10 flex items-center justify-center relative overflow-hidden"
-                    style={{ background: `radial-gradient(circle, rgba(79,255,176,0.1), transparent), ${record.thumbnail}` }}
+                  <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider block">Enhanced Image</span>
+                  <div className="aspect-[4/3] rounded-3xl border border-line flex items-center justify-center relative overflow-hidden"
+                    style={{ background: `radial-gradient(circle, rgba(5,150,105,0.1), transparent), ${record.thumbnail}` }}
                   >
-                    <span className="text-[#4FFFB0] font-bold text-xs flex items-center gap-1">
-                      <Play className="w-3.5 h-3.5 fill-[#4FFFB0]" />
+                    <span className="text-[#059669] font-bold text-xs flex items-center gap-1">
+                      <Play className="w-3.5 h-3.5 fill-[#059669]" />
                       Enhanced V1
                     </span>
                   </div>
@@ -177,25 +177,25 @@ export default function ModeratorImageReview() {
 
               {/* Flagged Duplicate Comparison Panel */}
               {record.isDuplicate && (
-                <div className="p-4 rounded-3xl bg-[#EA580C]/[0.06] border border-[#EA580C]/20 space-y-4">
-                  <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-[10px] text-purple-300 font-bold uppercase tracking-wider">Duplicate Match Analysis</span>
-                    <span className="text-xs font-bold text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded">
+                <div className="p-4 rounded-3xl bg-[#4338CA]/[0.06] border border-[#4338CA]/20 space-y-4">
+                  <div className="flex justify-between items-center pb-2 border-b border-line">
+                    <span className="text-[10px] text-violet-700 font-bold uppercase tracking-wider">Duplicate Match Analysis</span>
+                    <span className="text-xs font-bold text-violet-700 bg-violet-500/10 px-2 py-0.5 rounded">
                       {record.similarityScore}% Similarity Match
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-center">
                     <div className="space-y-1">
-                      <p className="text-[9px] text-white/40 font-semibold truncate">{record.filename}</p>
-                      <div className="aspect-[3/2] rounded-2xl border border-white/10 flex items-center justify-center" style={{ backgroundColor: record.thumbnail }}>
-                        <span className="text-white/20 text-[10px]">This Upload</span>
+                      <p className="text-[9px] text-ink-faint font-semibold truncate">{record.filename}</p>
+                      <div className="aspect-[3/2] rounded-2xl border border-line flex items-center justify-center" style={{ backgroundColor: record.thumbnail }}>
+                        <span className="text-ink-faint text-[10px]">This Upload</span>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-[9px] text-white/40 font-semibold truncate">{record.matchedFilename}</p>
-                      <div className="aspect-[3/2] rounded-2xl border border-white/10 flex items-center justify-center" style={{ backgroundColor: record.matchedThumbnail }}>
-                        <span className="text-white/20 text-[10px]">Existing Match</span>
+                      <p className="text-[9px] text-ink-faint font-semibold truncate">{record.matchedFilename}</p>
+                      <div className="aspect-[3/2] rounded-2xl border border-line flex items-center justify-center" style={{ backgroundColor: record.matchedThumbnail }}>
+                        <span className="text-ink-faint text-[10px]">Existing Match</span>
                       </div>
                     </div>
                   </div>
@@ -224,7 +224,7 @@ export default function ModeratorImageReview() {
                     onClick={() => setCorrectModal(true)}
                     className="fc-btn-secondary w-full justify-center py-3 text-xs font-bold flex items-center gap-1.5"
                   >
-                    <RefreshCw className="w-3.5 h-3.5 text-purple-300" /> Correct
+                    <RefreshCw className="w-3.5 h-3.5 text-violet-700" /> Correct
                   </button>
                   
                   <button 
@@ -233,12 +233,12 @@ export default function ModeratorImageReview() {
                     className="fc-btn-secondary w-full justify-center py-3 text-xs font-bold flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                     title={!record.allowReprocess ? "Reprocessing is not permitted for this item's state" : "Request pipeline reprocessing"}
                   >
-                    <Play className="w-3.5 h-3.5 text-[#F97316]" /> Reprocess
+                    <Play className="w-3.5 h-3.5 text-[#4F46E5]" /> Reprocess
                   </button>
                   
                   <button 
                     onClick={() => setEscalateModal(true)}
-                    className="fc-btn-secondary w-full justify-center py-3 text-xs font-bold flex items-center gap-1.5 !text-[#F59E0B] hover:!border-[#F59E0B]/50"
+                    className="fc-btn-secondary w-full justify-center py-3 text-xs font-bold flex items-center gap-1.5 !text-[#D97706] hover:!border-[#D97706]/50"
                   >
                     <AlertOctagon className="w-3.5 h-3.5" /> Escalate
                   </button>
@@ -260,23 +260,23 @@ export default function ModeratorImageReview() {
                   <AlertTriangle className="w-4 h-4" />
                   <span>AI Exception Trigger</span>
                 </div>
-                <p className="text-white/60 leading-relaxed font-semibold">
+                <p className="text-ink-mute leading-relaxed font-semibold">
                   {record.isDuplicate ? `Duplicate image match found: matched with ${record.matchedFilename}` : record.rejectionReason}
                 </p>
               </div>
 
               {/* Progress bars ratings */}
-              <div className="p-5 rounded-3xl bg-white/5 border border-white/10 space-y-4">
-                <h4 className="text-[10px] text-white/40 font-bold uppercase tracking-wider pb-2 border-b border-white/5">Biometric Threshold Ratings</h4>
+              <div className="p-5 rounded-3xl bg-surface-mute border border-line space-y-4">
+                <h4 className="text-[10px] text-ink-faint font-bold uppercase tracking-wider pb-2 border-b border-line">Biometric Threshold Ratings</h4>
                 
                 {/* Blur */}
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between font-bold">
                     <span>Blur Score (Image Sharpness)</span>
-                    <span className={record.blurScore >= 60 ? 'text-[#4FFFB0]' : 'text-red-400'}>{record.blurScore}/100</span>
+                    <span className={record.blurScore >= 60 ? 'text-[#059669]' : 'text-red-400'}>{record.blurScore}/100</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full transition-all" style={{ width: `${record.blurScore}%`, backgroundColor: record.blurScore >= 60 ? '#4FFFB0' : '#EF4444' }} />
+                  <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
+                    <div className="h-full transition-all" style={{ width: `${record.blurScore}%`, backgroundColor: record.blurScore >= 60 ? '#059669' : '#DC2626' }} />
                   </div>
                 </div>
 
@@ -284,10 +284,10 @@ export default function ModeratorImageReview() {
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between font-bold">
                     <span>Exposure / Brightness Rating</span>
-                    <span className={record.brightnessScore >= 45 ? 'text-[#4FFFB0]' : 'text-red-400'}>{record.brightnessScore}/100</span>
+                    <span className={record.brightnessScore >= 45 ? 'text-[#059669]' : 'text-red-400'}>{record.brightnessScore}/100</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full transition-all" style={{ width: `${record.brightnessScore}%`, backgroundColor: record.brightnessScore >= 45 ? '#4FFFB0' : '#EF4444' }} />
+                  <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
+                    <div className="h-full transition-all" style={{ width: `${record.brightnessScore}%`, backgroundColor: record.brightnessScore >= 45 ? '#059669' : '#DC2626' }} />
                   </div>
                 </div>
 
@@ -295,20 +295,20 @@ export default function ModeratorImageReview() {
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between font-bold">
                     <span>Face Boundary Coverage</span>
-                    <span className={record.faceSizeScore >= 50 ? 'text-[#4FFFB0]' : 'text-red-400'}>{record.faceSizeScore}/100</span>
+                    <span className={record.faceSizeScore >= 50 ? 'text-[#059669]' : 'text-red-400'}>{record.faceSizeScore}/100</span>
                   </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full transition-all" style={{ width: `${record.faceSizeScore}%`, backgroundColor: record.faceSizeScore >= 50 ? '#4FFFB0' : '#EF4444' }} />
+                  <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
+                    <div className="h-full transition-all" style={{ width: `${record.faceSizeScore}%`, backgroundColor: record.faceSizeScore >= 50 ? '#059669' : '#DC2626' }} />
                   </div>
                 </div>
               </div>
 
               {/* Recommendation summary card */}
-              <div className="p-4 rounded-3xl bg-white/5 border border-white/10 flex gap-3 text-xs text-white/55 items-start">
-                <ShieldAlert className="w-5 h-5 text-[#F97316] shrink-0 mt-0.5" />
+              <div className="p-4 rounded-3xl bg-surface-mute border border-line flex gap-3 text-xs text-ink-mute items-start">
+                <ShieldAlert className="w-5 h-5 text-[#4F46E5] shrink-0 mt-0.5" />
                 <div>
-                  <h4 className="font-bold text-white">AI Policy Recommender</h4>
-                  <p className="mt-1 leading-relaxed text-[11px] text-white/45">
+                  <h4 className="font-bold text-ink">AI Policy Recommender</h4>
+                  <p className="mt-1 leading-relaxed text-[11px] text-ink-mute">
                     {record.isDuplicate 
                       ? "Flagged for duplicate scan verification. Review original vs matched profile and confirm mapping override decision."
                       : "Image checks flag standard thresholds deviation. Manually override, schedule reprocessing, or decline ingestion."}
@@ -324,29 +324,29 @@ export default function ModeratorImageReview() {
 
       {/* APPROVE DIALOG MODAL */}
       {approveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-enter">
-          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-white/10 space-y-5">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-[#4FFFB0]" /> Approve Image Ingest
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ink/40 backdrop-blur-sm animate-enter">
+          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-line space-y-5">
+            <h3 className="text-sm font-bold text-ink flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-[#059669]" /> Approve Image Ingest
             </h3>
             
             <div className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">Confirm Person Cluster Folder</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">Confirm Person Cluster Folder</label>
                 <select 
                   value={targetFolder} 
                   onChange={e => setTargetFolder(e.target.value)}
-                  className="fc-input text-white"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  className="fc-input text-ink"
+                  style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
                 >
                   {mockGroups.map(g => (
-                    <option key={g.id} value={g.id} className="bg-[#05070A]">{g.label} ({g.id})</option>
+                    <option key={g.id} value={g.id} className="bg-[#FFFFFF]">{g.label} ({g.id})</option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">Review Comments (Optional)</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">Review Comments (Optional)</label>
                 <textarea 
                   value={moderatorNote}
                   onChange={e => setModeratorNote(e.target.value)}
@@ -358,7 +358,7 @@ export default function ModeratorImageReview() {
 
             <div className="flex gap-3 pt-2">
               <button onClick={() => setApproveModal(false)} className="fc-btn-secondary w-full justify-center py-2.5 text-xs">Cancel</button>
-              <button onClick={handleApproveSubmit} className="fc-btn-primary w-full justify-center py-2.5 text-xs !bg-[#4FFFB0] !text-black shadow-none font-bold">Approve & Ingest</button>
+              <button onClick={handleApproveSubmit} className="fc-btn-primary w-full justify-center py-2.5 text-xs !bg-[#059669] !text-black shadow-none font-bold">Approve & Ingest</button>
             </div>
           </div>
         </div>
@@ -366,33 +366,33 @@ export default function ModeratorImageReview() {
 
       {/* REJECT DIALOG MODAL */}
       {rejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-enter">
-          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-white/10 space-y-5">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ink/40 backdrop-blur-sm animate-enter">
+          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-line space-y-5">
+            <h3 className="text-sm font-bold text-ink flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-400" /> Confirm Rejection Decision
             </h3>
             
             <div className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">Rejection Reason *</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">Rejection Reason *</label>
                 <select 
                   value={rejectReason} 
                   onChange={e => setRejectReason(e.target.value)}
-                  className="fc-input text-white"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  className="fc-input text-ink"
+                  style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
                   required
                 >
-                  <option value="" className="bg-[#05070A]">-- Select Rejection Reason --</option>
-                  <option value="Image too blurry" className="bg-[#05070A]">Image too blurry</option>
-                  <option value="Too dark after enhancement" className="bg-[#05070A]">Too dark after enhancement</option>
-                  <option value="Multiple faces detected" className="bg-[#05070A]">Multiple faces detected</option>
-                  <option value="Face not detected" className="bg-[#05070A]">Face not detected</option>
-                  <option value="Face too small" className="bg-[#05070A]">Face too small</option>
+                  <option value="" className="bg-[#FFFFFF]">-- Select Rejection Reason --</option>
+                  <option value="Image too blurry" className="bg-[#FFFFFF]">Image too blurry</option>
+                  <option value="Too dark after enhancement" className="bg-[#FFFFFF]">Too dark after enhancement</option>
+                  <option value="Multiple faces detected" className="bg-[#FFFFFF]">Multiple faces detected</option>
+                  <option value="Face not detected" className="bg-[#FFFFFF]">Face not detected</option>
+                  <option value="Face too small" className="bg-[#FFFFFF]">Face too small</option>
                 </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">Instructions for User (Optional)</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">Instructions for User (Optional)</label>
                 <textarea 
                   value={feedbackNotes}
                   onChange={e => setFeedbackNotes(e.target.value)}
@@ -418,14 +418,14 @@ export default function ModeratorImageReview() {
 
       {/* CORRECT DIALOG MODAL */}
       {correctModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-enter">
-          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-white/10 space-y-5">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <RefreshCw className="w-5 h-5 text-purple-300 animate-spin" style={{ animationDuration: '3s' }} /> Correct AI Mapping
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ink/40 backdrop-blur-sm animate-enter">
+          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-line space-y-5">
+            <h3 className="text-sm font-bold text-ink flex items-center gap-2">
+              <RefreshCw className="w-5 h-5 text-violet-700 animate-spin" style={{ animationDuration: '3s' }} /> Correct AI Mapping
             </h3>
             
             <div className="space-y-4 text-xs">
-              <div className="flex gap-4 p-2.5 rounded-xl bg-white/5 border border-white/5">
+              <div className="flex gap-4 p-2.5 rounded-xl bg-surface-mute border border-line">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="radio" 
@@ -450,15 +450,15 @@ export default function ModeratorImageReview() {
 
               {correctOption === 'folder' && (
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">Select Target Cluster Folder</label>
+                  <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">Select Target Cluster Folder</label>
                   <select 
                     value={targetFolder} 
                     onChange={e => setTargetFolder(e.target.value)}
-                    className="fc-input text-white"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    className="fc-input text-ink"
+                    style={{ background: '#F1F3F7', border: '1px solid #E6E9EF' }}
                   >
                     {mockGroups.map(g => (
-                      <option key={g.id} value={g.id} className="bg-[#05070A]">{g.label} ({g.id})</option>
+                      <option key={g.id} value={g.id} className="bg-[#FFFFFF]">{g.label} ({g.id})</option>
                     ))}
                   </select>
                 </div>
@@ -467,7 +467,7 @@ export default function ModeratorImageReview() {
 
             <div className="flex gap-3 pt-2">
               <button onClick={() => setCorrectModal(false)} className="fc-btn-secondary w-full justify-center py-2.5 text-xs">Cancel</button>
-              <button onClick={handleCorrectSubmit} className="fc-btn-primary w-full justify-center py-2.5 text-xs !bg-purple-600 !text-white shadow-none font-bold">Confirm Correction</button>
+              <button onClick={handleCorrectSubmit} className="fc-btn-primary w-full justify-center py-2.5 text-xs !bg-violet-600 !text-white shadow-none font-bold">Confirm Correction</button>
             </div>
           </div>
         </div>
@@ -475,19 +475,19 @@ export default function ModeratorImageReview() {
 
       {/* ESCALATE DIALOG MODAL */}
       {escalateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/80 backdrop-blur-sm animate-enter">
-          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-white/10 space-y-5">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <AlertOctagon className="w-5 h-5 text-[#F59E0B]" /> Escalate to Administration
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-ink/40 backdrop-blur-sm animate-enter">
+          <div className="fc-panel-strong p-6 w-full max-w-md bg-[#0D0F14] border border-line space-y-5">
+            <h3 className="text-sm font-bold text-ink flex items-center gap-2">
+              <AlertOctagon className="w-5 h-5 text-[#D97706]" /> Escalate to Administration
             </h3>
             
             <div className="space-y-4 text-xs">
-              <p className="text-white/40 leading-relaxed">
+              <p className="text-ink-faint leading-relaxed">
                 This case will be removed from your active backlog queue and flagged for senior FaceCloud administration diagnostics override.
               </p>
               
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-white/50 uppercase tracking-wider block">Escalation Reason Notes *</label>
+                <label className="text-[10px] font-bold text-ink-mute uppercase tracking-wider block">Escalation Reason Notes *</label>
                 <textarea 
                   value={escalationNote}
                   onChange={e => setEscalationNote(e.target.value)}
@@ -503,7 +503,7 @@ export default function ModeratorImageReview() {
               <button 
                 onClick={handleEscalateSubmit} 
                 disabled={!escalationNote}
-                className="fc-btn-primary w-full justify-center py-2.5 text-xs !bg-[#F59E0B] !text-black shadow-none font-bold disabled:opacity-40 disabled:cursor-not-allowed"
+                className="fc-btn-primary w-full justify-center py-2.5 text-xs !bg-[#D97706] !text-black shadow-none font-bold disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Escalate Case
               </button>
