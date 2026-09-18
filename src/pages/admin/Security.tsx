@@ -35,8 +35,8 @@ export default function Security() {
                     key={a.id} 
                     className="p-4 rounded-3xl border transition-all flex items-start justify-between gap-4"
                     style={{
-                      background: a.risk === 'critical' ? 'rgba(239,68,68,0.06)' : a.risk === 'high' ? 'rgba(245,158,11,0.06)' : '#16181C',
-                      borderColor: a.risk === 'critical' ? 'rgba(239,68,68,0.20)' : a.risk === 'high' ? 'rgba(245,158,11,0.20)' : 'rgba(255,255,255,0.10)'
+                      background: a.risk === 'critical' ? 'rgba(239,68,68,0.06)' : a.risk === 'high' ? 'rgba(245,158,11,0.06)' : 'rgb(var(--a-surface-mute))',
+                      borderColor: a.risk === 'critical' ? 'rgba(239,68,68,0.20)' : a.risk === 'high' ? 'rgba(245,158,11,0.20)' : 'rgb(var(--a-line))'
                     }}
                   >
                     <div className="flex gap-3 text-xs">
@@ -45,9 +45,9 @@ export default function Security() {
                           a.risk === 'critical' || a.risk === 'high' ? 'animate-pulse' : ''
                         }`}
                         style={{
-                          background: '#16181C',
-                          border: '1px solid rgba(255,255,255,0.10)',
-                          color: a.risk === 'critical' || a.risk === 'high' ? '#EF4444' : 'rgba(255,255,255,0.52)'
+                          background: 'rgb(var(--a-surface-mute))',
+                          border: '1px solid rgb(var(--a-line))',
+                          color: a.risk === 'critical' || a.risk === 'high' ? '#EF4444' : 'rgb(var(--a-ink-mute))'
                         }}
                       >
                         {a.type === 'failed_login' ? <Lock className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
@@ -114,7 +114,7 @@ export default function Security() {
                 style={{
                   background: 'rgba(245,158,11,0.06)',
                   borderColor: 'rgba(245,158,11,0.20)',
-                  color: 'rgba(255,255,255,0.52)'
+                  color: 'rgb(var(--a-ink-mute))'
                 }}
               >
                 <AlertOctagon className="w-5 h-5 text-[#FCD34D] flex-shrink-0" />

@@ -139,7 +139,7 @@ export default function Dashboard() {
       <div
         className="fc-card p-5 md:p-6 rounded-[24px] relative overflow-hidden backdrop-blur-lg border border-line"
         style={{
-          background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(249,115,22, 0.08) 0%, transparent 60%), #0E0F12'
+          background: 'radial-gradient(ellipse 70% 80% at 80% 20%, rgba(249,115,22, 0.08) 0%, transparent 60%), rgb(var(--a-surface))'
         }}
       >
         <div className="space-y-1">
@@ -204,7 +204,7 @@ export default function Dashboard() {
             key={stat.label}
             className="fc-card p-4 flex flex-col justify-between min-h-[120px] relative"
             style={{
-              background: `radial-gradient(circle at top right, ${stat.glow} 0%, transparent 60%), #0E0F12`
+              background: `radial-gradient(circle at top right, ${stat.glow} 0%, transparent 60%), rgb(var(--a-surface))`
             }}
           >
             <div className="flex justify-between items-start">
@@ -212,8 +212,8 @@ export default function Dashboard() {
               <div
                 className="w-7 h-7 rounded-lg flex items-center justify-center border"
                 style={{
-                  borderColor: '#16181C',
-                  background: '#16181C',
+                  borderColor: 'rgb(var(--a-surface-mute))',
+                  background: 'rgb(var(--a-surface-mute))',
                   color: stat.fill,
                 }}
               >
@@ -243,31 +243,31 @@ export default function Dashboard() {
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={WEEKLY_DATA} barSize={12} barGap={4}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#16181C" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--a-surface-mute))" />
                   <XAxis
                     dataKey="day"
-                    tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.36)' }}
+                    tick={{ fontSize: 10, fill: 'rgb(var(--a-ink-faint))' }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.36)' }}
+                    tick={{ fontSize: 10, fill: 'rgb(var(--a-ink-faint))' }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <Tooltip
-                    cursor={{ fill: '#16181C' }}
+                    cursor={{ fill: 'rgb(var(--a-surface-mute))' }}
                     contentStyle={{
-                      background: '#0E0F12',
-                      border: '1px solid rgba(255,255,255,0.10)',
+                      background: 'rgb(var(--a-surface))',
+                      border: '1px solid rgb(var(--a-line))',
                       borderRadius: '14px',
                       fontSize: '11px',
-                      color: '#FFFFFF',
+                      color: 'rgb(var(--a-ink))',
                     }}
                   />
                   <Legend
                     formatter={(value) => (
-                      <span style={{ color: 'rgba(255,255,255,0.52)', fontSize: 10, fontWeight: 600 }}>
+                      <span style={{ color: 'rgb(var(--a-ink-mute))', fontSize: 10, fontWeight: 600 }}>
                         {value === 'accepted' ? 'Accepted' : 'Rejected'}
                       </span>
                     )}
@@ -374,7 +374,7 @@ export default function Dashboard() {
           <div
             className="fc-card p-5 space-y-4 rounded-[24px] border border-line relative overflow-hidden"
             style={{
-              background: 'radial-gradient(circle at bottom right, rgba(234,88,12,0.06) 0%, transparent 60%), #0E0F12'
+              background: 'radial-gradient(circle at bottom right, rgba(234,88,12,0.06) 0%, transparent 60%), rgb(var(--a-surface))'
             }}
           >
             <div className="flex items-center gap-3">

@@ -61,7 +61,7 @@ export default function ApiDocs() {
         </div>
         <div className="divide-y divide-line">
           {mockApiEndpoints.map((ep, i) => {
-            const methodStyle = methodColors[ep.method] ?? { bg: '#16181C', text: 'rgba(255,255,255,0.52)' }
+            const methodStyle = methodColors[ep.method] ?? { bg: 'rgb(var(--a-surface-mute))', text: 'rgb(var(--a-ink-mute))' }
             return (
               <div key={i} className="flex flex-wrap md:flex-nowrap items-center gap-4 px-5 py-3.5 hover:bg-surface-mute transition-colors">
                 <span

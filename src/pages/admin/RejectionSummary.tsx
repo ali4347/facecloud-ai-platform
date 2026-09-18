@@ -81,7 +81,7 @@ export default function RejectionSummary() {
                 style={{
                   background: 'rgba(239,68,68,0.06)',
                   borderColor: 'rgba(239,68,68,0.20)',
-                  color: 'rgba(255,255,255,0.52)'
+                  color: 'rgb(var(--a-ink-mute))'
                 }}
               >
                 <AlertTriangle className="w-5 h-5 text-[#EF4444] flex-shrink-0" />

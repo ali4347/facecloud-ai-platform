@@ -12,12 +12,14 @@ export interface FaceCloudLogoProps {
   href?: string
   priority?: boolean
   decorative?: boolean
-  /** Surface the logo sits on. 'light' is used inside the dashboard shell. */
-  tone?: 'dark' | 'light'
+  /** Where the logo sits. 'app' is the dashboard shell, which themes its own
+   *  text colours; 'dark' is the black marketing site. */
+  tone?: 'dark' | 'app'
 }
 
-/* Two tones so the same mark works on the black marketing pages and on the
-   light app shell. Only colour changes — the shapes are identical. */
+/* Two tones so the same mark works on the marketing pages and in the app
+   shell. The mark itself is brand orange in both; only the wordmark colours
+   differ, and in the shell they follow the appearance tokens. */
 const toneConfig = {
   dark: {
     cloudFrom: '#F97316', cloudTo: '#EA580C',
@@ -28,9 +30,9 @@ const toneConfig = {
     roleText:  'bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent',
     ring:      'focus-visible:ring-[#F97316] hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]',
   },
-  light: {
-    cloudFrom: '#4F46E5', cloudTo: '#4338CA',
-    faceFrom:  '#6366F1', faceTo:  '#818CF8',
+  app: {
+    cloudFrom: '#F97316', cloudTo: '#EA580C',
+    faceFrom:  '#FB923C', faceTo:  '#FDBA74',
     faceText:  'text-ink',
     cloudText: 'text-accent',
     subText:   'text-ink-faint',

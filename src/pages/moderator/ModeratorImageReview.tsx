@@ -151,7 +151,7 @@ export default function ModeratorImageReview() {
                 <div className="space-y-1.5 text-center">
                   <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider block">Original Image</span>
                   <div className="aspect-[4/3] rounded-3xl border border-line flex items-center justify-center relative overflow-hidden"
-                    style={{ background: `radial-gradient(circle, #16181C, transparent), ${record.thumbnail}` }}
+                    style={{ background: `radial-gradient(circle, rgb(var(--a-surface-mute)), transparent), ${record.thumbnail}` }}
                   >
                     {record.isDuplicate && (
                       <div className="absolute top-3 left-3 p-1.5 bg-[#EF4444]/90 border border-red-500/30 rounded-xl text-[9px] font-bold text-white uppercase shadow-lg">
@@ -337,10 +337,10 @@ export default function ModeratorImageReview() {
                   value={targetFolder} 
                   onChange={e => setTargetFolder(e.target.value)}
                   className="fc-input text-ink"
-                  style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+                  style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
                 >
                   {mockGroups.map(g => (
-                    <option key={g.id} value={g.id} className="bg-[#0E0F12]">{g.label} ({g.id})</option>
+                    <option key={g.id} value={g.id} className="bg-[rgb(var(--a-surface))]">{g.label} ({g.id})</option>
                   ))}
                 </select>
               </div>
@@ -379,15 +379,15 @@ export default function ModeratorImageReview() {
                   value={rejectReason} 
                   onChange={e => setRejectReason(e.target.value)}
                   className="fc-input text-ink"
-                  style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+                  style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
                   required
                 >
-                  <option value="" className="bg-[#0E0F12]">-- Select Rejection Reason --</option>
-                  <option value="Image too blurry" className="bg-[#0E0F12]">Image too blurry</option>
-                  <option value="Too dark after enhancement" className="bg-[#0E0F12]">Too dark after enhancement</option>
-                  <option value="Multiple faces detected" className="bg-[#0E0F12]">Multiple faces detected</option>
-                  <option value="Face not detected" className="bg-[#0E0F12]">Face not detected</option>
-                  <option value="Face too small" className="bg-[#0E0F12]">Face too small</option>
+                  <option value="" className="bg-[rgb(var(--a-surface))]">-- Select Rejection Reason --</option>
+                  <option value="Image too blurry" className="bg-[rgb(var(--a-surface))]">Image too blurry</option>
+                  <option value="Too dark after enhancement" className="bg-[rgb(var(--a-surface))]">Too dark after enhancement</option>
+                  <option value="Multiple faces detected" className="bg-[rgb(var(--a-surface))]">Multiple faces detected</option>
+                  <option value="Face not detected" className="bg-[rgb(var(--a-surface))]">Face not detected</option>
+                  <option value="Face too small" className="bg-[rgb(var(--a-surface))]">Face too small</option>
                 </select>
               </div>
 
@@ -455,10 +455,10 @@ export default function ModeratorImageReview() {
                     value={targetFolder} 
                     onChange={e => setTargetFolder(e.target.value)}
                     className="fc-input text-ink"
-                    style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+                    style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
                   >
                     {mockGroups.map(g => (
-                      <option key={g.id} value={g.id} className="bg-[#0E0F12]">{g.label} ({g.id})</option>
+                      <option key={g.id} value={g.id} className="bg-[rgb(var(--a-surface))]">{g.label} ({g.id})</option>
                     ))}
                   </select>
                 </div>

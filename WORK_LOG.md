@@ -26,7 +26,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete (mock) | Queue, image review, members, batches, notifications, reports, audit, settings |
-| Branding + design system | ✅ Done | One palette site-wide: black, orange `#F97316`, white text. Public pages keep the monospace display face and glass panels; the dashboards use the same colours in a flatter card layout (scope `.fc-app`, Inter headings) |
+| Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere. Public pages are always black with the monospace display face; the dashboards share the palette in a flatter card layout (scope `.fc-app`, Inter headings) and switch between a dark and a light appearance |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Vercel | `vercel.json` SPA rewrite that skips files with extensions (so `/videos/*.mp4` serve) |
 | Backend database (PostgreSQL 16 + Prisma 5.22) | ✅ Schema + migration + seed | 15 models, 8 enums, migration `20260714_init`, 3 seeded accounts |
@@ -45,6 +45,27 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-09-18 — Dashboard appearance switch (dark and light both work)
+*Status: committed (this commit)*
+- The topbar's appearance button is now a real toggle. It switches the shell between the dark and the light
+  appearance, remembers the choice per browser in `localStorage` under `facecloud_theme`, and shows a sun in dark
+  and a moon in light. **Dark stays the default**, matching the marketing site.
+- Both appearances share one set of token names, so no component has two sets of rules. The tokens moved from fixed
+  hex values to CSS variables holding channel triples — `rgb(var(--a-ink) / <alpha-value>)` — which keeps Tailwind's
+  opacity modifiers (`bg-accent/20`, `text-ink-mute/60`) working. `.fc-app` defines the dark values and
+  `.fc-app[data-theme='light']` redefines the same names.
+- Orange is the accent in **both** appearances; it is the brand colour, not a dark-mode affordance. On white it is
+  deepened to `#EA580C` so it does not read as thin. Only the neutrals and shadows differ between appearances.
+- Converted the neutral colour literals still baked into 26 dashboard files (`#0E0F12`, `rgba(255,255,255,…)` and the
+  black shadow rgba values) to the same variables, so those surfaces follow the switch too. Scrims over photos were
+  left dark on purpose.
+- Status colours get a light-appearance override block: the 12% tints that work on a dark card need the dark end of
+  each ramp on white.
+- The logo's app tone now uses brand orange for the mark instead of the indigo left over from the earlier light
+  palette, and the tone is named `app` rather than `light` since it serves both appearances.
+- New file `src/lib/theme.ts` holds the stored-appearance helpers.
+- Verified by running the app and rendering the user dashboard in both appearances, plus the admin overview in light.
 
 ### 2026-09-18 — Dashboard switched to the site's black and orange palette
 *Status: committed (this commit)*
@@ -294,8 +315,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
 - `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
-- The topbar's appearance (sun) button is decorative chrome copied from the reference and does nothing. Either wire
-  it to a real light/dark switch or remove it.
+- The appearance choice is stored per browser and does not follow the operating system setting. That is deliberate
+  for now, since the public pages are dark regardless, but it means a visitor who prefers light has to click once.
 - Vite 8 / rolldown chunk warning: consider `build.chunkSizeWarningLimit` or dynamic imports for portals.
 
 ---

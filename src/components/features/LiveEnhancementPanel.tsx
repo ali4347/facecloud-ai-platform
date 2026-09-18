@@ -324,8 +324,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       const fontSize = Math.max(10, Math.min(12, width * 0.08))
 
       const parts: { text: string; color: string; sizeMultiplier?: number }[] = []
-      parts.push({ text: `Face ${index + 1}`, color: '#0E0F12' })
-      parts.push({ text: ' • ', color: 'rgba(255,255,255,0.36)' })
+      parts.push({ text: `Face ${index + 1}`, color: 'rgb(var(--a-surface))' })
+      parts.push({ text: ' • ', color: 'rgb(var(--a-ink-faint))' })
       parts.push({ text: `${detectionConf}%`, color: '#FB923C', sizeMultiplier: 0.9 })
 
       // Calculate label width
@@ -355,7 +355,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       }
 
       // Draw dark glass label background
-      drawRoundedRect(ctx, labelX, labelY, labelW, labelH, radius, 'rgba(0,0,0,0.45)', 'rgba(16,185,129, 0.35)')
+      drawRoundedRect(ctx, labelX, labelY, labelW, labelH, radius, 'rgb(var(--a-shadow-rgb) / 0.45)', 'rgba(16,185,129, 0.35)')
 
       // Draw text parts
       let currentX = labelX + paddingX
@@ -779,7 +779,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       )}
 
       {/* ─── Mode Tabs ─── */}
-      <div className="mb-5 flex items-center gap-1 p-1 rounded-2xl w-fit" style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}>
+      <div className="mb-5 flex items-center gap-1 p-1 rounded-2xl w-fit" style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}>
         <button
           onClick={() => setActiveTab('live')}
           className="px-5 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-2"
@@ -789,7 +789,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
             border: '1px solid rgba(249,115,22,0.35)',
             boxShadow: '0 0 20px rgba(249,115,22,0.15)',
           } : {
-            color: 'rgba(255,255,255,0.52)',
+            color: 'rgb(var(--a-ink-mute))',
             border: '1px solid transparent',
           }}
         >
@@ -805,7 +805,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
             border: '1px solid rgba(249,115,22,0.35)',
             boxShadow: '0 0 20px rgba(249,115,22,0.15)',
           } : {
-            color: 'rgba(255,255,255,0.52)',
+            color: 'rgb(var(--a-ink-mute))',
             border: '1px solid transparent',
           }}
         >
@@ -1094,7 +1094,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                         onChange={e => sld.set(Number(e.target.value))}
                         className="fc-range-slider w-full cursor-pointer h-1 rounded-full appearance-none animate-none"
                         style={{
-                          background: `linear-gradient(to right, #F97316 0%, #10B981 ${sld.val}%, rgba(255,255,255,0.10) ${sld.val}%)`
+                          background: `linear-gradient(to right, #F97316 0%, #10B981 ${sld.val}%, rgb(var(--a-line)) ${sld.val}%)`
                         }}
                       />
                     </div>
@@ -1250,8 +1250,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                         <div
                           className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0 transition-all duration-300"
                           style={{
-                            background: isComplete ? 'rgba(16,185,129,0.15)' : isCurrent ? 'rgba(249,115,22,0.20)' : '#16181C',
-                            border: `1px solid ${isComplete ? 'rgba(16,185,129,0.30)' : isCurrent ? 'rgba(249,115,22,0.40)' : 'rgba(255,255,255,0.10)'}`,
+                            background: isComplete ? 'rgba(16,185,129,0.15)' : isCurrent ? 'rgba(249,115,22,0.20)' : 'rgb(var(--a-surface-mute))',
+                            border: `1px solid ${isComplete ? 'rgba(16,185,129,0.30)' : isCurrent ? 'rgba(249,115,22,0.40)' : 'rgb(var(--a-line))'}`,
                           }}
                         >
                           {isComplete ? (
@@ -1272,7 +1272,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   })}
 
                   {/* Progress bar */}
-                  <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: '#16181C' }}>
+                  <div className="mt-4 h-1 rounded-full overflow-hidden" style={{ background: 'rgb(var(--a-surface-mute))' }}>
                     <div
                       className="h-full rounded-full transition-all duration-500 ease-out"
                       style={{
@@ -1335,7 +1335,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                     { label: 'Face Validation', value: enhancementMetrics.validation, color: '#10B981' },
                     { label: 'Output Resolution', value: enhancementMetrics.resolution, color: '#FB923C' },
                   ].map(metric => (
-                    <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: '#16181C', border: '1px solid #16181C' }}>
+                    <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-surface-mute))' }}>
                       <p className="text-[10px] text-ink-faint font-semibold uppercase tracking-wider">{metric.label}</p>
                       <p className="text-sm font-bold font-mono" style={{ color: metric.color }}>{metric.value}</p>
                     </div>

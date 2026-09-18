@@ -223,11 +223,11 @@ export default function GroupDetail() {
                         style={{ background: `linear-gradient(135deg, ${img.thumbnail} 0%, ${img.thumbnail}88 100%)` }}
                       >
                         <svg width="40" height="52" viewBox="0 0 56 72" fill="none" className="opacity-50">
-                          <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.36)" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" />
-                          <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
-                          <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
-                          <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.52)" strokeWidth="2" fill="none" strokeLinecap="round" />
-                          <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.10)" />
+                          <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgb(var(--a-ink-faint))" stroke="rgb(var(--a-ink-mute))" strokeWidth="1.5" />
+                          <circle cx="21" cy="24" r="4" fill="rgb(var(--a-ink-mute))" />
+                          <circle cx="35" cy="24" r="4" fill="rgb(var(--a-ink-mute))" />
+                          <path d="M18 36 Q28 42 38 36" stroke="rgb(var(--a-ink-mute))" strokeWidth="2" fill="none" strokeLinecap="round" />
+                          <path d="M8 72 C8 56 48 56 48 72" fill="rgb(var(--a-line))" />
                         </svg>
                         {/* Dim overlay + checkbox on hover / selected */}
                         <div className={`absolute inset-0 bg-black/40 transition-opacity duration-150 ${isSelected || false ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
@@ -280,11 +280,11 @@ export default function GroupDetail() {
                 style={{ background: `linear-gradient(135deg, ${repImage.thumbnail} 0%, ${repImage.thumbnail}88 100%)` }}
               >
                 <svg width="44" height="56" viewBox="0 0 56 72" fill="none" className="opacity-50">
-                  <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgba(255,255,255,0.36)" stroke="rgba(255,255,255,0.52)" strokeWidth="1.5" />
-                  <circle cx="21" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
-                  <circle cx="35" cy="24" r="4" fill="rgba(255,255,255,0.52)" />
-                  <path d="M18 36 Q28 42 38 36" stroke="rgba(255,255,255,0.52)" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M8 72 C8 56 48 56 48 72" fill="rgba(255,255,255,0.10)" />
+                  <ellipse cx="28" cy="28" rx="20" ry="24" fill="rgb(var(--a-ink-faint))" stroke="rgb(var(--a-ink-mute))" strokeWidth="1.5" />
+                  <circle cx="21" cy="24" r="4" fill="rgb(var(--a-ink-mute))" />
+                  <circle cx="35" cy="24" r="4" fill="rgb(var(--a-ink-mute))" />
+                  <path d="M18 36 Q28 42 38 36" stroke="rgb(var(--a-ink-mute))" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <path d="M8 72 C8 56 48 56 48 72" fill="rgb(var(--a-line))" />
                 </svg>
                 <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/40 text-[9px] text-white font-mono">
                   Representative

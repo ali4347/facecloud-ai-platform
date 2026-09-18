@@ -27,7 +27,7 @@ export default function SystemMonitoring() {
             </div>
             <div
               className="p-3 rounded-2xl flex items-center justify-center"
-              style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+              style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
             >
               <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
             </div>

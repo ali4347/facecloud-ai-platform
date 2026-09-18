@@ -25,16 +25,16 @@ export function RejectionReasonChart({ data = rejectionReasonsData }: RejectionR
         <Tooltip
           contentStyle={{
             background: '#fff',
-            border: '1px solid rgba(255,255,255,0.10)',
+            border: '1px solid rgb(var(--a-line))',
             borderRadius: '12px',
-            boxShadow: '0 4px 6px -1px rgba(0,0,0,0.45)',
+            boxShadow: '0 4px 6px -1px rgb(var(--a-shadow-rgb) / 0.45)',
           }}
           formatter={(value) => [`${value}%`, 'Share']}
         />
         <Legend
           iconType="circle"
           iconSize={8}
-          formatter={(value) => <span style={{ color: 'rgba(255,255,255,0.52)', fontSize: '12px' }}>{value}</span>}
+          formatter={(value) => <span style={{ color: 'rgb(var(--a-ink-mute))', fontSize: '12px' }}>{value}</span>}
         />
       </PieChart>
     </ResponsiveContainer>

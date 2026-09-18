@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, Search, Settings, History, Sun } from 'lucide-react'
+import { Menu, Search, Settings, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
 import { UserMenu } from '../ui/UserMenu'
+import type { Appearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 
 interface TopbarProps {
@@ -9,6 +10,8 @@ interface TopbarProps {
   onMenuClick?: () => void
   sidebarOpen?: boolean
   onCloseSidebar?: () => void
+  appearance?: Appearance
+  onToggleAppearance?: () => void
 }
 
 const roleUser = {
@@ -17,7 +20,7 @@ const roleUser = {
   moderator: { name: 'Vaneeza Sohaib',  email: 'vaneeza@facecloud.io',  initials: 'VS' },
 }
 
-export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar }: TopbarProps) {
+export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
   const sessionStr = localStorage.getItem('facecloud_session')
   const searchRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
@@ -72,7 +75,7 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar }: Topba
             placeholder="Search project..."
             aria-label="Search images, groups and jobs"
             className="w-full h-11 pl-10 pr-16 rounded-[14px] bg-surface border border-line text-[13px] text-ink
-                       placeholder:text-ink-faint shadow-[0_1px_2px_rgba(0,0,0,0.45)] outline-none
+                       placeholder:text-ink-faint shadow-[0_1px_2px_rgb(var(--a-shadow-rgb) / 0.45)] outline-none
                        transition-colors focus:border-accent-soft"
           />
           <span className="fc-kbd absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center">
@@ -85,8 +88,17 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar }: Topba
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        <button type="button" className="fc-icon-btn hidden sm:inline-flex" aria-label="Appearance" title="Appearance">
-          <Sun className="w-[18px] h-[18px]" />
+        <button
+          type="button"
+          onClick={onToggleAppearance}
+          className="fc-icon-btn hidden sm:inline-flex"
+          aria-label={appearance === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance'}
+          title={appearance === 'dark' ? 'Light appearance' : 'Dark appearance'}
+          aria-pressed={appearance === 'light'}
+        >
+          {appearance === 'dark'
+            ? <Sun className="w-[18px] h-[18px]" />
+            : <Moon className="w-[18px] h-[18px]" />}
         </button>
         <button type="button" className="fc-icon-btn hidden sm:inline-flex" aria-label="Settings" title="Settings">
           <Settings className="w-[18px] h-[18px]" />

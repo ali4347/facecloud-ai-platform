@@ -73,11 +73,11 @@ export default function ReviewQueue() {
           value={filterType}
           onChange={e => setFilterType(e.target.value as any)}
           className="fc-input text-ink"
-          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+          style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
         >
-          <option value="all" className="bg-[#0E0F12]">All Queue Types</option>
-          <option value="rejected" className="bg-[#0E0F12]">Rejections Only</option>
-          <option value="duplicate" className="bg-[#0E0F12]">Duplicates Only</option>
+          <option value="all" className="bg-[rgb(var(--a-surface))]">All Queue Types</option>
+          <option value="rejected" className="bg-[rgb(var(--a-surface))]">Rejections Only</option>
+          <option value="duplicate" className="bg-[rgb(var(--a-surface))]">Duplicates Only</option>
         </select>
 
         {/* Filter Reason */}
@@ -85,14 +85,14 @@ export default function ReviewQueue() {
           value={filterReason}
           onChange={e => setFilterReason(e.target.value)}
           className="fc-input text-ink"
-          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+          style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
         >
-          <option value="all" className="bg-[#0E0F12]">All Flags/Reasons</option>
-          <option value="blurry" className="bg-[#0E0F12]">Too Blurry</option>
-          <option value="dark" className="bg-[#0E0F12]">Too Dark</option>
-          <option value="multiple" className="bg-[#0E0F12]">Multiple Faces</option>
-          <option value="not detected" className="bg-[#0E0F12]">Face Not Detected</option>
-          <option value="duplicate" className="bg-[#0E0F12]">Duplicate Upload</option>
+          <option value="all" className="bg-[rgb(var(--a-surface))]">All Flags/Reasons</option>
+          <option value="blurry" className="bg-[rgb(var(--a-surface))]">Too Blurry</option>
+          <option value="dark" className="bg-[rgb(var(--a-surface))]">Too Dark</option>
+          <option value="multiple" className="bg-[rgb(var(--a-surface))]">Multiple Faces</option>
+          <option value="not detected" className="bg-[rgb(var(--a-surface))]">Face Not Detected</option>
+          <option value="duplicate" className="bg-[rgb(var(--a-surface))]">Duplicate Upload</option>
         </select>
 
         {/* Filter Risk */}
@@ -100,13 +100,13 @@ export default function ReviewQueue() {
           value={filterRisk}
           onChange={e => setFilterRisk(e.target.value)}
           className="fc-input text-ink"
-          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+          style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
         >
-          <option value="all" className="bg-[#0E0F12]">All Risk Levels</option>
-          <option value="low" className="bg-[#0E0F12]">Low Risk</option>
-          <option value="medium" className="bg-[#0E0F12]">Medium Risk</option>
-          <option value="high" className="bg-[#0E0F12]">High Risk</option>
-          <option value="critical" className="bg-[#0E0F12]">Critical Risk</option>
+          <option value="all" className="bg-[rgb(var(--a-surface))]">All Risk Levels</option>
+          <option value="low" className="bg-[rgb(var(--a-surface))]">Low Risk</option>
+          <option value="medium" className="bg-[rgb(var(--a-surface))]">Medium Risk</option>
+          <option value="high" className="bg-[rgb(var(--a-surface))]">High Risk</option>
+          <option value="critical" className="bg-[rgb(var(--a-surface))]">Critical Risk</option>
         </select>
 
         {/* Sort */}
@@ -114,10 +114,10 @@ export default function ReviewQueue() {
           value={sortOrder}
           onChange={e => setSortOrder(e.target.value as any)}
           className="fc-input text-ink"
-          style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+          style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
         >
-          <option value="newest" className="bg-[#0E0F12]">Sort: Newest First</option>
-          <option value="oldest" className="bg-[#0E0F12]">Sort: Oldest First</option>
+          <option value="newest" className="bg-[rgb(var(--a-surface))]">Sort: Newest First</option>
+          <option value="oldest" className="bg-[rgb(var(--a-surface))]">Sort: Oldest First</option>
         </select>
       </div>
 

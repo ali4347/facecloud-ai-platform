@@ -15,7 +15,7 @@ const statusConfig = {
   error:      { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.28)', text: '#F87171', dot: '#EF4444' },
   info:       { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.28)', text: '#FB923C', dot: '#F97316' },
   purple:     { bg: 'rgba(139,92,246,0.12)', border: 'rgba(139,92,246,0.28)', text: '#A78BFA', dot: '#8B5CF6' },
-  muted:      { bg: '#16181C', border: 'rgba(255,255,255,0.10)', text: 'rgba(255,255,255,0.52)', dot: 'rgba(255,255,255,0.36)' },
+  muted:      { bg: 'rgb(var(--a-surface-mute))', border: 'rgb(var(--a-line))', text: 'rgb(var(--a-ink-mute))', dot: 'rgb(var(--a-ink-faint))' },
   processing: { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.28)', text: '#FB923C', dot: '#F97316' },
 }
 

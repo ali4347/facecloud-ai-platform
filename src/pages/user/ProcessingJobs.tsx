@@ -106,11 +106,11 @@ export default function ProcessingJobs() {
       {/* Summary stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: 'Total Jobs', value: totalJobs, border: 'rgba(255,255,255,0.10)' },
+          { label: 'Total Jobs', value: totalJobs, border: 'rgb(var(--a-line))' },
           { label: 'Processing', value: processingJobs, border: 'rgba(249,115,22,0.25)', highlight: 'text-[#FB923C]' },
           { label: 'Completed', value: completedJobs, border: 'rgba(16,185,129,0.25)', highlight: 'text-[#10B981]' },
           { label: 'Rejected', value: rejectedJobs, border: 'rgba(239,68,68,0.25)', highlight: 'text-[#EF4444]' },
-          { label: 'Avg Time', value: avgTime, border: 'rgba(255,255,255,0.10)' }
+          { label: 'Avg Time', value: avgTime, border: 'rgb(var(--a-line))' }
         ].map((stat, i) => (
           <div 
             key={i} 

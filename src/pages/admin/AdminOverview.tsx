@@ -43,10 +43,10 @@ export default function AdminOverview() {
                   <stop offset="95%" stopColor="#EA580C" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.10)" />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.52)' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#0E0F12', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '16px', fontSize: '11px', color: '#FFFFFF' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--a-line))" />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'rgb(var(--a-ink-mute))' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'rgb(var(--a-ink-mute))' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: 'rgb(var(--a-surface))', border: '1px solid rgb(var(--a-line))', borderRadius: '16px', fontSize: '11px', color: 'rgb(var(--a-ink))' }} />
               <Area type="monotone" dataKey="uploads" stroke="#F97316" fill="url(#gUploads)" strokeWidth={2} name="Uploads" />
               <Area type="monotone" dataKey="enhanced" stroke="#EA580C" fill="url(#gEnhanced)" strokeWidth={2} name="Enhanced" />
             </AreaChart>
@@ -62,7 +62,7 @@ export default function AdminOverview() {
       <ChartCard title="Storage Usage" subtitle={`${adminStats.storageUsedGB} GB used of ${adminStats.storageTotalGB} GB`} delay={0.2}>
         <div className="flex items-center gap-4">
           <div className="flex-1">
-            <div className="h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.10)' }}>
+            <div className="h-3 rounded-full overflow-hidden" style={{ background: 'rgb(var(--a-line))' }}>
               <div
                 className="h-full bg-gradient-to-r from-[#F97316] to-[#10B981] rounded-full transition-all"
                 style={{ width: `${storagePercent}%` }}

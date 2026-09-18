@@ -549,36 +549,77 @@ section[id] {
    ═══════════════════════════════════════════════════════════════════════ */
 
 .fc-app {
-  --a-page:    #000000;
-  --a-surface: #0E0F12;
-  --a-mute:    #16181C;
-  --a-sunk:    #1C1F24;
+  /* Channel triples, so Tailwind's opacity modifiers keep working.
+     Dark is the default appearance; the light block below only redefines
+     these same names, which is why no component needs a second set of rules. */
+  --a-surface:      14 15 18;      /* cards */
+  --a-surface-soft:  0  0  0;      /* page */
+  --a-surface-mute: 22 24 28;      /* inset fills, tracks */
+  --a-surface-sunk: 28 31 36;      /* pressed / deep inset */
 
-  --a-ink:       #FFFFFF;
-  --a-ink-soft:  rgba(255,255,255,0.72);
-  --a-ink-mute:  rgba(255,255,255,0.52);
-  --a-ink-faint: rgba(255,255,255,0.36);
+  --a-ink:       255 255 255;
+  --a-ink-soft:  190 194 201;
+  --a-ink-mute:  143 147 155;
+  --a-ink-faint: 106 110 118;
 
-  --a-line:        rgba(255,255,255,0.10);
-  --a-line-soft:   rgba(255,255,255,0.06);
-  --a-line-strong: rgba(255,255,255,0.18);
+  --a-line:         38 40 45;
+  --a-line-soft:    26 28 32;
+  --a-line-strong:  58 61 68;
 
-  --a-accent:      #F97316;
-  --a-accent-soft: #FB923C;
-  --a-accent-deep: #EA580C;
-  --a-accent-tint: rgba(249,115,22,0.12);
+  --a-accent:      249 115 22;
+  --a-accent-soft: 251 146 60;
+  --a-accent-deep: 234  88 12;
+  --a-accent-tint:  43  26 14;
+
+  --a-shadow-rgb: 0 0 0;
+  --a-shadow:      0 1px 2px rgb(var(--a-shadow-rgb) / 0.40), 0 8px 24px rgb(var(--a-shadow-rgb) / 0.35);
+  --a-shadow-md:   0 1px 2px rgb(var(--a-shadow-rgb) / 0.45), 0 12px 32px rgb(var(--a-shadow-rgb) / 0.45);
+  --a-shadow-lg:   0 2px 4px rgb(var(--a-shadow-rgb) / 0.50), 0 20px 48px rgb(var(--a-shadow-rgb) / 0.55);
+  --a-shadow-pill: 0 1px 2px rgb(var(--a-shadow-rgb) / 0.45), 0 4px 12px rgb(var(--a-shadow-rgb) / 0.35);
 
   --a-success: #10B981;
   --a-warning: #F59E0B;
   --a-danger:  #EF4444;
 
-  --a-shadow:      0 1px 2px rgba(0,0,0,0.40), 0 8px 24px rgba(0,0,0,0.35);
-  --a-shadow-md:   0 1px 2px rgba(0,0,0,0.45), 0 12px 32px rgba(0,0,0,0.45);
-  --a-shadow-pill: 0 1px 2px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.35);
-
-  background: var(--a-page);
-  color: var(--a-ink);
+  background: rgb(var(--a-surface-soft));
+  color: rgb(var(--a-ink));
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+/* Light appearance — same tokens, lighter values. Orange stays the accent in
+   both, since it is the brand colour, not a dark-mode affordance. */
+.fc-app[data-theme='light'] {
+  --a-surface:      255 255 255;
+  --a-surface-soft: 247 248 250;
+  --a-surface-mute: 241 243 247;
+  --a-surface-sunk: 233 236 242;
+
+  --a-ink:        15  23  42;
+  --a-ink-soft:   51  65  85;
+  --a-ink-mute:  100 116 139;
+  --a-ink-faint: 148 163 184;
+
+  --a-line:        230 233 239;
+  --a-line-soft:   240 242 246;
+  --a-line-strong: 214 219 228;
+
+  --a-accent:      234  88 12;   /* deeper orange: #F97316 on white is thin */
+  --a-accent-soft: 249 115 22;
+  --a-accent-deep: 194  65 12;
+  --a-accent-tint: 255 237 213;
+
+  --a-shadow-rgb: 15 23 42;
+  --a-shadow:      0 1px 2px rgb(var(--a-shadow-rgb) / 0.04), 0 8px 24px rgb(var(--a-shadow-rgb) / 0.05);
+  --a-shadow-md:   0 1px 2px rgb(var(--a-shadow-rgb) / 0.05), 0 12px 32px rgb(var(--a-shadow-rgb) / 0.07);
+  --a-shadow-lg:   0 2px 4px rgb(var(--a-shadow-rgb) / 0.05), 0 20px 48px rgb(var(--a-shadow-rgb) / 0.09);
+  --a-shadow-pill: 0 1px 2px rgb(var(--a-shadow-rgb) / 0.06), 0 4px 12px rgb(var(--a-shadow-rgb) / 0.06);
+
+  --a-success: #047857;
+  --a-warning: #B45309;
+  --a-danger:  #B91C1C;
+
+  color-scheme: light;
 }
 
 /* Headings drop the monospace display face — the app reads as a product,
@@ -592,15 +633,15 @@ section[id] {
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--a-ink);
+  color: rgb(var(--a-ink));
 }
 
 .fc-app ::-webkit-scrollbar        { width: 10px; height: 10px; }
 .fc-app ::-webkit-scrollbar-track  { background: transparent; }
 .fc-app ::-webkit-scrollbar-thumb  {
-  background: rgba(255,255,255,0.14);
+  background: rgb(var(--a-line-strong));
   border-radius: 9999px;
-  border: 3px solid var(--a-page);
+  border: 3px solid rgb(var(--a-surface-soft));
 }
 .fc-app ::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.45); }
 
@@ -608,15 +649,15 @@ section[id] {
 
 .fc-app.fc-app-bg,
 .fc-app .fc-app-bg {
-  background: var(--a-page);
+  background: rgb(var(--a-surface-soft));
 }
 
 .fc-app .fc-panel,
 .fc-app .fc-card {
-  background: var(--a-surface);
+  background: rgb(var(--a-surface));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid var(--a-line);
+  border: 1px solid rgb(var(--a-line));
   border-radius: 20px;
   box-shadow: var(--a-shadow);
   transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
@@ -630,7 +671,7 @@ section[id] {
 }
 
 .fc-app .fc-panel-strong {
-  background: var(--a-surface);
+  background: rgb(var(--a-surface));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: 1px solid rgba(249,115,22,0.22);
@@ -640,25 +681,25 @@ section[id] {
 
 .fc-app .liquid-glass,
 .fc-app .fc-dark-glass {
-  background: var(--a-surface);
+  background: rgb(var(--a-surface));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid var(--a-line);
+  border: 1px solid rgb(var(--a-line));
   box-shadow: var(--a-shadow);
 }
 .fc-app .liquid-glass::before { display: none; }
 
 .fc-app .glass-pill {
-  background: var(--a-surface);
+  background: rgb(var(--a-surface));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid var(--a-line);
+  border: 1px solid rgb(var(--a-line));
   box-shadow: var(--a-shadow-pill);
 }
 
 .fc-app .fc-glass-hover:hover {
   transform: translateY(-1px);
-  background: var(--a-surface);
+  background: rgb(var(--a-surface));
   border-color: rgba(249,115,22,0.28);
   box-shadow: var(--a-shadow-md);
 }
@@ -668,7 +709,7 @@ section[id] {
 /* Primary is the brand orange with white text — the site's main action. */
 .fc-app .fc-btn-primary {
   background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
-  color: #FFFFFF;
+  color: rgb(var(--a-ink));
   border: none;
   border-radius: 14px;
   box-shadow: 0 4px 18px rgba(249,115,22,0.30);
@@ -678,35 +719,35 @@ section[id] {
   transform: translateY(-1px);
 }
 .fc-app .fc-btn-primary:disabled {
-  background: var(--a-mute);
-  color: var(--a-ink-faint);
+  background: rgb(var(--a-surface-mute));
+  color: rgb(var(--a-ink-faint));
   box-shadow: none;
   opacity: 1;
 }
 
 .fc-app .fc-btn-secondary {
-  background: var(--a-mute);
-  border: 1px solid var(--a-line);
+  background: rgb(var(--a-surface-mute));
+  border: 1px solid rgb(var(--a-line));
   border-radius: 14px;
-  color: var(--a-ink-soft);
+  color: rgb(var(--a-ink-soft));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
 }
 .fc-app .fc-btn-secondary:hover {
-  background: var(--a-sunk);
+  background: rgb(var(--a-surface-sunk));
   border-color: rgba(249,115,22,0.35);
-  color: var(--a-ink);
+  color: rgb(var(--a-ink));
   box-shadow: none;
 }
 
 .fc-app .fc-btn-ghost {
   border-radius: 12px;
-  color: var(--a-ink-mute);
+  color: rgb(var(--a-ink-mute));
 }
 .fc-app .fc-btn-ghost:hover {
-  background: var(--a-mute);
-  color: var(--a-ink);
+  background: rgb(var(--a-surface-mute));
+  color: rgb(var(--a-ink));
 }
 
 .fc-app .fc-btn-success {
@@ -730,46 +771,46 @@ section[id] {
 }
 
 .fc-app .fc-btn-tier-secondary {
-  background: var(--a-mute);
+  background: rgb(var(--a-surface-mute));
   border: 1px solid rgba(249,115,22,0.45);
-  color: var(--a-ink);
+  color: rgb(var(--a-ink));
 }
 
 /* ── Inputs ───────────────────────────────────────────────────────────── */
 
 .fc-app .fc-input {
-  background: var(--a-mute);
-  border: 1px solid var(--a-line);
+  background: rgb(var(--a-surface-mute));
+  border: 1px solid rgb(var(--a-line));
   border-radius: 14px;
-  color: var(--a-ink);
+  color: rgb(var(--a-ink));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-.fc-app .fc-input::placeholder { color: var(--a-ink-faint); }
+.fc-app .fc-input::placeholder { color: rgb(var(--a-ink-faint)); }
 .fc-app .fc-input:focus {
   border-color: rgba(249,115,22,0.55);
   box-shadow: 0 0 0 4px rgba(249,115,22,0.12);
 }
 
 .fc-app select.fc-input,
-.fc-app .fc-input option { color: var(--a-ink); background: var(--a-mute); }
+.fc-app .fc-input option { color: rgb(var(--a-ink)); background: rgb(var(--a-surface-mute)); }
 
-.fc-app textarea { color: var(--a-ink); }
+.fc-app textarea { color: rgb(var(--a-ink)); }
 
 /* ── Tables ───────────────────────────────────────────────────────────── */
 
 .fc-app .fc-table th {
-  background: var(--a-mute);
-  color: var(--a-ink-mute);
-  border-bottom: 1px solid var(--a-line);
+  background: rgb(var(--a-surface-mute));
+  color: rgb(var(--a-ink-mute));
+  border-bottom: 1px solid rgb(var(--a-line));
   font-weight: 600;
   letter-spacing: 0.06em;
 }
 .fc-app .fc-table td {
-  color: var(--a-ink-soft);
-  border-top: 1px solid var(--a-line-soft);
+  color: rgb(var(--a-ink-soft));
+  border-top: 1px solid rgb(var(--a-line-soft));
 }
-.fc-app .fc-table tr:hover td { background: rgba(255,255,255,0.03); }
+.fc-app .fc-table tr:hover td { background: rgb(var(--a-surface-mute)); }
 
 /* ── Badges ───────────────────────────────────────────────────────────── */
 
@@ -784,10 +825,10 @@ section[id] {
 }
 .fc-app .badge-info,
 .fc-app .badge-purple {
-  background: var(--a-accent-tint); border-color: rgba(249,115,22,0.28); color: var(--a-accent-soft);
+  background: rgb(var(--a-accent-tint)); border-color: rgba(249,115,22,0.28); color: rgb(var(--a-accent-soft));
 }
 .fc-app .badge-muted {
-  background: var(--a-mute); border-color: var(--a-line); color: var(--a-ink-mute);
+  background: rgb(var(--a-surface-mute)); border-color: rgb(var(--a-line)); color: rgb(var(--a-ink-mute));
 }
 
 /* ── Sidebar navigation ───────────────────────────────────────────────── */
@@ -796,18 +837,18 @@ section[id] {
    marker, which is what carries the selection. */
 .fc-app .sidebar-item {
   border-radius: 14px;
-  color: var(--a-ink-mute);
+  color: rgb(var(--a-ink-mute));
   font-weight: 500;
 }
 .fc-app .sidebar-item:hover {
-  background: rgba(255,255,255,0.05);
-  color: var(--a-ink);
+  background: rgb(var(--a-surface-mute));
+  color: rgb(var(--a-ink));
 }
 .fc-app .sidebar-item-active {
   border-radius: 14px;
-  background: var(--a-mute);
+  background: rgb(var(--a-surface-mute));
   border: 1px solid rgba(249,115,22,0.24);
-  color: var(--a-ink);
+  color: rgb(var(--a-ink));
   box-shadow: none;
 }
 
@@ -834,23 +875,23 @@ section[id] {
   -webkit-text-fill-color: transparent;
 }
 
-.fc-app .text-dark { color: var(--a-ink) !important; }
+.fc-app .text-dark { color: rgb(var(--a-ink)) !important; }
 
-.fc-app .fc-range-slider { accent-color: var(--a-accent); }
+.fc-app .fc-range-slider { accent-color: rgb(var(--a-accent)); }
 .fc-app .fc-range-slider::-webkit-slider-thumb {
-  background: var(--a-accent);
-  border-color: #FFFFFF;
+  background: rgb(var(--a-accent));
+  border-color: rgb(var(--a-ink));
   box-shadow: 0 0 10px rgba(249,115,22,0.6);
 }
 .fc-app .fc-range-slider::-moz-range-thumb {
-  background: var(--a-accent);
-  border-color: #FFFFFF;
+  background: rgb(var(--a-accent));
+  border-color: rgb(var(--a-ink));
   box-shadow: 0 0 10px rgba(249,115,22,0.6);
 }
 
 /* Recharts chrome */
-.fc-app .recharts-cartesian-axis-tick text { fill: var(--a-ink-faint); }
-.fc-app .recharts-cartesian-grid line { stroke: var(--a-line-soft); }
+.fc-app .recharts-cartesian-axis-tick text { fill: rgb(var(--a-ink-faint)); }
+.fc-app .recharts-cartesian-grid line { stroke: rgb(var(--a-line-soft)); }
 
 /* ── Building blocks used by the shell ────────────────────────────────── */
 
@@ -859,7 +900,7 @@ section[id] {
   display: inline-flex;
   padding: 4px;
   gap: 2px;
-  background: var(--a-mute, #16181C);
+  background: var(--a-mute, rgb(var(--a-surface-mute)));
   border-radius: 14px;
 }
 .fc-seg-item {
@@ -867,15 +908,15 @@ section[id] {
   border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--a-ink-mute, rgba(255,255,255,0.52));
+  color: var(--a-ink-mute, rgb(var(--a-ink-mute)));
   cursor: pointer;
   transition: background 160ms ease, color 160ms ease;
 }
-.fc-seg-item:hover { color: var(--a-ink, #FFFFFF); }
+.fc-seg-item:hover { color: var(--a-ink, rgb(var(--a-ink))); }
 .fc-seg-item[aria-pressed='true'],
 .fc-seg-item[data-active='true'] {
-  background: rgba(249,115,22,0.14);
-  color: #FB923C;
+  background: rgb(var(--a-accent-tint));
+  color: rgb(var(--a-accent-deep));
 }
 
 /* Round chrome button in the topbar */
@@ -886,15 +927,15 @@ section[id] {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: var(--a-surface, #0E0F12);
-  border: 1px solid var(--a-line, rgba(255,255,255,0.10));
-  color: var(--a-ink-mute, rgba(255,255,255,0.52));
+  background: var(--a-surface, rgb(var(--a-surface)));
+  border: 1px solid var(--a-line, rgb(var(--a-line)));
+  color: var(--a-ink-mute, rgb(var(--a-ink-mute)));
   transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
   cursor: pointer;
 }
 .fc-icon-btn:hover {
-  background: var(--a-mute, #16181C);
-  color: var(--a-ink, #FFFFFF);
+  background: var(--a-mute, rgb(var(--a-surface-mute)));
+  color: var(--a-ink, rgb(var(--a-ink)));
   border-color: rgba(249,115,22,0.35);
 }
 
@@ -903,9 +944,9 @@ section[id] {
   font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 500;
-  color: var(--a-ink-faint, rgba(255,255,255,0.36));
-  background: var(--a-mute, #16181C);
-  border: 1px solid var(--a-line, rgba(255,255,255,0.10));
+  color: var(--a-ink-faint, rgb(var(--a-ink-faint)));
+  background: var(--a-mute, rgb(var(--a-surface-mute)));
+  border: 1px solid var(--a-line, rgb(var(--a-line)));
   border-radius: 7px;
   padding: 2px 7px;
 }
@@ -917,7 +958,60 @@ section[id] {
 .fc-app select:focus-visible,
 .fc-app textarea:focus-visible,
 .fc-app [tabindex]:focus-visible {
-  outline: 2px solid var(--a-accent);
+  outline: 2px solid rgb(var(--a-accent));
   outline-offset: 2px;
   border-radius: 10px;
+}
+
+
+/* ── Light appearance: status colours ──────────────────────────────────
+   The tints above are tuned for a dark card. On white the same 12% washes
+   need the dark end of each ramp for the text to stay legible. */
+
+.fc-app[data-theme='light'] .badge-success {
+  background: #ECFDF5; border-color: #A7F3D0; color: #047857;
+}
+.fc-app[data-theme='light'] .badge-error {
+  background: #FEF2F2; border-color: #FECACA; color: #B91C1C;
+}
+.fc-app[data-theme='light'] .badge-warning {
+  background: #FFFBEB; border-color: #FDE68A; color: #B45309;
+}
+.fc-app[data-theme='light'] .badge-info,
+.fc-app[data-theme='light'] .badge-purple {
+  background: rgb(var(--a-accent-tint)); border-color: rgba(234,88,12,0.28); color: rgb(var(--a-accent-deep));
+}
+
+.fc-app[data-theme='light'] .fc-btn-danger {
+  background: #FEF2F2;
+  border-color: #FECACA;
+  color: #B91C1C;
+}
+.fc-app[data-theme='light'] .fc-btn-danger:hover {
+  background: #FEE2E2;
+  border-color: #FCA5A5;
+}
+
+.fc-app[data-theme='light'] .fc-btn-success {
+  background: #047857;
+  color: #FFFFFF;
+}
+.fc-app[data-theme='light'] .fc-btn-success:hover { background: #065F46; }
+
+.fc-app[data-theme='light'] .upload-dropzone {
+  background: rgb(var(--a-surface-mute));
+  border-color: rgb(var(--a-line-strong));
+}
+.fc-app[data-theme='light'] .upload-dropzone:hover,
+.fc-app[data-theme='light'] .upload-dropzone.drag-active {
+  background: rgb(var(--a-accent-tint));
+  border-color: rgb(var(--a-accent));
+}
+
+/* The sidebar's selected row reads as a raised white pill on light, and as a
+   lifted panel with an orange edge on dark. */
+.fc-app[data-theme='light'] .sidebar-item-active {
+  background: rgb(var(--a-surface));
+  border-color: rgb(var(--a-line));
+  box-shadow: var(--a-shadow-pill);
 }

@@ -46,7 +46,7 @@ export default function Downloads() {
 
       {/* Summary bar */}
       <div className="flex items-center gap-4 px-5 py-3.5 rounded-2xl text-xs font-medium text-ink-mute"
-        style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+        style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
       >
         <Clock className="w-4 h-4 text-[#FB923C] shrink-0" />
         <span>All download links are secure and time-limited. Copy a link to share or re-download from any device.</span>
@@ -95,9 +95,9 @@ export default function Downloads() {
                   onClick={() => copyLink(dl.id, dl.secureLink)}
                   className="w-8 h-8 rounded-xl border flex items-center justify-center transition-all shrink-0"
                   style={{
-                    borderColor: copied ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.10)',
-                    background: copied ? 'rgba(16,185,129,0.06)' : '#16181C',
-                    color: copied ? '#10B981' : 'rgba(255,255,255,0.36)',
+                    borderColor: copied ? 'rgba(16,185,129,0.4)' : 'rgb(var(--a-line))',
+                    background: copied ? 'rgba(16,185,129,0.06)' : 'rgb(var(--a-surface-mute))',
+                    color: copied ? '#10B981' : 'rgb(var(--a-ink-faint))',
                   }}
                   title="Copy secure link"
                 >

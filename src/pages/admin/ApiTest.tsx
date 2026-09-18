@@ -79,7 +79,7 @@ export default function ApiTest() {
                     value={method} 
                     onChange={e => setMethod(e.target.value as any)}
                     className="fc-input !py-3 !px-2 text-xs text-ink"
-                    style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+                    style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
                   >
                     <option value="GET" className="bg-white text-ink">GET</option>
                     <option value="POST" className="bg-white text-ink">POST</option>

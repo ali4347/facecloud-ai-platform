@@ -139,7 +139,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
           <FaceCloudLogo
             variant="horizontal"
             size="sm"
-            tone="light"
+            tone="app"
             showSubtitle={false}
             href={roleHome[role]}
             priority={true}

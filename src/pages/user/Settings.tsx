@@ -140,7 +140,7 @@ function NotificationSettings() {
         style={{
           background: 'rgba(16,185,129,0.04)',
           border: '1px solid rgba(16,185,129,0.15)',
-          color: 'rgba(255,255,255,0.52)',
+          color: 'rgb(var(--a-ink-mute))',
         }}
       >
         <p className="font-bold" style={{ color: '#10B981' }}>Rejection emails are enabled by default</p>

@@ -32,9 +32,9 @@ export default function ActivityLogs() {
                 onClick={() => setFilter(f)}
                 className="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all capitalize cursor-pointer"
                 style={{
-                  background: isActive ? 'rgba(249,115,22, 0.14)' : '#16181C',
-                  border: isActive ? '1px solid rgba(249,115,22, 0.24)' : '1px solid rgba(255,255,255,0.10)',
-                  color: isActive ? '#FB923C' : 'rgba(255,255,255,0.52)',
+                  background: isActive ? 'rgba(249,115,22, 0.14)' : 'rgb(var(--a-surface-mute))',
+                  border: isActive ? '1px solid rgba(249,115,22, 0.24)' : '1px solid rgb(var(--a-line))',
+                  color: isActive ? '#FB923C' : 'rgb(var(--a-ink-mute))',
                   boxShadow: isActive ? '0 0 15px rgba(249,115,22, 0.1)' : 'none',
                 }}
               >

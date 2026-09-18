@@ -64,7 +64,7 @@ function SliderRow({ label, icon, value, onChange, color: _color }: {
         onChange={e => onChange(Number(e.target.value))}
         className="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-border"
         style={{
-          background: `linear-gradient(to right, var(--tw-gradient-from) 0%, var(--tw-gradient-to) ${value}%, rgba(255,255,255,0.10) ${value}%)`,
+          background: `linear-gradient(to right, var(--tw-gradient-from) 0%, var(--tw-gradient-to) ${value}%, rgb(var(--a-line)) ${value}%)`,
         }}
       />
     </div>

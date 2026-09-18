@@ -195,7 +195,7 @@ export default function MemberManagement() {
                                 Locked
                               </span>
                               {/* Hover Tooltip */}
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[#0E0F12]/95 border border-line rounded-xl text-[9px] text-[#EF4444] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-[rgb(var(--a-surface))]/95 border border-line rounded-xl text-[9px] text-[#EF4444] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
                                 You don't have permission to manage this account.
                               </div>
                             </div>
@@ -302,10 +302,10 @@ export default function MemberManagement() {
                   value={inviteRole}
                   onChange={e => setInviteRole(e.target.value as any)}
                   className="fc-input text-ink"
-                  style={{ background: '#16181C', border: '1px solid rgba(255,255,255,0.10)' }}
+                  style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-line))' }}
                   disabled
                 >
-                  <option value="user" className="bg-[#0E0F12]">User (Standard workspace)</option>
+                  <option value="user" className="bg-[rgb(var(--a-surface))]">User (Standard workspace)</option>
                 </select>
                 <span className="text-[9px] text-[#FCD34D]/70 mt-1 block">Moderators can only invite standard user accounts.</span>
               </div>

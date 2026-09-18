@@ -164,7 +164,7 @@ export default function BatchManagement() {
                                 batch.status === 'completed' ? '#10B981' :
                                 batch.status === 'processing' ? '#F97316' :
                                 batch.status === 'failed' ? '#EF4444' :
-                                batch.status === 'cancelled' ? 'rgba(255,255,255,0.10)' :
+                                batch.status === 'cancelled' ? 'rgb(var(--a-line))' :
                                 '#F59E0B'
                             }}
                           />
@@ -198,7 +198,7 @@ export default function BatchManagement() {
                                 <span className="text-[10px] text-ink-faint font-semibold cursor-not-allowed italic flex items-center gap-1.5 px-3 py-2 bg-surface-mute border border-line rounded-xl">
                                   <ShieldAlert className="w-3.5 h-3.5" /> Locked
                                 </span>
-                                <div className="absolute bottom-full right-0 mb-2 w-56 p-2 bg-[#0E0F12]/95 border border-line rounded-xl text-[9px] text-[#EF4444] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
+                                <div className="absolute bottom-full right-0 mb-2 w-56 p-2 bg-[rgb(var(--a-surface))]/95 border border-line rounded-xl text-[9px] text-[#EF4444] font-bold shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 text-center leading-normal">
                                   This batch has already completed and can't be modified.
                                 </div>
                               </div>
