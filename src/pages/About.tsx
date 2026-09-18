@@ -38,7 +38,7 @@ export default function About() {
             </RevealOnScroll>
 
             <RevealOnScroll delay={0.1}>
-              <p className="text-sm sm:text-base text-ink/60 max-w-2xl mx-auto font-medium leading-relaxed">
+              <p className="text-sm sm:text-base text-ink-mute max-w-2xl mx-auto font-medium leading-relaxed">
                 We built FaceCloud because manual folder sorting, dark or poor-quality photos, and duplicate identity directories were consistently slowing down vision teams. As developers working with massive biometric datasets, we needed a robust ingestion node that could automate enhancement, validate alignment ratios, and cluster identities in a single pass—without compromising security.
               </p>
             </RevealOnScroll>
@@ -58,7 +58,7 @@ export default function About() {
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={0.1}>
-                <p className="text-xs text-ink/50 leading-relaxed font-medium">
+                <p className="text-xs text-ink-mute leading-relaxed font-medium">
                   We believe that automated AI models are only as good as the images they ingest. By integrating state-of-the-art low-light enhancement (Zero-DCE) with dynamic clustering models, we ensure that every face entering your database passes standard biometric validation thresholds before it clutters your backend schemas.
                 </p>
               </RevealOnScroll>
@@ -78,15 +78,15 @@ export default function About() {
                   <h3 className="text-xs font-bold text-ink uppercase tracking-wider mb-2">Target Metrics</h3>
                   <div className="space-y-3 font-mono text-[10px]">
                     <div className="flex justify-between border-b border-ink/[0.05] pb-1.5">
-                      <span className="text-ink/45">Processing Speed</span>
+                      <span className="text-ink-mute">Processing Speed</span>
                       <span className="text-[var(--s-ok)] font-bold">&lt; 150ms / frame</span>
                     </div>
                     <div className="flex justify-between border-b border-ink/[0.05] pb-1.5">
-                      <span className="text-ink/45">Clustering Accuracy</span>
+                      <span className="text-ink-mute">Clustering Accuracy</span>
                       <span className="text-[var(--s-ok)] font-bold">99.8% Indexing</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-ink/45">Low-light Recovery</span>
+                      <span className="text-ink-mute">Low-light Recovery</span>
                       <span className="text-[var(--s-ok)] font-bold">+2.4 EV Boost</span>
                     </div>
                   </div>
@@ -111,13 +111,13 @@ export default function About() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <RevealOnScroll delay={0.05}>
-              <div className="fc-panel p-6 flex flex-col justify-between h-full bg-ink/[0.04]/40 border border-ink/[0.06] rounded-2xl hover:border-ink/15 transition-all">
+              <div className="fc-panel p-6 flex flex-col justify-between h-full bg-ink/[0.04] border border-ink/[0.06] rounded-2xl hover:border-ink/15 transition-all">
                 <div className="space-y-4">
                   <div className="w-9 h-9 rounded-xl bg-[#F97316]/10 flex items-center justify-center border border-[#F97316]/20 text-[#FB923C]">
                     <Activity className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-semibold text-ink">Automation with Control</h3>
-                  <p className="text-xs text-ink/50 leading-relaxed font-medium">
+                  <p className="text-xs text-ink-mute leading-relaxed font-medium">
                     Automating bulk uploads is only safe if you can override errors. Our human-in-the-loop review queue gives moderators complete authority to override automatic quality flags.
                   </p>
                 </div>
@@ -125,13 +125,13 @@ export default function About() {
             </RevealOnScroll>
 
             <RevealOnScroll delay={0.1}>
-              <div className="fc-panel p-6 flex flex-col justify-between h-full bg-ink/[0.04]/40 border border-ink/[0.06] rounded-2xl hover:border-ink/15 transition-all">
+              <div className="fc-panel p-6 flex flex-col justify-between h-full bg-ink/[0.04] border border-ink/[0.06] rounded-2xl hover:border-ink/15 transition-all">
                 <div className="space-y-4">
                   <div className="w-9 h-9 rounded-xl bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#A78BFA]">
                     <Shield className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-semibold text-ink">Security by Default</h3>
-                  <p className="text-xs text-ink/50 leading-relaxed font-medium">
+                  <p className="text-xs text-ink-mute leading-relaxed font-medium">
                     All biometric assets are encrypted at rest using AES-256 storage buffers, governed by strict JSON Web Token authorization schemas and explicit role-based access rules.
                   </p>
                 </div>
@@ -139,13 +139,13 @@ export default function About() {
             </RevealOnScroll>
 
             <RevealOnScroll delay={0.15}>
-              <div className="fc-panel p-6 flex flex-col justify-between h-full bg-ink/[0.04]/40 border border-ink/[0.06] rounded-2xl hover:border-ink/15 transition-all">
+              <div className="fc-panel p-6 flex flex-col justify-between h-full bg-ink/[0.04] border border-ink/[0.06] rounded-2xl hover:border-ink/15 transition-all">
                 <div className="space-y-4">
                   <div className="w-9 h-9 rounded-xl bg-[var(--s-ok)]/10 flex items-center justify-center border border-[var(--s-ok)]/20 text-[var(--s-ok)]">
                     <Users className="w-5 h-5" />
                   </div>
                   <h3 className="text-sm font-semibold text-ink">Built with a Partner</h3>
-                  <p className="text-xs text-ink/50 leading-relaxed font-medium">
+                  <p className="text-xs text-ink-mute leading-relaxed font-medium">
                     Developed in deep partnership with Datamart, our platform is designed around real production bottlenecks and actual ingest pipelines, not just theoretical benchmarks.
                   </p>
                 </div>
@@ -170,37 +170,37 @@ export default function About() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
               <RevealOnScroll delay={0.05}>
-                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04]/30 border border-ink/[0.06]">
+                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border border-ink/[0.06]">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(249, 115, 22,0.25)]">
                     A.C.
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-ink uppercase tracking-wider">Ali Chaudhry</h3>
-                    <p className="text-[10px] text-ink/40 font-semibold mt-0.5">Co-Founder &amp; Lead Architect</p>
+                    <p className="text-[10px] text-ink-faint font-semibold mt-0.5">Co-Founder &amp; Lead Architect</p>
                   </div>
                 </div>
               </RevealOnScroll>
 
               <RevealOnScroll delay={0.1}>
-                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04]/30 border border-ink/[0.06]">
+                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border border-ink/[0.06]">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#EA580C] to-[var(--s-ok)] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(234, 88, 12,0.25)]">
                     M.F.
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-ink uppercase tracking-wider">Maria F.</h3>
-                    <p className="text-[10px] text-ink/40 font-semibold mt-0.5">Co-Founder &amp; Product Lead</p>
+                    <p className="text-[10px] text-ink-faint font-semibold mt-0.5">Co-Founder &amp; Product Lead</p>
                   </div>
                 </div>
               </RevealOnScroll>
 
               <RevealOnScroll delay={0.15}>
-                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04]/30 border border-ink/[0.06]">
+                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border border-ink/[0.06]">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--s-ok)] to-[#F97316] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(79,255,176,0.25)]">
                     D.S.
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-ink uppercase tracking-wider">David S.</h3>
-                    <p className="text-[10px] text-ink/40 font-semibold mt-0.5">Security Architect</p>
+                    <p className="text-[10px] text-ink-faint font-semibold mt-0.5">Security Architect</p>
                   </div>
                 </div>
               </RevealOnScroll>
@@ -223,7 +223,7 @@ export default function About() {
                 Ready to enhance, validate, and <br />
                 organize facial images with AI?
               </h2>
-              <p className="text-xs text-ink/50 max-w-md mx-auto leading-relaxed font-medium">
+              <p className="text-xs text-ink-mute max-w-md mx-auto leading-relaxed font-medium">
                 Start with the user portal to enhance and organize your facial image datasets.
               </p>
               <div className="flex justify-center pt-2">

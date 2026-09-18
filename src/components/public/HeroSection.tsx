@@ -189,7 +189,7 @@ export function HeroSection() {
                 stiffness: 300,
                 damping: 20,
               }}
-              className="glass-media rounded-full flex items-center gap-2 px-4 py-2 text-[11px] font-medium
+              className="on-dark glass-media rounded-full flex items-center gap-2 px-4 py-2 text-[11px] font-medium
                          text-white/55 border border-white/[0.07]"
             >
               <s.icon className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0" />

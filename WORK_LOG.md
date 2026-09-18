@@ -46,6 +46,24 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-09-18 — Light-appearance contrast fixes on the marketing pages
+*Status: committed (this commit)*
+- A full-page capture of the light home page showed sections that were still dark or unreadable. Fixed:
+  - **Blocks that should stay dark** now say so. New `.on-dark` class re-declares the dark token values locally, so
+    everything inside it resolves the way it does in the dark appearance without a second rule set. Applied to the
+    live security log, the API request sample, the methodology band (it wraps dark footage, like the hero) and the
+    hero chrome. Before this, those blocks kept a dark background while their text turned dark — invisible.
+  - **Body copy moved off translucent ink.** `text-ink/40` reads fine as white on black but washes out as black on
+    white, so the marketing pages now use the tuned neutral ramp (`text-ink-soft` / `-mute` / `-faint`) that the
+    dashboards already use. Better in both appearances.
+  - **Two invisible controls.** The Free and Basic pricing buttons and the Contact form inputs kept `text-white` on
+    a near-white surface; they now use the ink token.
+  - Cleaned up fourteen malformed double-opacity classes (`bg-ink/[0.04]/50`) left by the earlier colour pass, which
+    Tailwind silently dropped, leaving those panels with no background at all.
+- Verified by driving the running app through the DevTools protocol: scrolled the whole page so every reveal
+  animation had fired, then captured the methodology, security, features, pricing and contact sections in both
+  appearances.
+
 ### 2026-09-18 — Appearance switch extended to the whole site
 *Status: committed (this commit)*
 - The light/dark switch now covers the marketing pages, the auth screens and the error pages, not just the
@@ -341,8 +359,10 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
 - The appearance choice is stored per browser and does not follow the operating system setting, so a visitor who
   prefers light has to click once. Wiring it to `prefers-color-scheme` on first visit would remove that step.
-- The hero video is dark in both appearances, so the top of the home page stays dark even in the light appearance.
-  That is deliberate, but it means the light home page opens on a dark screen before the rest lightens.
+- The hero video is dark in both appearances, so the top of the home page stays dark even in the light appearance,
+  as do the methodology band and the two terminal panels (all marked `.on-dark`). That is deliberate — they wrap
+  dark footage or imitate a console — but it means the light home page opens on a dark screen before the rest
+  lightens.
 - Vite 8 / rolldown chunk warning: consider `build.chunkSizeWarningLimit` or dynamic imports for portals.
 
 ---

@@ -228,11 +228,48 @@ section[id] {
       0 0 70px rgba(249,115,22,0.16);
   }
 
+  /* ── Deliberately dark blocks ───────────────────────────────────
+     A terminal panel, a code sample, or a band wrapped around dark footage
+     stays dark in either appearance. Rather than a second set of rules, the
+     block re-declares the dark token values locally, so every token-driven
+     class inside it (text-ink, border-line, bg-surface-mute…) resolves the
+     way it does in the dark appearance. */
+  .on-dark {
+    --a-surface:      14 15 18;
+    --a-surface-soft:  0  0  0;
+    --a-surface-mute: 22 24 28;
+    --a-surface-sunk: 28 31 36;
+
+    --a-ink:       255 255 255;
+    --a-ink-soft:  190 194 201;
+    --a-ink-mute:  143 147 155;
+    --a-ink-faint: 106 110 118;
+
+    --a-line:        38 40 45;
+    --a-line-soft:   26 28 32;
+    --a-line-strong: 58 61 68;
+
+    --a-shadow-rgb: 0 0 0;
+
+    --s-panel:         rgba(255,255,255,0.045);
+    --s-panel-strong:  rgba(255,255,255,0.075);
+    --s-border:        rgba(255,255,255,0.11);
+    --s-border-accent: rgba(249,115,22,0.20);
+    --s-pill:          rgba(255,255,255,0.055);
+    --s-pill-border:   rgba(255,255,255,0.10);
+    --s-inset:         rgba(255,255,255,0.10);
+    --s-shadow:        0 24px 90px rgba(0,0,0,0.32);
+    --s-ok:            #4FFFB0;
+
+    color-scheme: dark;
+  }
+
   /* ── Glass over media ───────────────────────────────────────────
      For chrome that floats on the hero video or a photo. Deliberately not
      token-driven: the footage is dark in both appearances, so this surface
      and the white text on it must stay dark too. */
   .glass-media {
+    /* inherits the dark token values from .on-dark when combined */
     background: rgba(255,255,255,0.055);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);

@@ -98,7 +98,7 @@ export function PublicNavbar() {
               "transition-all duration-300 ease-in-out flex items-center justify-between w-full",
               scrolled
                 ? "px-2 py-0 bg-transparent border-transparent shadow-none"
-                : cn("rounded-full px-5 py-3", onMedia ? "glass-media" : "liquid-glass")
+                : cn("rounded-full px-5 py-3", onMedia ? "on-dark glass-media" : "liquid-glass")
             )}
           >
             {/* Logo */}
@@ -159,7 +159,7 @@ export function PublicNavbar() {
                 to="/login"
                 className={cn(
                   "px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer ml-1",
-                  onMedia ? "glass-media" : "glass-pill",
+                  onMedia ? "on-dark glass-media" : "glass-pill",
                   onMedia ? "text-white border border-white/15 hover:border-white/30"
                           : "text-ink border border-ink/15 hover:border-ink/30"
                 )}

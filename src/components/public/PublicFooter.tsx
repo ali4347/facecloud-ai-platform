@@ -11,11 +11,11 @@ export function PublicFooter() {
 
   return (
     <footer className="py-16 bg-surface-soft border-t border-ink/[0.06] relative z-10">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 text-xs text-ink/40">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10 text-xs text-ink-faint">
         {/* Logo Column */}
         <div className="space-y-3.5">
           <FaceCloudLogo variant="horizontal" size="sm" href="/" priority={false} tone="app" />
-          <p className="text-[10px] text-ink/30 font-medium leading-relaxed">
+          <p className="text-[10px] text-ink-faint font-medium leading-relaxed">
             Powered by DATAMART / DTM.IO. Advanced facial image organization, quality check, and Zero-DCE restorative node suite.
           </p>
         </div>
@@ -51,7 +51,7 @@ export function PublicFooter() {
           </div>
           <div className="space-y-1 pt-1">
             <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Registry Compliance</h4>
-            <p className="text-[10px] text-ink/30 leading-relaxed font-medium">
+            <p className="text-[10px] text-ink-faint leading-relaxed font-medium">
               &copy; {new Date().getFullYear()} FaceCloud. Registered datasets under local Django SQL configurations. All rights reserved.
             </p>
           </div>

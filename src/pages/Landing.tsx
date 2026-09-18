@@ -197,7 +197,7 @@ function SectionHeading({ tag, title, subtitle, titleHtml, num }: {
       </RevealOnScroll>
       {subtitle && (
         <RevealOnScroll delay={num ? 0.09 : 0.06}>
-          <p className="text-xs sm:text-sm text-ink/50 max-w-xl mx-auto font-medium">{subtitle}</p>
+          <p className="text-xs sm:text-sm text-ink-mute max-w-xl mx-auto font-medium">{subtitle}</p>
         </RevealOnScroll>
       )}
     </div>
@@ -309,7 +309,7 @@ export default function Landing() {
         <section className="py-14 border-y border-ink/[0.06] bg-ink/[0.03] relative z-10 overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <RevealOnScroll>
-              <p className="text-[10px] text-ink/40 font-bold uppercase tracking-[0.25em] mb-7">
+              <p className="text-[10px] text-ink-faint font-bold uppercase tracking-[0.25em] mb-7">
                 Trusted by AI-driven teams and secure image workflows
               </p>
             </RevealOnScroll>
@@ -319,7 +319,7 @@ export default function Landing() {
                 {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].map((logo, i) => (
                   <span 
                     key={`logo-rtl-${logo}-${i}`} 
-                    className="text-sm font-extrabold tracking-[0.15em] text-ink/40 hover:text-ink/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
+                    className="text-sm font-extrabold tracking-[0.15em] text-ink-faint hover:text-ink-soft transition-all duration-300 select-none cursor-default whitespace-nowrap"
                   >
                     {logo.toUpperCase()}
                   </span>
@@ -330,7 +330,7 @@ export default function Landing() {
                 {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].reverse().map((logo, i) => (
                   <span 
                     key={`logo-ltr-${logo}-${i}`} 
-                    className="text-sm font-extrabold tracking-[0.15em] text-ink/40 hover:text-ink/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
+                    className="text-sm font-extrabold tracking-[0.15em] text-ink-faint hover:text-ink-soft transition-all duration-300 select-none cursor-default whitespace-nowrap"
                   >
                     {logo.toUpperCase()}
                   </span>
@@ -360,12 +360,12 @@ export default function Landing() {
                       duration={2.2}
                     />
                   </div>
-                  <p className="text-[10px] text-ink/40 font-bold uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-[10px] text-ink-faint font-bold uppercase tracking-wider">{stat.label}</p>
                 </div>
               </RevealOnScroll>
             ))}
           </div>
-          <p className="text-center text-[9px] text-ink/25 mt-4 font-medium">
+          <p className="text-center text-[9px] text-ink-faint mt-4 font-medium">
             Platform capability figures based on internal testing benchmarks
           </p>
         </section>
@@ -387,7 +387,7 @@ export default function Landing() {
                   transition={{ duration: 0.2 }}
                   className="fc-panel p-6 flex flex-col justify-between h-full relative"
                 >
-                  <p className="text-[12px] text-ink/70 leading-relaxed italic mb-6">
+                  <p className="text-[12px] text-ink-soft leading-relaxed italic mb-6">
                     "{t.quote}"
                   </p>
                   <div className="flex items-center gap-3">
@@ -395,7 +395,7 @@ export default function Landing() {
                       {t.initials}
                     </div>
                     <div>
-                      <h4 className="text-[10px] font-bold text-ink/40 uppercase tracking-wider">{t.role}</h4>
+                      <h4 className="text-[10px] font-bold text-ink-faint uppercase tracking-wider">{t.role}</h4>
                     </div>
                   </div>
                 </motion.div>
@@ -436,7 +436,7 @@ export default function Landing() {
                   </motion.div>
                   <div className="space-y-2 mt-4">
                     <h3 className="text-xs font-bold text-ink tracking-tight">{card.title}</h3>
-                    <p className="text-[11px] text-ink/40 leading-relaxed font-medium">{card.desc}</p>
+                    <p className="text-[11px] text-ink-faint leading-relaxed font-medium">{card.desc}</p>
                   </div>
                 </motion.div>
               </StaggerItem>
@@ -473,7 +473,7 @@ export default function Landing() {
                     </motion.div>
                     <div className="space-y-2">
                       <h3 className="text-xs font-bold text-ink tracking-tight">{uc.title}</h3>
-                      <p className="text-[11px] text-ink/40 leading-relaxed font-medium">{uc.desc}</p>
+                      <p className="text-[11px] text-ink-faint leading-relaxed font-medium">{uc.desc}</p>
                     </div>
                   </motion.div>
                 </StaggerItem>
@@ -501,12 +501,12 @@ export default function Landing() {
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={0.1}>
-                <p className="text-sm text-ink/55 leading-relaxed font-medium">
+                <p className="text-sm text-ink-mute leading-relaxed font-medium">
                   We automate exposure curves, crop structures, biometric validation, and identity matching parameters under a zero-trust compliance model.
                 </p>
               </RevealOnScroll>
               
-              <div className="space-y-3 pt-4 text-xs font-bold text-ink/60">
+              <div className="space-y-3 pt-4 text-xs font-bold text-ink-mute">
                 {[
                   { title: 'Zero-DCE enhancement', desc: 'Estimates lighting maps on underexposed faces.' },
                   { title: 'Face validation',     desc: 'Ensures only one subject is present in the frame.' },
@@ -520,7 +520,7 @@ export default function Landing() {
                       </div>
                       <div>
                         <span className="text-ink block font-bold">{spec.title}</span>
-                        <span className="text-[10px] text-ink/40 block font-medium mt-0.5">{spec.desc}</span>
+                        <span className="text-[10px] text-ink-faint block font-medium mt-0.5">{spec.desc}</span>
                       </div>
                     </div>
                   </RevealOnScroll>
@@ -542,7 +542,7 @@ export default function Landing() {
                     <div className="absolute inset-0 bg-[#EA580C]/10 mix-blend-overlay pointer-events-none" />
                     
                     {/* Simulated tech scanning grids/lines overlay */}
-                    <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-ink/40">
+                    <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-ink-faint">
                       <div className="flex justify-between items-center">
                         <span>SCAN_RESOLUTION: 512px</span>
                         <span>CONFIDENCE: 99.8%</span>
@@ -562,7 +562,7 @@ export default function Landing() {
               <RevealOnScroll direction="right">
                 <div className="fc-panel p-6 relative overflow-hidden">
                   <div className="flex justify-between items-center pb-4 border-b border-ink/[0.08] mb-6">
-                    <span className="text-[10px] font-bold text-ink/40 uppercase tracking-widest">Active AI Restructuring</span>
+                    <span className="text-[10px] font-bold text-ink-faint uppercase tracking-widest">Active AI Restructuring</span>
                     <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#F97316]/20 text-[#FB923C] font-bold">PIPELINE: ACTIVE</span>
                   </div>
 
@@ -575,12 +575,12 @@ export default function Landing() {
                           className="p-3.5 rounded-2xl bg-ink/[0.02] border border-ink/[0.06] flex items-center justify-between gap-4"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-ink/[0.04] text-xs font-mono font-bold text-ink/40">
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-ink/[0.04] text-xs font-mono font-bold text-ink-faint">
                               {index + 1}
                             </div>
                             <div>
                               <p className="text-[11px] font-bold text-ink">{proc.label}</p>
-                              <p className="text-[10px] text-ink/40 font-medium mt-0.5">{proc.value}</p>
+                              <p className="text-[10px] text-ink-faint font-medium mt-0.5">{proc.value}</p>
                             </div>
                           </div>
                           <AnimatePresence mode="wait">
@@ -593,7 +593,7 @@ export default function Landing() {
                               className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
                                 status === 'SUCCESS' ? 'bg-[var(--s-ok)]/15 text-[var(--s-ok)]' :
                                 status === 'ACTIVE' ? 'bg-[#F97316]/20 text-[#FB923C] animate-pulse' :
-                                'bg-ink/5 text-ink/30'
+                                'bg-ink/5 text-ink-faint'
                               }`}
                             >
                               {status}
@@ -636,7 +636,7 @@ export default function Landing() {
                   </motion.div>
                   <div className="mt-6 space-y-1">
                     <h3 className="text-xs font-bold text-ink tracking-tight">{feat.t}</h3>
-                    <p className="text-[10px] text-ink/45 leading-relaxed font-medium">{feat.d}</p>
+                    <p className="text-[10px] text-ink-mute leading-relaxed font-medium">{feat.d}</p>
                   </div>
                 </motion.div>
               </StaggerItem>
@@ -671,7 +671,7 @@ export default function Landing() {
                   />
                 </MacBookDemoFrame>
               </RevealOnScroll>
-              <p className="text-[10px] text-ink/35 mt-6 text-center font-medium">
+              <p className="text-[10px] text-ink-faint mt-6 text-center font-medium">
                 Frontend enhancement preview. Production processing uses the FaceCloud AI pipeline.
               </p>
             </div>
@@ -680,7 +680,7 @@ export default function Landing() {
               <RevealOnScroll direction="right" delay={0.15}>
                 <div className="fc-panel p-5 bg-ink/[0.02]">
                   <h4 className="text-xs font-bold text-ink mb-3">AI METADATA PARAMETERS</h4>
-                  <div className="space-y-3 text-[10px] font-medium text-ink/60">
+                  <div className="space-y-3 text-[10px] font-medium text-ink-mute">
                     <div className="flex justify-between">
                       <span>AI Model:</span>
                       <span className="text-ink font-bold font-mono">Zero-DCE (V1)</span>
@@ -736,7 +736,7 @@ export default function Landing() {
                   >
                     <div className="space-y-2">
                       <h3 className="text-sm font-bold text-ink tracking-tight">{card.title}</h3>
-                      <p className="text-[11px] text-ink/45 leading-relaxed font-medium">{card.desc}</p>
+                      <p className="text-[11px] text-ink-mute leading-relaxed font-medium">{card.desc}</p>
                     </div>
                     <Link 
                       to={card.link}
@@ -763,7 +763,7 @@ export default function Landing() {
           {/* Monthly / Yearly Toggle */}
           <RevealOnScroll>
             <div className="flex items-center justify-center gap-3 mb-12">
-              <span className={`text-sm font-medium transition-colors ${!yearlyBilling ? 'text-ink' : 'text-ink/40'}`}>Monthly</span>
+              <span className={`text-sm font-medium transition-colors ${!yearlyBilling ? 'text-ink' : 'text-ink-faint'}`}>Monthly</span>
               <button
                 onClick={() => setYearlyBilling(v => !v)}
                 className="relative w-14 h-7 rounded-full bg-ink/[0.08] border border-ink/[0.12] cursor-pointer transition-colors hover:border-ink/20"
@@ -776,7 +776,7 @@ export default function Landing() {
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               </button>
-              <span className={`text-sm font-medium transition-colors ${yearlyBilling ? 'text-ink' : 'text-ink/40'}`}>
+              <span className={`text-sm font-medium transition-colors ${yearlyBilling ? 'text-ink' : 'text-ink-faint'}`}>
                 Yearly <span className="text-[var(--s-ok)] text-xs font-bold">Save 20%</span>
               </span>
             </div>
@@ -799,9 +799,9 @@ export default function Landing() {
                       <h3 className="text-lg font-bold text-ink">{plan.name}</h3>
                       <div className="flex items-end gap-1">
                         <span className="text-4xl font-bold text-ink tracking-tight">${price}</span>
-                        {price > 0 && <span className="text-sm text-ink/40 font-medium pb-1">/mo</span>}
+                        {price > 0 && <span className="text-sm text-ink-faint font-medium pb-1">/mo</span>}
                       </div>
-                      <div className="flex items-center gap-4 text-[10px] font-medium text-ink/50">
+                      <div className="flex items-center gap-4 text-[10px] font-medium text-ink-mute">
                         <span className="flex items-center gap-1"><HardDrive className="w-3 h-3" /> {plan.storage}</span>
                         <span className="flex items-center gap-1"><Image className="w-3 h-3" /> {plan.uploads}/mo</span>
                       </div>
@@ -811,14 +811,14 @@ export default function Landing() {
 
                     <div className="space-y-2.5 flex-1">
                       {plan.features.map(f => (
-                        <div key={f} className="flex items-center gap-2 text-[11px] text-ink/70 font-medium">
+                        <div key={f} className="flex items-center gap-2 text-[11px] text-ink-soft font-medium">
                           <Check className="w-3.5 h-3.5 text-[var(--s-ok)] flex-shrink-0" />
                           {f}
                         </div>
                       ))}
                       {plan.missing.map(f => (
-                        <div key={f} className="flex items-center gap-2 text-[11px] text-ink/25 font-medium">
-                          <span className="w-3.5 h-3.5 flex items-center justify-center text-ink/15 flex-shrink-0">—</span>
+                        <div key={f} className="flex items-center gap-2 text-[11px] text-ink-faint font-medium">
+                          <span className="w-3.5 h-3.5 flex items-center justify-center text-ink-faint flex-shrink-0">—</span>
                           {f}
                         </div>
                       ))}
@@ -829,7 +829,7 @@ export default function Landing() {
                       className={`mt-6 text-center text-sm font-bold py-3 rounded-2xl transition-all duration-300 block ${
                         plan.highlight
                           ? 'bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white shadow-[0_4px_20px_rgba(249,115,22,0.35)] hover:shadow-[0_6px_28px_rgba(249,115,22,0.55)] hover:-translate-y-0.5'
-                          : 'bg-ink/[0.06] border border-ink/[0.12] text-white hover:bg-ink/[0.1] hover:border-ink/20'
+                          : 'bg-ink/[0.06] border border-ink/[0.12] text-ink hover:bg-ink/[0.1] hover:border-ink/20'
                       }`}
                     >
                       {plan.cta}
@@ -841,7 +841,7 @@ export default function Landing() {
           </StaggerChildren>
 
           <RevealOnScroll delay={0.3}>
-            <p className="text-center text-xs text-ink/35 mt-8 font-medium">
+            <p className="text-center text-xs text-ink-faint mt-8 font-medium">
               Need a custom enterprise plan?{' '}
               <a href="#contact" className="text-[#FB923C] hover:text-ink transition-colors underline underline-offset-2">Contact us</a>.
             </p>
@@ -864,14 +864,14 @@ export default function Landing() {
                   title: 'User Dashboard Preview',
                   desc: 'Observe processing counts, track pipeline latency, and access ingestion queues.',
                   mock: (
-                    <div className="space-y-3 font-mono text-[9px] text-ink/50">
+                    <div className="space-y-3 font-mono text-[9px] text-ink-mute">
                       <div className="grid grid-cols-2 gap-2">
                         <div className="p-2.5 rounded bg-ink/[0.04] border border-ink/[0.08]">
-                          <span className="block text-[8px] text-ink/30">TOTAL FILES</span>
+                          <span className="block text-[8px] text-ink-faint">TOTAL FILES</span>
                           <span className="block text-ink font-bold text-[11px] mt-0.5">142 assets</span>
                         </div>
                         <div className="p-2.5 rounded bg-ink/[0.04] border border-ink/[0.08]">
-                          <span className="block text-[8px] text-ink/30">STABILITY</span>
+                          <span className="block text-[8px] text-ink-faint">STABILITY</span>
                           <span className="block text-[var(--s-ok)] font-bold text-[11px] mt-0.5">99.8%</span>
                         </div>
                       </div>
@@ -886,12 +886,12 @@ export default function Landing() {
                   title: 'Image Detail Preview',
                   desc: 'Toggle exposure Restorations, verify blur scores, and check person index maps.',
                   mock: (
-                    <div className="space-y-2.5 font-mono text-[9px] text-ink/50">
+                    <div className="space-y-2.5 font-mono text-[9px] text-ink-mute">
                       <div className="h-20 bg-ink/[0.03] border border-ink/[0.08] rounded-xl flex items-center justify-center relative overflow-hidden">
-                        <span className="text-[10px] text-ink/30">[Face scanner Active]</span>
+                        <span className="text-[10px] text-ink-faint">[Face scanner Active]</span>
                         <div className="absolute inset-x-0 h-0.5 bg-[var(--s-ok)]/40 top-1/2 animate-bounce" />
                       </div>
-                      <div className="flex justify-between text-[8px] text-ink/40 px-1">
+                      <div className="flex justify-between text-[8px] text-ink-faint px-1">
                         <span>Landmarks: 68 points</span>
                         <span>Confidence: 99.84%</span>
                       </div>
@@ -902,7 +902,7 @@ export default function Landing() {
                   title: 'Person Folders Preview',
                   desc: 'Verify vector matching confidence scores and cluster similar faces instantly.',
                   mock: (
-                    <div className="space-y-2 font-mono text-[9px] text-ink/50">
+                    <div className="space-y-2 font-mono text-[9px] text-ink-mute">
                       {[
                         { grp: 'Person Folder 001', pct: '99.2%' },
                         { grp: 'Person Folder 002', pct: '94.8%' },
@@ -920,7 +920,7 @@ export default function Landing() {
                   <div className="fc-panel p-6 flex flex-col justify-between min-h-[290px] relative group overflow-hidden">
                     <div className="space-y-4">
                       <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#F97316]/10 text-[#FB923C] uppercase w-fit block">{mockup.title}</span>
-                      <p className="text-xs text-ink/50 leading-relaxed font-medium">{mockup.desc}</p>
+                      <p className="text-xs text-ink-mute leading-relaxed font-medium">{mockup.desc}</p>
                     </div>
                     
                     {/* Browser Frame Mockup */}
@@ -964,11 +964,11 @@ export default function Landing() {
                       </div>
                       <h3 className="text-lg font-bold tracking-tight">Admin Console</h3>
                     </div>
-                    <p className="text-xs text-ink/50 leading-relaxed font-medium">
+                    <p className="text-xs text-ink-mute leading-relaxed font-medium">
                       Monitor microservice health latency checks, manage API documents, run live playground queries, inspect security audit events, and analyze rejection metrics dashboard grids.
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-ink/40 pt-2">
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-ink-faint pt-2">
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> User Registries</div>
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> System Health</div>
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Upload statistics</div>
@@ -992,11 +992,11 @@ export default function Landing() {
                       </div>
                       <h3 className="text-lg font-bold tracking-tight">Moderator Review</h3>
                     </div>
-                    <p className="text-xs text-ink/50 leading-relaxed font-medium">
+                    <p className="text-xs text-ink-mute leading-relaxed font-medium">
                       Manually audit failed low-light or blurry images. Override automatic system classifications, re-group mismatched subject clusters, and dispatch notification updates to users.
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-ink/40 pt-2">
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-ink-faint pt-2">
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Rejected Queue</div>
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Override Decider</div>
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Subject Re-grouping</div>
@@ -1029,7 +1029,7 @@ export default function Landing() {
                   </h2>
                 </RevealOnScroll>
                 <RevealOnScroll delay={0.1}>
-                  <p className="text-sm text-ink/50 leading-relaxed font-medium">
+                  <p className="text-sm text-ink-mute leading-relaxed font-medium">
                     Strict directory boundary splits and zero-trust identity policies protect all ingested dataset assets.
                   </p>
                 </RevealOnScroll>
@@ -1044,7 +1044,7 @@ export default function Landing() {
                     <StaggerItem key={pt.title}>
                       <div className="p-3 bg-ink/[0.02] border border-ink/[0.06] rounded-2xl">
                         <span className="text-xs font-bold text-ink block">{pt.title}</span>
-                        <span className="text-[10px] text-ink/40 block mt-0.5 font-medium">{pt.desc}</span>
+                        <span className="text-[10px] text-ink-faint block mt-0.5 font-medium">{pt.desc}</span>
                       </div>
                     </StaggerItem>
                   ))}
@@ -1054,8 +1054,8 @@ export default function Landing() {
               {/* Right log stream with typewriter effect */}
               <div className="lg:col-span-7">
                 <RevealOnScroll direction="right">
-                  <div className="fc-panel p-5 bg-black/80 font-mono text-[10px] text-ink/60 space-y-4">
-                    <div className="flex justify-between items-center text-[9px] font-bold text-ink/30 border-b border-ink/[0.08] pb-2">
+                  <div className="on-dark fc-panel p-5 bg-black/80 font-mono text-[10px] text-ink-mute space-y-4">
+                    <div className="flex justify-between items-center text-[9px] font-bold text-ink-faint border-b border-ink/[0.08] pb-2">
                       <span>LIVE FIREWALL SECURITY AUDIT FEED</span>
                       <span className="text-[var(--s-ok)] animate-pulse">ONLINE</span>
                     </div>
@@ -1069,14 +1069,14 @@ export default function Landing() {
                           transition={{ duration: 0.4 }}
                           className="flex gap-2.5 items-start"
                         >
-                          <span className="text-ink/20 select-none">{i + 1}</span>
+                          <span className="text-ink-faint select-none">{i + 1}</span>
                           <span className="text-[#FB923C] flex-shrink-0">➜</span>
-                          <span className={i === logs.length - 1 ? 'text-ink' : 'text-ink/80'}>{log}</span>
+                          <span className={i === logs.length - 1 ? 'text-ink' : 'text-ink-soft'}>{log}</span>
                         </motion.div>
                       ))}
                     </div>
 
-                    <div className="pt-2.5 border-t border-ink/[0.08] flex justify-between text-[8px] text-ink/30 font-bold">
+                    <div className="pt-2.5 border-t border-ink/[0.08] flex justify-between text-[8px] text-ink-faint font-bold">
                       <span>Tripped alerts: 0 logs</span>
                       <span>Compliance score: HIPAA / ISO 27001</span>
                     </div>
@@ -1111,7 +1111,7 @@ export default function Landing() {
                       transition={{ duration: 0.25 }}
                       className="flex-shrink-0"
                     >
-                      <ChevronDown className="w-4 h-4 text-ink/40" />
+                      <ChevronDown className="w-4 h-4 text-ink-faint" />
                     </motion.div>
                   </button>
                   <AnimatePresence initial={false}>
@@ -1123,7 +1123,7 @@ export default function Landing() {
                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 pb-5 text-xs text-ink/50 leading-relaxed font-medium border-t border-ink/[0.06] pt-4">
+                        <div className="px-5 pb-5 text-xs text-ink-mute leading-relaxed font-medium border-t border-ink/[0.06] pt-4">
                           {item.a}
                         </div>
                       </motion.div>
@@ -1146,29 +1146,29 @@ export default function Landing() {
             />
 
             <RevealOnScroll>
-              <div className="fc-panel p-6 bg-black/80 font-mono text-[10px] relative overflow-hidden">
+              <div className="on-dark fc-panel p-6 bg-black/80 font-mono text-[10px] relative overflow-hidden">
                 <div className="flex items-center justify-between pb-3 border-b border-ink/[0.08] mb-4">
                   <div className="flex items-center gap-2">
                     <Code2 className="w-4 h-4 text-[#FB923C]" />
-                    <span className="text-[10px] font-bold text-ink/40 uppercase tracking-widest">API Request Example</span>
+                    <span className="text-[10px] font-bold text-ink-faint uppercase tracking-widest">API Request Example</span>
                   </div>
                   <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[var(--s-ok)]/15 text-[var(--s-ok)] font-bold">REST</span>
                 </div>
 
                 <div className="space-y-1 text-[10px] leading-relaxed">
                   <div><span className="text-[#A78BFA]">POST</span> <span className="text-[#FB923C]">/api/v1/images/enhance</span></div>
-                  <div className="text-ink/30">Content-Type: multipart/form-data</div>
-                  <div className="text-ink/30">Authorization: Bearer {'<'}your_jwt_token{'>'}</div>
-                  <div className="mt-3 text-ink/20">{'{'}</div>
-                  <div className="pl-4"><span className="text-[var(--s-ok)]">"file"</span>: <span className="text-ink/50">"portrait_001.jpg"</span>,</div>
+                  <div className="text-ink-faint">Content-Type: multipart/form-data</div>
+                  <div className="text-ink-faint">Authorization: Bearer {'<'}your_jwt_token{'>'}</div>
+                  <div className="mt-3 text-ink-faint">{'{'}</div>
+                  <div className="pl-4"><span className="text-[var(--s-ok)]">"file"</span>: <span className="text-ink-mute">"portrait_001.jpg"</span>,</div>
                   <div className="pl-4"><span className="text-[var(--s-ok)]">"enhance"</span>: <span className="text-[#A78BFA]">true</span>,</div>
                   <div className="pl-4"><span className="text-[var(--s-ok)]">"detect_faces"</span>: <span className="text-[#A78BFA]">true</span>,</div>
                   <div className="pl-4"><span className="text-[var(--s-ok)]">"auto_cluster"</span>: <span className="text-[#A78BFA]">true</span></div>
-                  <div className="text-ink/20">{'}'}</div>
+                  <div className="text-ink-faint">{'}'}</div>
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-ink/[0.08] flex items-center justify-between">
-                  <p className="text-[10px] text-ink/35 font-medium">Full Swagger documentation available for Pro subscribers.</p>
+                  <p className="text-[10px] text-ink-faint font-medium">Full Swagger documentation available for Pro subscribers.</p>
                   <Link to="/docs" className="flex items-center gap-1.5 text-[11px] font-bold text-[#FB923C] hover:text-ink transition-colors">
                     View API Docs <ExternalLink className="w-3.5 h-3.5" />
                   </Link>
@@ -1191,7 +1191,7 @@ export default function Landing() {
                 Ready to enhance, validate, and <br />
                 organize facial images <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">with AI?</span>
               </h2>
-              <p className="text-xs text-ink/50 max-w-md mx-auto leading-relaxed font-medium">
+              <p className="text-xs text-ink-mute max-w-md mx-auto leading-relaxed font-medium">
                 Start with the user portal to enhance and organize your facial image datasets.
               </p>
               <div className="flex flex-wrap justify-center gap-4 pt-4">

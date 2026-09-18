@@ -151,7 +151,7 @@ export default function Contact() {
             </h1>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1}>
-            <p className="text-xs sm:text-sm text-ink/50 font-medium">
+            <p className="text-xs sm:text-sm text-ink-mute font-medium">
               Questions about FaceCloud, enterprise plans, or integrating with your existing systems—reach out.
             </p>
           </RevealOnScroll>
@@ -163,7 +163,7 @@ export default function Contact() {
           {/* LEFT — Contact Form */}
           <div className="md:col-span-7">
             <RevealOnScroll>
-              <div className="fc-panel p-6 sm:p-8 bg-ink/[0.04]/40 border border-ink/[0.06] rounded-2xl">
+              <div className="fc-panel p-6 sm:p-8 bg-ink/[0.04] border border-ink/[0.06] rounded-2xl">
                 
                 {status === 'success' ? (
                   <div className="text-center py-10 space-y-6 flex flex-col items-center">
@@ -172,13 +172,13 @@ export default function Contact() {
                     </div>
                     <div className="space-y-2">
                       <h2 className="text-lg font-bold text-ink uppercase tracking-wider">Submission Received</h2>
-                      <p className="text-xs text-ink/50 max-w-sm mx-auto leading-relaxed">
+                      <p className="text-xs text-ink-mute max-w-sm mx-auto leading-relaxed">
                         Thanks—we'll get back to you within 1-2 business days. If this is an urgent partner inquiry, please refer to the support channels on the right.
                       </p>
                     </div>
                     <button
                       onClick={() => setStatus('idle')}
-                      className="px-6 py-2.5 bg-ink/5 text-ink/70 hover:text-white border border-ink/10 hover:border-ink/20 rounded-xl text-xs font-semibold tracking-wider transition-all mt-2"
+                      className="px-6 py-2.5 bg-ink/5 text-ink-soft hover:text-ink border border-ink/10 hover:border-ink/20 rounded-xl text-xs font-semibold tracking-wider transition-all mt-2"
                     >
                       Send Another Message
                     </button>
@@ -191,7 +191,7 @@ export default function Contact() {
                         <AlertTriangle className="w-4 h-4 text-[#EF4444] shrink-0 mt-0.5" />
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-[#EF4444]">Submission Failed</p>
-                          <p className="text-[10px] text-ink/40 leading-relaxed font-medium">
+                          <p className="text-[10px] text-ink-faint leading-relaxed font-medium">
                             An error occurred while transmitting the contact form. Please try again.
                           </p>
                         </div>
@@ -200,7 +200,7 @@ export default function Contact() {
 
                     {/* Name Field */}
                     <div className="flex flex-col text-left">
-                      <label htmlFor="name" className="text-[10px] font-bold uppercase tracking-wider text-ink/50 mb-1.5 block">
+                      <label htmlFor="name" className="text-[10px] font-bold uppercase tracking-wider text-ink-mute mb-1.5 block">
                         Full Name <span className="text-red-400">*</span>
                       </label>
                       <input
@@ -210,7 +210,7 @@ export default function Contact() {
                         value={fields.name}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-ink/[0.04]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all ${
+                        className={`bg-ink/[0.04] border rounded-xl px-4 py-3 text-xs text-ink focus:outline-none focus:border-[#F97316] transition-all ${
                           errors.name ? 'border-red-400/40 focus:border-red-400' : 'border-ink/10'
                         }`}
                         placeholder="John Doe"
@@ -224,7 +224,7 @@ export default function Contact() {
 
                     {/* Email Field */}
                     <div className="flex flex-col text-left">
-                      <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-wider text-ink/50 mb-1.5 block">
+                      <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-wider text-ink-mute mb-1.5 block">
                         Email Address <span className="text-red-400">*</span>
                       </label>
                       <input
@@ -234,7 +234,7 @@ export default function Contact() {
                         value={fields.email}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-ink/[0.04]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all ${
+                        className={`bg-ink/[0.04] border rounded-xl px-4 py-3 text-xs text-ink focus:outline-none focus:border-[#F97316] transition-all ${
                           errors.email ? 'border-red-400/40 focus:border-red-400' : 'border-ink/10'
                         }`}
                         placeholder="john@example.com"
@@ -248,8 +248,8 @@ export default function Contact() {
 
                     {/* Company Field (Optional) */}
                     <div className="flex flex-col text-left">
-                      <label htmlFor="company" className="text-[10px] font-bold uppercase tracking-wider text-ink/50 mb-1.5 block">
-                        Company Name <span className="text-ink/20">(Optional)</span>
+                      <label htmlFor="company" className="text-[10px] font-bold uppercase tracking-wider text-ink-mute mb-1.5 block">
+                        Company Name <span className="text-ink-faint">(Optional)</span>
                       </label>
                       <input
                         id="company"
@@ -258,14 +258,14 @@ export default function Contact() {
                         value={fields.company}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className="bg-ink/[0.04]/50 border border-ink/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all"
+                        className="bg-ink/[0.04] border border-ink/10 rounded-xl px-4 py-3 text-xs text-ink focus:outline-none focus:border-[#F97316] transition-all"
                         placeholder="DataMart Inc."
                       />
                     </div>
 
                     {/* Reason for contact Field */}
                     <div className="flex flex-col text-left">
-                      <label htmlFor="reason" className="text-[10px] font-bold uppercase tracking-wider text-ink/50 mb-1.5 block">
+                      <label htmlFor="reason" className="text-[10px] font-bold uppercase tracking-wider text-ink-mute mb-1.5 block">
                         Reason for Contact <span className="text-red-400">*</span>
                       </label>
                       <select
@@ -274,7 +274,7 @@ export default function Contact() {
                         value={fields.reason}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-ink/[0.04]/80 border rounded-xl px-4 py-3 text-xs text-ink/80 focus:outline-none focus:border-[#F97316] transition-all cursor-pointer ${
+                        className={`bg-ink/[0.04] border rounded-xl px-4 py-3 text-xs text-ink-soft focus:outline-none focus:border-[#F97316] transition-all cursor-pointer ${
                           errors.reason ? 'border-red-400/40 focus:border-red-400' : 'border-ink/10'
                         }`}
                       >
@@ -294,7 +294,7 @@ export default function Contact() {
 
                     {/* Message Field */}
                     <div className="flex flex-col text-left">
-                      <label htmlFor="message" className="text-[10px] font-bold uppercase tracking-wider text-ink/50 mb-1.5 block">
+                      <label htmlFor="message" className="text-[10px] font-bold uppercase tracking-wider text-ink-mute mb-1.5 block">
                         Message <span className="text-red-400">*</span>
                       </label>
                       <textarea
@@ -303,7 +303,7 @@ export default function Contact() {
                         value={fields.message}
                         onChange={handleChange}
                         disabled={status === 'submitting'}
-                        className={`bg-ink/[0.04]/50 border rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[#F97316] transition-all h-32 resize-none ${
+                        className={`bg-ink/[0.04] border rounded-xl px-4 py-3 text-xs text-ink focus:outline-none focus:border-[#F97316] transition-all h-32 resize-none ${
                           errors.message ? 'border-red-400/40 focus:border-red-400' : 'border-ink/10'
                         }`}
                         placeholder="Tell us about your project, team, or specific quality/enhancement needs..."
@@ -346,38 +346,38 @@ export default function Contact() {
             
             {/* General Card */}
             <RevealOnScroll delay={0.05}>
-              <div className="fc-panel p-6 bg-ink/[0.04]/30 border border-ink/[0.06] rounded-2xl space-y-4 text-left">
+              <div className="fc-panel p-6 bg-ink/[0.04] border border-ink/[0.06] rounded-2xl space-y-4 text-left">
                 <div className="w-8 h-8 rounded-lg bg-[#F97316]/10 flex items-center justify-center border border-[#F97316]/20 text-[#FB923C]">
                   <Mail className="w-4.5 h-4.5" />
                 </div>
                 <div className="space-y-1.5">
                   <h3 className="text-xs font-bold text-ink uppercase tracking-wider">General Support</h3>
-                  <p className="text-[10px] text-ink/40 leading-relaxed font-semibold">
+                  <p className="text-[10px] text-ink-faint leading-relaxed font-semibold">
                     Have questions about setting up datasets or account billing?
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-ink/[0.06] flex flex-col gap-1">
                   <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.pro</span>
-                  <span className="text-[9px] text-ink/30 font-medium">We typically reply within 1-2 business days.</span>
+                  <span className="text-[9px] text-ink-faint font-medium">We typically reply within 1-2 business days.</span>
                 </div>
               </div>
             </RevealOnScroll>
 
             {/* Enterprise Card */}
             <RevealOnScroll delay={0.1}>
-              <div className="fc-panel p-6 bg-ink/[0.04]/30 border border-ink/[0.06] rounded-2xl space-y-4 text-left">
+              <div className="fc-panel p-6 bg-ink/[0.04] border border-ink/[0.06] rounded-2xl space-y-4 text-left">
                 <div className="w-8 h-8 rounded-lg bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#FB923C]">
                   <ShieldCheck className="w-4.5 h-4.5" />
                 </div>
                 <div className="space-y-1.5">
                   <h3 className="text-xs font-bold text-ink uppercase tracking-wider">Enterprise &amp; Partnerships</h3>
-                  <p className="text-[10px] text-ink/40 leading-relaxed font-semibold">
+                  <p className="text-[10px] text-ink-faint leading-relaxed font-semibold">
                     Inquiries regarding bulk DataMart integrations and dedicated custom model nodes.
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-ink/[0.06] flex flex-col gap-1">
                   <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.pro</span>
-                  <span className="text-[9px] text-ink/30 font-medium">Fast-track response channels for production partners.</span>
+                  <span className="text-[9px] text-ink-faint font-medium">Fast-track response channels for production partners.</span>
                 </div>
               </div>
             </RevealOnScroll>
@@ -394,7 +394,7 @@ export default function Contact() {
                   </div>
                   <div className="space-y-0.5">
                     <h4 className="text-[11px] font-bold text-ink uppercase tracking-wider group-hover:text-[#F97316] transition-colors">Looking for quick answers?</h4>
-                    <p className="text-[9px] text-ink/35 font-medium">Check our FAQ section on the landing page.</p>
+                    <p className="text-[9px] text-ink-faint font-medium">Check our FAQ section on the landing page.</p>
                   </div>
                 </div>
                 <div className="text-[#FB923C] group-hover:text-ink transition-colors shrink-0">

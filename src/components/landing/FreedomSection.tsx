@@ -90,7 +90,7 @@ export default function FreedomSection() {
   return (
     <section
       id="methodology"
-      className="freedom-section w-full flex flex-col items-center select-none"
+      className="on-dark freedom-section w-full flex flex-col items-center select-none"
       style={{
         background: `
           radial-gradient(
