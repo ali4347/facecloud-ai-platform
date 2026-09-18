@@ -9,7 +9,7 @@ export default function NotFound() {
         background:
           'radial-gradient(circle at 20% 15%, rgba(249, 115, 22,0.12), transparent 38%),' +
           'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.08), transparent 38%),' +
-          '#000000',
+          'rgb(var(--a-surface-soft))',
       }}
     >
       <div className="absolute top-[20%] left-[20%] w-72 h-72 rounded-full blur-[80px]"
@@ -28,14 +28,14 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">Page Not Found</h1>
-          <p className="text-xs max-w-xs mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink">Page Not Found</h1>
+          <p className="text-xs max-w-xs mx-auto leading-relaxed" style={{ color: 'rgb(var(--a-ink) / 0.50)' }}>
             The requested page does not exist or has been moved to a new folder path.
           </p>
         </div>
 
         <div className="fc-panel-strong p-6 space-y-4">
-          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.42)' }}>
+          <p className="text-[11px]" style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
             Please check the web URL or navigate back to the main user/admin control center.
           </p>
           <Link to="/" className="fc-btn-primary w-full text-xs font-bold py-3 flex items-center justify-center gap-2">

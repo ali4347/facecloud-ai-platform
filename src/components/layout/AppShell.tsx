@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
-import { getStoredAppearance, storeAppearance } from '../../lib/theme'
-import type { Appearance } from '../../lib/theme'
+import { useAppearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 
 interface AppShellProps {
@@ -12,27 +11,7 @@ interface AppShellProps {
 
 export function AppShell({ role }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [appearance, setAppearance] = useState<Appearance>(getStoredAppearance)
-
-  const toggleAppearance = useCallback(() => {
-    setAppearance(current => {
-      const next: Appearance = current === 'dark' ? 'light' : 'dark'
-      storeAppearance(next)
-      return next
-    })
-  }, [])
-
-  /* The page behind the shell is painted black for the marketing site. In the
-     light appearance that shows through on overscroll and under short pages,
-     so repaint the body while the shell is mounted and restore it on the way
-     out, back to the dark public pages. */
-  useEffect(() => {
-    const previous = document.body.style.backgroundColor
-    document.body.style.backgroundColor = appearance === 'light' ? '#F7F8FA' : ''
-    return () => {
-      document.body.style.backgroundColor = previous
-    }
-  }, [appearance])
+  const [appearance, toggleAppearance] = useAppearance()
 
   // Escape key listener to close sidebar
   useEffect(() => {
@@ -57,7 +36,7 @@ export function AppShell({ role }: AppShellProps) {
   }, [sidebarOpen])
 
   return (
-    <div className="fc-app min-h-screen relative" data-theme={appearance}>
+    <div className="fc-app min-h-screen relative">
       {/* Sidebar */}
       <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

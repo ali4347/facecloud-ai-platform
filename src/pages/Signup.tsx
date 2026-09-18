@@ -50,7 +50,7 @@ export default function Signup() {
       <div className="w-full max-w-md relative z-10 space-y-5">
         {/* Logo */}
         <div className="text-center">
-          <FaceCloudLogo variant="full" size="lg" roleLabel="Create Account" href="/" priority={true} className="mx-auto" />
+          <FaceCloudLogo variant="full" size="lg" roleLabel="Create Account" href="/" priority={true} className="mx-auto" tone="app" />
         </div>
 
         {/* Card */}

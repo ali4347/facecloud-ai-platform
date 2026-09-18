@@ -117,13 +117,13 @@ export default function FreedomSection() {
         <div
           className="flex items-center gap-2 text-lg font-medium rounded-full"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.72)',
+            backgroundColor: 'rgb(var(--a-shadow-rgb) / 0.72)',
             border: '1px solid rgba(249, 115, 22, 0.22)',
             color: '#FFFFFF',
             backdropFilter: 'blur(16px) saturate(150%)',
             padding: 'clamp(10px, 0.9vw, 14px) clamp(14px, 1.25vw, 20px)',
             boxShadow: `
-              inset 0 1px 0 rgba(255, 255, 255, 0.06),
+              inset 0 1px 0 rgb(var(--a-ink) / 0.06),
               0 10px 30px rgba(249, 115, 22, 0.10)
             `,
           }}
@@ -153,7 +153,7 @@ export default function FreedomSection() {
 
         {/* Heading */}
         <h2
-          className="font-bold tracking-tight text-white font-display"
+          className="font-bold tracking-tight text-ink font-display"
           style={{
             fontSize: 'clamp(28px, 3.5vw, 48px)',
             lineHeight: 1.2,
@@ -209,7 +209,7 @@ export default function FreedomSection() {
                 borderRadius: '18px',
                 background: 'linear-gradient(145deg, rgba(10, 10, 10, 0.90), rgba(5, 5, 5, 0.82))',
                 border: '1px solid rgba(239, 68, 68, 0.14)',
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 14px 38px rgba(0, 0, 0, 0.26)',
+                boxShadow: 'inset 0 1px 0 rgb(var(--a-ink) / 0.035), 0 14px 38px rgb(var(--a-shadow-rgb) / 0.26)',
                 backdropFilter: 'blur(18px) saturate(130%)',
               }}
             >
@@ -290,7 +290,7 @@ export default function FreedomSection() {
                 borderRadius: '18px',
                 background: 'linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(10, 10, 10, 0.86))',
                 border: '1px solid rgba(16, 185, 129, 0.16)',
-                boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 14px 40px rgba(0, 0, 0, 0.13)',
+                boxShadow: 'inset 0 1px 0 rgb(var(--a-ink) / 0.04), 0 14px 40px rgb(var(--a-shadow-rgb) / 0.13)',
               }}
             >
               <img

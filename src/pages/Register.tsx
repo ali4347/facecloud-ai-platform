@@ -31,7 +31,7 @@ export default function Register() {
         background:
           'radial-gradient(circle at 20% 15%, rgba(249, 115, 22,0.18), transparent 38%),' +
           'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.14), transparent 38%),' +
-          '#000000',
+          'rgb(var(--a-surface-soft))',
       }}
     >
       <div className="absolute inset-0 pointer-events-none">
@@ -44,13 +44,13 @@ export default function Register() {
       <div className="w-full max-w-md relative z-10 space-y-5">
         {/* Logo */}
         <div className="text-center">
-          <FaceCloudLogo variant="full" size="lg" roleLabel="Create Account" href="/" priority={true} className="mx-auto" />
+          <FaceCloudLogo variant="full" size="lg" roleLabel="Create Account" href="/" priority={true} className="mx-auto" tone="app" />
         </div>
 
         {/* Card */}
         <div className="fc-panel-strong p-8">
-          <h2 className="text-xl font-bold text-white mb-1">Get Started</h2>
-          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.48)' }}>
+          <h2 className="text-xl font-bold text-ink mb-1">Get Started</h2>
+          <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Create your profile to process faces with AI.
           </p>
 
@@ -70,12 +70,12 @@ export default function Register() {
             ].map(f => (
               <div key={f.label} className="space-y-1.5">
                 <label className="text-[10px] font-bold uppercase tracking-widest"
-                  style={{ color: 'rgba(255,255,255,0.42)' }}>
+                  style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                   {f.label}
                 </label>
                 <div className="relative">
                   <f.icon className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                    style={{ color: 'rgba(255,255,255,0.35)' }} />
+                    style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                   <input
                     type={f.type}
                     placeholder={f.placeholder}
@@ -94,7 +94,7 @@ export default function Register() {
           </form>
         </div>
 
-        <div className="text-center text-xs" style={{ color: 'rgba(255,255,255,0.38)' }}>
+        <div className="text-center text-xs" style={{ color: 'rgb(var(--a-ink) / 0.38)' }}>
           Already have an account?{' '}
           <Link to="/login" className="font-semibold transition-colors"
             style={{ color: '#FB923C' }}

@@ -9,7 +9,7 @@ export default function Unauthorized() {
         background:
           'radial-gradient(circle at 20% 15%, rgba(239,68,68,0.12), transparent 38%),' +
           'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.08), transparent 38%),' +
-          '#000000',
+          'rgb(var(--a-surface-soft))',
       }}
     >
       {/* Glow */}
@@ -29,14 +29,14 @@ export default function Unauthorized() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-extrabold tracking-tight text-white">Access Denied</h1>
-          <p className="text-xs max-w-xs mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.50)' }}>
+          <h1 className="text-2xl font-extrabold tracking-tight text-ink">Access Denied</h1>
+          <p className="text-xs max-w-xs mx-auto leading-relaxed" style={{ color: 'rgb(var(--a-ink) / 0.50)' }}>
             Your authenticated role does not possess permissions to view this directory block.
           </p>
         </div>
 
         <div className="fc-panel-strong p-6 space-y-4">
-          <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.42)' }}>
+          <p className="text-[11px]" style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
             To resolve this, please sign out and sign in using a credential mapping with appropriate clearances.
           </p>
           <div className="flex gap-3">

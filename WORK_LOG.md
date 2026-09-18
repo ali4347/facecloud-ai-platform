@@ -26,7 +26,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete (mock) | Queue, image review, members, batches, notifications, reports, audit, settings |
-| Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere. Public pages are always black with the monospace display face; the dashboards share the palette in a flatter card layout (scope `.fc-app`, Inter headings) and switch between a dark and a light appearance |
+| Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Vercel | `vercel.json` SPA rewrite that skips files with extensions (so `/videos/*.mp4` serve) |
 | Backend database (PostgreSQL 16 + Prisma 5.22) | ✅ Schema + migration + seed | 15 models, 8 enums, migration `20260714_init`, 3 seeded accounts |
@@ -45,6 +45,30 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-09-18 — Appearance switch extended to the whole site
+*Status: committed (this commit)*
+- The light/dark switch now covers the marketing pages, the auth screens and the error pages, not just the
+  dashboards. One setting drives everything: `<html data-theme>`, stored under `facecloud_theme`, dark by default.
+- The appearance tokens moved from the app shell to `:root`, so every page resolves the same `ink` / `line` /
+  `surface` / `accent` names. `html[data-theme='light']` redefines them and `html[data-theme='light'] .fc-app`
+  carries the few shell-specific differences.
+- Added a second set of variables (`--s-*`) for the marketing surfaces, which keep their glass treatment: panel,
+  border, pill, blur, glow and shadow each have a dark and a light value. The base component classes
+  (`.fc-panel`, `.fc-input`, `.fc-btn-*`, `.badge-muted`, `.fc-table`, `.glass-pill`, `.liquid-glass`, `.fc-app-bg`)
+  now read those instead of hardcoded translucent white, so they follow the switch without a second rule set.
+- Converted the colour literals in twelve marketing and auth files. The useful trick: `ink` is white in dark and
+  near-black in light, so `*-white/N` became `*-ink/N` and kept its exact current look in dark while inverting
+  correctly in light.
+- New `.glass-media` class for chrome that floats on the hero video — the navbar pill, the "Get Started" button and
+  the hero's feature pills. That footage is dark in both appearances, so those surfaces stay dark on purpose. The
+  navbar tracks this with an `onMedia` flag: white text at the top of the home page, token colours once it docks or
+  on any other page.
+- The auth screens painted their own black ground; that now resolves from the same token, and their logos use the
+  token tone so the wordmark does not disappear on white.
+- A toggle sits in the public navbar as well as the dashboard topbar; `useAppearance()` in `src/lib/theme.ts` keeps
+  them in step, and `main.tsx` paints the stored choice before React mounts so there is no flash.
+- Verified by rendering the home page, About, Contact, the login screen and the user dashboard in both appearances.
 
 ### 2026-09-18 — Dashboard appearance switch (dark and light both work)
 *Status: committed (this commit)*
@@ -315,8 +339,10 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
 - `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
-- The appearance choice is stored per browser and does not follow the operating system setting. That is deliberate
-  for now, since the public pages are dark regardless, but it means a visitor who prefers light has to click once.
+- The appearance choice is stored per browser and does not follow the operating system setting, so a visitor who
+  prefers light has to click once. Wiring it to `prefers-color-scheme` on first visit would remove that step.
+- The hero video is dark in both appearances, so the top of the home page stays dark even in the light appearance.
+  That is deliberate, but it means the light home page opens on a dark screen before the rest lightens.
 - Vite 8 / rolldown chunk warning: consider `build.chunkSizeWarningLimit` or dynamic imports for portals.
 
 ---

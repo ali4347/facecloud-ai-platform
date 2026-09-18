@@ -42,7 +42,7 @@ export default function Login() {
         background:
           'radial-gradient(circle at 20% 15%, rgba(249, 115, 22,0.18), transparent 38%),' +
           'radial-gradient(circle at 80% 85%, rgba(234, 88, 12,0.14), transparent 38%),' +
-          '#000000',
+          'rgb(var(--a-surface-soft))',
       }}
     >
       {/* Animated ambient layers */}
@@ -56,13 +56,13 @@ export default function Login() {
       <div className="w-full max-w-md relative z-10 space-y-5">
         {/* Logo */}
         <div className="text-center">
-          <FaceCloudLogo variant="full" size="lg" roleLabel="User Portal" href="/" priority={true} className="mx-auto" />
+          <FaceCloudLogo variant="full" size="lg" roleLabel="User Portal" href="/" priority={true} className="mx-auto" tone="app" />
         </div>
 
         {/* Card */}
         <div className="fc-panel-strong p-8">
-          <h2 className="text-xl font-bold text-white mb-1">Welcome Back</h2>
-          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.48)' }}>
+          <h2 className="text-xl font-bold text-ink mb-1">Welcome Back</h2>
+          <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Access your AI-enhanced image workspace.
           </p>
 
@@ -97,12 +97,12 @@ export default function Login() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color: 'rgba(255,255,255,0.42)' }}>
+                style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Email Address
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                  style={{ color: 'rgba(255,255,255,0.35)' }} />
+                  style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input
                   type="email"
                   value={email}
@@ -115,12 +115,12 @@ export default function Login() {
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color: 'rgba(255,255,255,0.42)' }}>
+                style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                  style={{ color: 'rgba(255,255,255,0.35)' }} />
+                  style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input
                   type="password"
                   value={password}
@@ -138,7 +138,7 @@ export default function Login() {
         </div>
 
         {/* Links */}
-        <div className="text-center space-y-3 text-xs" style={{ color: 'rgba(255,255,255,0.38)' }}>
+        <div className="text-center space-y-3 text-xs" style={{ color: 'rgb(var(--a-ink) / 0.38)' }}>
           <p>
             Don't have an account?{' '}
             <Link to="/register" className="font-semibold transition-colors"
@@ -152,8 +152,8 @@ export default function Login() {
           <div className="flex justify-center gap-5">
             {[{ to: '/admin/login', label: 'Admin Portal' }, { to: '/moderator/login', label: 'Moderator Portal' }, { to: '/', label: 'Home' }].map(l => (
               <Link key={l.to} to={l.to}
-                className="hover:text-white transition-colors"
-                style={{ color: 'rgba(255,255,255,0.35)' }}
+                className="hover:text-ink transition-colors"
+                style={{ color: 'rgb(var(--a-ink) / 0.35)' }}
               >
                 {l.label}
               </Link>

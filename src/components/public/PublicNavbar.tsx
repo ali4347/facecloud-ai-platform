@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Sun, Moon } from 'lucide-react'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 import { cn } from '../../lib/utils'
+import { useAppearance } from '../../lib/theme'
 
 export function PublicNavbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
   const isHomePage = location.pathname === '/'
+  const [appearance, toggleAppearance] = useAppearance()
+
+  /* At the top of the home page the bar floats over the hero video, which is
+     dark in either appearance — so the text there stays white. Once it docks,
+     or on any other page, it sits on the page itself and follows the tokens. */
+  const onMedia = isHomePage && !scrolled
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,7 +86,7 @@ export function PublicNavbar() {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-in-out",
           scrolled
-            ? "bg-black/80 backdrop-blur-md border-b border-white/10 py-3 shadow-lg"
+            ? "bg-surface-soft/85 backdrop-blur-md border-b border-ink/10 py-3 shadow-lg"
             : "bg-transparent py-5"
         )}
       >
@@ -91,14 +98,17 @@ export function PublicNavbar() {
               "transition-all duration-300 ease-in-out flex items-center justify-between w-full",
               scrolled
                 ? "px-2 py-0 bg-transparent border-transparent shadow-none"
-                : "liquid-glass rounded-full px-5 py-3"
+                : cn("rounded-full px-5 py-3", onMedia ? "glass-media" : "liquid-glass")
             )}
           >
             {/* Logo */}
-            <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} />
+            <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} tone={onMedia ? "dark" : "app"} />
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-7 text-white/70 text-sm font-medium">
+            <div className={cn(
+              "hidden md:flex items-center gap-7 text-sm font-medium",
+              onMedia ? "text-white/70" : "text-ink-mute"
+            )}>
               {menuItems.map(item => {
                 if (item.isHash) {
                   return (
@@ -106,7 +116,10 @@ export function PublicNavbar() {
                       key={item.label}
                       href={getHref(item)}
                       onClick={(e) => handleNavClick(e, item)}
-                      className="hover:text-white transition-colors duration-200"
+                      className={cn(
+                        "transition-colors duration-200",
+                        onMedia ? "hover:text-white" : "hover:text-ink"
+                      )}
                     >
                       {item.label}
                     </a>
@@ -120,8 +133,8 @@ export function PublicNavbar() {
                       className={cn(
                         "transition-colors duration-200",
                         location.pathname === getHref(item)
-                          ? "text-white font-semibold"
-                          : "hover:text-white text-white/70"
+                          ? (onMedia ? "text-white font-semibold" : "text-ink font-semibold")
+                          : (onMedia ? "text-white/70 hover:text-white" : "text-ink-mute hover:text-ink")
                       )}
                     >
                       {item.label}
@@ -135,22 +148,50 @@ export function PublicNavbar() {
             <div className="hidden md:flex items-center gap-1">
               <Link
                 to="/login"
-                className="px-4 py-2 text-[13px] font-medium text-white/65 hover:text-white transition-colors duration-200"
+                className={cn(
+                  "px-4 py-2 text-[13px] font-medium transition-colors duration-200",
+                  onMedia ? "text-white/65 hover:text-white" : "text-ink-mute hover:text-ink"
+                )}
               >
                 User Login
               </Link>
               <Link
                 to="/login"
-                className="glass-pill px-5 py-2 text-[13px] font-medium text-white border border-white/15 hover:border-white/30 hover:bg-white/[0.06] transition-all duration-300 cursor-pointer ml-1"
+                className={cn(
+                  "px-5 py-2 rounded-full text-[13px] font-medium transition-all duration-300 cursor-pointer ml-1",
+                  onMedia ? "glass-media" : "glass-pill",
+                  onMedia ? "text-white border border-white/15 hover:border-white/30"
+                          : "text-ink border border-ink/15 hover:border-ink/30"
+                )}
               >
                 Get Started
               </Link>
+
+              <button
+                type="button"
+                onClick={toggleAppearance}
+                aria-label={appearance === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance'}
+                title={appearance === 'dark' ? 'Light appearance' : 'Dark appearance'}
+                aria-pressed={appearance === 'light'}
+                className={cn(
+                  "ml-1 p-2 rounded-full transition-colors duration-200 cursor-pointer",
+                  onMedia ? "text-white/65 hover:text-white hover:bg-white/10"
+                          : "text-ink-mute hover:text-ink hover:bg-ink/10"
+                )}
+              >
+                {appearance === 'dark'
+                  ? <Sun className="w-[18px] h-[18px]" />
+                  : <Moon className="w-[18px] h-[18px]" />}
+              </button>
             </div>
 
             {/* Mobile hamburger */}
             <button
               onClick={() => setMobileOpen(o => !o)}
-              className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+              className={cn(
+                "md:hidden p-2 transition-colors",
+                onMedia ? "text-white/70 hover:text-white" : "text-ink-mute hover:text-ink"
+              )}
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -180,14 +221,14 @@ export function PublicNavbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed inset-x-0 top-0 z-[100] w-full bg-[#080808] border-b border-[rgba(255,255,255,0.16)] px-6 pt-5 pb-8 flex flex-col gap-5 shadow-2xl md:hidden overflow-y-auto max-h-[100vh]"
+              className="fixed inset-x-0 top-0 z-[100] w-full bg-surface-soft border-b border-ink/15 px-6 pt-5 pb-8 flex flex-col gap-5 shadow-2xl md:hidden overflow-y-auto max-h-[100vh]"
             >
               {/* Header row: Logo + Close button */}
-              <div className="flex items-center justify-between pb-4 border-b border-[rgba(255,255,255,0.12)]">
-                <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} />
+              <div className="flex items-center justify-between pb-4 border-b border-ink/10">
+                <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} tone="app" />
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="p-2 text-white/70 hover:text-white transition-colors rounded-lg bg-white/5 border border-white/10"
+                  className="p-2 text-ink-mute hover:text-ink transition-colors rounded-lg bg-ink/5 border border-ink/10"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -205,7 +246,7 @@ export function PublicNavbar() {
                         key={item.label}
                         href={href}
                         onClick={(e) => handleNavClick(e, item)}
-                        className="text-left text-white/80 hover:text-white text-base font-medium py-1.5 transition-colors"
+                        className="text-left text-ink-soft hover:text-ink text-base font-medium py-1.5 transition-colors"
                       >
                         {item.label}
                       </a>
@@ -220,7 +261,7 @@ export function PublicNavbar() {
                           "text-left text-base font-medium py-1.5 transition-colors",
                           isActive
                             ? "text-[#F97316] font-semibold"
-                            : "text-white/80 hover:text-white"
+                            : "text-ink-soft hover:text-ink"
                         )}
                       >
                         {item.label}
@@ -231,14 +272,14 @@ export function PublicNavbar() {
               </div>
 
               {/* Separator */}
-              <div className="h-px bg-[rgba(255,255,255,0.12)] my-1" />
+              <div className="h-px bg-ink/10 my-1" />
 
               {/* CTAs */}
               <div className="flex flex-col gap-3">
                 <Link
                   to="/login"
                   onClick={() => setMobileOpen(false)}
-                  className="text-left text-white/80 hover:text-white text-sm font-medium py-2 transition-colors"
+                  className="text-left text-ink-soft hover:text-ink text-sm font-medium py-2 transition-colors"
                 >
                   User Login
                 </Link>

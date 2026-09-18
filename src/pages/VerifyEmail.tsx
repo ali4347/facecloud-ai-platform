@@ -39,7 +39,7 @@ export default function VerifyEmail() {
         background:
           'radial-gradient(circle at 20% 20%, rgba(249, 115, 22,0.18), transparent 38%),' +
           'radial-gradient(circle at 80% 80%, rgba(79,255,176,0.10), transparent 38%),' +
-          '#000000',
+          'rgb(var(--a-surface-soft))',
       }}
     >
       <div className="absolute inset-0 pointer-events-none">
@@ -52,7 +52,7 @@ export default function VerifyEmail() {
       <div className="w-full max-w-md relative z-10 space-y-5">
         {/* Logo */}
         <div className="text-center">
-          <FaceCloudLogo variant="full" size="lg" roleLabel="Verify Identity" href="/" priority={true} className="mx-auto" />
+          <FaceCloudLogo variant="full" size="lg" roleLabel="Verify Identity" href="/" priority={true} className="mx-auto" tone="app" />
         </div>
 
         {/* Card */}
@@ -74,11 +74,11 @@ export default function VerifyEmail() {
           </div>
 
           <div className="space-y-2">
-            <h2 className="text-xl font-bold text-white">
+            <h2 className="text-xl font-bold text-ink">
               {success ? 'Email Verified!' : 'Confirm Email Address'}
             </h2>
             <p className="text-xs leading-relaxed max-w-xs mx-auto"
-              style={{ color: 'rgba(255,255,255,0.50)' }}>
+              style={{ color: 'rgb(var(--a-ink) / 0.50)' }}>
               {success
                 ? 'Redirecting you to login…'
                 : 'We sent a verification link to your email. Click below to confirm your registration.'}
@@ -110,8 +110,8 @@ export default function VerifyEmail() {
           </div>
         </div>
 
-        <div className="text-center text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-          <Link to="/login" className="hover:text-white transition-colors">
+        <div className="text-center text-xs" style={{ color: 'rgb(var(--a-ink) / 0.35)' }}>
+          <Link to="/login" className="hover:text-ink transition-colors">
             ← Back to Login
           </Link>
         </div>

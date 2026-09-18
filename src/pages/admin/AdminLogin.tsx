@@ -41,7 +41,7 @@ export default function AdminLogin() {
         background:
           'radial-gradient(circle at 20% 15%, rgba(234, 88, 12,0.18), transparent 38%),' +
           'radial-gradient(circle at 80% 85%, rgba(249, 115, 22,0.14), transparent 38%),' +
-          '#000000',
+          'rgb(var(--a-surface-soft))',
       }}
     >
       {/* Animated ambient layers */}
@@ -56,13 +56,13 @@ export default function AdminLogin() {
         
         {/* Logo */}
         <div className="text-center">
-          <FaceCloudLogo variant="full" size="lg" roleLabel="Admin Console" href="/" priority={true} className="mx-auto" />
+          <FaceCloudLogo variant="full" size="lg" roleLabel="Admin Console" href="/" priority={true} className="mx-auto" tone="app" />
         </div>
 
         {/* Card */}
         <div className="fc-panel-strong p-8">
-          <h2 className="text-xl font-bold text-white mb-1">Console Authentication</h2>
-          <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.48)' }}>
+          <h2 className="text-xl font-bold text-ink mb-1">Console Authentication</h2>
+          <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Manage global users, logs, and services.
           </p>
 
@@ -82,12 +82,12 @@ export default function AdminLogin() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color: 'rgba(255,255,255,0.42)' }}>
+                style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Admin Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                  style={{ color: 'rgba(255,255,255,0.35)' }} />
+                  style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input 
                   type="email"
                   value={email}
@@ -100,12 +100,12 @@ export default function AdminLogin() {
 
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold uppercase tracking-widest"
-                style={{ color: 'rgba(255,255,255,0.42)' }}>
+                style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Console Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                  style={{ color: 'rgba(255,255,255,0.35)' }} />
+                  style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input 
                   type="password"
                   value={password}
@@ -121,7 +121,7 @@ export default function AdminLogin() {
               className="fc-btn-primary w-full mt-2"
               style={{
                 background: 'linear-gradient(135deg, #EA580C 0%, #F97316 100%)',
-                boxShadow: '0 4px 20px rgba(234, 88, 12,0.35), inset 0 1px 0 rgba(255,255,255,0.20)'
+                boxShadow: '0 4px 20px rgba(234, 88, 12,0.35), inset 0 1px 0 rgb(var(--a-ink) / 0.20)'
               }}
               disabled={loading}
             >
@@ -131,11 +131,11 @@ export default function AdminLogin() {
         </div>
 
         {/* Footnotes */}
-        <div className="text-center space-y-3 text-xs" style={{ color: 'rgba(255,255,255,0.38)' }}>
+        <div className="text-center space-y-3 text-xs" style={{ color: 'rgb(var(--a-ink) / 0.38)' }}>
           <div className="flex justify-center gap-5">
-            <Link to="/login" className="hover:text-white transition-colors">User Login</Link>
-            <Link to="/moderator/login" className="hover:text-white transition-colors">Moderator Portal</Link>
-            <Link to="/" className="hover:text-white transition-colors">Home Page</Link>
+            <Link to="/login" className="hover:text-ink transition-colors">User Login</Link>
+            <Link to="/moderator/login" className="hover:text-ink transition-colors">Moderator Portal</Link>
+            <Link to="/" className="hover:text-ink transition-colors">Home Page</Link>
           </div>
         </div>
 

@@ -98,8 +98,8 @@ section[id] {
   }
 
   body {
-    background-color: #000000;
-    color: rgba(255,255,255,0.94);
+    background-color: rgb(var(--a-surface-soft));
+    color: rgb(var(--a-ink));
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -109,13 +109,14 @@ section[id] {
 
   /* Scrollbars */
   ::-webkit-scrollbar        { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track  { background: #000000; }
+  ::-webkit-scrollbar-track  { background: var(--s-scroll-track); }
   ::-webkit-scrollbar-thumb  { background: rgba(249,115,22,0.25); border-radius: 9999px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.45); }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Space Mono', 'JetBrains Mono', monospace;
     font-weight: 700;
+    color: rgb(var(--a-ink));
   }
 }
 
@@ -125,23 +126,22 @@ section[id] {
   /* ── Cinematic app background ──────────────────────────────────── */
   .fc-app-bg {
     background:
-      radial-gradient(circle at 18% 12%,  rgba(249,115,22,0.12),  transparent 34%),
-      radial-gradient(circle at 82%  8%,  rgba(234,88,12,0.10), transparent 30%),
-      radial-gradient(circle at 70% 85%,  rgba(251,146,60,0.06), transparent 34%),
-      #000000;
+      radial-gradient(circle at 18% 12%, var(--s-glow), transparent 34%),
+      radial-gradient(circle at 82%  8%, var(--s-glow), transparent 30%),
+      radial-gradient(circle at 70% 85%, var(--s-glow), transparent 34%),
+      rgb(var(--a-surface-soft));
     min-height: 100vh;
   }
 
   /* ── Liquid Glass (Apple-style) ─────────────────────────────────── */
   .liquid-glass {
-    background: rgba(255,255,255,0.045);
-    background-blend-mode: luminosity;
-    backdrop-filter: blur(18px) saturate(170%);
-    -webkit-backdrop-filter: blur(18px) saturate(170%);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: var(--s-panel);
+    backdrop-filter: var(--s-blur);
+    -webkit-backdrop-filter: var(--s-blur);
+    border: 1px solid var(--s-border);
     box-shadow:
-      inset 0 1px 1px rgba(255,255,255,0.12),
-      0 24px 90px rgba(0,0,0,0.35);
+      inset 0 1px 1px var(--s-inset),
+      var(--s-shadow);
     position: relative;
     overflow: hidden;
   }
@@ -171,15 +171,14 @@ section[id] {
 
   /* ── fc-panel ────────────────────────────────────────────────────── */
   .fc-panel {
-    background: rgba(255,255,255,0.045);
-    backdrop-filter: blur(20px) saturate(170%);
-    -webkit-backdrop-filter: blur(20px) saturate(170%);
-    border: 1px solid rgba(255,255,255,0.11);
+    background: var(--s-panel);
+    backdrop-filter: var(--s-blur);
+    -webkit-backdrop-filter: var(--s-blur);
+    border: 1px solid var(--s-border);
     border-radius: 24px;
     box-shadow:
-      inset 0 1px 1px rgba(255,255,255,0.10),
-      0 24px 90px rgba(0,0,0,0.32),
-      0 0 45px rgba(249,115,22,0.08);
+      inset 0 1px 1px var(--s-inset),
+      var(--s-shadow);
     transition: border-color 220ms ease, box-shadow 220ms ease;
   }
 
@@ -192,15 +191,14 @@ section[id] {
   }
 
   .fc-panel-strong {
-    background: rgba(255,255,255,0.075);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(249,115,22,0.20);
+    background: var(--s-panel-strong);
+    backdrop-filter: var(--s-blur);
+    -webkit-backdrop-filter: var(--s-blur);
+    border: 1px solid var(--s-border-accent);
     border-radius: 28px;
     box-shadow:
-      inset 0 1px 1px rgba(255,255,255,0.12),
-      0 28px 100px rgba(0,0,0,0.42),
-      0 0 60px rgba(249,115,22,0.10);
+      inset 0 1px 1px var(--s-inset),
+      var(--s-shadow);
   }
 
   /* ── fc-card (alias for fc-panel for component usage) ────────────── */
@@ -230,24 +228,38 @@ section[id] {
       0 0 70px rgba(249,115,22,0.16);
   }
 
-  /* ── Glass pill ─────────────────────────────────────────────────── */
-  .glass-pill {
+  /* ── Glass over media ───────────────────────────────────────────
+     For chrome that floats on the hero video or a photo. Deliberately not
+     token-driven: the footage is dark in both appearances, so this surface
+     and the white text on it must stay dark too. */
+  .glass-media {
     background: rgba(255,255,255,0.055);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid rgba(255,255,255,0.10);
-    border-radius: 9999px;
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.10),
       0 12px 40px rgba(0,0,0,0.20);
   }
 
+  /* ── Glass pill ─────────────────────────────────────────────────── */
+  .glass-pill {
+    background: var(--s-pill);
+    backdrop-filter: var(--s-blur);
+    -webkit-backdrop-filter: var(--s-blur);
+    border: 1px solid var(--s-pill-border);
+    border-radius: 9999px;
+    box-shadow:
+      inset 0 1px 1px var(--s-inset),
+      var(--s-shadow);
+  }
+
   /* ── fc-dark-glass (sidebar/topbar) ────────────────────────────── */
   .fc-dark-glass {
-    background: rgba(0,0,0,0.52);
-    backdrop-filter: blur(24px) saturate(160%);
-    -webkit-backdrop-filter: blur(24px) saturate(160%);
-    border: 1px solid rgba(255,255,255,0.09);
+    background: var(--s-panel);
+    backdrop-filter: var(--s-blur);
+    -webkit-backdrop-filter: var(--s-blur);
+    border: 1px solid var(--s-border);
   }
 
   /* ── Buttons ─────────────────────────────────────────────────────── */
@@ -281,14 +293,14 @@ section[id] {
   .fc-btn-secondary {
     @apply rounded-2xl px-6 py-3.5 text-sm font-semibold transition-all duration-300
            flex items-center justify-center gap-2 cursor-pointer;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.14);
-    color: rgba(255,255,255,0.88);
+    background: var(--s-panel);
+    border: 1px solid var(--s-border);
+    color: rgb(var(--a-ink-soft));
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
   .fc-btn-secondary:hover {
-    background: rgba(255,255,255,0.11);
+    background: var(--s-panel-strong);
     border-color: rgba(251,146,60,0.35);
     box-shadow: 0 0 20px rgba(249,115,22,0.12);
   }
@@ -296,11 +308,11 @@ section[id] {
   .fc-btn-ghost {
     @apply rounded-2xl px-5 py-2.5 text-sm font-medium transition-all duration-200
            flex items-center justify-center gap-2 cursor-pointer;
-    color: rgba(255,255,255,0.55);
+    color: rgb(var(--a-ink-mute));
   }
   .fc-btn-ghost:hover {
-    background: rgba(255,255,255,0.07);
-    color: rgba(255,255,255,0.90);
+    background: var(--s-panel);
+    color: rgb(var(--a-ink));
   }
 
   .fc-btn-danger {
@@ -358,9 +370,9 @@ section[id] {
   /* muted */
   .badge-muted {
     @apply badge;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: rgba(255,255,255,0.52);
+    background: var(--s-panel);
+    border: 1px solid var(--s-border);
+    color: rgb(var(--a-ink-mute));
   }
 
   /* ── Sidebar nav ─────────────────────────────────────────────────── */
@@ -386,18 +398,18 @@ section[id] {
   .fc-table { @apply w-full; }
   .fc-table th {
     @apply text-[10px] font-bold uppercase tracking-widest px-5 py-4 text-left;
-    background: rgba(255,255,255,0.035);
-    color: rgba(255,255,255,0.45);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: var(--s-panel);
+    color: rgb(var(--a-ink-mute));
+    border-bottom: 1px solid var(--s-border);
   }
   .fc-table td {
     @apply text-sm px-5 py-4;
-    color: rgba(255,255,255,0.82);
-    border-top: 1px solid rgba(255,255,255,0.06);
+    color: rgb(var(--a-ink-soft));
+    border-top: 1px solid var(--s-border);
     font-family: inherit;
   }
   .fc-table tr:hover td {
-    background: rgba(255,255,255,0.025);
+    background: var(--s-panel);
   }
   .fc-table .mono {
     font-family: 'JetBrains Mono', monospace;
@@ -407,13 +419,13 @@ section[id] {
   /* ── Inputs ──────────────────────────────────────────────────────── */
   .fc-input {
     @apply w-full px-4 py-3 rounded-2xl text-sm outline-none transition-all duration-200;
-    background: rgba(255,255,255,0.045);
-    border: 1px solid rgba(255,255,255,0.10);
-    color: rgba(255,255,255,0.94);
+    background: var(--s-panel);
+    border: 1px solid var(--s-border);
+    color: rgb(var(--a-ink));
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
-  .fc-input::placeholder { color: rgba(255,255,255,0.38); }
+  .fc-input::placeholder { color: rgb(var(--a-ink-faint)); }
   .fc-input:focus {
     border-color: rgba(251,146,60,0.45);
     box-shadow: 0 0 0 4px rgba(249,115,22,0.10);
@@ -440,7 +452,7 @@ section[id] {
   }
 
   .text-dark {
-    color: rgba(255, 255, 255, 0.94) !important;
+    color: rgb(var(--a-ink)) !important;
   }
 
   @keyframes fcFadeIn {
@@ -548,7 +560,20 @@ section[id] {
    else is carried by white at four opacities on a near-black card.
    ═══════════════════════════════════════════════════════════════════════ */
 
-.fc-app {
+/* ═══════════════════════════════════════════════════════════════════════
+   APPEARANCE TOKENS  —  one set of names, two sets of values
+
+   Defined on :root so the marketing pages and the app shell both resolve
+   them. Dark is the default; `html[data-theme='light']` redefines the same
+   names. Channel triples keep Tailwind's opacity modifiers working
+   (bg-accent/20, text-ink-mute/60).
+
+   Orange is the accent in BOTH appearances — it is the brand colour, not a
+   dark-mode affordance. Only neutrals, shadows and status tints differ.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+
   /* Channel triples, so Tailwind's opacity modifiers keep working.
      Dark is the default appearance; the light block below only redefines
      these same names, which is why no component needs a second set of rules. */
@@ -581,15 +606,26 @@ section[id] {
   --a-warning: #F59E0B;
   --a-danger:  #EF4444;
 
-  background: rgb(var(--a-surface-soft));
-  color: rgb(var(--a-ink));
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Marketing-page surfaces. The public pages keep their glass treatment, so
+     these are full colour values rather than channel triples. */
+  --s-panel:         rgba(255,255,255,0.045);
+  --s-panel-strong:  rgba(255,255,255,0.075);
+  --s-border:        rgba(255,255,255,0.11);
+  --s-border-accent: rgba(249,115,22,0.20);
+  --s-pill:          rgba(255,255,255,0.055);
+  --s-pill-border:   rgba(255,255,255,0.10);
+  --s-inset:         rgba(255,255,255,0.10);
+  --s-shadow:        0 24px 90px rgba(0,0,0,0.32);
+  --s-glow:          rgba(249,115,22,0.08);
+  --s-blur:          blur(20px) saturate(170%);
+  --s-scroll-track:  #000000;
+  --s-ok:            #4FFFB0;
+
   color-scheme: dark;
 }
 
-/* Light appearance — same tokens, lighter values. Orange stays the accent in
-   both, since it is the brand colour, not a dark-mode affordance. */
-.fc-app[data-theme='light'] {
+html[data-theme='light'] {
+
   --a-surface:      255 255 255;
   --a-surface-soft: 247 248 250;
   --a-surface-mute: 241 243 247;
@@ -619,8 +655,29 @@ section[id] {
   --a-warning: #B45309;
   --a-danger:  #B91C1C;
 
+  --s-panel:         #FFFFFF;
+  --s-panel-strong:  #FFFFFF;
+  --s-border:        #E6E9EF;
+  --s-border-accent: rgba(234,88,12,0.28);
+  --s-pill:          rgba(255,255,255,0.88);
+  --s-pill-border:   #E6E9EF;
+  --s-inset:         rgba(255,255,255,0);
+  --s-shadow:        0 1px 2px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.06);
+  --s-glow:          rgba(249,115,22,0.05);
+  --s-blur:          blur(12px) saturate(120%);
+  --s-scroll-track:  #F7F8FA;
+  --s-ok:            #047857;
+
   color-scheme: light;
 }
+
+/* The shell paints its own ground; the marketing pages paint theirs on body. */
+.fc-app {
+  background: rgb(var(--a-surface-soft));
+  color: rgb(var(--a-ink));
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
 
 /* Headings drop the monospace display face — the app reads as a product,
    not as the marketing site. */
@@ -968,49 +1025,49 @@ section[id] {
    The tints above are tuned for a dark card. On white the same 12% washes
    need the dark end of each ramp for the text to stay legible. */
 
-.fc-app[data-theme='light'] .badge-success {
+html[data-theme='light'] .fc-app .badge-success {
   background: #ECFDF5; border-color: #A7F3D0; color: #047857;
 }
-.fc-app[data-theme='light'] .badge-error {
+html[data-theme='light'] .fc-app .badge-error {
   background: #FEF2F2; border-color: #FECACA; color: #B91C1C;
 }
-.fc-app[data-theme='light'] .badge-warning {
+html[data-theme='light'] .fc-app .badge-warning {
   background: #FFFBEB; border-color: #FDE68A; color: #B45309;
 }
-.fc-app[data-theme='light'] .badge-info,
-.fc-app[data-theme='light'] .badge-purple {
+html[data-theme='light'] .fc-app .badge-info,
+html[data-theme='light'] .fc-app .badge-purple {
   background: rgb(var(--a-accent-tint)); border-color: rgba(234,88,12,0.28); color: rgb(var(--a-accent-deep));
 }
 
-.fc-app[data-theme='light'] .fc-btn-danger {
+html[data-theme='light'] .fc-app .fc-btn-danger {
   background: #FEF2F2;
   border-color: #FECACA;
   color: #B91C1C;
 }
-.fc-app[data-theme='light'] .fc-btn-danger:hover {
+html[data-theme='light'] .fc-app .fc-btn-danger:hover {
   background: #FEE2E2;
   border-color: #FCA5A5;
 }
 
-.fc-app[data-theme='light'] .fc-btn-success {
+html[data-theme='light'] .fc-app .fc-btn-success {
   background: #047857;
   color: #FFFFFF;
 }
-.fc-app[data-theme='light'] .fc-btn-success:hover { background: #065F46; }
+html[data-theme='light'] .fc-app .fc-btn-success:hover { background: #065F46; }
 
-.fc-app[data-theme='light'] .upload-dropzone {
+html[data-theme='light'] .fc-app .upload-dropzone {
   background: rgb(var(--a-surface-mute));
   border-color: rgb(var(--a-line-strong));
 }
-.fc-app[data-theme='light'] .upload-dropzone:hover,
-.fc-app[data-theme='light'] .upload-dropzone.drag-active {
+html[data-theme='light'] .fc-app .upload-dropzone:hover,
+html[data-theme='light'] .fc-app .upload-dropzone.drag-active {
   background: rgb(var(--a-accent-tint));
   border-color: rgb(var(--a-accent));
 }
 
 /* The sidebar's selected row reads as a raised white pill on light, and as a
    lifted panel with an orange edge on dark. */
-.fc-app[data-theme='light'] .sidebar-item-active {
+html[data-theme='light'] .fc-app .sidebar-item-active {
   background: rgb(var(--a-surface));
   border-color: rgb(var(--a-line));
   box-shadow: var(--a-shadow-pill);

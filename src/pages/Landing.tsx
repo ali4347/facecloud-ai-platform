@@ -179,7 +179,7 @@ function SectionHeading({ tag, title, subtitle, titleHtml, num }: {
         <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">{tag}</span>
       </RevealOnScroll>
       <RevealOnScroll delay={num ? 0.06 : 0.03}>
-        <h2 className="text-2xl sm:text-4xl font-bold text-white tracking-tight leading-relaxed font-display">
+        <h2 className="text-2xl sm:text-4xl font-bold text-ink tracking-tight leading-relaxed font-display">
           {titleHtml || (
             <span>
               {parts.map((p, idx) => (
@@ -197,7 +197,7 @@ function SectionHeading({ tag, title, subtitle, titleHtml, num }: {
       </RevealOnScroll>
       {subtitle && (
         <RevealOnScroll delay={num ? 0.09 : 0.06}>
-          <p className="text-xs sm:text-sm text-white/50 max-w-xl mx-auto font-medium">{subtitle}</p>
+          <p className="text-xs sm:text-sm text-ink/50 max-w-xl mx-auto font-medium">{subtitle}</p>
         </RevealOnScroll>
       )}
     </div>
@@ -280,7 +280,7 @@ export default function Landing() {
 
 
   return (
-    <div className="bg-black text-[#F0F4FF] font-sans selection:bg-[#F97316] selection:text-white overflow-x-hidden relative min-h-screen">
+    <div className="bg-surface-soft text-ink font-sans selection:bg-[#F97316] selection:text-white overflow-x-hidden relative min-h-screen">
       
       <PublicNavbar />
 
@@ -306,10 +306,10 @@ export default function Landing() {
       <div className="relative z-10">
 
         {/* ── 2. Trusted Logos Marquee ──────────────────────────── */}
-        <section className="py-14 border-y border-white/[0.06] bg-black/40 relative z-10 overflow-hidden">
+        <section className="py-14 border-y border-ink/[0.06] bg-ink/[0.03] relative z-10 overflow-hidden">
           <div className="max-w-7xl mx-auto px-6 text-center">
             <RevealOnScroll>
-              <p className="text-[10px] text-white/40 font-bold uppercase tracking-[0.25em] mb-7">
+              <p className="text-[10px] text-ink/40 font-bold uppercase tracking-[0.25em] mb-7">
                 Trusted by AI-driven teams and secure image workflows
               </p>
             </RevealOnScroll>
@@ -319,7 +319,7 @@ export default function Landing() {
                 {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].map((logo, i) => (
                   <span 
                     key={`logo-rtl-${logo}-${i}`} 
-                    className="text-sm font-extrabold tracking-[0.15em] text-white/40 hover:text-white/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
+                    className="text-sm font-extrabold tracking-[0.15em] text-ink/40 hover:text-ink/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
                   >
                     {logo.toUpperCase()}
                   </span>
@@ -330,7 +330,7 @@ export default function Landing() {
                 {[...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS].reverse().map((logo, i) => (
                   <span 
                     key={`logo-ltr-${logo}-${i}`} 
-                    className="text-sm font-extrabold tracking-[0.15em] text-white/40 hover:text-white/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
+                    className="text-sm font-extrabold tracking-[0.15em] text-ink/40 hover:text-ink/80 transition-all duration-300 select-none cursor-default whitespace-nowrap"
                   >
                     {logo.toUpperCase()}
                   </span>
@@ -351,7 +351,7 @@ export default function Landing() {
             ].map((stat, i) => (
               <RevealOnScroll key={stat.label} delay={i * 0.1}>
                 <div className="fc-panel p-5 text-center space-y-2">
-                  <div className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                  <div className="text-2xl md:text-3xl font-bold text-ink tracking-tight">
                     <CountUp
                       end={stat.end}
                       suffix={stat.suffix}
@@ -360,18 +360,18 @@ export default function Landing() {
                       duration={2.2}
                     />
                   </div>
-                  <p className="text-[10px] text-white/40 font-bold uppercase tracking-wider">{stat.label}</p>
+                  <p className="text-[10px] text-ink/40 font-bold uppercase tracking-wider">{stat.label}</p>
                 </div>
               </RevealOnScroll>
             ))}
           </div>
-          <p className="text-center text-[9px] text-white/25 mt-4 font-medium">
+          <p className="text-center text-[9px] text-ink/25 mt-4 font-medium">
             Platform capability figures based on internal testing benchmarks
           </p>
         </section>
 
         {/* ── 2.7 Testimonials / Early Feedback ────────────────── */}
-        <section className="py-24 max-w-7xl mx-auto px-6 border-t border-white/[0.03]">
+        <section className="py-24 max-w-7xl mx-auto px-6 border-t border-ink/[0.03]">
           <SectionHeading
             num="01"
             tag="Early Access Feedback"
@@ -387,15 +387,15 @@ export default function Landing() {
                   transition={{ duration: 0.2 }}
                   className="fc-panel p-6 flex flex-col justify-between h-full relative"
                 >
-                  <p className="text-[12px] text-white/70 leading-relaxed italic mb-6">
+                  <p className="text-[12px] text-ink/70 leading-relaxed italic mb-6">
                     "{t.quote}"
                   </p>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#EA580C]/20 border border-white/10 flex items-center justify-center text-xs font-bold text-white tracking-wider">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#F97316]/20 to-[#EA580C]/20 border border-ink/10 flex items-center justify-center text-xs font-bold text-white tracking-wider">
                       {t.initials}
                     </div>
                     <div>
-                      <h4 className="text-[10px] font-bold text-white/40 uppercase tracking-wider">{t.role}</h4>
+                      <h4 className="text-[10px] font-bold text-ink/40 uppercase tracking-wider">{t.role}</h4>
                     </div>
                   </div>
                 </motion.div>
@@ -430,13 +430,13 @@ export default function Landing() {
                     whileInView={{ scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.15 }}
-                    className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/[0.04] border border-white/[0.08] text-[#4FFFB0] mb-5"
+                    className="w-10 h-10 rounded-2xl flex items-center justify-center bg-ink/[0.04] border border-ink/[0.08] text-[var(--s-ok)] mb-5"
                   >
                     <card.icon className="w-4 h-4" />
                   </motion.div>
                   <div className="space-y-2 mt-4">
-                    <h3 className="text-xs font-bold text-white tracking-tight">{card.title}</h3>
-                    <p className="text-[11px] text-white/40 leading-relaxed font-medium">{card.desc}</p>
+                    <h3 className="text-xs font-bold text-ink tracking-tight">{card.title}</h3>
+                    <p className="text-[11px] text-ink/40 leading-relaxed font-medium">{card.desc}</p>
                   </div>
                 </motion.div>
               </StaggerItem>
@@ -445,7 +445,7 @@ export default function Landing() {
         </section>
 
         {/* ── 3.5 Use Cases / Who It's For ─────────────────────── */}
-        <section className="py-24 bg-black/40 border-y border-white/[0.05]">
+        <section className="py-24 bg-ink/[0.03] border-y border-ink/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
               num="03"
@@ -472,8 +472,8 @@ export default function Landing() {
                       <uc.icon className="w-4 h-4" />
                     </motion.div>
                     <div className="space-y-2">
-                      <h3 className="text-xs font-bold text-white tracking-tight">{uc.title}</h3>
-                      <p className="text-[11px] text-white/40 leading-relaxed font-medium">{uc.desc}</p>
+                      <h3 className="text-xs font-bold text-ink tracking-tight">{uc.title}</h3>
+                      <p className="text-[11px] text-ink/40 leading-relaxed font-medium">{uc.desc}</p>
                     </div>
                   </motion.div>
                 </StaggerItem>
@@ -493,7 +493,7 @@ export default function Landing() {
                 <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">AI Infrastructure</span>
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
-                <h2 className="text-2xl sm:text-4xl font-bold text-white leading-relaxed font-display">
+                <h2 className="text-2xl sm:text-4xl font-bold text-ink leading-relaxed font-display">
                   <ScrambleText text="FaceCloud turns raw uploads " /> <br />
                   <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">
                     <ScrambleText text="into organized AI-ready folders" />
@@ -501,12 +501,12 @@ export default function Landing() {
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={0.1}>
-                <p className="text-sm text-white/55 leading-relaxed font-medium">
+                <p className="text-sm text-ink/55 leading-relaxed font-medium">
                   We automate exposure curves, crop structures, biometric validation, and identity matching parameters under a zero-trust compliance model.
                 </p>
               </RevealOnScroll>
               
-              <div className="space-y-3 pt-4 text-xs font-bold text-white/60">
+              <div className="space-y-3 pt-4 text-xs font-bold text-ink/60">
                 {[
                   { title: 'Zero-DCE enhancement', desc: 'Estimates lighting maps on underexposed faces.' },
                   { title: 'Face validation',     desc: 'Ensures only one subject is present in the frame.' },
@@ -515,12 +515,12 @@ export default function Landing() {
                 ].map((spec, i) => (
                   <RevealOnScroll key={spec.title} delay={0.15 + i * 0.08} direction="left">
                     <div className="flex items-start gap-3">
-                      <div className="w-5 h-5 rounded-lg bg-[#4FFFB0]/15 border border-[#4FFFB0]/25 flex items-center justify-center text-[#4FFFB0] mt-0.5">
+                      <div className="w-5 h-5 rounded-lg bg-[var(--s-ok)]/15 border border-[var(--s-ok)]/25 flex items-center justify-center text-[var(--s-ok)] mt-0.5">
                         <Check className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <span className="text-white block font-bold">{spec.title}</span>
-                        <span className="text-[10px] text-white/40 block font-medium mt-0.5">{spec.desc}</span>
+                        <span className="text-ink block font-bold">{spec.title}</span>
+                        <span className="text-[10px] text-ink/40 block font-medium mt-0.5">{spec.desc}</span>
                       </div>
                     </div>
                   </RevealOnScroll>
@@ -529,7 +529,7 @@ export default function Landing() {
 
               {/* Subtly treated face detection illustrative image */}
               <RevealOnScroll delay={0.4} direction="up">
-                <div className="fc-panel p-2 relative overflow-hidden group max-w-sm mt-6 border border-white/[0.06] rounded-2xl">
+                <div className="fc-panel p-2 relative overflow-hidden group max-w-sm mt-6 border border-ink/[0.06] rounded-2xl">
                   <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
                     <img 
                       src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&q=80&w=800" 
@@ -542,14 +542,14 @@ export default function Landing() {
                     <div className="absolute inset-0 bg-[#EA580C]/10 mix-blend-overlay pointer-events-none" />
                     
                     {/* Simulated tech scanning grids/lines overlay */}
-                    <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-white/40">
+                    <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-ink/40">
                       <div className="flex justify-between items-center">
                         <span>SCAN_RESOLUTION: 512px</span>
                         <span>CONFIDENCE: 99.8%</span>
                       </div>
                       <div className="flex justify-between items-center">
                         <span>[MODEL_SCAN: IN_PROGRESS]</span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#4FFFB0] animate-pulse" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--s-ok)] animate-pulse" />
                       </div>
                     </div>
                   </div>
@@ -561,8 +561,8 @@ export default function Landing() {
             <div className="lg:col-span-7">
               <RevealOnScroll direction="right">
                 <div className="fc-panel p-6 relative overflow-hidden">
-                  <div className="flex justify-between items-center pb-4 border-b border-white/[0.08] mb-6">
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Active AI Restructuring</span>
+                  <div className="flex justify-between items-center pb-4 border-b border-ink/[0.08] mb-6">
+                    <span className="text-[10px] font-bold text-ink/40 uppercase tracking-widest">Active AI Restructuring</span>
                     <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#F97316]/20 text-[#FB923C] font-bold">PIPELINE: ACTIVE</span>
                   </div>
 
@@ -572,15 +572,15 @@ export default function Landing() {
                       return (
                         <div 
                           key={proc.label} 
-                          className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.06] flex items-center justify-between gap-4"
+                          className="p-3.5 rounded-2xl bg-ink/[0.02] border border-ink/[0.06] flex items-center justify-between gap-4"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-white/[0.04] text-xs font-mono font-bold text-white/40">
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-ink/[0.04] text-xs font-mono font-bold text-ink/40">
                               {index + 1}
                             </div>
                             <div>
-                              <p className="text-[11px] font-bold text-white">{proc.label}</p>
-                              <p className="text-[10px] text-white/40 font-medium mt-0.5">{proc.value}</p>
+                              <p className="text-[11px] font-bold text-ink">{proc.label}</p>
+                              <p className="text-[10px] text-ink/40 font-medium mt-0.5">{proc.value}</p>
                             </div>
                           </div>
                           <AnimatePresence mode="wait">
@@ -591,9 +591,9 @@ export default function Landing() {
                               exit={{ opacity: 0, scale: 0.8 }}
                               transition={{ duration: 0.25 }}
                               className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                                status === 'SUCCESS' ? 'bg-[#4FFFB0]/15 text-[#4FFFB0]' :
+                                status === 'SUCCESS' ? 'bg-[var(--s-ok)]/15 text-[var(--s-ok)]' :
                                 status === 'ACTIVE' ? 'bg-[#F97316]/20 text-[#FB923C] animate-pulse' :
-                                'bg-white/5 text-white/30'
+                                'bg-ink/5 text-ink/30'
                               }`}
                             >
                               {status}
@@ -635,8 +635,8 @@ export default function Landing() {
                     <feat.icon className="w-5 h-5 text-[#FB923C]" />
                   </motion.div>
                   <div className="mt-6 space-y-1">
-                    <h3 className="text-xs font-bold text-white tracking-tight">{feat.t}</h3>
-                    <p className="text-[10px] text-white/45 leading-relaxed font-medium">{feat.d}</p>
+                    <h3 className="text-xs font-bold text-ink tracking-tight">{feat.t}</h3>
+                    <p className="text-[10px] text-ink/45 leading-relaxed font-medium">{feat.d}</p>
                   </div>
                 </motion.div>
               </StaggerItem>
@@ -671,35 +671,35 @@ export default function Landing() {
                   />
                 </MacBookDemoFrame>
               </RevealOnScroll>
-              <p className="text-[10px] text-white/35 mt-6 text-center font-medium">
+              <p className="text-[10px] text-ink/35 mt-6 text-center font-medium">
                 Frontend enhancement preview. Production processing uses the FaceCloud AI pipeline.
               </p>
             </div>
             
             <div className="lg:col-span-4 space-y-4">
               <RevealOnScroll direction="right" delay={0.15}>
-                <div className="fc-panel p-5 bg-white/[0.02]">
-                  <h4 className="text-xs font-bold text-white mb-3">AI METADATA PARAMETERS</h4>
-                  <div className="space-y-3 text-[10px] font-medium text-white/60">
+                <div className="fc-panel p-5 bg-ink/[0.02]">
+                  <h4 className="text-xs font-bold text-ink mb-3">AI METADATA PARAMETERS</h4>
+                  <div className="space-y-3 text-[10px] font-medium text-ink/60">
                     <div className="flex justify-between">
                       <span>AI Model:</span>
-                      <span className="text-white font-bold font-mono">Zero-DCE (V1)</span>
+                      <span className="text-ink font-bold font-mono">Zero-DCE (V1)</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Brightness check:</span>
-                      <span className="text-[#4FFFB0] font-bold">RESTORED (+2.2 EV)</span>
+                      <span className="text-[var(--s-ok)] font-bold">RESTORED (+2.2 EV)</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Blur check threshold:</span>
-                      <span className="text-[#4FFFB0] font-bold">PASSED (Score 88/100)</span>
+                      <span className="text-[var(--s-ok)] font-bold">PASSED (Score 88/100)</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Face size validation:</span>
-                      <span className="text-[#4FFFB0] font-bold">PASSED (128x128px)</span>
+                      <span className="text-[var(--s-ok)] font-bold">PASSED (128x128px)</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Faces detected:</span>
-                      <span className="text-[#4FFFB0] font-bold">1</span>
+                      <span className="text-[var(--s-ok)] font-bold">1</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Dataset payload status:</span>
@@ -713,7 +713,7 @@ export default function Landing() {
         </section>
 
         {/* ── 8. Upload Modes Section ───────────────────────────── */}
-        <section className="py-24 bg-black/40 border-y border-white/[0.05]">
+        <section className="py-24 bg-ink/[0.03] border-y border-ink/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
               num="07"
@@ -735,8 +735,8 @@ export default function Landing() {
                     className="fc-panel p-6 flex flex-col justify-between min-h-[190px]"
                   >
                     <div className="space-y-2">
-                      <h3 className="text-sm font-bold text-white tracking-tight">{card.title}</h3>
-                      <p className="text-[11px] text-white/45 leading-relaxed font-medium">{card.desc}</p>
+                      <h3 className="text-sm font-bold text-ink tracking-tight">{card.title}</h3>
+                      <p className="text-[11px] text-ink/45 leading-relaxed font-medium">{card.desc}</p>
                     </div>
                     <Link 
                       to={card.link}
@@ -763,10 +763,10 @@ export default function Landing() {
           {/* Monthly / Yearly Toggle */}
           <RevealOnScroll>
             <div className="flex items-center justify-center gap-3 mb-12">
-              <span className={`text-sm font-medium transition-colors ${!yearlyBilling ? 'text-white' : 'text-white/40'}`}>Monthly</span>
+              <span className={`text-sm font-medium transition-colors ${!yearlyBilling ? 'text-ink' : 'text-ink/40'}`}>Monthly</span>
               <button
                 onClick={() => setYearlyBilling(v => !v)}
-                className="relative w-14 h-7 rounded-full bg-white/[0.08] border border-white/[0.12] cursor-pointer transition-colors hover:border-white/20"
+                className="relative w-14 h-7 rounded-full bg-ink/[0.08] border border-ink/[0.12] cursor-pointer transition-colors hover:border-ink/20"
                 aria-label="Toggle billing period"
               >
                 <motion.div
@@ -776,8 +776,8 @@ export default function Landing() {
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               </button>
-              <span className={`text-sm font-medium transition-colors ${yearlyBilling ? 'text-white' : 'text-white/40'}`}>
-                Yearly <span className="text-[#4FFFB0] text-xs font-bold">Save 20%</span>
+              <span className={`text-sm font-medium transition-colors ${yearlyBilling ? 'text-ink' : 'text-ink/40'}`}>
+                Yearly <span className="text-[var(--s-ok)] text-xs font-bold">Save 20%</span>
               </span>
             </div>
           </RevealOnScroll>
@@ -796,29 +796,29 @@ export default function Landing() {
                       </div>
                     )}
                     <div className="space-y-4 mb-6">
-                      <h3 className="text-lg font-bold text-white">{plan.name}</h3>
+                      <h3 className="text-lg font-bold text-ink">{plan.name}</h3>
                       <div className="flex items-end gap-1">
-                        <span className="text-4xl font-bold text-white tracking-tight">${price}</span>
-                        {price > 0 && <span className="text-sm text-white/40 font-medium pb-1">/mo</span>}
+                        <span className="text-4xl font-bold text-ink tracking-tight">${price}</span>
+                        {price > 0 && <span className="text-sm text-ink/40 font-medium pb-1">/mo</span>}
                       </div>
-                      <div className="flex items-center gap-4 text-[10px] font-medium text-white/50">
+                      <div className="flex items-center gap-4 text-[10px] font-medium text-ink/50">
                         <span className="flex items-center gap-1"><HardDrive className="w-3 h-3" /> {plan.storage}</span>
                         <span className="flex items-center gap-1"><Image className="w-3 h-3" /> {plan.uploads}/mo</span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-white/[0.08] mb-4" />
+                    <div className="h-px bg-ink/[0.08] mb-4" />
 
                     <div className="space-y-2.5 flex-1">
                       {plan.features.map(f => (
-                        <div key={f} className="flex items-center gap-2 text-[11px] text-white/70 font-medium">
-                          <Check className="w-3.5 h-3.5 text-[#4FFFB0] flex-shrink-0" />
+                        <div key={f} className="flex items-center gap-2 text-[11px] text-ink/70 font-medium">
+                          <Check className="w-3.5 h-3.5 text-[var(--s-ok)] flex-shrink-0" />
                           {f}
                         </div>
                       ))}
                       {plan.missing.map(f => (
-                        <div key={f} className="flex items-center gap-2 text-[11px] text-white/25 font-medium">
-                          <span className="w-3.5 h-3.5 flex items-center justify-center text-white/15 flex-shrink-0">—</span>
+                        <div key={f} className="flex items-center gap-2 text-[11px] text-ink/25 font-medium">
+                          <span className="w-3.5 h-3.5 flex items-center justify-center text-ink/15 flex-shrink-0">—</span>
                           {f}
                         </div>
                       ))}
@@ -829,7 +829,7 @@ export default function Landing() {
                       className={`mt-6 text-center text-sm font-bold py-3 rounded-2xl transition-all duration-300 block ${
                         plan.highlight
                           ? 'bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white shadow-[0_4px_20px_rgba(249,115,22,0.35)] hover:shadow-[0_6px_28px_rgba(249,115,22,0.55)] hover:-translate-y-0.5'
-                          : 'bg-white/[0.06] border border-white/[0.12] text-white hover:bg-white/[0.1] hover:border-white/20'
+                          : 'bg-ink/[0.06] border border-ink/[0.12] text-white hover:bg-ink/[0.1] hover:border-ink/20'
                       }`}
                     >
                       {plan.cta}
@@ -841,15 +841,15 @@ export default function Landing() {
           </StaggerChildren>
 
           <RevealOnScroll delay={0.3}>
-            <p className="text-center text-xs text-white/35 mt-8 font-medium">
+            <p className="text-center text-xs text-ink/35 mt-8 font-medium">
               Need a custom enterprise plan?{' '}
-              <a href="#contact" className="text-[#FB923C] hover:text-white transition-colors underline underline-offset-2">Contact us</a>.
+              <a href="#contact" className="text-[#FB923C] hover:text-ink transition-colors underline underline-offset-2">Contact us</a>.
             </p>
           </RevealOnScroll>
         </section>
 
         {/* ── 9. Dashboard Preview Section ──────────────────────── */}
-        <section className="py-24 bg-black/40 border-y border-white/[0.05]">
+        <section className="py-24 bg-ink/[0.03] border-y border-ink/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <SectionHeading
               num="09"
@@ -864,18 +864,18 @@ export default function Landing() {
                   title: 'User Dashboard Preview',
                   desc: 'Observe processing counts, track pipeline latency, and access ingestion queues.',
                   mock: (
-                    <div className="space-y-3 font-mono text-[9px] text-white/50">
+                    <div className="space-y-3 font-mono text-[9px] text-ink/50">
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="p-2.5 rounded bg-white/[0.04] border border-white/[0.08]">
-                          <span className="block text-[8px] text-white/30">TOTAL FILES</span>
-                          <span className="block text-white font-bold text-[11px] mt-0.5">142 assets</span>
+                        <div className="p-2.5 rounded bg-ink/[0.04] border border-ink/[0.08]">
+                          <span className="block text-[8px] text-ink/30">TOTAL FILES</span>
+                          <span className="block text-ink font-bold text-[11px] mt-0.5">142 assets</span>
                         </div>
-                        <div className="p-2.5 rounded bg-white/[0.04] border border-white/[0.08]">
-                          <span className="block text-[8px] text-white/30">STABILITY</span>
-                          <span className="block text-[#4FFFB0] font-bold text-[11px] mt-0.5">99.8%</span>
+                        <div className="p-2.5 rounded bg-ink/[0.04] border border-ink/[0.08]">
+                          <span className="block text-[8px] text-ink/30">STABILITY</span>
+                          <span className="block text-[var(--s-ok)] font-bold text-[11px] mt-0.5">99.8%</span>
                         </div>
                       </div>
-                      <div className="p-2.5 rounded bg-white/[0.04] border border-white/[0.08] flex items-center justify-between">
+                      <div className="p-2.5 rounded bg-ink/[0.04] border border-ink/[0.08] flex items-center justify-between">
                         <span className="truncate">Processing job-002...</span>
                         <span className="text-[#FB923C] animate-pulse">active</span>
                       </div>
@@ -886,12 +886,12 @@ export default function Landing() {
                   title: 'Image Detail Preview',
                   desc: 'Toggle exposure Restorations, verify blur scores, and check person index maps.',
                   mock: (
-                    <div className="space-y-2.5 font-mono text-[9px] text-white/50">
-                      <div className="h-20 bg-white/[0.03] border border-white/[0.08] rounded-xl flex items-center justify-center relative overflow-hidden">
-                        <span className="text-[10px] text-white/30">[Face scanner Active]</span>
-                        <div className="absolute inset-x-0 h-0.5 bg-[#4FFFB0]/40 top-1/2 animate-bounce" />
+                    <div className="space-y-2.5 font-mono text-[9px] text-ink/50">
+                      <div className="h-20 bg-ink/[0.03] border border-ink/[0.08] rounded-xl flex items-center justify-center relative overflow-hidden">
+                        <span className="text-[10px] text-ink/30">[Face scanner Active]</span>
+                        <div className="absolute inset-x-0 h-0.5 bg-[var(--s-ok)]/40 top-1/2 animate-bounce" />
                       </div>
-                      <div className="flex justify-between text-[8px] text-white/40 px-1">
+                      <div className="flex justify-between text-[8px] text-ink/40 px-1">
                         <span>Landmarks: 68 points</span>
                         <span>Confidence: 99.84%</span>
                       </div>
@@ -902,13 +902,13 @@ export default function Landing() {
                   title: 'Person Folders Preview',
                   desc: 'Verify vector matching confidence scores and cluster similar faces instantly.',
                   mock: (
-                    <div className="space-y-2 font-mono text-[9px] text-white/50">
+                    <div className="space-y-2 font-mono text-[9px] text-ink/50">
                       {[
                         { grp: 'Person Folder 001', pct: '99.2%' },
                         { grp: 'Person Folder 002', pct: '94.8%' },
                       ].map(f => (
-                        <div key={f.grp} className="p-2 rounded bg-white/[0.03] border border-white/[0.08] flex justify-between items-center">
-                          <span className="text-white font-bold">{f.grp}</span>
+                        <div key={f.grp} className="p-2 rounded bg-ink/[0.03] border border-ink/[0.08] flex justify-between items-center">
+                          <span className="text-ink font-bold">{f.grp}</span>
                           <span className="text-[#A78BFA]">{f.pct} confidence</span>
                         </div>
                       ))}
@@ -920,15 +920,15 @@ export default function Landing() {
                   <div className="fc-panel p-6 flex flex-col justify-between min-h-[290px] relative group overflow-hidden">
                     <div className="space-y-4">
                       <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#F97316]/10 text-[#FB923C] uppercase w-fit block">{mockup.title}</span>
-                      <p className="text-xs text-white/50 leading-relaxed font-medium">{mockup.desc}</p>
+                      <p className="text-xs text-ink/50 leading-relaxed font-medium">{mockup.desc}</p>
                     </div>
                     
                     {/* Browser Frame Mockup */}
-                    <div className="mt-6 border border-white/[0.08] bg-black/60 rounded-2xl p-4 relative pt-7 flex flex-col justify-end">
+                    <div className="mt-6 border border-ink/[0.08] bg-ink/[0.04] rounded-2xl p-4 relative pt-7 flex flex-col justify-end">
                       <div className="absolute top-3 left-4 flex gap-1.5">
                         <span className="w-1.5 h-1.5 bg-[#F87171] rounded-full" />
                         <span className="w-1.5 h-1.5 bg-[#FCD34D] rounded-full" />
-                        <span className="w-1.5 h-1.5 bg-[#4FFFB0] rounded-full" />
+                        <span className="w-1.5 h-1.5 bg-[var(--s-ok)] rounded-full" />
                       </div>
                       {mockup.mock}
                     </div>
@@ -958,21 +958,21 @@ export default function Landing() {
                   className="fc-panel p-8 flex flex-col justify-between min-h-[340px]"
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-white">
+                    <div className="flex items-center gap-2 text-ink">
                       <div className="w-8 h-8 rounded-xl bg-[#EA580C]/15 border border-[#EA580C]/30 flex items-center justify-center text-[#A78BFA]">
                         <Cpu className="w-4 h-4" />
                       </div>
                       <h3 className="text-lg font-bold tracking-tight">Admin Console</h3>
                     </div>
-                    <p className="text-xs text-white/50 leading-relaxed font-medium">
+                    <p className="text-xs text-ink/50 leading-relaxed font-medium">
                       Monitor microservice health latency checks, manage API documents, run live playground queries, inspect security audit events, and analyze rejection metrics dashboard grids.
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-white/40 pt-2">
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> User Registries</div>
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> System Health</div>
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Upload statistics</div>
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Swagger Playgrounds</div>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-ink/40 pt-2">
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> User Registries</div>
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> System Health</div>
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Upload statistics</div>
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Swagger Playgrounds</div>
                     </div>
                   </div>
                 </motion.div>
@@ -986,21 +986,21 @@ export default function Landing() {
                   className="fc-panel p-8 flex flex-col justify-between min-h-[300px]"
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-white">
-                      <div className="w-8 h-8 rounded-xl bg-[#4FFFB0]/15 border border-[#4FFFB0]/30 flex items-center justify-center text-[#4FFFB0]">
+                    <div className="flex items-center gap-2 text-ink">
+                      <div className="w-8 h-8 rounded-xl bg-[var(--s-ok)]/15 border border-[var(--s-ok)]/30 flex items-center justify-center text-[var(--s-ok)]">
                         <Eye className="w-4 h-4" />
                       </div>
                       <h3 className="text-lg font-bold tracking-tight">Moderator Review</h3>
                     </div>
-                    <p className="text-xs text-white/50 leading-relaxed font-medium">
+                    <p className="text-xs text-ink/50 leading-relaxed font-medium">
                       Manually audit failed low-light or blurry images. Override automatic system classifications, re-group mismatched subject clusters, and dispatch notification updates to users.
                     </p>
                     
-                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-white/40 pt-2">
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Rejected Queue</div>
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Override Decider</div>
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Subject Re-grouping</div>
-                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[#4FFFB0]" /> Email notifications</div>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-bold text-ink/40 pt-2">
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Rejected Queue</div>
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Override Decider</div>
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Subject Re-grouping</div>
+                      <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Email notifications</div>
                     </div>
                   </div>
                 </motion.div>
@@ -1010,7 +1010,7 @@ export default function Landing() {
         </section>
 
         {/* ── 11. Security + Logs Section ──────────────────────── */}
-        <section id="security" className="py-24 bg-black/40 border-y border-white/[0.05]">
+        <section id="security" className="py-24 bg-ink/[0.03] border-y border-ink/[0.05]">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               
@@ -1021,7 +1021,7 @@ export default function Landing() {
                   <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Enterprise Security</span>
                 </RevealOnScroll>
                 <RevealOnScroll delay={0.05}>
-                  <h2 className="text-2xl sm:text-4xl font-bold text-white tracking-tight leading-relaxed font-display">
+                  <h2 className="text-2xl sm:text-4xl font-bold text-ink tracking-tight leading-relaxed font-display">
                     <ScrambleText text="Built for secure " /> <br />
                     <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">
                       <ScrambleText text="image workflows" />
@@ -1029,7 +1029,7 @@ export default function Landing() {
                   </h2>
                 </RevealOnScroll>
                 <RevealOnScroll delay={0.1}>
-                  <p className="text-sm text-white/50 leading-relaxed font-medium">
+                  <p className="text-sm text-ink/50 leading-relaxed font-medium">
                     Strict directory boundary splits and zero-trust identity policies protect all ingested dataset assets.
                   </p>
                 </RevealOnScroll>
@@ -1042,9 +1042,9 @@ export default function Landing() {
                     { title: 'Secure Storage',  desc: 'Encrypted buffer repositories.' }
                   ].map(pt => (
                     <StaggerItem key={pt.title}>
-                      <div className="p-3 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
-                        <span className="text-xs font-bold text-white block">{pt.title}</span>
-                        <span className="text-[10px] text-white/40 block mt-0.5 font-medium">{pt.desc}</span>
+                      <div className="p-3 bg-ink/[0.02] border border-ink/[0.06] rounded-2xl">
+                        <span className="text-xs font-bold text-ink block">{pt.title}</span>
+                        <span className="text-[10px] text-ink/40 block mt-0.5 font-medium">{pt.desc}</span>
                       </div>
                     </StaggerItem>
                   ))}
@@ -1054,10 +1054,10 @@ export default function Landing() {
               {/* Right log stream with typewriter effect */}
               <div className="lg:col-span-7">
                 <RevealOnScroll direction="right">
-                  <div className="fc-panel p-5 bg-black/80 font-mono text-[10px] text-white/60 space-y-4">
-                    <div className="flex justify-between items-center text-[9px] font-bold text-white/30 border-b border-white/[0.08] pb-2">
+                  <div className="fc-panel p-5 bg-black/80 font-mono text-[10px] text-ink/60 space-y-4">
+                    <div className="flex justify-between items-center text-[9px] font-bold text-ink/30 border-b border-ink/[0.08] pb-2">
                       <span>LIVE FIREWALL SECURITY AUDIT FEED</span>
-                      <span className="text-[#4FFFB0] animate-pulse">ONLINE</span>
+                      <span className="text-[var(--s-ok)] animate-pulse">ONLINE</span>
                     </div>
                     
                     <div className="space-y-2 h-44 overflow-y-auto font-mono text-[9px] leading-relaxed">
@@ -1069,14 +1069,14 @@ export default function Landing() {
                           transition={{ duration: 0.4 }}
                           className="flex gap-2.5 items-start"
                         >
-                          <span className="text-white/20 select-none">{i + 1}</span>
+                          <span className="text-ink/20 select-none">{i + 1}</span>
                           <span className="text-[#FB923C] flex-shrink-0">➜</span>
-                          <span className={i === logs.length - 1 ? 'text-white' : 'text-white/80'}>{log}</span>
+                          <span className={i === logs.length - 1 ? 'text-ink' : 'text-ink/80'}>{log}</span>
                         </motion.div>
                       ))}
                     </div>
 
-                    <div className="pt-2.5 border-t border-white/[0.08] flex justify-between text-[8px] text-white/30 font-bold">
+                    <div className="pt-2.5 border-t border-ink/[0.08] flex justify-between text-[8px] text-ink/30 font-bold">
                       <span>Tripped alerts: 0 logs</span>
                       <span>Compliance score: HIPAA / ISO 27001</span>
                     </div>
@@ -1105,13 +1105,13 @@ export default function Landing() {
                     onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
                     className="w-full flex items-center justify-between p-5 text-left cursor-pointer group"
                   >
-                    <span className="text-sm font-bold text-white group-hover:text-[#FB923C] transition-colors pr-4">{item.q}</span>
+                    <span className="text-sm font-bold text-ink group-hover:text-[#FB923C] transition-colors pr-4">{item.q}</span>
                     <motion.div
                       animate={{ rotate: openFaq === idx ? 180 : 0 }}
                       transition={{ duration: 0.25 }}
                       className="flex-shrink-0"
                     >
-                      <ChevronDown className="w-4 h-4 text-white/40" />
+                      <ChevronDown className="w-4 h-4 text-ink/40" />
                     </motion.div>
                   </button>
                   <AnimatePresence initial={false}>
@@ -1123,7 +1123,7 @@ export default function Landing() {
                         transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 pb-5 text-xs text-white/50 leading-relaxed font-medium border-t border-white/[0.06] pt-4">
+                        <div className="px-5 pb-5 text-xs text-ink/50 leading-relaxed font-medium border-t border-ink/[0.06] pt-4">
                           {item.a}
                         </div>
                       </motion.div>
@@ -1136,7 +1136,7 @@ export default function Landing() {
         </section>
 
         {/* ── 11.7 API / Integrations Teaser ───────────────────── */}
-        <section className="py-24 bg-black/40 border-y border-white/[0.05]">
+        <section className="py-24 bg-ink/[0.03] border-y border-ink/[0.05]">
           <div className="max-w-4xl mx-auto px-6">
             <SectionHeading
               num="13"
@@ -1147,29 +1147,29 @@ export default function Landing() {
 
             <RevealOnScroll>
               <div className="fc-panel p-6 bg-black/80 font-mono text-[10px] relative overflow-hidden">
-                <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
+                <div className="flex items-center justify-between pb-3 border-b border-ink/[0.08] mb-4">
                   <div className="flex items-center gap-2">
                     <Code2 className="w-4 h-4 text-[#FB923C]" />
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">API Request Example</span>
+                    <span className="text-[10px] font-bold text-ink/40 uppercase tracking-widest">API Request Example</span>
                   </div>
-                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[#4FFFB0]/15 text-[#4FFFB0] font-bold">REST</span>
+                  <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-[var(--s-ok)]/15 text-[var(--s-ok)] font-bold">REST</span>
                 </div>
 
                 <div className="space-y-1 text-[10px] leading-relaxed">
                   <div><span className="text-[#A78BFA]">POST</span> <span className="text-[#FB923C]">/api/v1/images/enhance</span></div>
-                  <div className="text-white/30">Content-Type: multipart/form-data</div>
-                  <div className="text-white/30">Authorization: Bearer {'<'}your_jwt_token{'>'}</div>
-                  <div className="mt-3 text-white/20">{'{'}</div>
-                  <div className="pl-4"><span className="text-[#4FFFB0]">"file"</span>: <span className="text-white/50">"portrait_001.jpg"</span>,</div>
-                  <div className="pl-4"><span className="text-[#4FFFB0]">"enhance"</span>: <span className="text-[#A78BFA]">true</span>,</div>
-                  <div className="pl-4"><span className="text-[#4FFFB0]">"detect_faces"</span>: <span className="text-[#A78BFA]">true</span>,</div>
-                  <div className="pl-4"><span className="text-[#4FFFB0]">"auto_cluster"</span>: <span className="text-[#A78BFA]">true</span></div>
-                  <div className="text-white/20">{'}'}</div>
+                  <div className="text-ink/30">Content-Type: multipart/form-data</div>
+                  <div className="text-ink/30">Authorization: Bearer {'<'}your_jwt_token{'>'}</div>
+                  <div className="mt-3 text-ink/20">{'{'}</div>
+                  <div className="pl-4"><span className="text-[var(--s-ok)]">"file"</span>: <span className="text-ink/50">"portrait_001.jpg"</span>,</div>
+                  <div className="pl-4"><span className="text-[var(--s-ok)]">"enhance"</span>: <span className="text-[#A78BFA]">true</span>,</div>
+                  <div className="pl-4"><span className="text-[var(--s-ok)]">"detect_faces"</span>: <span className="text-[#A78BFA]">true</span>,</div>
+                  <div className="pl-4"><span className="text-[var(--s-ok)]">"auto_cluster"</span>: <span className="text-[#A78BFA]">true</span></div>
+                  <div className="text-ink/20">{'}'}</div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between">
-                  <p className="text-[10px] text-white/35 font-medium">Full Swagger documentation available for Pro subscribers.</p>
-                  <Link to="/docs" className="flex items-center gap-1.5 text-[11px] font-bold text-[#FB923C] hover:text-white transition-colors">
+                <div className="mt-6 pt-4 border-t border-ink/[0.08] flex items-center justify-between">
+                  <p className="text-[10px] text-ink/35 font-medium">Full Swagger documentation available for Pro subscribers.</p>
+                  <Link to="/docs" className="flex items-center gap-1.5 text-[11px] font-bold text-[#FB923C] hover:text-ink transition-colors">
                     View API Docs <ExternalLink className="w-3.5 h-3.5" />
                   </Link>
                 </div>
@@ -1187,11 +1187,11 @@ export default function Landing() {
           <RevealOnScroll>
             <div className="max-w-4xl mx-auto px-6 text-center space-y-8 flex flex-col items-center relative z-10">
               <span className="text-xs font-bold text-[#F97316] tracking-widest uppercase block">Ingestion Suite</span>
-              <h2 className="text-3xl sm:text-5xl font-bold text-white leading-tight tracking-tight font-display">
+              <h2 className="text-3xl sm:text-5xl font-bold text-ink leading-tight tracking-tight font-display">
                 Ready to enhance, validate, and <br />
                 organize facial images <span className="bg-[#F97316] text-white px-2 py-0.5 inline-block font-bold">with AI?</span>
               </h2>
-              <p className="text-xs text-white/50 max-w-md mx-auto leading-relaxed font-medium">
+              <p className="text-xs text-ink/50 max-w-md mx-auto leading-relaxed font-medium">
                 Start with the user portal to enhance and organize your facial image datasets.
               </p>
               <div className="flex flex-wrap justify-center gap-4 pt-4">
