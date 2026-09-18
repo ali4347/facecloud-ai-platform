@@ -75,11 +75,40 @@ const roleHome = {
   moderator: '/moderator',
 }
 
+/* Same avatar colour the topbar's UserMenu uses, so the two representations of
+   the signed-in person match. */
+const avatarColor = {
+  user:      '#4F46E5',
+  admin:     '#4338CA',
+  moderator: '#059669',
+}
+
+const fallbackUser = {
+  user:      { name: 'Ali Hassan',     initials: 'AH' },
+  admin:     { name: 'Ali Hassan',     initials: 'AH' },
+  moderator: { name: 'Vaneeza Sohaib', initials: 'VS' },
+}
+
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const nav = navByRole[role]
   const cfg = roleConfig[role]
+
+  /* Read the signed-in person from the session, exactly as the topbar does. */
+  let account = fallbackUser[role]
+  const sessionStr = localStorage.getItem('facecloud_session')
+  if (sessionStr) {
+    try {
+      const session = JSON.parse(sessionStr)
+      if (session.role === role) {
+        account = {
+          name:     session.name     || account.name,
+          initials: session.initials || account.initials,
+        }
+      }
+    } catch (_) { /* ignore a malformed session and keep the fallback */ }
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('facecloud_session')
@@ -190,12 +219,15 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       {/* ── Account card ───────────────────────────────────────────── */}
       <div className="mt-auto bg-surface border border-line rounded-[18px] shadow-soft p-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0">
-            {role === 'moderator' ? 'VS' : 'AH'}
+          <div
+            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0"
+            style={{ background: avatarColor[role] }}
+          >
+            {account.initials}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-ink truncate leading-none">
-              {role === 'moderator' ? 'Vaneeza Sohaib' : 'Ali Hassan'}
+              {account.name}
             </p>
             <span className="inline-flex mt-1.5 px-1.5 py-0.5 rounded-md bg-accent-tint text-accent-deep text-[10px] font-semibold capitalize leading-none">
               {role}

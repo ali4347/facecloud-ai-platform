@@ -33,7 +33,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Backend API server (NestJS/Express) | ❌ Not started | Planned in README_BACKEND_ROADMAP.md §3 |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
-| Build health | ⚠️ Type-check passes; bundle not verifiable locally | `tsc -b` clean and Tailwind compiles (2026-09-18). `npm run build` could not run: Node is no longer on this machine's PATH — see §7 |
+| Build health | ✅ `npm run build` passes (checked 2026-09-18) | JS bundle 2.31 MB minified / 625 kB gzip, CSS 94.8 kB; chunk-size warning, no code splitting. Lint reports warnings only |
 
 **Tooling:** `npm run dev` (Vite, port 5173) · `npm run build` (`tsc -b && vite build`) · `npm run lint` (oxlint) ·
 backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker compose up -d`.
@@ -71,9 +71,12 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
   values remapped, and a second pass for the Tailwind config aliases (`primary`, `mint`, `pink`, `sky`, `violet`,
   `orange`, `purple`) that the 2026-08 rebrand had pointed at orange. White text was kept wherever it sits on a
   coloured button or a scrim over a photo.
-- Verification: `tsc -b --force` exits clean; the Tailwind CLI compiles `src/index.css` and all 55 new-token classes
-  used in source appear in the output; a static render of the shell markup against the compiled CSS was screenshotted
-  and matches the reference layout. The Vite bundle was **not** built — see §7.
+- The sidebar account card now reads the signed-in person from the session and uses the same per-role avatar colour
+  as the topbar menu, instead of a hardcoded name and a fixed indigo dot.
+- Verification: Node 26.8.2 was installed with Homebrew to restore the toolchain (it had gone missing from the
+  machine). `npm run build` succeeds, `tsc -b` is clean, and `npm run lint` reports warnings only. The running dev
+  server was driven with headless Chrome and the user dashboard, upload centre, admin overview, rejection summary,
+  moderator dashboard and review queue were each rendered and checked against the reference.
 
 ### 2026-09-17 — Project work log + auto-update rule set up; uncommitted landing v3 discarded
 *Status: committed (this commit)*
@@ -272,11 +275,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - `docker-compose.yml` defaults the database name to `facecloud_db` while README §15 uses `facecloud` in `DATABASE_URL`;
   confirm which one the local `.env` uses.
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
-- **Node is not installed on the development machine any more** (it was present on 2026-09-17). `npm`, `node` and
-  `npx` are all absent from PATH, so `npm run build`, `npm run lint` and the dev server cannot be run locally.
-  Type-checking and Tailwind compilation were run through the Node runtime bundled inside VS Code; that runtime
-  cannot load the project's native binaries (`rolldown`, `oxlint`) because macOS rejects the code signature across
-  Team IDs. Reinstall Node 18+ to restore the normal build.
+- `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
+  warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
 - The three login pages and the moderator access-denied screen are still dark while the dashboards behind them are
   light. Intentional for now — the restyle was scoped to the dashboards — but the transition is abrupt.
 - Vite 8 / rolldown chunk warning: consider `build.chunkSizeWarningLimit` or dynamic imports for portals.
