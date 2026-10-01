@@ -1,15 +1,14 @@
 import { useEffect } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, Code2, ShieldCheck, Key, Eye, ScrollText,
-  Sparkles, X, LogOut, Bell, Briefcase
+  Sparkles, X, Bell, Briefcase
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
-import { useSessionUser } from '../../lib/session'
-import { Avatar } from '../ui/Avatar'
+import { UserMenu } from '../ui/UserMenu'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -77,29 +76,11 @@ const roleHome = {
   moderator: '/moderator',
 }
 
-/* Same avatar colour the topbar's UserMenu uses, so the two representations of
-   the signed-in person match. */
-const avatarColor = {
-  user:      '#F97316',
-  admin:     '#EA580C',
-  moderator: '#10B981',
-}
-
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
-  const navigate = useNavigate()
   const nav = navByRole[role]
   const cfg = roleConfig[role]
-
-  const account = useSessionUser(role)
-
-  const handleLogout = () => {
-    localStorage.removeItem('facecloud_session')
-    if (role === 'admin') navigate('/admin/login')
-    else if (role === 'moderator') navigate('/moderator/login')
-    else navigate('/login')
-  }
 
   // Auto-close on route change for mobile width
   useEffect(() => {
@@ -200,34 +181,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         </div>
       </div>
 
-      {/* ── Account card ───────────────────────────────────────────── */}
-      <div className="mt-auto bg-surface border border-line rounded-[18px] shadow-soft p-3">
-        <div className="flex items-center gap-2.5">
-          <Avatar
-            email={account.email}
-            initials={account.initials}
-            size={36}
-            fallbackColor={avatarColor[role]}
-          />
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-semibold text-ink truncate leading-none">
-              {account.name}
-            </p>
-            <span className="inline-flex mt-1.5 px-1.5 py-0.5 rounded-md bg-accent-tint text-accent-soft text-[10px] font-semibold capitalize leading-none">
-              {role}
-            </span>
-          </div>
-          <button
-            onClick={handleLogout}
-            type="button"
-            aria-label="Logout"
-            title="Logout"
-            className="p-2 rounded-lg text-ink-faint hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer flex-shrink-0"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      {/* ── Account menu ────────────────────────────────────────── */}
+      <UserMenu role={role} />
     </aside>
   )
 }

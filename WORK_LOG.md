@@ -46,6 +46,21 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-01 — One account menu, in the sidebar
+*Status: committed (this commit)*
+- The signed-in person appeared twice in the shell: top right and bottom left, each with its own menu. Removed the
+  topbar copy; the sidebar card is now the single account menu. The topbar keeps only search, appearance,
+  notifications and history.
+- The sidebar card opens upward with the full details — avatar, name, email, role badge — plus Settings and Logout.
+- **Logout actually signs you out now.** The topbar menu's Logout was a plain link to `/login` that never cleared
+  the session, so the route guard saw a valid session and let you straight back in. The merged menu clears the
+  session first, then goes to the login page for that role.
+- Settings only appears for roles that have a settings page: the admin console has none, and the old menu linked
+  every role to `/dashboard/settings`, which a moderator or admin could not open.
+- The menu reads the session itself through `useSessionUser`, so the sidebar no longer passes identity down.
+- Verified in the running app: no profile remains in the topbar, the menu opens with the email shown, an outside
+  click closes it, and Logout clears storage and lands on `/login`.
+
 ### 2026-10-01 — User menu now closes when you click away
 *Status: committed (this commit)*
 - The topbar's user card stayed open when you clicked elsewhere, and survived a route change — it was still hanging
