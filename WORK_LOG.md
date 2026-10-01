@@ -46,6 +46,22 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-01 — Moderator gate: login redirect, backdoor removed, follows the appearance
+*Status: committed (this commit)*
+- With the `.htaccess` fix deployed, `/moderator` reached the app and showed **Access Denied with only a "Back to
+  Home Page" button** — a moderator typing the URL had no way in short of guessing `/moderator/login`. The gate now
+  splits three ways:
+  - no session → redirect to `/moderator/login`, the way `/admin` already behaved
+  - signed in as another role → Access Denied, plus a "Sign in as moderator" action so switching is deliberate
+  - suspended moderator → Access Denied with the deactivation message and no login action, since it would not help
+- **Removed the `?dev_login=moderator` backdoor.** Opening `/moderator?dev_login=moderator` minted a full moderator
+  session for anyone, with no password — which defeated the role separation added earlier the same day. The URL now
+  simply lands on the moderator login.
+- The gate was pinned to the dark palette while the rest of the site follows the appearance; it now uses the tokens.
+- Fixed the moderator sign-in button, which had a mint-to-orange gradient left over from the palette work. It now
+  matches the admin and user buttons.
+- Verified all three gate outcomes plus the old backdoor URL against the running app.
+
 ### 2026-10-01 — Fixed deep links 404ing on the live site
 *Status: committed (this commit)*
 - Every URL except `/` returned the host's own 404 page on `facecloudai.com` — `/admin`, `/dashboard`, `/login`, all

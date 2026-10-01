@@ -120,7 +120,7 @@ export default function ModeratorLogin() {
               type="submit" 
               className="fc-btn-primary w-full mt-2"
               style={{
-                background: 'linear-gradient(135deg, #4FFFB0 0%, #F97316 100%)',
+                background: 'linear-gradient(135deg, #EA580C 0%, #F97316 100%)',
                 color: 'rgb(var(--a-surface-soft))',
                 boxShadow: '0 4px 20px rgba(79,255,176,0.30), inset 0 1px 0 rgb(var(--a-ink) / 0.40)'
               }}
