@@ -12,6 +12,7 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
 import { userStats, recentUploads, mockActivity } from '../../data/mock'
 import { formatDateTime } from '../../lib/utils'
+import { getSessionUser } from '../../lib/session'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
@@ -82,6 +83,7 @@ function simplifyActivity(act: { type: string; message: string; status: string }
 
 export default function Dashboard() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const account = getSessionUser('user')
 
   const isProcessing = userStats.processingInProgress > 0
 
@@ -143,7 +145,7 @@ export default function Dashboard() {
         }}
       >
         <div className="space-y-1">
-          <h2 className="text-lg md:text-xl font-bold text-ink tracking-tight leading-snug">Welcome back, Ali Hassan</h2>
+          <h2 className="text-lg md:text-xl font-bold text-ink tracking-tight leading-snug">Welcome back, {account.name}</h2>
           <p className="text-xs text-ink-mute leading-relaxed font-medium">
             Upload a photo, review your results, or download your enhanced images below.
           </p>

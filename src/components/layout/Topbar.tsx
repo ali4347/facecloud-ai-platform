@@ -3,6 +3,7 @@ import { Menu, Search, Settings, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
 import { UserMenu } from '../ui/UserMenu'
 import type { Appearance } from '../../lib/theme'
+import { getSessionUser } from '../../lib/session'
 import type { Role } from '../../data/mock'
 
 interface TopbarProps {
@@ -14,30 +15,11 @@ interface TopbarProps {
   onToggleAppearance?: () => void
 }
 
-const roleUser = {
-  user:      { name: 'Ali Hassan',      email: 'ali@facecloud.io',      initials: 'AH' },
-  admin:     { name: 'Ali Hassan',      email: 'ali@facecloud.io',      initials: 'AH' },
-  moderator: { name: 'Vaneeza Sohaib',  email: 'vaneeza@facecloud.io',  initials: 'VS' },
-}
 
 export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
-  const sessionStr = localStorage.getItem('facecloud_session')
   const searchRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
-  let user = roleUser[role]
-
-  if (sessionStr) {
-    try {
-      const session = JSON.parse(sessionStr)
-      if (session.role === role) {
-        user = {
-          name:     session.name     || user.name,
-          email:    session.email    || user.email,
-          initials: session.initials || user.initials,
-        }
-      }
-    } catch (_) { /* ignore */ }
-  }
+  const user = getSessionUser(role)
 
   /* ⌘K / Ctrl+K focuses search — the shortcut the chip in the field advertises. */
   useEffect(() => {

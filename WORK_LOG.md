@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-09-18
+**Last updated:** 2026-10-01
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://www.facecloudai.pro (Vercel)
 
@@ -45,6 +45,25 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-01 — Staff portals are link-only; the dashboard shows the real signed-in user
+*Status: committed (this commit)*
+- **Removed every way to switch role from the interface.** The user menu carried a "Switch Role (Demo)" block with
+  User / Admin / Moderator buttons, so anyone signed in as a user could walk into the other portals. It is gone; the
+  menu is now the profile, Settings and Logout.
+- The user login page advertised "Admin Portal" and "Moderator Portal" beneath the form. Both links removed, leaving
+  only Home. The two staff login pages also cross-linked each other; those are gone too.
+- The portals are still reachable **by direct link** — `/admin` and `/moderator` — which is how staff get in:
+  - no session → the matching staff login (`/admin/login`, `/moderator/login`)
+  - signed in with a different role → Access Denied, which is what stops a user from crossing over
+- **Fixed a real bug the screenshots exposed:** the dashboard greeted "Welcome back, Ali Hassan" while the signed-in
+  person was someone else, and the Settings profile showed the same baked-in name, email and initials. Both now read
+  the session.
+- Added `src/lib/session.ts` as the single source of truth for the signed-in identity, with a per-role fallback, and
+  pointed the topbar, sidebar, dashboard greeting and Settings at it. The topbar and sidebar had each carried their
+  own copy of the parsing logic.
+- Verified against the running app: the user menu, the login page, `/admin` with no session, and `/admin` while
+  signed in as a user.
 
 ### 2026-09-18 — Light-appearance contrast fixes on the marketing pages
 *Status: committed (this commit)*
@@ -357,6 +376,9 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
 - `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
+- Role separation is enforced in the browser only, against a `localStorage` session. That is appropriate for the
+  current mock build, but once the API exists the checks have to move server-side — a determined visitor can still
+  hand-write a session object today.
 - The appearance choice is stored per browser and does not follow the operating system setting, so a visitor who
   prefers light has to click once. Wiring it to `prefers-color-scheme` on first visit would remove that step.
 - The hero video is dark in both appearances, so the top of the home page stays dark even in the light appearance,

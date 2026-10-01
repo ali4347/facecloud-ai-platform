@@ -131,10 +131,11 @@ export default function AdminLogin() {
         </div>
 
         {/* Footnotes */}
+          {/* The other staff portal is reachable by direct link only, so it is
+              not advertised here either. */}
         <div className="text-center space-y-3 text-xs" style={{ color: 'rgb(var(--a-ink) / 0.38)' }}>
           <div className="flex justify-center gap-5">
             <Link to="/login" className="hover:text-ink transition-colors">User Login</Link>
-            <Link to="/moderator/login" className="hover:text-ink transition-colors">Moderator Portal</Link>
             <Link to="/" className="hover:text-ink transition-colors">Home Page</Link>
           </div>
         </div>

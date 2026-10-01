@@ -150,7 +150,9 @@ export default function Login() {
             </Link>
           </p>
           <div className="flex justify-center gap-5">
-            {[{ to: '/admin/login', label: 'Admin Portal' }, { to: '/moderator/login', label: 'Moderator Portal' }, { to: '/', label: 'Home' }].map(l => (
+            {/* Staff portals are reachable by direct link only (/admin, /moderator),
+                so they are not advertised to people signing in as users. */}
+            {[{ to: '/', label: 'Home' }].map(l => (
               <Link key={l.to} to={l.to}
                 className="hover:text-ink transition-colors"
                 style={{ color: 'rgb(var(--a-ink) / 0.35)' }}

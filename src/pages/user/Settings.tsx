@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { User, Lock, Bell, Camera, Save } from 'lucide-react'
+import { getSessionUser } from '../../lib/session'
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -44,20 +45,22 @@ export default function Settings() {
 }
 
 function ProfileSettings() {
+  const account = getSessionUser('user')
+
   return (
     <div className="space-y-5">
       <h2 className="text-base font-bold text-ink">Profile Settings</h2>
       <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-violet-600 flex items-center justify-center text-white text-2xl font-bold">AH</div>
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-violet-600 flex items-center justify-center text-white text-2xl font-bold">{account.initials}</div>
         <div>
-          <p className="text-sm font-semibold text-ink">Ali Hassan</p>
-          <p className="text-xs text-ink-mute">ali@facecloud.io · User</p>
+          <p className="text-sm font-semibold text-ink">{account.name}</p>
+          <p className="text-xs text-ink-mute">{account.email} · User</p>
           <button className="text-xs text-accent font-medium mt-1 hover:underline">Change avatar</button>
         </div>
       </div>
       {[
-        { label: 'Full Name', value: 'Ali Hassan', id: 'profile-name' },
-        { label: 'Email Address', value: 'ali@facecloud.io', id: 'profile-email' },
+        { label: 'Full Name', value: account.name, id: 'profile-name' },
+        { label: 'Email Address', value: account.email, id: 'profile-email' },
         { label: 'University', value: 'Bahria University Lahore Campus', id: 'profile-uni' },
         { label: 'Department', value: 'Department of Computer Sciences', id: 'profile-dept' },
       ].map(f => (

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
+import { getSessionUser } from '../../lib/session'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -83,11 +84,6 @@ const avatarColor = {
   moderator: '#10B981',
 }
 
-const fallbackUser = {
-  user:      { name: 'Ali Hassan',     initials: 'AH' },
-  admin:     { name: 'Ali Hassan',     initials: 'AH' },
-  moderator: { name: 'Vaneeza Sohaib', initials: 'VS' },
-}
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
@@ -95,20 +91,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const nav = navByRole[role]
   const cfg = roleConfig[role]
 
-  /* Read the signed-in person from the session, exactly as the topbar does. */
-  let account = fallbackUser[role]
-  const sessionStr = localStorage.getItem('facecloud_session')
-  if (sessionStr) {
-    try {
-      const session = JSON.parse(sessionStr)
-      if (session.role === role) {
-        account = {
-          name:     session.name     || account.name,
-          initials: session.initials || account.initials,
-        }
-      }
-    } catch (_) { /* ignore a malformed session and keep the fallback */ }
-  }
+  const account = getSessionUser(role)
 
   const handleLogout = () => {
     localStorage.removeItem('facecloud_session')

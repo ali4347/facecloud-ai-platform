@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Settings, LogOut, ChevronDown, Shield } from 'lucide-react'
 import type { Role } from '../../data/mock'
 
@@ -24,7 +24,6 @@ const avatarColor: Record<Role, string> = {
 
 export function UserMenu({ name, email, role, initials }: UserMenuProps) {
   const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
   const badge = roleBadge[role]
 
   return (
@@ -77,25 +76,6 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
                 <Shield className="w-3 h-3" />
                 {role.charAt(0).toUpperCase() + role.slice(1)}
               </div>
-            </div>
-
-            {/* Role switch */}
-            <div className="px-2 py-2 border-b border-line-soft">
-              <p className="text-[11px] px-2 py-1 mb-1 text-ink-faint">Switch Role (Demo)</p>
-              {(['user', 'admin', 'moderator'] as Role[]).map(r => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => { navigate(r === 'user' ? '/dashboard' : `/${r}`); setOpen(false) }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-[13px] transition-colors capitalize cursor-pointer ${
-                    role === r
-                      ? 'bg-accent-tint text-accent-soft font-semibold'
-                      : 'text-ink-soft hover:bg-surface-mute'
-                  }`}
-                >
-                  {r} Dashboard
-                </button>
-              ))}
             </div>
 
             {/* Actions */}
