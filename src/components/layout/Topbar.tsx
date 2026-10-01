@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, Search, Settings, History, Sun, Moon } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Menu, Search, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
 import { UserMenu } from '../ui/UserMenu'
 import type { Appearance } from '../../lib/theme'
@@ -15,6 +16,14 @@ interface TopbarProps {
   onToggleAppearance?: () => void
 }
 
+
+/* Each portal keeps its own activity trail, so the history button goes to the
+   one that belongs to the signed-in role. */
+const activityPath: Record<Role, string> = {
+  user:      '/dashboard/activity',
+  admin:     '/admin/audit-logs',
+  moderator: '/moderator/audit',
+}
 
 export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
   const searchRef = useRef<HTMLInputElement>(null)
@@ -82,13 +91,15 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appeara
             ? <Sun className="w-[18px] h-[18px]" />
             : <Moon className="w-[18px] h-[18px]" />}
         </button>
-        <button type="button" className="fc-icon-btn hidden sm:inline-flex" aria-label="Settings" title="Settings">
-          <Settings className="w-[18px] h-[18px]" />
-        </button>
         <NotificationDropdown sidebarOpen={sidebarOpen} onOpen={onCloseSidebar} />
-        <button type="button" className="fc-icon-btn hidden md:inline-flex" aria-label="Activity history" title="Activity history">
+        <Link
+          to={activityPath[role]}
+          className="fc-icon-btn hidden md:inline-flex"
+          aria-label="Activity history"
+          title="Activity history"
+        >
           <History className="w-[18px] h-[18px]" />
-        </button>
+        </Link>
         <div className="w-px h-6 bg-line mx-1 hidden sm:block" />
         <UserMenu name={user.name} email={user.email} role={role} initials={user.initials} />
       </div>

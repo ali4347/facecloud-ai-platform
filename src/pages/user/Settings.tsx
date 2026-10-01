@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { GradientButton } from '../../components/ui/GradientButton'
-import { User, Lock, Bell, Camera, Save } from 'lucide-react'
+import { Avatar } from '../../components/ui/Avatar'
+import { User, Lock, Bell, Camera, Save, Upload, Trash2, Check } from 'lucide-react'
 import { getSessionUser } from '../../lib/session'
+import { AVATAR_PRESETS, fileToAvatarDataUrl, useAvatar } from '../../lib/avatar'
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -50,14 +52,7 @@ function ProfileSettings() {
   return (
     <div className="space-y-5">
       <h2 className="text-base font-bold text-ink">Profile Settings</h2>
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-violet-600 flex items-center justify-center text-white text-2xl font-bold">{account.initials}</div>
-        <div>
-          <p className="text-sm font-semibold text-ink">{account.name}</p>
-          <p className="text-xs text-ink-mute">{account.email} · User</p>
-          <button className="text-xs text-accent font-medium mt-1 hover:underline">Change avatar</button>
-        </div>
-      </div>
+      <AvatarSettings email={account.email} initials={account.initials} name={account.name} />
       {[
         { label: 'Full Name', value: account.name, id: 'profile-name' },
         { label: 'Email Address', value: account.email, id: 'profile-email' },
@@ -194,6 +189,116 @@ function CameraSettings() {
         <p className="text-xs text-ink-mute mt-1">Higher values increase processing time</p>
       </div>
       <GradientButton leftIcon={<Save className="w-4 h-4" />}>Save Settings</GradientButton>
+    </div>
+  )
+}
+
+/* ── Avatar picker ──────────────────────────────────────────────────────
+   A colour preset or an uploaded photo. There is no backend, so the choice is
+   kept in this browser against the signed-in account; the photo is downscaled
+   to 256px before it is stored. */
+function AvatarSettings({ email, initials, name }: { email: string; initials: string; name: string }) {
+  const [avatar, setAvatar] = useAvatar(email)
+  const [open, setOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const handleFile = async (file: File | undefined) => {
+    if (!file) return
+    setError(null)
+    setBusy(true)
+    try {
+      setAvatar({ kind: 'photo', dataUrl: await fileToAvatarDataUrl(file) })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'That image could not be used.')
+    } finally {
+      setBusy(false)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-4">
+        <Avatar email={email} initials={initials} size={64} alt={`${name}'s avatar`} />
+        <div>
+          <p className="text-sm font-semibold text-ink">{name}</p>
+          <p className="text-xs text-ink-mute">{email} · User</p>
+          <button
+            type="button"
+            onClick={() => { setOpen(o => !o); setError(null) }}
+            aria-expanded={open}
+            className="text-xs text-accent font-medium mt-1 hover:underline cursor-pointer"
+          >
+            {open ? 'Close' : 'Change avatar'}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="mt-4 p-4 rounded-2xl border border-line bg-surface-mute">
+          <p className="text-xs font-semibold text-ink mb-3">Pick a colour</p>
+          <div className="flex flex-wrap gap-2.5">
+            {AVATAR_PRESETS.map(preset => {
+              const selected = avatar?.kind === 'preset' && avatar.id === preset.id
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => { setError(null); setAvatar({ kind: 'preset', id: preset.id }) }}
+                  aria-label={preset.label}
+                  aria-pressed={selected}
+                  title={preset.label}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center text-white text-[13px] font-semibold
+                              transition-transform cursor-pointer hover:scale-105
+                              ${selected ? 'ring-2 ring-accent ring-offset-2 ring-offset-surface-mute' : ''}`}
+                  style={{ background: `linear-gradient(135deg, ${preset.from}, ${preset.to})` }}
+                >
+                  {selected ? <Check className="w-4 h-4" /> : initials}
+                </button>
+              )
+            })}
+          </div>
+
+          <p className="text-xs font-semibold text-ink mt-5 mb-2">Or use your own photo</p>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={e => handleFile(e.target.files?.[0])}
+          />
+          <div className="flex flex-wrap gap-2">
+            <GradientButton
+              variant="secondary"
+              size="sm"
+              type="button"
+              disabled={busy}
+              leftIcon={<Upload className="w-3.5 h-3.5" />}
+              onClick={() => fileRef.current?.click()}
+            >
+              {busy ? 'Processing…' : 'Upload photo'}
+            </GradientButton>
+            {avatar && (
+              <GradientButton
+                variant="ghost"
+                size="sm"
+                type="button"
+                leftIcon={<Trash2 className="w-3.5 h-3.5" />}
+                onClick={() => { setError(null); setAvatar(null) }}
+              >
+                Reset
+              </GradientButton>
+            )}
+          </div>
+
+          <p className="text-[11px] text-ink-faint mt-2.5">
+            JPG, PNG or WebP up to 8 MB. The photo is cropped square, resized to 256px and kept in this browser.
+          </p>
+          {error && <p className="text-[11px] text-red-500 mt-2" role="alert">{error}</p>}
+        </div>
+      )}
     </div>
   )
 }

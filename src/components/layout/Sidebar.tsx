@@ -9,6 +9,7 @@ import {
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 import { getSessionUser } from '../../lib/session'
+import { Avatar } from '../ui/Avatar'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -202,12 +203,12 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       {/* ── Account card ───────────────────────────────────────────── */}
       <div className="mt-auto bg-surface border border-line rounded-[18px] shadow-soft p-3">
         <div className="flex items-center gap-2.5">
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0"
-            style={{ background: avatarColor[role] }}
-          >
-            {account.initials}
-          </div>
+          <Avatar
+            email={account.email}
+            initials={account.initials}
+            size={36}
+            fallbackColor={avatarColor[role]}
+          />
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-semibold text-ink truncate leading-none">
               {account.name}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Settings, LogOut, ChevronDown, Shield } from 'lucide-react'
+import { Avatar } from './Avatar'
 import type { Role } from '../../data/mock'
 
 interface UserMenuProps {
@@ -36,12 +37,7 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
         aria-expanded={open}
         aria-haspopup="menu"
       >
-        <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[11px] font-semibold flex-shrink-0"
-          style={{ background: avatarColor[role] }}
-        >
-          {initials}
-        </div>
+        <Avatar email={email} initials={initials} size={36} fallbackColor={avatarColor[role]} />
         <div className="hidden sm:block text-left">
           <p className="text-[13px] font-semibold text-ink leading-none">{name.split(' ')[0]}</p>
           <p className="text-[11px] mt-1 capitalize text-ink-mute leading-none">{role}</p>
@@ -58,12 +54,7 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
             {/* Profile info */}
             <div className="px-4 py-4 border-b border-line-soft">
               <div className="flex items-center gap-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[13px] font-semibold flex-shrink-0"
-                  style={{ background: avatarColor[role] }}
-                >
-                  {initials}
-                </div>
+                <Avatar email={email} initials={initials} size={40} fallbackColor={avatarColor[role]} />
                 <div className="min-w-0">
                   <p className="text-[13px] font-semibold text-ink truncate">{name}</p>
                   <p className="text-[12px] text-ink-mute truncate">{email}</p>

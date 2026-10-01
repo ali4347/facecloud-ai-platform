@@ -46,6 +46,26 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-01 — Topbar icons wired up, and avatars you can actually change
+*Status: committed (this commit)*
+- The topbar's **activity history** icon did nothing. It is now a link to the trail that belongs to the signed-in
+  role: `/dashboard/activity`, `/admin/audit-logs` or `/moderator/audit`.
+- Removed the topbar's **settings** icon. It was decorative chrome copied from the reference, and Settings is
+  already reachable from the sidebar and the user menu.
+- **"Change avatar" works.** Opening it offers nine colour presets or an upload of your own photo, and the choice
+  shows up immediately in the topbar, the sidebar account card and Settings.
+  - New `src/lib/avatar.ts` holds the presets, the per-account storage and a `useAvatar` hook that keeps every
+    surface in step, the same pattern the appearance toggle uses.
+  - New `src/components/ui/Avatar.tsx` is the single rendering, so the three places that drew an avatar by hand no
+    longer each have their own copy.
+  - An uploaded photo is centre-cropped square, downscaled to 256px and encoded as JPEG **before** it is stored. A
+    phone photo would otherwise fill the ~5 MB localStorage quota on its own; a 99 KB test image came out at 12 KB.
+  - Rejects non-images and anything over 8 MB with a message rather than failing silently, and "Reset" returns the
+    account to its role colour.
+  - Avatars are keyed by email, so signing in as someone else does not inherit the previous person's picture.
+- Verified in the running app: the history link target, the settings icon being gone, picking a preset, and
+  uploading a real photo end to end.
+
 ### 2026-10-01 — Moderator gate: login redirect, backdoor removed, follows the appearance
 *Status: committed (this commit)*
 - With the `.htaccess` fix deployed, `/moderator` reached the app and showed **Access Denied with only a "Back to
@@ -411,6 +431,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
 - Deployment is a manual upload, and `.htaccess` is a hidden file that most file managers do not show. If a deploy
   drops it, every deep link breaks again with the host's 404 page.
+- Avatars live in this browser's `localStorage`, so they do not follow the account to another device and are lost
+  if site data is cleared. They move to the server with the rest of the profile once the API exists.
 - Role separation is enforced in the browser only, against a `localStorage` session. That is appropriate for the
   current mock build, but once the API exists the checks have to move server-side — a determined visitor can still
   hand-write a session object today.
