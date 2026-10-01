@@ -46,6 +46,21 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-01 — User menu now closes when you click away
+*Status: committed (this commit)*
+- The topbar's user card stayed open when you clicked elsewhere, and survived a route change — it was still hanging
+  over the next page.
+- **Cause:** it closed itself with a full-screen `fixed inset-0 z-30` backdrop rendered inside the topbar. The topbar
+  is `sticky z-30`, which starts its own stacking context, so that backdrop could never rise above the sidebar at
+  `z-50`. Clicks over the sidebar — including the nav links — went straight past it.
+- Replaced the backdrop with the pattern the notification panel already used: a document-level `pointerdown`
+  listener, an Escape handler that returns focus to the trigger, and a close on navigation. A document listener has
+  no stacking blind spot.
+- The two topbar popovers are now mutually exclusive: opening one closes the other, through a small shared
+  announcement in `src/lib/popover.ts` rather than either knowing about the other.
+- Verified all five paths in the running app: clicking page content, clicking the sidebar, Escape, opening
+  notifications, and navigating from a sidebar link.
+
 ### 2026-10-01 — Profile form made general, and it now actually saves
 *Status: committed (this commit)*
 - The profile form asked for **University** and **Department**. FaceCloud is for anyone with photos to clean up, not

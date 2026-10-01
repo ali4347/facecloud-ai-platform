@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { Bell, Check, X } from 'lucide-react'
 import { formatDateTime } from '../../lib/utils'
 import { mockActivity } from '../../data/mock'
+import { announcePopoverOpen, onOtherPopoverOpen } from '../../lib/popover'
 
 interface NotificationDropdownProps {
   onOpen?: () => void
@@ -66,11 +67,15 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
     }
   }, [open])
 
+  // Opening the user menu closes this panel.
+  useEffect(() => onOtherPopoverOpen('notifications', () => setOpen(false)), [])
+
   const handleToggle = () => {
     setOpen(prev => {
       const next = !prev
-      if (next && onOpen) {
-        onOpen()
+      if (next) {
+        announcePopoverOpen('notifications')
+        if (onOpen) onOpen()
       }
       return next
     })

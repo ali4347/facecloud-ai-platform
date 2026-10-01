@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Settings, LogOut, ChevronDown, Shield } from 'lucide-react'
 import { Avatar } from './Avatar'
+import { announcePopoverOpen, onOtherPopoverOpen } from '../../lib/popover'
 import type { Role } from '../../data/mock'
 
 interface UserMenuProps {
@@ -26,11 +27,61 @@ const avatarColor: Record<Role, string> = {
 export function UserMenu({ name, email, role, initials }: UserMenuProps) {
   const [open, setOpen] = useState(false)
   const badge = roleBadge[role]
+  const location = useLocation()
+
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  // Close on navigation — the menu used to stay open across a route change.
+  useEffect(() => {
+    setOpen(false)
+  }, [location.pathname, location.search, location.hash])
+
+  /* Close on a click anywhere outside.
+     This replaces a full-screen backdrop div, which sat inside the topbar's own
+     stacking context: the sidebar paints above it, so clicks over there never
+     reached it and the menu stayed open. A document-level listener has no such
+     blind spot. */
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (btnRef.current?.contains(target) || panelRef.current?.contains(target)) return
+      setOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [open])
+
+  // Escape closes and returns focus to the trigger.
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        btnRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open])
+
+  // Opening the notification panel closes this one.
+  useEffect(() => onOtherPopoverOpen('user-menu', () => setOpen(false)), [])
+
+  const handleToggle = () => {
+    setOpen(prev => {
+      const next = !prev
+      if (next) announcePopoverOpen('user-menu')
+      return next
+    })
+  }
 
   return (
     <div className="relative">
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={handleToggle}
         type="button"
         className="flex items-center gap-2.5 p-1 pr-2.5 rounded-xl border border-transparent hover:bg-surface hover:border-line transition-colors cursor-pointer"
         id="user-menu-btn"
@@ -49,8 +100,12 @@ export function UserMenu({ name, email, role, initials }: UserMenuProps) {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-14 z-40 w-64 rounded-2xl overflow-hidden bg-surface border border-line shadow-soft-lg">
+          <div
+            ref={panelRef}
+            role="menu"
+            aria-labelledby="user-menu-btn"
+            className="absolute right-0 top-14 z-40 w-64 rounded-2xl overflow-hidden bg-surface border border-line shadow-soft-lg"
+          >
             {/* Profile info */}
             <div className="px-4 py-4 border-b border-line-soft">
               <div className="flex items-center gap-3">
