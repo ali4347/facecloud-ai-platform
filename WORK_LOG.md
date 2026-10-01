@@ -28,7 +28,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete (mock) | Queue, image review, members, batches, notifications, reports, audit, settings |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
-| Deployment | ✅ Vercel | `vercel.json` SPA rewrite that skips files with extensions (so `/videos/*.mp4` serve) |
+| Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
 | Backend database (PostgreSQL 16 + Prisma 5.22) | ✅ Schema + migration + seed | 15 models, 8 enums, migration `20260714_init`, 3 seeded accounts |
 | Backend API server (NestJS/Express) | ❌ Not started | Planned in README_BACKEND_ROADMAP.md §3 |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
@@ -45,6 +45,23 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-01 — Fixed deep links 404ing on the live site
+*Status: committed (this commit)*
+- Every URL except `/` returned the host's own 404 page on `facecloudai.com` — `/admin`, `/dashboard`, `/login`, all
+  of them. Clicking through the app worked, because React Router handles those moves in the browser; only a typed
+  URL or a refresh reached the server.
+- **Cause: the live site is not on Vercel.** The response headers say `platform: hostinger` / `server: hcdn`, so
+  `vercel.json` was never being read. Nothing on the server rewrote unknown paths to `index.html`.
+- Added `public/.htaccess` for Apache/LiteSpeed. Vite copies `public/` into `dist/`, so it ships with every build.
+  It serves real files untouched, hands every other path the app shell, and deliberately lets a request that looks
+  like a static file 404 on its own — a missing bundle should report as missing rather than come back as HTML, which
+  the browser then reports as a confusing MIME type error. It also stops `index.html` being cached, since it names
+  the hashed bundles.
+- Verified by serving the real `dist/` through a local Apache with the file in place: `/admin`, `/dashboard`,
+  `/moderator`, `/admin/login` and a nested route all return the app shell with 200; real assets keep their MIME
+  types; a missing asset returns 404; `robots.txt` still serves as text.
+- Corrected README §16 and the status table above, which both claimed Vercel.
 
 ### 2026-10-01 — Staff portals are link-only; the dashboard shows the real signed-in user
 *Status: committed (this commit)*
@@ -376,6 +393,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
 - `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
+- Deployment is a manual upload, and `.htaccess` is a hidden file that most file managers do not show. If a deploy
+  drops it, every deep link breaks again with the host's 404 page.
 - Role separation is enforced in the browser only, against a `localStorage` session. That is appropriate for the
   current mock build, but once the API exists the checks have to move server-side — a determined visitor can still
   hand-write a session object today.

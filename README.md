@@ -423,8 +423,18 @@ docker-compose.yml            # Optional: PostgreSQL 16 + Redis 7
 
 ## 16. Deployment
 
-* **Hosting Platforms**: The application is configured for deployment on static hosting providers like Vercel, Netlify, or AWS Amplify.
-* **SPA Routing Configuration**: For React Router's client-side routing to function correctly on page reloads, a rewrite rule is required. The Vercel configuration file is located at `vercel.json` and directs all requests to `index.html`.
+* **Live host**: `facecloudai.com` is served from **Hostinger** (Apache/LiteSpeed). Deployment is a manual upload of
+  the `dist/` folder to the web root.
+* **SPA Routing Configuration**: React Router owns every path, so the server must return `index.html` for any route
+  that is not a real file. Two config files cover this, and both are built from `public/`:
+  * `public/.htaccess` — the one that matters for the live site. It ships inside `dist/` on every build.
+  * `vercel.json` — kept for Vercel deployments; it has no effect on Hostinger.
+
+> [!IMPORTANT]
+> **`.htaccess` is a hidden file.** Most file managers and FTP clients do not show names beginning with a dot, so it
+> is easy to upload `dist/` without it. If it is missing from the web root, every deep link (`/admin`, `/dashboard`,
+> `/login`) returns the host's own 404 page — the app only works from `/`. Turn on "show hidden files" before
+> uploading, and check the web root afterwards.
 
 ---
 
