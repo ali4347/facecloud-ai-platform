@@ -12,7 +12,7 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
 import { userStats, recentUploads, mockActivity } from '../../data/mock'
 import { formatDateTime } from '../../lib/utils'
-import { getSessionUser } from '../../lib/session'
+import { useSessionUser } from '../../lib/session'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts'
@@ -83,7 +83,7 @@ function simplifyActivity(act: { type: string; message: string; status: string }
 
 export default function Dashboard() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const account = getSessionUser('user')
+  const account = useSessionUser('user')
 
   const isProcessing = userStats.processingInProgress > 0
 

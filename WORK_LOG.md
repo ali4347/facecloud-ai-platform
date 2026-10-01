@@ -46,6 +46,22 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-01 — Profile form made general, and it now actually saves
+*Status: committed (this commit)*
+- The profile form asked for **University** and **Department**. FaceCloud is for anyone with photos to clean up, not
+  for one university, so those are replaced with fields that suit any account: Organization, Job Title, Phone and
+  Country — all optional. Full Name stays required; Email is read-only, because it identifies the account in the
+  mock session and editing it would orphan the sign-in.
+- **The form never saved anything.** Every field was an uncontrolled `defaultValue` and "Save Changes" had no
+  handler, so edits vanished on navigation. It is a real form now: controlled inputs, a submit handler, a "Profile
+  saved" confirmation, and an error line if storage refuses.
+- Changing the name updates the session, and the topbar, sidebar and dashboard greeting follow immediately —
+  `useSessionUser` subscribes to a session-change event instead of reading once per render. Initials are derived
+  from the name rather than stored separately, so they cannot drift.
+- New `src/lib/profile.ts` keeps the optional details per account, matching how avatars are stored.
+- Verified in the running app: filled every field, saved, and confirmed what landed in storage and that the name and
+  initials changed across the shell.
+
 ### 2026-10-01 — Topbar icons wired up, and avatars you can actually change
 *Status: committed (this commit)*
 - The topbar's **activity history** icon did nothing. It is now a link to the trail that belongs to the signed-in
@@ -431,8 +447,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
 - Deployment is a manual upload, and `.htaccess` is a hidden file that most file managers do not show. If a deploy
   drops it, every deep link breaks again with the host's 404 page.
-- Avatars live in this browser's `localStorage`, so they do not follow the account to another device and are lost
-  if site data is cleared. They move to the server with the rest of the profile once the API exists.
+- Profile details and avatars live in this browser's `localStorage`, so they do not follow the account to another device and are lost
+  if site data is cleared. They move to the server once the API exists.
 - Role separation is enforced in the browser only, against a `localStorage` session. That is appropriate for the
   current mock build, but once the API exists the checks have to move server-side — a determined visitor can still
   hand-write a session object today.

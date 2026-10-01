@@ -8,7 +8,7 @@ import {
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
-import { getSessionUser } from '../../lib/session'
+import { useSessionUser } from '../../lib/session'
 import { Avatar } from '../ui/Avatar'
 
 interface SidebarProps {
@@ -92,7 +92,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const nav = navByRole[role]
   const cfg = roleConfig[role]
 
-  const account = getSessionUser(role)
+  const account = useSessionUser(role)
 
   const handleLogout = () => {
     localStorage.removeItem('facecloud_session')

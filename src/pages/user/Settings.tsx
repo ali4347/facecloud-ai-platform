@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { Avatar } from '../../components/ui/Avatar'
 import { User, Lock, Bell, Camera, Save, Upload, Trash2, Check } from 'lucide-react'
-import { getSessionUser } from '../../lib/session'
+import { useSessionUser, updateSessionName } from '../../lib/session'
+import { useProfile, saveProfile } from '../../lib/profile'
+import type { Profile } from '../../lib/profile'
 import { AVATAR_PRESETS, fileToAvatarDataUrl, useAvatar } from '../../lib/avatar'
 
 const TABS = [
@@ -47,25 +49,112 @@ export default function Settings() {
 }
 
 function ProfileSettings() {
-  const account = getSessionUser('user')
+  const account = useSessionUser('user')
+  const stored = useProfile(account.email)
+
+  const [name, setName] = useState(account.name)
+  const [profile, setProfile] = useState<Profile>(stored)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  /* Re-sync when the account or its stored profile changes underneath us —
+     for instance after signing in as someone else. */
+  useEffect(() => { setName(account.name) }, [account.name])
+  useEffect(() => { setProfile(stored) }, [stored])
+
+  const field = (key: keyof Profile) => ({
+    value: profile[key],
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      setProfile(p => ({ ...p, [key]: e.target.value }))
+      setSaved(false)
+    },
+  })
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    if (!name.trim()) {
+      setError('Please enter your name.')
+      return
+    }
+    try {
+      saveProfile(account.email, profile)
+      updateSessionName('user', name)
+      setSaved(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save your profile.')
+    }
+  }
 
   return (
-    <div className="space-y-5">
+    <form className="space-y-5" onSubmit={handleSave}>
       <h2 className="text-base font-bold text-ink">Profile Settings</h2>
       <AvatarSettings email={account.email} initials={account.initials} name={account.name} />
-      {[
-        { label: 'Full Name', value: account.name, id: 'profile-name' },
-        { label: 'Email Address', value: account.email, id: 'profile-email' },
-        { label: 'University', value: 'Bahria University Lahore Campus', id: 'profile-uni' },
-        { label: 'Department', value: 'Department of Computer Sciences', id: 'profile-dept' },
-      ].map(f => (
-        <div key={f.id}>
-          <label className="text-xs font-semibold text-ink block mb-1.5">{f.label}</label>
-          <input id={f.id} type="text" defaultValue={f.value} className="fc-input" />
-        </div>
-      ))}
-      <GradientButton leftIcon={<Save className="w-4 h-4" />}>Save Changes</GradientButton>
-    </div>
+
+      <div>
+        <label htmlFor="profile-name" className="text-xs font-semibold text-ink block mb-1.5">Full Name</label>
+        <input
+          id="profile-name"
+          type="text"
+          className="fc-input"
+          value={name}
+          onChange={e => { setName(e.target.value); setSaved(false) }}
+          autoComplete="name"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="profile-email" className="text-xs font-semibold text-ink block mb-1.5">Email Address</label>
+        <input id="profile-email" type="email" className="fc-input" value={account.email} readOnly disabled />
+        <p className="text-[11px] text-ink-faint mt-1.5">
+          Your email identifies the account and cannot be changed here.
+        </p>
+      </div>
+
+      {/* Everything below is optional — FaceCloud is used by individuals as
+          well as teams, so none of it is required to use the product. */}
+      <div>
+        <label htmlFor="profile-org" className="text-xs font-semibold text-ink block mb-1.5">
+          Organization <span className="font-normal text-ink-faint">(optional)</span>
+        </label>
+        <input id="profile-org" type="text" className="fc-input" placeholder="Company, studio or team"
+               autoComplete="organization" {...field('organization')} />
+      </div>
+
+      <div>
+        <label htmlFor="profile-role" className="text-xs font-semibold text-ink block mb-1.5">
+          Job Title <span className="font-normal text-ink-faint">(optional)</span>
+        </label>
+        <input id="profile-role" type="text" className="fc-input" placeholder="Photographer, HR lead, developer…"
+               autoComplete="organization-title" {...field('jobTitle')} />
+      </div>
+
+      <div>
+        <label htmlFor="profile-phone" className="text-xs font-semibold text-ink block mb-1.5">
+          Phone <span className="font-normal text-ink-faint">(optional)</span>
+        </label>
+        <input id="profile-phone" type="tel" className="fc-input" placeholder="+92 300 1234567"
+               autoComplete="tel" {...field('phone')} />
+      </div>
+
+      <div>
+        <label htmlFor="profile-country" className="text-xs font-semibold text-ink block mb-1.5">
+          Country <span className="font-normal text-ink-faint">(optional)</span>
+        </label>
+        <input id="profile-country" type="text" className="fc-input" placeholder="Pakistan"
+               autoComplete="country-name" {...field('country')} />
+      </div>
+
+      <div className="flex items-center gap-3 flex-wrap">
+        <GradientButton type="submit" leftIcon={<Save className="w-4 h-4" />}>Save Changes</GradientButton>
+        {saved && (
+          <span className="text-xs text-emerald-500 font-medium inline-flex items-center gap-1.5" role="status">
+            <Check className="w-3.5 h-3.5" /> Profile saved
+          </span>
+        )}
+        {error && <span className="text-xs text-red-500" role="alert">{error}</span>}
+      </div>
+    </form>
   )
 }
 

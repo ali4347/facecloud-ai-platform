@@ -4,7 +4,7 @@ import { Menu, Search, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
 import { UserMenu } from '../ui/UserMenu'
 import type { Appearance } from '../../lib/theme'
-import { getSessionUser } from '../../lib/session'
+import { useSessionUser } from '../../lib/session'
 import type { Role } from '../../data/mock'
 
 interface TopbarProps {
@@ -28,7 +28,7 @@ const activityPath: Record<Role, string> = {
 export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
   const searchRef = useRef<HTMLInputElement>(null)
   const [query, setQuery] = useState('')
-  const user = getSessionUser(role)
+  const user = useSessionUser(role)
 
   /* ⌘K / Ctrl+K focuses search — the shortcut the chip in the field advertises. */
   useEffect(() => {
