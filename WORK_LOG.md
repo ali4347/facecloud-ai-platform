@@ -25,12 +25,12 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
 | User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
-| Moderator panel (9 routes under `/moderator`) | ✅ Complete (mock) | Queue, image review, members, batches, notifications, reports, audit, settings |
+| Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
-| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 175 endpoints, 43 models, 1054 tests, CI with pip-audit and bandit. This repo is the browser app only |
-| Frontend ↔ backend integration | 🔄 Started | API client and sign-in wired behind `VITE_USE_API`; every other screen still reads `src/data/mock.ts` |
+| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1153 tests**, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics) added 2026-10-02. This repo is the browser app only |
+| Frontend ↔ backend integration | 🔄 In progress | Sign-in, the moderator dashboard and the review queue read the live API behind `VITE_USE_API`; the remaining screens still read `src/data/mock.ts` |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
 | Build health | ✅ `npm run build` passes (checked 2026-09-18) | JS bundle 2.31 MB minified / 625 kB gzip, CSS 94.8 kB; chunk-size warning, no code splitting. Lint reports warnings only |
@@ -45,6 +45,77 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-02 — Moderator queue operations in the backend, and the moderator panel attached to it
+*Status: committed (this commit); backend changes are PRs #56 and #57 on FaceCloud_backend*
+
+**Backend audit first.** Checked whether the Django project was actually built professionally before adding to it:
+`pip-audit` reports no known vulnerabilities, `bandit` no medium/high findings, **zero** TODO/FIXME/HACK markers in
+45,000 lines, no hardcoded secrets, 1,110 functions with only 9 over 120 lines, and 1,050 test functions with 2,766
+assertions and behaviour-style names. It is professional work. The one real defect was that the suite only passed on
+PostgreSQL — fixed in **PR #56**: SQLite reuses a primary key after a rolled-back transaction while PostgreSQL never
+does, so several tests shared one DRF throttle bucket (throttles are keyed by `user.pk` and the cache is not rolled
+back) and tripped the collage endpoint's 20/hour limit; the same reuse polluted the shared `MEDIA_ROOT` folder for a
+thumbnail race test. Test runner now clears the cache per test and the thumbnail test compares the folder before and
+after. 1054 passing on SQLite in 13s, no application code touched.
+
+**New moderator features (PR #57, backend).** Four additions, each closing a way the queue could go wrong quietly:
+- *Review deadlines (SLA).* Every review is stamped with a `due_at` at creation from `MODERATION_SLA_HOURS` (default
+  24) and the deadline never moves afterwards, so a review is judged against the service level it was accepted under.
+  Queue takes `?overdue=true`, `?assignment=mine|unassigned` and `?ordering=due_at`; the dashboard adds `overdue`,
+  `due_soon`, `unassigned`, `claimed_now`, `oldest_open_age_hours` and `sla_hours`; a new `moderation.flag_sla_breaches`
+  beat task sends one `moderator_review_overdue` notification per late review.
+- *Claim soft lock.* `claim/` holds a review for `MODERATION_CLAIM_MINUTES` (default 15) so two moderators cannot work
+  the same photo and race to contradictory decisions — another moderator's decision or escalation answers 409. It
+  expires on its own so nothing is stranded, `release/` returns it early, an owner can release someone else's hold,
+  and losing moderator rights drops the claim.
+- *Bulk decisions.* `bulk-decision/` approves, rejects or escalates up to 50 reviews. Each row goes through the same
+  `decide_review()` as the single endpoint and succeeds or fails on its own, so one stale row does not cost the other
+  forty-nine. `correct` is excluded — the person-folder choice is per photo.
+- *Per-moderator performance.* `metrics/?days=30` reports throughput by outcome, on-time/late against each review's own
+  deadline, and average and slowest decision time measured from when the review arrived, not from when it was assigned.
+  The platform-wide admin overview carries the same counts.
+
+Also widened the backend CI static-analysis scan from a hand-kept list to **every** app — it had fallen behind and left
+`moderation`, `organizations`, `collages`, `events` and `thumbnails` unscanned. 99 new tests; suite now **1153 passing**,
+with `manage.py check`, `makemigrations --check` and `spectacular --validate --fail-on-warn` all clean, green on
+PostgreSQL in CI.
+
+**Frontend attached to it (this repo).** The moderator dashboard and review queue now read live data:
+- `src/lib/api/moderation.ts` — typed client for the queue, dashboard, claim/release, bulk decisions and metrics.
+- `src/lib/api/organizations.ts` — resolves which organization to scope moderator requests to, preferring a shared
+  organization over the personal one every account gets (the personal one has nobody to moderate).
+- `src/lib/moderationData.ts` — hooks serving either the real API or the built-in demo data, adapted into the same
+  shape so each screen is written once. With `VITE_USE_API=false` the panel still shows a full demo queue.
+- `ModeratorDashboard.tsx` rebuilt around the service level: overdue / due soon / unassigned / oldest waiting first,
+  then the queue counts, then a team performance table over a 7/30/90-day window.
+- `ReviewQueue.tsx` rebuilt on real reviews: status/source/assignment filters, an overdue-only toggle, deadline-first
+  ordering, deadline chips (overdue, due soon, on track, met, missed), who is holding each review, per-row claim and
+  release, and multi-select bulk approve/reject/escalate that reports per-row outcomes rather than one success or error.
+
+**One real bug fixed on the way.** `apiFetch` could not recover after a page reload: the access token lives in memory
+only, and the 401 for a *missing* credential carries no `token_not_valid` code, so the retry path never fired and a
+valid refresh token sat unused while the person looked signed out. It now exchanges the refresh token before the first
+request when there is no access token in memory. This affects every screen, not just the moderator ones.
+
+**Verified end to end**, not just type-checked: signed in against the local Django server, seeded a demo organization,
+and confirmed over HTTP that the dashboard reports `overdue: 2 / due_soon: 1 / oldest_open_age_hours: 6.0`, that a
+second moderator's decision on a claimed review returns **409** naming the holder, that a bulk approve of four ids
+returns **2 succeeded / 2 failed** with per-row reasons, and that metrics report `on_time_rate` 1.0 and 0.5 for the two
+moderators. Then drove the real UI in headless Chrome: queue renders 6 rows with correct deadline chips
+(`OVERDUE, MISSED, MET, MET, MET, ON TRACK`), the held-by column shows the live claim, and the bulk bar appears on
+selection. `npm run build` passes; lint reports no new warnings.
+
+**Files (this repo):** `src/lib/api/moderation.ts` (new), `src/lib/api/organizations.ts` (new),
+`src/lib/moderationData.ts` (new), `src/lib/api/client.ts`, `src/pages/moderator/ModeratorDashboard.tsx`,
+`src/pages/moderator/ReviewQueue.tsx`, `.env.local` (gitignored; the old `.env` is a leftover from the removed
+Node/Prisma backend and has no effect on a Vite app).
+
+**Known gap, needs a decision.** Image thumbnails are owner-only (`thumbnails/views.py` filters on
+`owner=request.user`), so a moderator cannot see the photo they are being asked to judge. Giving moderators
+organization-scoped access to review images is the obvious next step, but it widens who can see facial data, so it is
+left for the owner to decide rather than done quietly.
+
 
 ### 2026-10-02 — Reviewed the Django backend, and started attaching it
 *Status: committed (this commit)*

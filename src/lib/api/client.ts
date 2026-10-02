@@ -104,6 +104,16 @@ export async function apiFetch<T = unknown>(path: string, options: RequestOption
     throw new ApiError(0, 'No API URL is configured. Set VITE_API_URL.')
   }
 
+  /* After a page reload the access token is gone -- it lives in memory only --
+     while the refresh token is still on disk. Exchanging it here rather than
+     waiting for a 401 is what keeps someone signed in across a refresh: the
+     401 for a *missing* credential carries no `token_not_valid` code, so the
+     retry path below cannot recognise it and would sign the person out while
+     a perfectly good refresh token sat unused. */
+  if (!getAccessToken() && !options.anonymous && getRefreshToken()) {
+    await refreshAccessToken()
+  }
+
   const send = async (): Promise<Response> => {
     const headers: Record<string, string> = {}
     if (!options.formData) headers['Content-Type'] = 'application/json'

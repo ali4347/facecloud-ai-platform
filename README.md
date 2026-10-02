@@ -24,7 +24,12 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 
 ## 2. Current Frontend Status
 
-The frontend is built as a production-style UI prototype. Authentication, uploads, AI processing, notifications, admin data, and moderator actions are currently simulated with mock data and `localStorage` persistence until the backend is connected.
+The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
+
+* **Live on the API:** sign-in, the moderator dashboard, and the moderator review queue.
+* **Still on mock data and `localStorage`:** uploads, AI processing, notifications, admin data, and the remaining moderator screens.
+
+With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
 ---
 
@@ -162,8 +167,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/logs` (Redirects to `/admin/audit-logs`)
 
 ### Moderator Routes (under `/moderator`)
-* `/moderator` (Moderation Metrics dashboard)
-* `/moderator/queue` (Rejected or borderline images awaiting decision)
+* `/moderator` (Dashboard: overdue and due-soon counts against the review deadline, unassigned work, oldest waiting review, and per-moderator performance over a 7/30/90-day window)
+* `/moderator/queue` (Review queue: filter by status, source, assignment and overdue-only, order by deadline, claim or release a review so two moderators cannot work the same photo, and approve, reject or escalate a selection in bulk)
 * `/moderator/images/:id` (Human-in-the-loop audit detail view)
 * `/moderator/audit` (Historical review log matching decisions to actors)
 * `/moderator/settings` (Moderator interface threshold settings)
