@@ -29,7 +29,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
-| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1172 tests**, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics, and org-scoped access to the photo under review) added 2026-10-02. This repo is the browser app only |
+| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1172 tests**, all merged to `main`, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics, and org-scoped access to the photo under review) added 2026-10-02. This repo is the browser app only |
 | Frontend ↔ backend integration | 🔄 In progress | Sign-in, the moderator dashboard and the review queue read the live API behind `VITE_USE_API`; the remaining screens still read `src/data/mock.ts` |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
@@ -46,8 +46,36 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-02 — Merged the three backend PRs into FaceCloud_backend `main`
+*Status: backend only — nothing changed in this repo except this log*
+
+All the day's backend work is now on `main` in Ijaz's repository, merged in order so each built on the one
+before: **#56** (test suite portable across database engines) → **#57** (review deadlines, claim lock, bulk
+decisions, per-moderator metrics) → **#58** (the photo under review).
+
+`main` is a protected branch, so each PR had to be up to date with it before it could merge. #57 needed a
+branch update, which re-ran CI — green, then merged. #58 hit two snags worth recording:
+
+- GitHub's own "update branch" button reported a conflict, but merging `origin/main` into the branch locally
+  resolved cleanly with no conflict at all. GitHub was comparing against a stale mergeability cache, not a
+  real conflict.
+- `gh pr merge --delete-branch` **closed the pull request and deleted its branch even though the merge
+  itself failed.** Nothing was lost — the commit was safe locally and the remote branch still had it — but the
+  PR had to be reopened after pushing the merge. Worth knowing: do not pass `--delete-branch` on a merge that
+  might be refused.
+
+Verified on `main` after pulling: **1172 tests passing**, `makemigrations --check` reports no changes, and
+`spectacular --validate --fail-on-warn` exits 0.
+
+**Repository rule (restated by the owner):** backend work goes **only** to
+[ijaz-student021/FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend); frontend work goes
+**only** to [ali4347/facecloud-ai-platform](https://github.com/ali4347/facecloud-ai-platform). The two never
+mix — the backend is Ijaz's half of the project, the frontend is Ali's. Checked and holding: this repo tracks
+no Python, and the backend repo tracks no frontend files.
+
+
 ### 2026-10-02 — The moderator can now see the photo being judged
-*Status: committed (this commit); backend change is PR #58 on FaceCloud_backend*
+*Status: committed (this commit); backend change is PR #58 on FaceCloud_backend — **merged into `main` on 2026-10-02***
 
 Closing the gap flagged in the entry below. Thumbnails were owner-only
 (`thumbnails/views.py` filters on `owner=request.user`), so a moderator was being asked to decide on a photo they
@@ -89,7 +117,7 @@ all six queue rows render a loaded `blob:` image at 256×192 with the correct fi
 
 
 ### 2026-10-02 — Moderator queue operations in the backend, and the moderator panel attached to it
-*Status: committed (this commit); backend changes are PRs #56 and #57 on FaceCloud_backend*
+*Status: committed (this commit); backend changes are PRs #56 and #57 on FaceCloud_backend — **both merged into `main` on 2026-10-02***
 
 **Backend audit first.** Checked whether the Django project was actually built professionally before adding to it:
 `pip-audit` reports no known vulnerabilities, `bandit` no medium/high findings, **zero** TODO/FIXME/HACK markers in
