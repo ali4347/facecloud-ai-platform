@@ -46,8 +46,31 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
-### 2026-10-02 — Upload result: the comparison on top, the details underneath
+### 2026-10-02 — Upload result back to two cards: the photo left, the comparison right
 *Status: committed (this commit)*
+
+**Corrected twice, because the first reading of the request was wrong.** The ask was for the layout the screen
+originally had — **two cards side by side, the uploaded photo in the left one and the before/after comparison
+with its drag handle in the right one**. The first attempt put the comparison full width on top with the detail
+cards underneath, which is not that.
+
+- The picker card stays after a result instead of being hidden, retitled "Your photo / The original, as you
+  uploaded it". It is the left-hand card.
+- The result card keeps its half of the row, with the before/after slider as its own content, and the quality
+  checks and photo facts stacked beneath it rather than side by side — the column is half the width now.
+- Without the API the right card no longer repeats the same photo, since the left card is already showing it;
+  it says what would be there instead.
+
+**Checked both ways in headless Chrome:** two columns, left card titled "Your photo", the photo rendered once
+rather than twice, and with the API the slider loaded with both images and "Light correction", the six real
+measures and the photo's facts beneath it.
+
+**Files:** `src/pages/user/UploadSingle.tsx`.
+
+---
+
+### 2026-10-02 — Upload result: the comparison on top, the details underneath (superseded the same day)
+*Status: committed; replaced by the entry above*
 
 Owner's layout request: the two result cards (quality checks, photo details) sat in a column beside the photo;
 move them below and put the comparison where they were, the way the old screen read.

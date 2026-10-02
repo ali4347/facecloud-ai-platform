@@ -281,10 +281,13 @@ export default function UploadSingle() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Once there is a result, the picker has done its job and the result
-            takes the width instead of sitting beside an empty column. */}
-        <div className={phase === 'done' ? 'hidden' : 'lg:col-span-6 space-y-6'}>
-          <ChartCard title="Select a photo" subtitle="One photo at a time">
+        {/* Two cards side by side: the photo on the left, the result and its
+            before/after on the right. */}
+        <div className="lg:col-span-6 space-y-6">
+          <ChartCard
+            title={phase === 'done' ? 'Your photo' : 'Select a photo'}
+            subtitle={phase === 'done' ? 'The original, as you uploaded it' : 'One photo at a time'}
+          >
             <div className="space-y-6">
               {!file ? (
                 <label className="upload-dropzone block cursor-pointer">
@@ -377,7 +380,7 @@ export default function UploadSingle() {
           </ChartCard>
         </div>
 
-        <div className={phase === 'done' ? 'lg:col-span-12 space-y-6' : 'lg:col-span-6 space-y-6'}>
+        <div className="lg:col-span-6 space-y-6">
           <ChartCard title="Result" subtitle="What the pipeline concluded">
             {phase === 'idle' && (
               <div className="text-center py-16 text-ink-faint">
@@ -436,9 +439,7 @@ export default function UploadSingle() {
 
                 {/* Before and after, once there is something to compare. */}
                 {accepted && (
-                  /* Capped and centred: full width leaves a portrait photo
-                     stranded in empty space. */
-                  <div className="space-y-2 max-w-3xl mx-auto w-full">
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute flex items-center gap-1.5">
                         <Wand2 className="w-3.5 h-3.5" />Enhancement
@@ -470,27 +471,27 @@ export default function UploadSingle() {
                       </div>
                     ) : enhanceError ? (
                       <p className="text-[11px] text-[#F87171]">{enhanceError}</p>
-                    ) : !USE_API && previewUrl ? (
-                      <>
-                        <div className="rounded-3xl overflow-hidden border border-line bg-surface-mute flex items-center justify-center">
-                          <img
-                            src={previewUrl}
-                            alt={file?.name ?? 'Your photo'}
-                            className="max-h-[360px] w-auto max-w-full object-contain"
-                          />
-                        </div>
-                        <p className="text-[10px] text-ink-faint">
-                          Enhancing runs on the server. Connect the API to see the before and after here.
+                    ) : !USE_API ? (
+                      /* The photo is already in the card to the left, so this
+                         one says what would be here instead of repeating it. */
+                      <div className="rounded-3xl border border-line bg-surface-mute p-6 text-center space-y-1.5">
+                        <Wand2 className="w-5 h-5 mx-auto text-ink-faint" />
+                        <p className="text-[11px] font-semibold text-ink-soft">
+                          Before and after, side by side
                         </p>
-                      </>
+                        <p className="text-[10px] text-ink-faint">
+                          Enhancing runs on the server, so the comparison appears
+                          here once the API is connected.
+                        </p>
+                      </div>
                     ) : (
                       <p className="text-[11px] text-ink-faint">Not enhanced yet.</p>
                     )}
                   </div>
                 )}
 
-                {/* The details read underneath the photo, side by side. */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                {/* Stacked, not side by side: this card is half the width now. */}
+                <div className="space-y-5">
                 {/* What the checks measured, rather than a verdict alone. */}
                 {image?.quality_decision && (
                   <div className="p-4 rounded-3xl bg-surface-mute border border-line">
