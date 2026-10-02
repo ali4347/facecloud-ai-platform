@@ -167,7 +167,7 @@ export default function ImageDetail() {
                       <span className="font-bold text-ink">{image.width}×{image.height}</span>
                     </div>
                   )}
-                  {image.face_validation?.face_count != null && (
+                  {USE_API && image.face_validation?.face_count != null && (
                     <div className="flex justify-between">
                       <span>Faces found:</span>
                       <span className="font-bold text-ink">{image.face_validation.face_count}</span>

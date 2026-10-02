@@ -6,9 +6,10 @@ interface QualityScoresProps {
   threshold?: number
   compact?: boolean
   /**
-   * True when these numbers are demo values rather than measurements of the
-   * photo on screen. It must be said: numbers that look measured but are not
-   * are exactly what this component replaced.
+   * True when there is no server behind the screen, so nothing has actually
+   * been measured. Shows what gets measured rather than inventing scores:
+   * numbers that look measured but are not are exactly what this component
+   * replaced.
    */
   sample?: boolean
 }
@@ -31,6 +32,39 @@ function toneFor(score: number, threshold: number) {
 export function QualityScores({ quality, threshold = 60, compact = false, sample = false }: QualityScoresProps) {
   if (!quality) return null
 
+  /* Without the API there is no measurement of the photo on screen, so there
+     are no bars to draw. Drawing them anyway meant every photo scored the same
+     88% -- a number that looks measured, is not, and is the exact thing this
+     component exists to stop. Say what gets measured instead. */
+  if (sample) {
+    return (
+      <div className="space-y-3">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute block">
+          Quality checks
+        </span>
+        <p className="text-[11px] text-ink-soft leading-relaxed">
+          Your photo is measured on six things — sharpness, brightness, contrast,
+          exposure, noise and resolution — each scored against a {threshold}% mark
+          it has to clear.
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {QUALITY_MEASURES.map(measure => (
+            <span
+              key={measure.key}
+              className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-surface border border-line text-ink-mute"
+            >
+              {measure.label}
+            </span>
+          ))}
+        </div>
+        <p className="text-[10px] text-ink-faint">
+          The measuring happens on the server, so the real scores for this photo
+          appear once the API is connected.
+        </p>
+      </div>
+    )
+  }
+
   const measures = QUALITY_MEASURES
     .map(measure => ({ ...measure, value: quality[measure.key] }))
     .filter((measure): measure is typeof measure & { value: number } =>
@@ -46,7 +80,7 @@ export function QualityScores({ quality, threshold = 60, compact = false, sample
       {typeof overall === 'number' && overallTone && (
         <div className="flex items-baseline justify-between">
           <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute">
-            Overall quality{sample && ' (sample)'}
+            Overall quality
           </span>
           <span className={`text-lg font-bold ${overallTone.text}`}>{Math.round(overall)}%</span>
         </div>
@@ -81,9 +115,7 @@ export function QualityScores({ quality, threshold = 60, compact = false, sample
       </div>
 
       <p className="text-[10px] text-ink-faint">
-        {sample
-          ? `Sample figures, not measured from this photo — connect the API for real ones. The line on each bar is the ${threshold}% mark a photo has to clear.`
-          : `The line on each bar is the ${threshold}% mark a photo has to clear.`}
+        The line on each bar is the {threshold}% mark a photo has to clear.
       </p>
     </div>
   )

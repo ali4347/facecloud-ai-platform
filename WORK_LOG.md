@@ -79,9 +79,11 @@ correction", comparison slider loaded with both images, overall 85% with all six
 full result card, six measures, real filename and 401 KB size, and no fake names or model names anywhere
 (checked by probing the rendered text for each of them).
 
-**Follow-up the same day:** in demo mode the measurement bars were sample figures but did not say so, which is a
-milder version of exactly the problem this change removed — numbers that look measured but are not. The heading
-now reads "Overall quality (sample)" and a line underneath says they are not measured from the photo on screen.
+**Follow-up the same day:** in demo mode the measurement bars were sample figures, so every photo scored the same
+88%. Labelling them "(sample)" was not enough — drawing bars at all is the same problem this change removed, just
+quieter. Without a server nothing has been measured, so demo mode now names the six things that get measured and
+says the real scores arrive with the API, instead of inventing any. "Faces found" went the same way: it is a
+measurement too.
 
 **Files:** `src/lib/api/enhancements.ts` and `src/components/features/QualityScores.tsx` (new),
 `src/lib/api/images.ts`, `src/lib/imageData.ts`, `src/pages/user/UploadSingle.tsx`,

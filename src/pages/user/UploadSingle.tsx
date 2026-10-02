@@ -502,7 +502,8 @@ export default function UploadSingle() {
                       <span>Photo:</span>
                       <span className="font-bold text-ink truncate">{image.original_name}</span>
                     </div>
-                    {image.face_validation?.face_count != null && (
+                    {/* Also a measurement, so also absent without a server. */}
+                    {USE_API && image.face_validation?.face_count != null && (
                       <div className="flex justify-between">
                         <span className="flex items-center gap-1.5">
                           <ScanFace className="w-3.5 h-3.5" />Faces found:
