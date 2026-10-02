@@ -46,6 +46,44 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-02 — A real result on the upload screen: before/after, and the measurements behind the verdict
+*Status: committed (this commit)*
+
+Owner's report: after uploading, the screen was bare — just "Your photo was accepted" and a button — and the
+design had lost everything the old one showed. Fair. The old screen's content was invented (identical 82% scores
+from one fake seed, a random name from a hardcoded list of five, a `sec-mock` download link, and a notice naming
+Zero-DCE/GFPGAN/CodeFormer), so removing it was right, but nothing real had replaced it yet. The backend does
+record the real equivalents; they just were not being asked for.
+
+**What the result panel now shows, all of it real:**
+- **Before and after.** Enhancing is a separate step on the backend from uploading, so the screen now starts it
+  for an accepted photo, polls until it settles, and loads both sides into the comparison slider. The applied
+  level is shown ("Light correction") because the backend picks it from the photo — which is also why a good
+  photo's two sides look alike.
+- **The six measurements behind the verdict** — sharpness, brightness, contrast, exposure, noise, resolution —
+  as bars against the 60% acceptance threshold, with the threshold marked on each bar. New shared component
+  `QualityScores`, also used on the image detail screen. These are the real numbers the pipeline recorded, which
+  is what the old fake trio was pretending to be.
+- **Faces found**, from the face validation result, and the photo's real size.
+
+**Layout.** Once there is a result the picker column is hidden and the result takes the full width, with the
+comparison beside the measurements, instead of a long card next to an empty column. The preview is capped by
+height rather than forced into a 4:3 box, which was letterboxing portrait photos.
+
+**Demo mode had the same emptiness** and now shows a full representative result — the person's own photo, the
+sample measurements, their real filename and file size — with one honest line saying enhancement needs the
+server. Checked by running a second dev server with the API switched off, which is the state the owner was in.
+
+**Verified in headless Chrome, both ways.** With the API: a real photo uploaded, accepted, enhanced at "Light
+correction", comparison slider loaded with both images, overall 85% with all six measures. With the API off: a
+full result card, six measures, real filename and 401 KB size, and no fake names or model names anywhere
+(checked by probing the rendered text for each of them).
+
+**Files:** `src/lib/api/enhancements.ts` and `src/components/features/QualityScores.tsx` (new),
+`src/lib/api/images.ts`, `src/lib/imageData.ts`, `src/pages/user/UploadSingle.tsx`,
+`src/pages/user/ImageDetail.tsx`.
+
+
 ### 2026-10-02 — The user portal's upload → processing → images chain runs on the API
 *Status: committed (this commit); backend fixes are PRs #59 and #60 on FaceCloud_backend*
 

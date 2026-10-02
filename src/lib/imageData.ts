@@ -58,9 +58,22 @@ function demoImage(record: ImageRecord, index: number): ImageListItem {
     quality_decision: {
       decision: record.qualityStatus === 'passed' ? 'accepted' : 'rejected',
       overall_score: record.blurScore,
+      sharpness_score: record.blurScore,
+      brightness_score: record.brightnessScore,
+      contrast_score: record.faceSizeScore,
+      exposure_score: record.brightnessScore,
+      noise_score: record.blurScore,
+      resolution_score: record.faceSizeScore,
       rejection_reasons: record.rejectionReason ? [record.rejectionReason] : [],
       status: 'completed',
     },
+    face_validation: {
+      decision: record.faceDetected ? 'accepted' : 'rejected',
+      face_count: record.faceCount,
+    },
+    latest_enhancement: record.enhanced
+      ? { id: index + 1, status: 'completed', applied_level: 'medium' }
+      : null,
     created_at: record.uploadedAt,
     updated_at: record.uploadedAt,
   }

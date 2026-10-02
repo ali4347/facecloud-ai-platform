@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AuthedImage } from '../../components/ui/AuthedImage'
+import { QualityScores } from '../../components/features/QualityScores'
 import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
 import { downloadImage, getImageThumbnail } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
@@ -165,12 +166,10 @@ export default function ImageDetail() {
                       <span className="font-bold text-ink">{image.width}×{image.height}</span>
                     </div>
                   )}
-                  {image.quality_decision?.overall_score != null && (
+                  {image.face_validation?.face_count != null && (
                     <div className="flex justify-between">
-                      <span>Quality score:</span>
-                      <span className="font-bold text-ink">
-                        {Math.round(image.quality_decision.overall_score)}%
-                      </span>
+                      <span>Faces found:</span>
+                      <span className="font-bold text-ink">{image.face_validation.face_count}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
@@ -184,6 +183,12 @@ export default function ImageDetail() {
                     <span className="font-bold text-ink">{formatDateTime(image.created_at)}</span>
                   </div>
                 </div>
+
+                {image.quality_decision && (
+                  <div className="p-4 rounded-3xl bg-surface-mute border border-line">
+                    <QualityScores quality={image.quality_decision} compact />
+                  </div>
+                )}
 
                 <Link
                   to={`/dashboard/processing/${image.batch}`}

@@ -19,12 +19,35 @@ export type DisplayStatus =
   | 'queued' | 'processing' | 'accepted' | 'rejected' | 'needs_review'
   | 'completed' | 'failed' | 'cancelled' | 'uploaded'
 
+/**
+ * What the quality checks measured. Every score is a percentage, 0 to 100 —
+ * the acceptance threshold is 60. These are real measurements, so showing them
+ * is worth more than an overall verdict alone: they say *why*.
+ */
 export interface QualityDecisionSummary {
   decision?: string
-  /** A percentage, 0 to 100 — the acceptance threshold is 60. Not a fraction. */
   overall_score?: number | null
+  brightness_score?: number | null
+  sharpness_score?: number | null
+  contrast_score?: number | null
+  noise_score?: number | null
+  exposure_score?: number | null
+  resolution_score?: number | null
   rejection_reasons?: string[] | null
   status?: string
+}
+
+export interface FaceValidationSummary {
+  decision?: string
+  face_count?: number
+  rejection_reason?: string
+  message?: string
+}
+
+export interface EnhancementSummary {
+  id: number
+  status: string
+  applied_level?: string
 }
 
 export interface ImageListItem {
@@ -45,9 +68,21 @@ export interface ImageListItem {
   batch_display_name: string
   upload_type: string
   quality_decision: QualityDecisionSummary | null
+  face_validation: FaceValidationSummary | null
+  latest_enhancement: EnhancementSummary | null
   created_at: string
   updated_at: string
 }
+
+/** The sub-scores worth showing, in the order they read best. */
+export const QUALITY_MEASURES = [
+  { key: 'sharpness_score', label: 'Sharpness' },
+  { key: 'brightness_score', label: 'Brightness' },
+  { key: 'contrast_score', label: 'Contrast' },
+  { key: 'exposure_score', label: 'Exposure' },
+  { key: 'noise_score', label: 'Noise' },
+  { key: 'resolution_score', label: 'Resolution' },
+] as const
 
 export interface UploadBatch {
   id: number

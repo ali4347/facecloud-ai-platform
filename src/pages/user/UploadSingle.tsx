@@ -6,15 +6,26 @@ import { USE_API } from '../../lib/api/config'
 import {
   getBatchProgress,
   getImage,
+  getImageThumbnail,
   isBatchFinished,
   uploadSingle,
   type BatchProgress,
   type ImageListItem,
 } from '../../lib/api/images'
-import { formatBytes, statusLabel } from '../../lib/imageData'
+import {
+  downloadEnhanced,
+  enhanceImage,
+  getEnhancementResult,
+  isEnhancementSettled,
+  levelLabel,
+  type EnhancementResult,
+} from '../../lib/api/enhancements'
+import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
+import { QualityScores } from '../../components/features/QualityScores'
+import { demoImages, formatBytes, statusLabel } from '../../lib/imageData'
 import {
   AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Info, Loader2,
-  RefreshCw, Sparkles, Upload, XCircle,
+  RefreshCw, ScanFace, Sparkles, Upload, Wand2, XCircle,
 } from 'lucide-react'
 
 /**
@@ -57,6 +68,12 @@ export default function UploadSingle() {
   const [image, setImage] = useState<ImageListItem | null>(null)
   const [error, setError] = useState('')
   const [batchId, setBatchId] = useState<number | null>(null)
+  const [enhancement, setEnhancement] = useState<EnhancementResult | null>(null)
+  const [enhancing, setEnhancing] = useState(false)
+  const [enhanceError, setEnhanceError] = useState('')
+  // Both sides of the comparison, fetched with the token and handed to the
+  // browser as object URLs. Revoked together when the screen resets.
+  const [comparison, setComparison] = useState<{ before: string; after: string } | null>(null)
 
   // The preview is a local object URL; revoke it rather than leaking one per
   // file the person tries.
@@ -82,6 +99,10 @@ export default function UploadSingle() {
 
   const reset = () => {
     if (pollRef.current) clearTimeout(pollRef.current)
+    if (comparison) {
+      URL.revokeObjectURL(comparison.before)
+      URL.revokeObjectURL(comparison.after)
+    }
     setFile(null)
     setPreviewUrl('')
     setPhase('idle')
@@ -90,6 +111,48 @@ export default function UploadSingle() {
     setImage(null)
     setError('')
     setBatchId(null)
+    setEnhancement(null)
+    setEnhancing(false)
+    setEnhanceError('')
+    setComparison(null)
+  }
+
+  /**
+   * Enhance the accepted photo, then load both sides of the comparison.
+   *
+   * Enhancing is a separate step from uploading on the backend, so it is
+   * started here rather than assumed. A **429** means the account already has
+   * as many enhancement jobs running as it is allowed; the message says so and
+   * the right answer is to wait, not to retry.
+   */
+  const enhance = async (accepted: ImageListItem) => {
+    setEnhancing(true)
+    setEnhanceError('')
+    try {
+      let result = await enhanceImage(accepted.id)
+      // The job can come back already finished, or still running.
+      for (let attempt = 0; attempt < 20 && !isEnhancementSettled(result); attempt += 1) {
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        result = await getEnhancementResult(result.id)
+      }
+      setEnhancement(result)
+      if (result.status !== 'completed') {
+        setEnhanceError(result.failure_reason || 'The enhancement did not finish.')
+        return
+      }
+      const [before, after] = await Promise.all([
+        getImageThumbnail(accepted.id, 1024),
+        downloadEnhanced(result.id),
+      ])
+      setComparison({
+        before: URL.createObjectURL(before),
+        after: URL.createObjectURL(after),
+      })
+    } catch (caught) {
+      setEnhanceError(caught instanceof Error ? caught.message : 'Could not enhance this photo.')
+    } finally {
+      setEnhancing(false)
+    }
   }
 
   /** Walk the same stages on a timer when there is no server to talk to. */
@@ -102,6 +165,20 @@ export default function UploadSingle() {
       if (step < STAGES.length - 1) {
         pollRef.current = setTimeout(advance, DEMO_STEP_MS)
       } else {
+        // Show a complete result rather than an empty card: the demo exists so
+        // the screen can be seen working without a server behind it.
+        const sample = demoImages().find(row => row.display_status === 'accepted')
+        if (sample) {
+          // Keep the demo's representative scores, but report the real file the
+          // person actually picked rather than the sample's name and size.
+          setImage({
+            ...sample,
+            original_name: file?.name ?? sample.original_name,
+            file_size: file?.size ?? sample.file_size,
+            width: null,
+            height: null,
+          })
+        }
         setPhase('done')
       }
     }
@@ -124,10 +201,17 @@ export default function UploadSingle() {
         return
       }
       const imageId = next.images[0]?.image_id
+      let finished: ImageListItem | null = null
       if (imageId) {
-        setImage(await getImage(imageId))
+        finished = await getImage(imageId)
+        setImage(finished)
       }
       setPhase(next.status === 'failed' ? 'failed' : 'done')
+      // Uploading and enhancing are separate steps on the backend. A photo that
+      // was not accepted is not enhanced -- there is nothing to improve into.
+      if (finished && finished.display_status === 'accepted') {
+        enhance(finished)
+      }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Lost contact while processing.')
       setPhase('failed')
@@ -197,7 +281,9 @@ export default function UploadSingle() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-6 space-y-6">
+        {/* Once there is a result, the picker has done its job and the result
+            takes the width instead of sitting beside an empty column. */}
+        <div className={phase === 'done' ? 'hidden' : 'lg:col-span-6 space-y-6'}>
           <ChartCard title="Select a photo" subtitle="One photo at a time">
             <div className="space-y-6">
               {!file ? (
@@ -214,8 +300,14 @@ export default function UploadSingle() {
                   </div>
                 </label>
               ) : (
-                <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-line bg-surface-mute flex items-center justify-center">
-                  <img src={previewUrl} alt={file.name} className="w-full h-full object-contain" />
+                <div className="relative rounded-3xl overflow-hidden border border-line bg-surface-mute flex items-center justify-center">
+                  {/* Capped rather than a fixed aspect: a portrait photo in a
+                      4:3 box is mostly empty box. */}
+                  <img
+                    src={previewUrl}
+                    alt={file.name}
+                    className="max-h-[420px] w-auto max-w-full object-contain"
+                  />
                   {phase === 'idle' && (
                     <button
                       type="button"
@@ -285,7 +377,7 @@ export default function UploadSingle() {
           </ChartCard>
         </div>
 
-        <div className="lg:col-span-6 space-y-6">
+        <div className={phase === 'done' ? 'lg:col-span-12 space-y-6' : 'lg:col-span-6 space-y-6'}>
           <ChartCard title="Result" subtitle="What the pipeline concluded">
             {phase === 'idle' && (
               <div className="text-center py-16 text-ink-faint">
@@ -335,12 +427,74 @@ export default function UploadSingle() {
                         : 'A moderator will take a look'}
                     </p>
                     <p className="text-[11px] text-ink-faint mt-0.5">
-                      {accepted ? 'It is enhanced and filed under the right person.'
+                      {accepted ? 'It passed every check and has been filed.'
                         : rejected ? 'The reason is below — a clearer photo usually fixes it.'
                         : 'The automatic checks were not confident enough to decide on their own.'}
                     </p>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                {/* Before and after, once there is something to compare. */}
+                {accepted && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute flex items-center gap-1.5">
+                        <Wand2 className="w-3.5 h-3.5" />Enhancement
+                      </span>
+                      {enhancement?.status === 'completed' && (
+                        <span className="text-[10px] font-bold text-[#FB923C]">
+                          {levelLabel(enhancement.applied_level)} correction
+                        </span>
+                      )}
+                    </div>
+
+                    {comparison ? (
+                      <>
+                        <div className="rounded-3xl overflow-hidden border border-line">
+                          <BeforeAfterSlider
+                            className="aspect-[4/3]"
+                            beforeSrc={comparison.before}
+                            afterSrc={comparison.after}
+                          />
+                        </div>
+                        <p className="text-[10px] text-ink-faint">
+                          Drag the handle to compare. The original is never overwritten.
+                        </p>
+                      </>
+                    ) : enhancing ? (
+                      <div className="rounded-3xl border border-line bg-surface-mute aspect-[4/3] flex flex-col items-center justify-center gap-2 text-ink-faint">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <p className="text-[11px] font-semibold">Enhancing your photo…</p>
+                      </div>
+                    ) : enhanceError ? (
+                      <p className="text-[11px] text-[#F87171]">{enhanceError}</p>
+                    ) : !USE_API && previewUrl ? (
+                      <>
+                        <div className="rounded-3xl overflow-hidden border border-line bg-surface-mute flex items-center justify-center">
+                          <img
+                            src={previewUrl}
+                            alt={file?.name ?? 'Your photo'}
+                            className="max-h-[360px] w-auto max-w-full object-contain"
+                          />
+                        </div>
+                        <p className="text-[10px] text-ink-faint">
+                          Enhancing runs on the server. Connect the API to see the before and after here.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-[11px] text-ink-faint">Not enhanced yet.</p>
+                    )}
+                  </div>
+                )}
+
+                <div className="space-y-5">
+                {/* What the checks measured, rather than a verdict alone. */}
+                {image?.quality_decision && (
+                  <div className="p-4 rounded-3xl bg-surface-mute border border-line">
+                    <QualityScores quality={image.quality_decision} compact />
+                  </div>
+                )}
 
                 {image && (
                   <div className="p-4 rounded-3xl bg-surface-mute border border-line space-y-3 text-xs text-ink-mute">
@@ -348,18 +502,25 @@ export default function UploadSingle() {
                       <span>Photo:</span>
                       <span className="font-bold text-ink truncate">{image.original_name}</span>
                     </div>
+                    {image.face_validation?.face_count != null && (
+                      <div className="flex justify-between">
+                        <span className="flex items-center gap-1.5">
+                          <ScanFace className="w-3.5 h-3.5" />Faces found:
+                        </span>
+                        <span className="font-bold text-ink">{image.face_validation.face_count}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span>Size:</span>
+                      <span className="font-bold text-ink">
+                        {image.width && image.height && `${image.width}×${image.height} · `}
+                        {formatBytes(image.file_size)}
+                      </span>
+                    </div>
                     <div className="flex justify-between">
                       <span>Outcome:</span>
                       <span className="font-bold text-ink">{statusLabel(image.display_status)}</span>
                     </div>
-                    {image.width && image.height && (
-                      <div className="flex justify-between">
-                        <span>Size:</span>
-                        <span className="font-bold text-ink">
-                          {image.width}×{image.height} · {formatBytes(image.file_size)}
-                        </span>
-                      </div>
-                    )}
                     {image.rejection_reason && (
                       <div className="pt-2 border-t border-line-soft">
                         <p className="text-[#F87171]">{image.rejection_reason}</p>
@@ -385,9 +546,11 @@ export default function UploadSingle() {
                     The batch finished partly — check My Images for the full picture.
                   </p>
                 )}
+                </div>
+                </div>
 
                 <div className="flex flex-wrap gap-3">
-                  {image && (
+                  {image && USE_API && (
                     <button
                       type="button"
                       onClick={() => navigate(`/dashboard/images/${image.id}`)}
