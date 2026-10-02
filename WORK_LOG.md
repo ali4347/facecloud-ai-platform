@@ -23,14 +23,14 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 |:-----|:-------|:------|
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
-| User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
+| User portal (16 routes under `/dashboard`) | ✅ Complete | Single upload, processing, uploads list, My Images and image detail run on the live API; groups, downloads, activity, notifications, multiple/ZIP upload and live webcam enhancement are still on mock data |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
 | Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1172 tests**, all merged to `main`, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics, and org-scoped access to the photo under review) added 2026-10-02. This repo is the browser app only |
-| Frontend ↔ backend integration | 🔄 In progress | Sign-in, the moderator dashboard and the review queue read the live API behind `VITE_USE_API`; the remaining screens still read `src/data/mock.ts` |
+| Frontend ↔ backend integration | 🔄 In progress | Sign-in, the moderator dashboard and queue, and the user portal's upload → processing → images chain read the live API behind `VITE_USE_API`; the remaining screens still read `src/data/mock.ts` |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
 | Build health | ✅ `npm run build` passes (checked 2026-09-18) | JS bundle 2.31 MB minified / 625 kB gzip, CSS 94.8 kB; chunk-size warning, no code splitting. Lint reports warnings only |
@@ -45,6 +45,61 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-02 — The user portal's upload → processing → images chain runs on the API
+*Status: committed (this commit); backend fixes are PRs #59 and #60 on FaceCloud_backend*
+
+The whole path a person actually walks — pick a photo, watch it process, find it in the gallery, open it — now
+talks to the Django backend, behind `VITE_USE_API`. With the API off every screen still falls back to the demo
+data, so the prototype stays browsable without a server.
+
+**Shared groundwork, so screens are written once:**
+- `src/lib/useApiResource.ts` — the loader every migrated screen needs: fetch on mount, cancel if the screen goes
+  away before the answer does, reload after an action, demo fallback. `moderationData.ts` was rewritten onto it,
+  so there is one of these rather than two.
+- `src/components/ui/AuthedImage.tsx` — any image behind the bearer token (a photo, a thumbnail, a review's
+  preview), fetched and handed to the browser as an object URL, **revoked** on unmount or key change.
+  `ReviewThumbnail` is now a thin wrapper over it instead of a second copy.
+- `src/lib/api/images.ts` and `src/lib/imageData.ts` — uploads, batch progress, gallery, detail, thumbnails and
+  downloads, plus the hooks and a demo adapter.
+
+**Screens migrated:**
+- **Upload a Photo** was a 528-line simulation with invented scores, invented person-folder matches and the model
+  names in its step labels. It now uploads for real and follows the backend's own stages, worded for the person
+  uploading rather than naming what runs underneath — which also removes the model names from this screen.
+- **Processing** follows the real progress endpoint, polling while the batch moves and **stopping on a terminal
+  status** rather than forever. Shows each photo's own row (a batch can finish `partial`), and offers cancel
+  while running and retry once finished.
+- **My Images** is the real gallery: server-side status filtering, paging, real thumbnails, real downloads.
+- **Your uploads** (`/dashboard/jobs`) lists real batches and links into the processing view.
+- **Image detail** shows the photo at 1024, the verdict, the quality score and the reasons behind a rejection.
+
+**Two real backend bugs found and fixed while wiring this:**
+1. **PR #59** — `GET /api/images/{id}/` answered with a thinner serializer than `GET /api/images/my/`, so a photo's
+   own page was missing `display_status` and the quality decision. A photo's page is exactly where someone asks
+   "was it accepted, and why not", and it was the one view that could not answer. Both views now share one
+   queryset builder so they cannot drift apart again — and reading one photo is still 4 queries, with a test
+   holding that.
+2. **PR #60** — `ModeratorReview.ai_confidence` held two different units: a quality score and a duplicate
+   similarity are 0-100, an identity similarity is 0-1. The obvious reading (a fraction, multiply by 100) turned
+   an 85.44 quality score into 8544%. Identity values are now normalised to a percentage where the review is
+   created, with a data migration for existing rows. The frontend rendering was corrected to match.
+
+**Verified end to end, not just type-checked.** Drove a real photo through the real UI in headless Chrome:
+the file input took it, the pipeline accepted it, the result card read "Your photo was accepted · 800×1000",
+My Images showed 7 real photos with loaded `blob:` thumbnails, the detail page reported "Accepted · 85%" with the
+photo at 700×900, and the uploads list showed 3 batches (`COMPLETED | COMPLETED | PARTLY DONE`) linking into a
+processing view with its stages and per-photo rows. `npm run build` passes; lint reports no new warnings.
+
+**Files:** `src/lib/useApiResource.ts`, `src/lib/api/images.ts`, `src/lib/imageData.ts`,
+`src/components/ui/AuthedImage.tsx` (all new), `src/lib/api/client.ts`, `src/lib/api/moderation.ts`,
+`src/lib/moderationData.ts`, `src/components/features/ImageCard.tsx`, `src/components/features/ReviewThumbnail.tsx`,
+`src/components/ui/StatusBadge.tsx`, `src/pages/user/{UploadSingle,ProcessingPage,ProcessingJobs,MyImages,ImageDetail}.tsx`,
+`src/pages/moderator/ReviewQueue.tsx`, `README.md`.
+
+**Still on mock data:** Dashboard, Downloads, Activity Logs, Identity Groups, Group Detail, Notifications, and the
+multiple/ZIP upload screens; the nine remaining moderator screens; the thirteen admin screens.
+
 
 ### 2026-10-02 — Merged the three backend PRs into FaceCloud_backend `main`
 *Status: backend only — nothing changed in this repo except this log*

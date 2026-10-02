@@ -26,8 +26,8 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 
 The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
 
-* **Live on the API:** sign-in, the moderator dashboard, and the moderator review queue.
-* **Still on mock data and `localStorage`:** uploads, AI processing, notifications, admin data, and the remaining moderator screens.
+* **Live on the API:** sign-in; the moderator dashboard and review queue; and the user portal's single upload, processing view, uploads list, My Images gallery and image detail.
+* **Still on mock data and `localStorage`:** the user dashboard, downloads, activity, notifications, identity groups, multiple/ZIP upload, the remaining moderator screens, and the admin console.
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 

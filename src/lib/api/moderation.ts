@@ -19,6 +19,7 @@ export interface ModeratorReview {
   source: ReviewSource
   status: ReviewStatus
   ai_recommendation: string
+  /** A percentage, 0 to 100, whatever raised the review. Render it directly. */
   ai_confidence: number | null
   assigned_moderator: ReviewPerson | null
   claimed_by: ReviewPerson | null

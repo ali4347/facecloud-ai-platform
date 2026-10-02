@@ -334,7 +334,7 @@ export default function ReviewQueue() {
                     </td>
                     <td>
                       <span className="text-xs font-mono text-ink-soft">
-                        {review.ai_confidence === null ? '--' : `${Math.round(review.ai_confidence * 100)}%`}
+                        {review.ai_confidence === null ? '--' : `${Math.round(review.ai_confidence)}%`}
                       </span>
                     </td>
                     <td><DeadlineChip review={review} /></td>

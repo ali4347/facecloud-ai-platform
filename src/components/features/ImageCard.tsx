@@ -1,59 +1,95 @@
-import { Eye, Download, ZapIcon } from 'lucide-react'
-import type { ImageRecord } from '../../data/mock'
-import { formatDateTime } from '../../lib/utils'
+import { Download, Eye, Loader2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { AuthedImage } from '../ui/AuthedImage'
 import { uploadStatusBadge } from '../ui/StatusBadge'
+import { downloadImage, getImageThumbnail, type ImageListItem } from '../../lib/api/images'
+import { formatBytes } from '../../lib/imageData'
+import { formatDateTime } from '../../lib/utils'
 
 interface ImageCardProps {
-  image: ImageRecord
-  onView?: () => void
+  image: ImageListItem
 }
 
-export function ImageCard({ image, onView }: ImageCardProps) {
+export function ImageCard({ image }: ImageCardProps) {
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
+
+  /* A rejected photo has no thumbnail to serve, so there is nothing to ask for
+     — the card shows the placeholder instead of a request that will 404. */
+  const canPreview = image.thumbnail_url !== null
+
+  /* The file is behind the bearer token, so it cannot be a plain <a download>:
+     the bytes are fetched, handed to the browser, and the object URL revoked
+     once the click has been taken. */
+  const handleDownload = async () => {
+    setDownloading(true)
+    setDownloadError('')
+    try {
+      const blob = await downloadImage(image.id)
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = image.original_name
+      anchor.click()
+      URL.revokeObjectURL(url)
+    } catch (caught) {
+      setDownloadError(caught instanceof Error ? caught.message : 'Download failed.')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return (
     <div className="fc-card overflow-hidden group hover:shadow-card-md transition-all duration-200">
-      {/* Thumbnail */}
-      <div
-        className="h-44 relative flex items-center justify-center"
-        style={{ background: `linear-gradient(135deg, ${image.thumbnail} 0%, ${image.thumbnail}99 100%)` }}
-      >
-        {/* Mock face SVG */}
-        <svg width="60" height="80" viewBox="0 0 60 80" fill="none">
-          <ellipse cx="30" cy="40" rx="22" ry="28" fill="rgb(var(--a-line))" stroke="rgb(var(--a-ink-faint))" strokeWidth="1.5" />
-          <circle cx="22" cy="34" r="4" fill="rgb(var(--a-ink-faint))" />
-          <circle cx="38" cy="34" r="4" fill="rgb(var(--a-ink-faint))" />
-          <path d="M22 50 Q30 56 38 50" stroke="rgb(var(--a-ink-faint))" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-        </svg>
+      <div className="h-44 relative bg-surface-mute">
+        <AuthedImage
+          load={canPreview ? signal => getImageThumbnail(image.id, 256, signal) : null}
+          cacheKey={`image-${image.id}`}
+          alt={image.original_name}
+          className="w-full h-full !border-0"
+          rounded="rounded-none"
+        />
 
-        {/* Overlay actions */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-          <button onClick={onView} className="p-2 bg-surface rounded-xl hover:bg-white shadow-sm">
+          <Link
+            to={`/dashboard/images/${image.id}`}
+            className="p-2 bg-surface rounded-xl hover:bg-surface-mute shadow-sm"
+            aria-label={`Open ${image.original_name}`}
+          >
             <Eye className="w-4 h-4 text-ink" />
-          </button>
-          <button className="p-2 bg-surface rounded-xl hover:bg-white shadow-sm">
-            <Download className="w-4 h-4 text-ink" />
-          </button>
+          </Link>
+          {image.download_url && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="p-2 bg-surface rounded-xl hover:bg-surface-mute shadow-sm cursor-pointer disabled:opacity-60"
+              aria-label={`Download ${image.original_name}`}
+            >
+              {downloading
+                ? <Loader2 className="w-4 h-4 text-ink animate-spin" />
+                : <Download className="w-4 h-4 text-ink" />}
+            </button>
+          )}
         </div>
-
-        {/* Enhanced badge */}
-        {image.enhanced && (
-          <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 bg-accent/90 rounded-full">
-            <ZapIcon className="w-3 h-3 text-ink" />
-            <span className="text-[10px] text-ink font-semibold">Enhanced</span>
-          </div>
-        )}
       </div>
 
-      {/* Info */}
       <div className="p-3">
-        <p className="text-sm font-semibold text-ink truncate mb-1">{image.filename}</p>
-        <div className="flex items-center justify-between">
-          {uploadStatusBadge(image.status)}
-          <span className="text-xs text-ink-mute">{image.size}</span>
+        <p className="text-sm font-semibold text-ink truncate mb-1" title={image.original_name}>
+          {image.original_name}
+        </p>
+        <div className="flex items-center justify-between gap-2">
+          {uploadStatusBadge(image.display_status)}
+          <span className="text-xs text-ink-mute flex-shrink-0">{formatBytes(image.file_size)}</span>
         </div>
-        {image.rejectionReason && (
-          <p className="text-xs text-error mt-1.5 truncate">⚠ {image.rejectionReason}</p>
+        {image.rejection_reason && (
+          <p className="text-xs text-error mt-1.5 truncate" title={image.rejection_reason}>
+            ⚠ {image.rejection_reason}
+          </p>
         )}
-        <p className="text-xs text-ink-mute mt-1">{formatDateTime(image.uploadedAt)}</p>
+        {downloadError && <p className="text-xs text-error mt-1.5">{downloadError}</p>}
+        <p className="text-xs text-ink-mute mt-1">{formatDateTime(image.created_at)}</p>
       </div>
     </div>
   )

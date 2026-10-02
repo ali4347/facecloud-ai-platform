@@ -37,8 +37,20 @@ export function StatusBadge({ status, label, dot = true, className }: StatusBadg
   )
 }
 
+/**
+ * The pipeline's own verdict on a photo, which is not the same as whether the
+ * upload worked: `display_status` from the API says accepted, rejected or sent
+ * to a moderator. The older mock statuses are kept so unmigrated screens still
+ * render while they wait their turn.
+ */
 export function uploadStatusBadge(status: string) {
   switch (status) {
+    case 'accepted':     return <StatusBadge status="success"    label="Accepted" />
+    case 'needs_review': return <StatusBadge status="warning"    label="In review" />
+    case 'queued':       return <StatusBadge status="info"       label="Queued" />
+    case 'processing':   return <StatusBadge status="processing" label="Processing" />
+    case 'failed':       return <StatusBadge status="error"      label="Failed" />
+    case 'cancelled':    return <StatusBadge status="muted"      label="Cancelled" />
     case 'completed':  return <StatusBadge status="success"    label="Completed" />
     case 'rejected':   return <StatusBadge status="error"      label="Rejected" />
     case 'enhancing':  return <StatusBadge status="processing" label="Enhancing" />

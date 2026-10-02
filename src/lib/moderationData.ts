@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { USE_API } from './api/config'
+import { messageFor, useApiResource, type AsyncState } from './useApiResource'
 import { resolveModeratorOrganization } from './api/organizations'
 import {
   getDashboard,
@@ -37,7 +38,7 @@ function mockReviewToApiShape(item: ReviewItem, index: number): ModeratorReview 
     source: item.isDuplicate ? 'duplicate' : MOCK_SOURCES[index % MOCK_SOURCES.length],
     status: item.status === 'pending' ? 'pending' : item.status,
     ai_recommendation: item.isDuplicate ? 'perceptual' : item.rejectionReason,
-    ai_confidence: item.isDuplicate ? (item.similarityScore ?? 0) / 100 : item.qualityScore / 100,
+    ai_confidence: item.isDuplicate ? (item.similarityScore ?? 0) : item.qualityScore,
     assigned_moderator: null,
     claimed_by: null,
     is_claimed: false,
@@ -137,25 +138,12 @@ function mockPerformance(days: number): ModeratorPerformance {
   }
 }
 
-export interface AsyncState<T> {
-  data: T | null
-  loading: boolean
-  error: string | null
-  /** True when this screen is showing demo data rather than the live API. */
-  isDemo: boolean
-  reload: () => void
-}
-
-function messageFor(error: unknown): string {
-  return error instanceof Error ? error.message : 'Something went wrong loading this screen.'
-}
-
 /**
  * The organization every moderator request is scoped to.
  *
- * Resolved once per screen and cached in module scope, because it does not
- * change while someone is signed in and every moderator screen needs it before
- * it can ask for anything.
+ * Resolved once and cached in module scope, because it does not change while
+ * someone is signed in and every moderator screen needs it before it can ask
+ * for anything.
  */
 let cachedOrganizationId: number | null = null
 
@@ -181,59 +169,20 @@ export function useModeratorOrganization() {
   return { organizationId, resolving, error }
 }
 
+/** A moderator resource: the shared loader, plus the organization it needs first. */
 function useModeratorResource<T>(
   load: (organizationId: number, signal: AbortSignal) => Promise<T>,
   demo: () => T,
   dependencies: unknown[],
 ): AsyncState<T> {
   const { organizationId, resolving, error: organizationError } = useModeratorOrganization()
-  const [data, setData] = useState<T | null>(USE_API ? null : demo)
-  const [loading, setLoading] = useState(USE_API)
-  const [error, setError] = useState<string | null>(null)
-  const [reloadToken, setReloadToken] = useState(0)
-  // The loader closes over its own filters; keeping it in a ref means a new
-  // closure on every render does not retrigger the request on its own.
-  const loadRef = useRef(load)
-  loadRef.current = load
-
-  const reload = useCallback(() => setReloadToken(token => token + 1), [])
-
-  useEffect(() => {
-    if (!USE_API) {
-      setData(demo())
-      setLoading(false)
-      return
-    }
-    if (resolving) return
-    if (organizationError) {
-      setError(organizationError)
-      setLoading(false)
-      return
-    }
-    if (organizationId === null) {
-      // No organization means nothing to moderate, which is an empty screen
-      // rather than a failure.
-      setData(null)
-      setLoading(false)
-      return
-    }
-    const controller = new AbortController()
-    setLoading(true)
-    setError(null)
-    loadRef.current(organizationId, controller.signal)
-      .then(result => setData(result))
-      .catch(caught => {
-        if (controller.signal.aborted) return
-        setError(messageFor(caught))
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false)
-      })
-    return () => controller.abort()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [organizationId, resolving, organizationError, reloadToken, ...dependencies])
-
-  return { data, loading, error, isDemo: !USE_API, reload }
+  const state = useApiResource(
+    signal => load(organizationId as number, signal),
+    demo,
+    [organizationId, ...dependencies],
+    { ready: !resolving, skip: organizationId === null },
+  )
+  return organizationError ? { ...state, error: organizationError, loading: false } : state
 }
 
 export function useModeratorDashboard(): AsyncState<ModeratorDashboard> {

@@ -1,166 +1,201 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
-import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
-import { mockImages } from '../../data/mock'
-import { ArrowLeft, AlertTriangle, Download, Link2 } from 'lucide-react'
+import { AuthedImage } from '../../components/ui/AuthedImage'
+import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
+import { downloadImage, getImageThumbnail } from '../../lib/api/images'
+import { formatDateTime } from '../../lib/utils'
+import {
+  AlertTriangle, ArrowLeft, CheckCircle2, Download, Loader2, RefreshCw, XCircle,
+} from 'lucide-react'
 
 export default function ImageDetail() {
   const { id } = useParams<{ id: string }>()
-  
-  // Find record in mock data
-  const record = mockImages.find(img => img.id === id) || mockImages[0]
+  const imageId = id && /^\d+$/.test(id) ? Number(id) : null
+  const { data: image, loading, error, isDemo, reload } = useImage(imageId)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
+
+  const handleDownload = async () => {
+    if (!image) return
+    setDownloading(true)
+    setDownloadError('')
+    try {
+      const blob = await downloadImage(image.id)
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = image.original_name
+      anchor.click()
+      URL.revokeObjectURL(url)
+    } catch (caught) {
+      setDownloadError(caught instanceof Error ? caught.message : 'Download failed.')
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const verdict = image?.display_status
+  const accepted = verdict === 'accepted'
+  const rejected = verdict === 'rejected'
+  const reasons = image?.quality_decision?.rejection_reasons ?? []
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 page-enter">
       <div className="flex items-center gap-3">
-        <Link to="/dashboard/images" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
+        <Link
+          to="/dashboard/images"
+          className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink"
+          aria-label="Back to my images"
+        >
           <ArrowLeft className="w-4 h-4" />
         </Link>
-        <PageHeader 
-          title="Image Asset Detail"
-          subtitle={`Trace and audit metrics for asset ID ${record.id}`}
+        <PageHeader
+          title={image?.original_name ?? 'Photo'}
+          subtitle={image ? `Uploaded ${formatDateTime(image.created_at)}` : 'Loading…'}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Left Column: Visual Before/After */}
-        <div className="lg:col-span-6 space-y-6">
-          <ChartCard title="Restored Face Asset" subtitle={record.filename}>
-            <div className="space-y-6">
-              
-              {record.status === 'completed' ? (
-                <div className="aspect-[4/3] rounded-3xl overflow-hidden relative border border-line bg-surface-mute">
-                  <BeforeAfterSlider 
-                    beforeColor="#0D0F14"
-                    afterColor="#F97316"
-                  />
-                </div>
-              ) : (
-                <div className="aspect-[4/3] rounded-3xl bg-accent-tint/10 border border-accent/30/20 flex flex-col items-center justify-center text-center p-6 gap-3">
-                  <AlertTriangle className="w-12 h-12 text-accent-soft animate-bounce" />
-                  <h4 className="text-sm font-bold text-accent-soft uppercase tracking-wider">Asset Rejected by AI Node</h4>
-                  <p className="text-xs text-ink-mute max-w-xs">{record.feedback}</p>
-                </div>
-              )}
-
-              {/* Action Buttons if accepted */}
-              {record.status === 'completed' && (
-                <div className="flex gap-3">
-                  <a 
-                    href="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=640&sat=20&sharp=10"
-                    download="enhanced_face.jpg"
-                    className="fc-btn-primary w-full justify-center py-3 text-xs"
-                  >
-                    <Download className="w-4 h-4" /> Download Enhanced
-                  </a>
-                  <button 
-                    onClick={() => {
-                      navigator.clipboard.writeText(record.secureDownloadLink || '')
-                      alert('Secure download link copied to clipboard!')
-                    }}
-                    className="fc-btn-secondary w-full justify-center py-3 text-xs"
-                  >
-                    <Link2 className="w-4 h-4" /> Copy Secure Link
-                  </button>
-                </div>
-              )}
-
-            </div>
-          </ChartCard>
+      {isDemo && (
+        <div className="p-3 rounded-2xl text-xs flex items-center gap-2 bg-surface-mute border border-line text-ink-soft">
+          <AlertTriangle className="w-4 h-4 text-[#F59E0B] flex-shrink-0" />
+          Showing demo data. Set <code className="fc-kbd">VITE_USE_API=true</code> to see a real photo.
         </div>
+      )}
 
-        {/* Right Column: Biometric compliance audits list */}
-        <div className="lg:col-span-6 space-y-6">
-          <ChartCard title="Biometrics Trace Logs" subtitle="Zero-trust compliance checks">
-            <div className="space-y-4">
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-surface-mute border border-line">
-                  <span className="block text-[8px] text-ink-mute font-bold uppercase tracking-wider">Asset Status</span>
-                  <span className={`block text-xs font-bold uppercase mt-1 ${record.status === 'completed' ? 'text-emerald-400' : 'text-accent-soft'}`}>
-                    {record.status === 'completed' ? 'Accepted' : 'Rejected'}
-                  </span>
-                </div>
-                <div className="p-4 rounded-2xl bg-surface-mute border border-line">
-                  <span className="block text-[8px] text-ink-mute font-bold uppercase tracking-wider">Matching folder</span>
-                  <span className="block text-xs font-bold text-ink mt-1">{record.personFolderId || 'None'}</span>
-                </div>
+      {loading && (
+        <div className="fc-card p-12 text-center text-ink-faint">
+          <Loader2 className="w-6 h-6 mx-auto mb-3 animate-spin" />
+          <p className="text-xs font-semibold">Loading the photo…</p>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="fc-card p-12 text-center">
+          <AlertTriangle className="w-7 h-7 mx-auto mb-3 text-[#EF4444]" />
+          <p className="text-xs font-semibold text-ink">{error}</p>
+          <button
+            type="button"
+            onClick={reload}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />Try again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && image && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-7 space-y-6">
+            <ChartCard title="The photo" subtitle={image.original_name}>
+              <div className="aspect-[4/3] rounded-3xl overflow-hidden border border-line bg-surface-mute">
+                {/* 1024 rather than the 256 the gallery uses: this is the
+                    lightbox view, and the original could be enormous. */}
+                <AuthedImage
+                  load={image.thumbnail_url
+                    ? signal => getImageThumbnail(image.id, 1024, signal)
+                    : null}
+                  cacheKey={`detail-${image.id}`}
+                  alt={image.original_name}
+                  className="w-full h-full !border-0 !object-contain"
+                  rounded="rounded-none"
+                />
               </div>
 
-              {/* Pipeline details checkmarks */}
-              <div className="p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-mute space-y-3.5">
-                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-wider pb-1.5 border-b border-line">
-                  <span>Methodology details</span>
-                  <span>Compliance score</span>
+              {image.download_url && (
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={handleDownload}
+                    disabled={downloading}
+                    className="fc-btn-primary !py-2 !px-4 text-xs font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                  >
+                    {downloading
+                      ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Preparing…</>
+                      : <><Download className="w-3.5 h-3.5" />Download the full photo</>}
+                  </button>
+                  {downloadError && <p className="text-xs text-error mt-2">{downloadError}</p>}
                 </div>
-                <div className="flex justify-between">
-                  <span>Original Asset Saved:</span>
-                  <span className="font-bold text-emerald-400">Yes (Secure write)</span>
+              )}
+            </ChartCard>
+          </div>
+
+          <div className="lg:col-span-5 space-y-6">
+            <ChartCard title="Outcome" subtitle="What the checks concluded">
+              <div className="space-y-5">
+                <div className="flex items-start gap-3">
+                  {accepted
+                    ? <CheckCircle2 className="w-7 h-7 text-[#10B981] flex-shrink-0" />
+                    : rejected
+                      ? <XCircle className="w-7 h-7 text-[#EF4444] flex-shrink-0" />
+                      : <AlertTriangle className="w-7 h-7 text-[#F59E0B] flex-shrink-0" />}
+                  <div>
+                    <p className="text-sm font-bold text-ink">{statusLabel(image.display_status)}</p>
+                    <p className="text-[11px] text-ink-faint mt-0.5">
+                      {accepted ? 'This photo passed every check.'
+                        : rejected ? 'This photo did not meet the quality bar.'
+                        : 'A moderator is taking a look at this one.'}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>AI Restoration model:</span>
-                  <span className="font-bold text-accent">{record.aiModel} (CNN Restorer)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Enhanced Asset Saved:</span>
-                  <span className={`font-bold ${record.enhancedSaved ? 'text-emerald-400' : 'text-accent-soft'}`}>
-                    {record.enhancedSaved ? 'Yes' : 'No'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Face detection:</span>
-                  <span className={`font-bold ${record.faceDetected ? 'text-emerald-400' : 'text-accent-soft'}`}>
-                    {record.faceDetected ? `Exactly 1 face (${record.faceCount} found)` : 'Failed (0 faces found)'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Blur rating:</span>
-                  <span className={`font-bold ${record.blurScore >= 60 ? 'text-emerald-400' : 'text-accent-soft'}`}>
-                    {record.blurScore}/100
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Brightness index:</span>
-                  <span className={`font-bold ${record.brightnessScore >= 40 ? 'text-emerald-400' : 'text-accent-soft'}`}>
-                    {record.brightnessScore}/100
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Face size score:</span>
-                  <span className={`font-bold ${record.faceSizeScore >= 10 ? 'text-emerald-400' : 'text-accent-soft'}`}>
-                    {record.faceSizeScore}/100
-                  </span>
-                </div>
-                {record.status === 'completed' && (
-                  <div className="flex justify-between">
-                    <span>Face embedding matched:</span>
-                    <span className="font-bold text-emerald-400">{record.matchingConfidence}% Confidence</span>
+
+                {(image.rejection_reason || reasons.length > 0) && (
+                  <div className="p-4 rounded-3xl bg-[#EF4444]/5 border border-[#EF4444]/20 text-xs text-ink-mute space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#F87171]">
+                      Why
+                    </p>
+                    {image.rejection_reason && <p>{image.rejection_reason}</p>}
+                    {reasons.length > 0 && (
+                      <ul className="list-disc list-inside space-y-0.5">
+                        {reasons.map(reason => <li key={reason}>{reason}</li>)}
+                      </ul>
+                    )}
                   </div>
                 )}
-                <div className="flex justify-between">
-                  <span>Email Notification sent:</span>
-                  <span className="font-bold text-emerald-400">Yes (Completed)</span>
-                </div>
-              </div>
 
-              {/* Rejection block if failed */}
-              {record.status === 'rejected' && (
-                <div className="p-4 rounded-3xl bg-accent-tint/10 border border-accent/30/20 space-y-2">
-                  <div className="flex gap-2 items-center text-xs font-bold text-accent-soft uppercase tracking-wider">
-                    <AlertTriangle className="w-4 h-4" />
-                    <span>Rejection Reason feedback</span>
+                <div className="p-4 rounded-3xl bg-surface-mute border border-line text-xs text-ink-mute space-y-3.5">
+                  <div className="flex justify-between gap-3">
+                    <span>Size:</span>
+                    <span className="font-bold text-ink">{formatBytes(image.file_size)}</span>
                   </div>
-                  <p className="text-xs text-ink leading-relaxed font-medium">{record.feedback}</p>
+                  {image.width && image.height && (
+                    <div className="flex justify-between">
+                      <span>Dimensions:</span>
+                      <span className="font-bold text-ink">{image.width}×{image.height}</span>
+                    </div>
+                  )}
+                  {image.quality_decision?.overall_score != null && (
+                    <div className="flex justify-between">
+                      <span>Quality score:</span>
+                      <span className="font-bold text-ink">
+                        {Math.round(image.quality_decision.overall_score)}%
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>From upload:</span>
+                    <span className="font-bold text-ink truncate max-w-[160px]">
+                      {image.batch_display_name || `#${image.batch}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Uploaded:</span>
+                    <span className="font-bold text-ink">{formatDateTime(image.created_at)}</span>
+                  </div>
                 </div>
-              )}
 
-            </div>
-          </ChartCard>
+                <Link
+                  to={`/dashboard/processing/${image.batch}`}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline"
+                >
+                  See how this upload was processed
+                </Link>
+              </div>
+            </ChartCard>
+          </div>
         </div>
-
-      </div>
+      )}
     </div>
   )
 }

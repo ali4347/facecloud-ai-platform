@@ -1,418 +1,205 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  Briefcase, Search, Filter, ChevronDown, ChevronUp, FileText, FolderArchive,
-  AlertCircle, Key, Upload, Shield, Zap, Eye, Cpu, Users, Download, ArrowUpRight, HelpCircle
-} from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
-import { StatusBadge } from '../../components/ui/StatusBadge'
-import { mockJobs } from '../../data/mock'
+import { ChartCard } from '../../components/ui/ChartCard'
+import { SearchInput } from '../../components/ui/SearchInput'
+import { EmptyState } from '../../components/ui/EmptyState'
+import { useBatches, formatBytes, statusLabel, statusTone } from '../../lib/imageData'
 import { formatDateTime } from '../../lib/utils'
+import {
+  AlertTriangle, ArrowRight, FolderArchive, FileText, Images, Loader2, RefreshCw,
+} from 'lucide-react'
 
-// Icon mapper for the 9-step pipeline
-const STEP_ICONS: Record<string, any> = {
-  'Authentication': Key,
-  'Upload Ingest': Upload,
-  'Original Saved': Shield,
-  'Zero-DCE Enhance': Zap,
-  'Face Validation': Eye,
-  'Quality Audit': Cpu,
-  'Embedding Extraction': Cpu,
-  'Person Folder Match': Users,
-  'Secure Download': Download,
+const TONE_CLASSES: Record<string, string> = {
+  good: 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/25',
+  bad: 'bg-[#EF4444]/10 text-[#F87171] border-[#EF4444]/25',
+  warn: 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/25',
+  busy: 'bg-[#F97316]/10 text-[#FB923C] border-[#F97316]/25',
+  neutral: 'bg-surface-mute text-ink-mute border-line',
 }
 
+const STATUS_FILTERS = ['All', 'completed', 'partial', 'processing', 'failed', 'cancelled'] as const
+
+/** An upload is the unit of work: one photo or a hundred, it is one batch. */
 export default function ProcessingJobs() {
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('All')
-  const [typeFilter, setTypeFilter] = useState('All')
-  const [sortBy, setSortBy] = useState('Newest')
-  
-  // Expanded card tracking
-  const [expandedJobs, setExpandedJobs] = useState<Record<string, boolean>>({
-    'job-002': true // keep the active processing job expanded by default for cool visuals
+  const [status, setStatus] = useState<string>('All')
+  const { data, loading, error, isDemo, reload } = useBatches()
+  const batches = useMemo(() => data ?? [], [data])
+
+  const visible = batches.filter(batch => {
+    const name = batch.display_name || batch.original_archive_name || `Upload ${batch.id}`
+    const matchesSearch = name.toLowerCase().includes(search.toLowerCase())
+    const matchesStatus = status === 'All' || batch.processing_status === status
+    return matchesSearch && matchesStatus
   })
 
-  const toggleExpand = (id: string) => {
-    setExpandedJobs(prev => ({ ...prev, [id]: !prev[id] }))
-  }
-
-  // Summary counts
-  const totalJobs = mockJobs.length
-  const completedJobs = mockJobs.filter(j => j.currentStage === 'completed').length
-  const rejectedJobs = mockJobs.filter(j => j.currentStage === 'rejected').length
-  const processingJobs = totalJobs - completedJobs - rejectedJobs
-  const avgTime = '4.8s'
-
-  // Filter & Sort Logic
-  const filteredJobs = mockJobs.filter(job => {
-    const matchesSearch = job.filename.toLowerCase().includes(search.toLowerCase())
-    
-    let matchesStatus = true
-    if (statusFilter !== 'All') {
-      if (statusFilter === 'Processing') {
-        matchesStatus = job.currentStage !== 'completed' && job.currentStage !== 'rejected'
-      } else if (statusFilter === 'Completed') {
-        matchesStatus = job.currentStage === 'completed'
-      } else if (statusFilter === 'Rejected') {
-        matchesStatus = job.currentStage === 'rejected'
-      }
-    }
-
-    let matchesType = true
-    if (typeFilter !== 'All') {
-      matchesType = job.uploadType === typeFilter
-    }
-
-    return matchesSearch && matchesStatus && matchesType
-  }).sort((a, b) => {
-    if (sortBy === 'Newest') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    }
-    if (sortBy === 'Oldest') {
-      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    }
-    if (sortBy === 'Progress') {
-      return (b.progress || 0) - (a.progress || 0)
-    }
-    return 0
-  })
-
-  // Get status details for badges
-  const getStageBadge = (stage: string) => {
-    switch (stage) {
-      case 'completed':
-        return <StatusBadge status="success" label="Completed" />
-      case 'rejected':
-        return <StatusBadge status="error" label="Rejected" />
-      case 'enhancing':
-        return <StatusBadge status="processing" label="Enhancing" />
-      case 'validating':
-        return <StatusBadge status="info" label="Validating" />
-      case 'uploaded':
-        return <StatusBadge status="muted" label="Queued" />
-      default:
-        return <StatusBadge status="muted" label={stage} />
-    }
+  const counts = {
+    total: batches.length,
+    done: batches.filter(b => b.processing_status === 'completed').length,
+    partial: batches.filter(b => b.processing_status === 'partial').length,
+    failed: batches.filter(b => b.processing_status === 'failed').length,
   }
 
   return (
-    <div className="page-enter space-y-6">
+    <div className="space-y-6 page-enter">
       <PageHeader
-        title="Processing Jobs"
-        subtitle="Track every upload as it moves through FaceCloud’s AI enhancement, validation, and identity grouping pipeline."
+        title="Your uploads"
+        subtitle={loading ? 'Loading…' : `${counts.total} upload${counts.total === 1 ? '' : 's'}`}
       />
 
-      {/* Summary stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      {isDemo && (
+        <div className="p-3 rounded-2xl text-xs flex items-center gap-2 bg-surface-mute border border-line text-ink-soft">
+          <AlertTriangle className="w-4 h-4 text-[#F59E0B] flex-shrink-0" />
+          Showing demo data. Set <code className="fc-kbd">VITE_USE_API=true</code> to see your real uploads.
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Jobs', value: totalJobs, border: 'rgb(var(--a-line))' },
-          { label: 'Processing', value: processingJobs, border: 'rgba(249,115,22,0.25)', highlight: 'text-[#FB923C]' },
-          { label: 'Completed', value: completedJobs, border: 'rgba(16,185,129,0.25)', highlight: 'text-[#10B981]' },
-          { label: 'Rejected', value: rejectedJobs, border: 'rgba(239,68,68,0.25)', highlight: 'text-[#EF4444]' },
-          { label: 'Avg Time', value: avgTime, border: 'rgb(var(--a-line))' }
-        ].map((stat, i) => (
-          <div 
-            key={i} 
-            className="fc-card p-4 flex flex-col justify-between min-h-[90px] backdrop-blur-md"
-            style={{ borderColor: stat.border }}
-          >
-            <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider">{stat.label}</span>
-            <span className={`text-2xl font-extrabold tracking-tight mt-2 ${stat.highlight || 'text-ink'}`}>
-              {stat.value}
+          { label: 'Uploads', value: counts.total, tone: 'text-ink' },
+          { label: 'Finished', value: counts.done, tone: 'text-emerald-400' },
+          { label: 'Partly done', value: counts.partial, tone: 'text-[#F59E0B]' },
+          { label: 'Failed', value: counts.failed, tone: counts.failed ? 'text-[#F87171]' : 'text-ink' },
+        ].map(card => (
+          <div key={card.label} className="fc-card p-5 space-y-1.5">
+            <span className="text-[10px] text-ink-mute font-bold uppercase tracking-wider block">
+              {card.label}
             </span>
+            <span className={`text-lg font-bold block ${card.tone}`}>{card.value}</span>
           </div>
         ))}
       </div>
 
-      {/* Filter and search bar */}
-      <div className="fc-card p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
-        
-        {/* Search */}
-        <div className="relative w-full md:max-w-xs">
-          <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-ink-faint" />
-          <input
-            type="text"
-            placeholder="Search by filename…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="fc-input !pl-10 !py-2.5"
-          />
-        </div>
-
-        {/* Filters */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-          <div className="flex items-center gap-2">
-            <Filter className="w-3.5 h-3.5 text-ink-faint" />
-            <span className="text-xs text-ink-faint font-bold uppercase">Filter:</span>
-          </div>
-
-          {/* Status filter */}
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="fc-input !py-2 !px-3 text-xs !w-32 bg-surface-sunk cursor-pointer"
-          >
-            <option value="All">All Statuses</option>
-            <option value="Processing">Processing</option>
-            <option value="Completed">Completed</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-
-          {/* Type filter */}
-          <select
-            value={typeFilter}
-            onChange={e => setTypeFilter(e.target.value)}
-            className="fc-input !py-2 !px-3 text-xs !w-32 bg-surface-sunk cursor-pointer"
-          >
-            <option value="All">All Types</option>
-            <option value="Single">Single Image</option>
-            <option value="Multiple">Multiple Files</option>
-            <option value="ZIP">ZIP Archive</option>
-          </select>
-
-          {/* Sort selection */}
-          <select
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            className="fc-input !py-2 !px-3 text-xs !w-32 bg-surface-sunk cursor-pointer"
-          >
-            <option value="Newest">Newest First</option>
-            <option value="Oldest">Oldest First</option>
-            <option value="Progress">Highest Progress</option>
-          </select>
-        </div>
-
-      </div>
-
-      {/* Jobs Grid List */}
-      <div className="space-y-4">
-        {filteredJobs.length > 0 ? (
-          filteredJobs.map(job => {
-            const isExpanded = !!expandedJobs[job.id]
-            const FileIcon = job.uploadType === 'ZIP' ? FolderArchive : FileText
-            const isFailed = job.currentStage === 'rejected'
-
+      <div className="flex flex-wrap items-center gap-3">
+        <SearchInput
+          placeholder="Search uploads…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-64"
+        />
+        <div className="flex flex-wrap gap-2">
+          {STATUS_FILTERS.map(option => {
+            const isActive = status === option
             return (
-              <div 
-                key={job.id} 
-                className={`fc-card p-6 transition-all duration-300 ${
-                  isExpanded ? 'border-[#F97316]/25 shadow-[0_4px_30px_rgba(249,115,22,0.04)]' : ''
-                }`}
+              <button
+                key={option}
+                onClick={() => setStatus(option)}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer"
+                style={{
+                  background: isActive ? 'rgba(249,115,22, 0.14)' : 'rgb(var(--a-surface-mute))',
+                  border: isActive ? '1px solid rgba(249,115,22, 0.24)' : '1px solid rgb(var(--a-line))',
+                  color: isActive ? '#FB923C' : 'rgb(var(--a-ink-mute))',
+                }}
               >
-                {/* Upper Summary Row */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-surface-mute border border-line flex items-center justify-center text-[#FB923C]">
-                      <FileIcon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-ink tracking-tight">{job.filename}</h3>
-                      <p className="text-[11px] text-ink-faint font-semibold mt-0.5">
-                        Uploaded at {formatDateTime(job.createdAt)} • Type: {job.uploadType}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Actions & Badges */}
-                  <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider">Duration: {job.duration}</span>
-                      {getStageBadge(job.currentStage)}
-                    </div>
-                    <button
-                      onClick={() => toggleExpand(job.id)}
-                      className="fc-btn-secondary !py-2 !px-4 text-xs font-bold flex items-center gap-1.5 hover:border-[#F97316]/30"
-                    >
-                      {isExpanded ? 'Hide Details' : 'View Details'}
-                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Progress bar container */}
-                <div className="mt-5 space-y-2">
-                  <div className="flex justify-between text-[10px] font-bold text-ink-mute uppercase tracking-wider">
-                    <span>Processing Ingestion Status</span>
-                    <span className={isFailed ? 'text-[#EF4444]' : 'text-[#10B981]'}>
-                      {isFailed ? 'Execution Halted' : `${job.progress}% complete`}
-                    </span>
-                  </div>
-                  <div className="h-2 w-full rounded-full bg-surface-mute overflow-hidden relative">
-                    <div 
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        isFailed ? 'bg-[#EF4444]' : 'bg-gradient-to-r from-[#F97316] to-[#10B981]'
-                      }`}
-                      style={{ width: `${job.progress}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Expandable detailed views */}
-                {isExpanded && (
-                  <div className="mt-6 pt-6 border-t border-line space-y-6">
-                    {/* Failure details alert if rejected */}
-                    {isFailed && job.failureReason && (
-                      <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-[#EF4444] font-semibold flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                        <span>{job.failureReason}</span>
-                      </div>
-                    )}
-
-                    {/* Metadata specs grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-surface-mute p-5 rounded-2xl border border-line">
-                      <div className="space-y-3.5 text-xs font-medium text-ink-mute">
-                        <div className="flex justify-between">
-                          <span>Original file saved:</span>
-                          <span className="text-ink font-bold">{job.details?.originalSaved}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>AI model resolver:</span>
-                          <span className="text-ink font-bold font-mono">{job.details?.aiModel}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Detections count:</span>
-                          <span className="text-ink font-bold">{job.details?.faceCount} faces</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Blur checks score:</span>
-                          <span className="text-ink font-bold">{job.details?.blurScore}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Illumination curve score:</span>
-                          <span className="text-ink font-bold">{job.details?.brightnessScore}</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-3.5 text-xs font-medium text-ink-mute">
-                        <div className="flex justify-between">
-                          <span>Minimal size validation:</span>
-                          <span className="text-ink font-bold">{job.details?.faceSizeScore}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Identity Person folder:</span>
-                          <span className="text-[#A78BFA] font-bold">{job.details?.personFolder}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Status alerts sent:</span>
-                          <span className="text-ink font-bold">{job.details?.notificationSent}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Logged tracing ID:</span>
-                          <span className="text-ink font-bold font-mono">{job.details?.activityLog}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span>Download generated:</span>
-                          {job.currentStage === 'completed' && job.details?.secureDownload ? (
-                            <a 
-                              href={job.details.secureDownload}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-[#FB923C] font-bold hover:underline flex items-center gap-1 text-[11px]"
-                            >
-                              Download Assets <ArrowUpRight className="w-3.5 h-3.5" />
-                            </a>
-                          ) : (
-                            <span className="text-ink-faint font-bold font-mono">N/A</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Stepper Pipeline timeline */}
-                    <div className="space-y-3">
-                      <span className="text-[10px] text-ink-faint font-bold uppercase tracking-wider block">Pipeline Progress Stages</span>
-                      
-                      {/* Horizontal timeline on desktop / vertical on mobile */}
-                      <div className="hidden lg:flex items-start gap-1 justify-between pt-2">
-                        {job.stages.map((stage, idx) => {
-                          const isDone = stage.status === 'done'
-                          const isActive = stage.status === 'active'
-                          const isFailed = stage.status === 'failed'
-                          const IconComp = STEP_ICONS[stage.label] || HelpCircle
-
-                          return (
-                            <div key={stage.label} className="flex-1 flex items-center">
-                              <div className="flex flex-col items-center text-center gap-2">
-                                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all ${
-                                  isDone ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
-                                  isActive ? 'bg-[#F97316]/20 border-[#F97316]/30 text-[#FB923C] animate-pulse' :
-                                  isFailed ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' :
-                                  'bg-surface-mute border-transparent text-ink-faint'
-                                }`}>
-                                  <IconComp className="w-4.5 h-4.5" />
-                                </div>
-                                <div className="space-y-0.5">
-                                  <p className="text-[9px] font-bold text-ink-soft leading-none truncate max-w-[80px]">{stage.label}</p>
-                                  <p className="text-[8px] text-ink-faint font-mono">{stage.time || 'Pending'}</p>
-                                </div>
-                              </div>
-
-                              {idx < job.stages.length - 1 && (
-                                <div className={`h-0.5 flex-1 mx-2 ${
-                                  isDone ? 'bg-[#10B981]/40' :
-                                  isActive ? 'bg-[#F97316]/40 border-dashed border-[#F97316]' :
-                                  'bg-surface-mute'
-                                }`} />
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-
-                      {/* Vertical timeline stacked on mobile */}
-                      <div className="lg:hidden flex flex-col gap-3 pt-2">
-                        {job.stages.map((stage) => {
-                          const isDone = stage.status === 'done'
-                          const isActive = stage.status === 'active'
-                          const isFailed = stage.status === 'failed'
-                          const IconComp = STEP_ICONS[stage.label] || HelpCircle
-
-                          return (
-                            <div key={stage.label} className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg border flex items-center justify-center flex-shrink-0 ${
-                                isDone ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]' :
-                                isActive ? 'bg-[#F97316]/20 border-[#F97316]/30 text-[#FB923C] animate-pulse' :
-                                isFailed ? 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]' :
-                                'bg-surface-mute border-transparent text-ink-faint'
-                              }`}>
-                                <IconComp className="w-3.5 h-3.5" />
-                              </div>
-                              <div className="flex-1 flex justify-between items-center text-xs">
-                                <span className="font-bold text-ink">{stage.label}</span>
-                                <span className="text-[10px] text-ink-faint font-mono">{stage.time || 'Pending'}</span>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-
-                    </div>
-                  </div>
-                )}
-              </div>
+                {option === 'All' ? 'All' : statusLabel(option)}
+              </button>
             )
-          })
-        ) : (
-          /* Empty state */
-          <div className="fc-card p-12 text-center flex flex-col items-center justify-center space-y-4">
-            <Briefcase className="w-12 h-12 text-ink-faint" />
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-ink">No processing jobs found</h3>
-              <p className="text-xs text-ink-mute max-w-sm">
-                Try changing filters or upload a new image to start a FaceCloud AI processing job.
-              </p>
-            </div>
-            <Link 
-              to="/dashboard/upload" 
-              className="fc-btn-primary font-bold px-6 py-2.5 text-xs"
-              style={{ minHeight: 'auto' }}
-            >
-              Go to Upload Center
-            </Link>
-          </div>
-        )}
+          })}
+        </div>
       </div>
+
+      {loading && (
+        <div className="fc-card p-16 text-center text-ink-faint">
+          <Loader2 className="w-6 h-6 mx-auto mb-3 animate-spin" />
+          <p className="text-xs font-semibold">Loading your uploads…</p>
+        </div>
+      )}
+
+      {!loading && error && (
+        <div className="fc-card p-16 text-center">
+          <AlertTriangle className="w-7 h-7 mx-auto mb-3 text-[#EF4444]" />
+          <p className="text-xs font-semibold text-ink">{error}</p>
+          <button
+            type="button"
+            onClick={reload}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />Try again
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && visible.length === 0 && (
+        <EmptyState
+          icon={Images}
+          title={batches.length === 0 ? 'Nothing uploaded yet' : 'No uploads match that'}
+          description={
+            batches.length === 0
+              ? 'Upload a photo and it will show up here while it is processed.'
+              : 'Try a different search or filter.'
+          }
+          action={{
+            label: batches.length === 0 ? 'Upload images' : 'Clear filters',
+            onClick: () => {
+              if (batches.length === 0) window.location.assign('/dashboard/upload')
+              else { setSearch(''); setStatus('All') }
+            },
+          }}
+        />
+      )}
+
+      {!loading && !error && visible.length > 0 && (
+        <ChartCard title="Uploads" subtitle="Open one to follow it stage by stage">
+          <div className="overflow-x-auto">
+            <table className="w-full fc-table text-left">
+              <thead>
+                <tr>
+                  <th>Upload</th><th>Photos</th><th>Through</th><th>Size</th>
+                  <th>Status</th><th>Started</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map(batch => {
+                  const Icon = batch.upload_type === 'zip' ? FolderArchive : FileText
+                  const tone = TONE_CLASSES[statusTone(batch.processing_status)]
+                  return (
+                    <tr key={batch.id} className="hover:bg-surface-mute transition-colors">
+                      <td>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <Icon className="w-4 h-4 text-ink-faint flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-bold text-ink truncate max-w-[200px]">
+                              {batch.display_name || batch.original_archive_name || `Upload ${batch.id}`}
+                            </p>
+                            <p className="text-[10px] text-ink-faint">{batch.upload_type}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="text-xs text-ink-soft">{batch.total_files}</td>
+                      <td className="text-xs text-ink-soft">
+                        {batch.processed_files}
+                        {batch.processing_failed_files > 0 && (
+                          <span className="text-[#F87171]"> · {batch.processing_failed_files} failed</span>
+                        )}
+                      </td>
+                      <td className="text-xs font-mono text-ink-mute">{formatBytes(batch.total_size)}</td>
+                      <td>
+                        <span className={`px-2 py-0.5 rounded border text-[9px] font-bold uppercase tracking-wider ${tone}`}>
+                          {statusLabel(batch.processing_status)}
+                        </span>
+                      </td>
+                      <td className="text-[10px] text-ink-mute">
+                        {batch.processing_started_at
+                          ? formatDateTime(batch.processing_started_at)
+                          : formatDateTime(batch.created_at)}
+                      </td>
+                      <td>
+                        <Link
+                          to={`/dashboard/processing/${batch.id}`}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline"
+                        >
+                          Open <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </ChartCard>
+      )}
     </div>
   )
 }
