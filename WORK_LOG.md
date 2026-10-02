@@ -46,6 +46,26 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-02 — Upload result: the comparison on top, the details underneath
+*Status: committed (this commit)*
+
+Owner's layout request: the two result cards (quality checks, photo details) sat in a column beside the photo;
+move them below and put the comparison where they were, the way the old screen read.
+
+- The enhancement block — the before/after slider with the API connected, the photo itself without it — is now
+  full width at the top of the result.
+- The two detail cards sit side by side underneath it instead of stacked in a narrow column.
+- The photo is capped at `max-w-3xl` and centred. Full width left a portrait photo stranded in empty space,
+  which is the same complaint the earlier 4:3 box caused from the other direction.
+
+**Checked both ways in headless Chrome.** With the API: slider at the top with both images loaded and "Light
+correction", then the six real measures (overall 85%) beside the photo's facts (1 face, 800×1000 · 401 KB).
+Without it: the person's own photo at the top, then what gets measured and the real filename and size — still no
+invented numbers. `npm run build` passes.
+
+**Files:** `src/pages/user/UploadSingle.tsx`.
+
+
 ### 2026-10-02 — The user dashboard runs on the backend's own summary endpoint
 *Status: committed (this commit); no backend change was needed*
 

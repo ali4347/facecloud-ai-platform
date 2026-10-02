@@ -434,10 +434,11 @@ export default function UploadSingle() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
                 {/* Before and after, once there is something to compare. */}
                 {accepted && (
-                  <div className="space-y-2">
+                  /* Capped and centred: full width leaves a portrait photo
+                     stranded in empty space. */
+                  <div className="space-y-2 max-w-3xl mx-auto w-full">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute flex items-center gap-1.5">
                         <Wand2 className="w-3.5 h-3.5" />Enhancement
@@ -488,7 +489,8 @@ export default function UploadSingle() {
                   </div>
                 )}
 
-                <div className="space-y-5">
+                {/* The details read underneath the photo, side by side. */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
                 {/* What the checks measured, rather than a verdict alone. */}
                 {image?.quality_decision && (
                   <div className="p-4 rounded-3xl bg-surface-mute border border-line">
@@ -547,7 +549,6 @@ export default function UploadSingle() {
                     The batch finished partly — check My Images for the full picture.
                   </p>
                 )}
-                </div>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
