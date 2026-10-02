@@ -29,8 +29,8 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
-| Backend database (PostgreSQL 16 + Prisma 5.22) | ✅ Schema + migration + seed | 15 models, 8 enums, migration `20260714_init`, 3 seeded accounts |
-| Backend API server (NestJS/Express) | ❌ Not started | Planned in README_BACKEND_ROADMAP.md §3 |
+| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 175 endpoints, 43 models, 1054 tests, CI with pip-audit and bandit. This repo is the browser app only |
+| Frontend ↔ backend integration | 🔄 Started | API client and sign-in wired behind `VITE_USE_API`; every other screen still reads `src/data/mock.ts` |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
 | Build health | ✅ `npm run build` passes (checked 2026-09-18) | JS bundle 2.31 MB minified / 625 kB gzip, CSS 94.8 kB; chunk-size warning, no code splitting. Lint reports warnings only |
@@ -45,6 +45,40 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-02 — Reviewed the Django backend, and started attaching it
+*Status: committed (this commit)*
+
+**Review of [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend)** (read-only; cloned, installed
+and run locally):
+- Django 6.1 + DRF, 45,427 lines across 24 apps, 175 endpoints, 43 models, 1054 tests, 50 documented features.
+- Verified here: dependencies install clean, `pip check` passes, Django system check raises one expected warning
+  (identity model not configured), no missing migrations, and the OpenAPI schema validates with zero warnings and
+  151 documented paths. 1048 of 1054 tests pass on sqlite; the 6 failures are the collage endpoint's own 20/hour
+  throttle firing inside its test run, plus one thumbnail race test leaving a file. The project's own CI runs on
+  PostgreSQL and is green.
+- It is a careful piece of work: `DEBUG` fails closed, a production guard refuses to boot on unsafe configuration,
+  CORS opens only in `DEBUG`, DRF defaults to `IsAuthenticated`, 14 throttle scopes, separate keys for two-factor,
+  image encryption and identity embeddings, invitation tokens stored hashed, and an audit event on every
+  organization change.
+- **The frontend is the weaker half**, not the backend. The backend's own feature list marks the user and moderator
+  dashboards as "Planned frontend integration".
+
+**Started the integration:**
+- Fixed all 6 npm advisories (5 high, including a React Router CSRF advisory). `npm audit` now reports none.
+- **Removed `backend/` and `docker-compose.yml`.** That folder was a Prisma schema drafted before the Django backend
+  existed: 15 models against the real 43, no API at all, and a documented setup that did not work (the Prisma CLI
+  could not find `DATABASE_URL` from `backend/`, and compose created `facecloud_db` while `.env` pointed at
+  `facecloud`). Keeping two contradictory backends in one repo would only mislead.
+- `.env.example` rewritten for a browser app: `VITE_API_URL` and `VITE_USE_API` instead of database and SMTP secrets.
+- New `src/lib/api/`: `config.ts`, `tokens.ts`, `client.ts`, `auth.ts`. The access token is kept in memory only and
+  the rotating refresh token in storage; refreshes are single-flight, because several requests expiring together
+  would otherwise each spend the rotating token and invalidate the session they were trying to save.
+- The sign-in screen now calls the real API when `VITE_USE_API=true`, and falls back to the mock otherwise, so the
+  demo keeps working while screens migrate.
+- Added frontend CI (type-check, lint, build, `npm audit`) and Dependabot, matching the backend's standard.
+- Verified end to end against the running backend: a wrong password returns the backend's own message, a correct one
+  signs in, routes by the role the server returned, and stores the rotating refresh token.
 
 ### 2026-10-02 — Model names hidden, password reveal, working mark-as-read
 *Status: committed (this commit)*
@@ -498,6 +532,10 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
   rest should be scrubbed too, and whether the admin console (which legitimately lists services) is exempt.
 - Profile details, avatars and notification read state live in this browser's `localStorage`, so they do not follow the account to another device and are lost
   if site data is cleared. They move to the server once the API exists.
+- Role separation is still enforced in the browser only on every screen except sign-in. It moves to the server as
+  each screen is migrated to the API.
+- Model weights for the backend are licensed CC BY-NC-SA 4.0 for PureScale and PureVision — **non-commercial**. Fine
+  for the project as it stands; a commercial release would need different models.
 - Role separation is enforced in the browser only, against a `localStorage` session. That is appropriate for the
   current mock build, but once the API exists the checks have to move server-side — a determined visitor can still
   hand-write a session object today.

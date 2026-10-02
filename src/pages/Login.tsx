@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Lock, Mail, AlertTriangle } from 'lucide-react'
 import { PasswordInput } from '../components/ui/PasswordInput'
+import { login } from '../lib/api/auth'
+import { ApiError } from '../lib/api/client'
+import { USE_API } from '../lib/api/config'
+import { initialsFrom } from '../lib/session'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 
 export default function Login() {
@@ -18,6 +22,40 @@ export default function Login() {
     e.preventDefault()
     setLoading(true)
     setError('')
+
+    /* With VITE_USE_API=true this is a real sign-in against the backend; the
+       mock path below keeps the demo working until every screen is migrated. */
+    if (USE_API) {
+      try {
+        const result = await login(email, password)
+        if (result.kind === 'two-factor') {
+          setError('This account has two-factor authentication on. That screen is not built yet.')
+          return
+        }
+        const name =
+          [result.user.first_name, result.user.last_name].filter(Boolean).join(' ').trim() ||
+          result.user.username ||
+          result.user.email
+        localStorage.setItem('facecloud_session', JSON.stringify({
+          role: result.role,
+          email: result.user.email,
+          name,
+          initials: initialsFrom(name),
+          emailVerified: true,
+        }))
+        navigate(result.dashboard === 'admin' ? '/admin'
+               : result.dashboard === 'moderator' ? '/moderator'
+               : '/dashboard')
+      } catch (err) {
+        // The backend answers the same way for wrong password, unverified and
+        // suspended accounts, on purpose. Show its message rather than guessing.
+        setError(err instanceof ApiError ? err.message : 'Could not sign in. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
     await new Promise(r => setTimeout(r, 800))
     setLoading(false)
     if (email === 'user@facecloud.ai' && password === 'password') {
