@@ -12,6 +12,7 @@ import {
   type Page,
   type UploadBatch,
 } from './api/images'
+import { getUserDashboard, type UserDashboard } from './api/dashboard'
 import { messageFor, useApiResource, type AsyncState } from './useApiResource'
 import { mockImages, type ImageRecord } from '../data/mock'
 
@@ -216,4 +217,52 @@ export function formatBytes(bytes: number): string {
     unit += 1
   }
   return `${value < 10 && unit > 0 ? value.toFixed(1) : Math.round(value)} ${units[unit]}`
+}
+
+
+/** Day labels for the seven-day chart, in the viewer's own locale. */
+export function dayLabel(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, { weekday: 'short' })
+}
+
+function demoDashboard(): UserDashboard {
+  const images = demoImages()
+  const count = (status: string) => images.filter(image => image.display_status === status).length
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(Date.now() - (6 - index) * 86_400_000)
+    return { date: date.toISOString().slice(0, 10), uploads: 0, accepted: 0, rejected: 0 }
+  })
+  return {
+    summary: {
+      total_images: images.length,
+      upload_batches: 1,
+      enhanced_images: images.filter(image => image.latest_enhancement).length,
+      accepted_images: count('accepted'),
+      rejected_images: count('rejected'),
+      needs_review_images: count('needs_review'),
+      processing_images: count('processing'),
+      failed_images: 0,
+      // Nothing has been measured without a server, so no average is claimed.
+      average_quality_score: null,
+      most_common_rejection_reason: null,
+      identity_groups: 0,
+      identity_grouped_images: 0,
+      identity_review_items: 0,
+      identity_groups_available: false,
+      storage_bytes: images.reduce((total, image) => total + image.file_size, 0),
+    },
+    uploads_last_7_days: days,
+    recent_uploads: images.slice(0, 5).map(image => ({
+      id: image.id,
+      filename: image.original_name,
+      status: image.display_status,
+      batch_id: image.batch,
+      uploaded_at: image.created_at,
+    })),
+    recent_activity: [],
+  }
+}
+
+export function useUserDashboard(): AsyncState<UserDashboard> {
+  return useApiResource(signal => getUserDashboard(signal), demoDashboard, [])
 }

@@ -46,6 +46,37 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-02 — The user dashboard runs on the backend's own summary endpoint
+*Status: committed (this commit); no backend change was needed*
+
+**Nearly added an endpoint that already existed.** The plan was a new
+`/api/user/dashboard/` returning the dashboard's counts — written, routed, tested — and the tests failed with
+queries nothing in the new code could have made. `accounts/user_urls.py` already routes `dashboard/` to
+`accounts.views.UserDashboardView`, so Django matched the existing one first and the new view was never reached.
+Reverted the lot. The existing endpoint is better than what was being built: it carries `summary` (totals,
+average quality, most common rejection reason, storage bytes, identity-group figures and whether grouping is
+even switched on), `uploads_last_7_days`, `recent_uploads` and `recent_activity` — four screens' worth in one
+request. **Check the API before adding to it.**
+
+**Dashboard rewired to it.** Stat cards, the seven-day accepted-against-rejected chart (which was a hardcoded
+`WEEKLY_DATA` array), recent uploads and the activity feed are all real now. Two judgements worth recording:
+- The fourth stat card shows person folders only when `identity_groups_available` says grouping is on, and falls
+  back to "In review" when it is not — a folder count of zero because the feature is off reads as a failure.
+- Average quality is only shown when the backend has one. No measurement, no number.
+
+**The sidebar's "Free plan · 312 MB of 500 MB" was pure fiction** — there is no plan and no quota anywhere in the
+backend, so the bar was drawn against a limit nothing enforces. It now reads "5.8 MB stored · 11 photos", which
+is what the backend can actually answer, and the progress bar is gone with the quota it was measuring.
+
+**Verified against the live API in headless Chrome:** subtitle "11 photos · 5.8 MB stored", four stat cards,
+the chart rendering from real daily figures, five real recent uploads, a real activity feed ("Face validation for
+ui-upload.jpg: Exactly one suitable frontal face was detected"), and the sidebar with no trace of the old
+"Free plan" or "500 MB".
+
+**Files:** `src/lib/api/dashboard.ts` (new), `src/lib/imageData.ts`, `src/pages/user/Dashboard.tsx`,
+`src/components/layout/Sidebar.tsx`.
+
+
 ### 2026-10-02 — A real result on the upload screen: before/after, and the measurements behind the verdict
 *Status: committed (this commit)*
 

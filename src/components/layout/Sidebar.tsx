@@ -7,9 +7,9 @@ import {
   HardDrive, X, Bell, Briefcase
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { useUserDashboard, formatBytes } from '../../lib/imageData'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 import { UserMenu } from '../ui/UserMenu'
-import { userStats } from '../../data/mock'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -82,10 +82,9 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
   const nav = navByRole[role]
   const cfg = roleConfig[role]
-  const storagePercent = Math.min(
-    100,
-    Math.round((userStats.storageUsedMb / userStats.storageQuotaMb) * 100)
-  )
+  // Only the user portal shows storage, so only it asks for the figures.
+  const dashboard = useUserDashboard()
+  const summary = role === 'user' ? dashboard.data?.summary : null
 
   // Auto-close on route change for mobile width
   useEffect(() => {
@@ -174,30 +173,26 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
 
       {/* ── Storage card ───────────────────────────────────────────
            Replaces a card that named the enhancement model. Which model runs
-           is an implementation detail; how much room is left is not. Only the
-           user portal has a quota, so the other roles do not show this. */}
-      {role === 'user' && (
+           is an implementation detail; how much room is taken is not.
+
+           There is no plan or quota in the system, so none is drawn: a bar
+           against a limit nothing enforces would be a made-up number, and the
+           previous "312 MB of 500 MB" was exactly that. What is shown is what
+           the backend can actually answer — how much has been stored. */}
+      {role === 'user' && summary && (
         <div className="bg-surface border border-line rounded-[18px] shadow-soft p-3.5">
-          <div className="flex items-center gap-2.5 mb-2.5">
+          <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center flex-shrink-0">
               <HardDrive className="w-4 h-4 text-accent" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-ink leading-none">{userStats.plan} plan</p>
+              <p className="text-xs font-semibold text-ink leading-none">
+                {formatBytes(summary.storage_bytes)} stored
+              </p>
               <p className="text-[11px] text-ink-mute mt-1 leading-none">
-                {userStats.storageUsedMb} MB of {userStats.storageQuotaMb} MB
+                {summary.total_images} photo{summary.total_images === 1 ? '' : 's'}
               </p>
             </div>
-          </div>
-          <div
-            className="h-1.5 rounded-full bg-surface-mute overflow-hidden"
-            role="progressbar"
-            aria-valuenow={storagePercent}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Storage used"
-          >
-            <div className="h-full rounded-full bg-accent" style={{ width: `${storagePercent}%` }} />
           </div>
         </div>
       )}
