@@ -492,7 +492,7 @@ export default function UploadSingle() {
                 {/* What the checks measured, rather than a verdict alone. */}
                 {image?.quality_decision && (
                   <div className="p-4 rounded-3xl bg-surface-mute border border-line">
-                    <QualityScores quality={image.quality_decision} compact />
+                    <QualityScores quality={image.quality_decision} compact sample={!USE_API} />
                   </div>
                 )}
 

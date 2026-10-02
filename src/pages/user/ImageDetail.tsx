@@ -4,6 +4,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { QualityScores } from '../../components/features/QualityScores'
+import { USE_API } from '../../lib/api/config'
 import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
 import { downloadImage, getImageThumbnail } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
@@ -186,7 +187,7 @@ export default function ImageDetail() {
 
                 {image.quality_decision && (
                   <div className="p-4 rounded-3xl bg-surface-mute border border-line">
-                    <QualityScores quality={image.quality_decision} compact />
+                    <QualityScores quality={image.quality_decision} compact sample={!USE_API} />
                   </div>
                 )}
 

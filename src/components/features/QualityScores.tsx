@@ -5,6 +5,12 @@ interface QualityScoresProps {
   /** The acceptance threshold the backend uses, for the marker on each bar. */
   threshold?: number
   compact?: boolean
+  /**
+   * True when these numbers are demo values rather than measurements of the
+   * photo on screen. It must be said: numbers that look measured but are not
+   * are exactly what this component replaced.
+   */
+  sample?: boolean
 }
 
 function toneFor(score: number, threshold: number) {
@@ -22,7 +28,7 @@ function toneFor(score: number, threshold: number) {
  * did not record are left out rather than shown as zero, which would read as
  * "this failed" when it means "this was not measured".
  */
-export function QualityScores({ quality, threshold = 60, compact = false }: QualityScoresProps) {
+export function QualityScores({ quality, threshold = 60, compact = false, sample = false }: QualityScoresProps) {
   if (!quality) return null
 
   const measures = QUALITY_MEASURES
@@ -40,7 +46,7 @@ export function QualityScores({ quality, threshold = 60, compact = false }: Qual
       {typeof overall === 'number' && overallTone && (
         <div className="flex items-baseline justify-between">
           <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute">
-            Overall quality
+            Overall quality{sample && ' (sample)'}
           </span>
           <span className={`text-lg font-bold ${overallTone.text}`}>{Math.round(overall)}%</span>
         </div>
@@ -75,7 +81,9 @@ export function QualityScores({ quality, threshold = 60, compact = false }: Qual
       </div>
 
       <p className="text-[10px] text-ink-faint">
-        The line on each bar is the {threshold}% mark a photo has to clear.
+        {sample
+          ? `Sample figures, not measured from this photo — connect the API for real ones. The line on each bar is the ${threshold}% mark a photo has to clear.`
+          : `The line on each bar is the ${threshold}% mark a photo has to clear.`}
       </p>
     </div>
   )
