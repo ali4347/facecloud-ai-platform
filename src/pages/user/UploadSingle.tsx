@@ -21,11 +21,11 @@ import {
   type EnhancementResult,
 } from '../../lib/api/enhancements'
 import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
-import { QualityScores } from '../../components/features/QualityScores'
-import { demoImages, formatBytes, statusLabel } from '../../lib/imageData'
+import { makeLocalPreview } from '../../lib/previewEnhance'
+import { demoImages, formatBytes } from '../../lib/imageData'
 import {
   AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Info, Loader2,
-  RefreshCw, ScanFace, Sparkles, Upload, Wand2, XCircle,
+  RefreshCw, Sparkles, Upload, Wand2, XCircle,
 } from 'lucide-react'
 
 /**
@@ -166,7 +166,14 @@ export default function UploadSingle() {
         pollRef.current = setTimeout(advance, DEMO_STEP_MS)
       } else {
         // Show a complete result rather than an empty card: the demo exists so
-        // the screen can be seen working without a server behind it.
+        // the screen can be seen working without a server behind it. The second
+        // side of the comparison is made here in the browser, and the caption
+        // under the slider says exactly that.
+        if (previewUrl) {
+          makeLocalPreview(previewUrl)
+            .then(after => setComparison({ before: previewUrl, after }))
+            .catch(() => setEnhanceError('This photo could not be previewed.'))
+        }
         const sample = demoImages().find(row => row.display_status === 'accepted')
         if (sample) {
           // Keep the demo's representative scores, but report the real file the
@@ -461,7 +468,9 @@ export default function UploadSingle() {
                           />
                         </div>
                         <p className="text-[10px] text-ink-faint">
-                          Drag the handle to compare. The original is never overwritten.
+                          {USE_API
+                            ? 'Drag the handle to compare. The original is never overwritten.'
+                            : 'Drag the handle to compare. This preview is made in your browser — the server\u2019s own enhancement replaces it once the API is connected.'}
                         </p>
                       </>
                     ) : enhancing ? (
@@ -471,76 +480,8 @@ export default function UploadSingle() {
                       </div>
                     ) : enhanceError ? (
                       <p className="text-[11px] text-[#F87171]">{enhanceError}</p>
-                    ) : !USE_API ? (
-                      /* The photo is already in the card to the left, so this
-                         one says what would be here instead of repeating it. */
-                      <div className="rounded-3xl border border-line bg-surface-mute p-6 text-center space-y-1.5">
-                        <Wand2 className="w-5 h-5 mx-auto text-ink-faint" />
-                        <p className="text-[11px] font-semibold text-ink-soft">
-                          Before and after, side by side
-                        </p>
-                        <p className="text-[10px] text-ink-faint">
-                          Enhancing runs on the server, so the comparison appears
-                          here once the API is connected.
-                        </p>
-                      </div>
                     ) : (
                       <p className="text-[11px] text-ink-faint">Not enhanced yet.</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Stacked, not side by side: this card is half the width now. */}
-                <div className="space-y-5">
-                {/* What the checks measured, rather than a verdict alone. */}
-                {image?.quality_decision && (
-                  <div className="p-4 rounded-3xl bg-surface-mute border border-line">
-                    <QualityScores quality={image.quality_decision} compact sample={!USE_API} />
-                  </div>
-                )}
-
-                {image && (
-                  <div className="p-4 rounded-3xl bg-surface-mute border border-line space-y-3 text-xs text-ink-mute">
-                    <div className="flex justify-between gap-3">
-                      <span>Photo:</span>
-                      <span className="font-bold text-ink truncate">{image.original_name}</span>
-                    </div>
-                    {/* Also a measurement, so also absent without a server. */}
-                    {USE_API && image.face_validation?.face_count != null && (
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5">
-                          <ScanFace className="w-3.5 h-3.5" />Faces found:
-                        </span>
-                        <span className="font-bold text-ink">{image.face_validation.face_count}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span>Size:</span>
-                      <span className="font-bold text-ink">
-                        {image.width && image.height && `${image.width}×${image.height} · `}
-                        {formatBytes(image.file_size)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Outcome:</span>
-                      <span className="font-bold text-ink">{statusLabel(image.display_status)}</span>
-                    </div>
-                    {image.rejection_reason && (
-                      <div className="pt-2 border-t border-line-soft">
-                        <p className="text-[#F87171]">{image.rejection_reason}</p>
-                      </div>
-                    )}
-                    {!image.rejection_reason
-                      && image.quality_decision?.rejection_reasons
-                      && image.quality_decision.rejection_reasons.length > 0 && (
-                      <div className="pt-2 border-t border-line-soft">
-                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1">What stood out</p>
-                        <ul className="list-disc list-inside space-y-0.5">
-                          {image.quality_decision.rejection_reasons.map(reason => (
-                            <li key={reason}>{reason}</li>
-                          ))}
-                        </ul>
-                      </div>
                     )}
                   </div>
                 )}
@@ -550,7 +491,6 @@ export default function UploadSingle() {
                     The batch finished partly — check My Images for the full picture.
                   </p>
                 )}
-                </div>
 
                 <div className="flex flex-wrap gap-3">
                   {image && USE_API && (

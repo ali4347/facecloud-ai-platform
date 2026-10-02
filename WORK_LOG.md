@@ -46,6 +46,29 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-02 — Upload result pared back to the two cards and a working slider
+*Status: committed (this commit)*
+
+Owner's request: drop the quality-checks and photo-details cards from the result, keep the rest, and make the
+place that said "Before and after, side by side" an actual slider with an image in it.
+
+- Both cards removed from the upload result. The six quality measurements are not lost from the product — the
+  image detail screen still shows them, measured, which is where someone goes to ask why.
+- The comparison is now a real slider in **both** modes. With the API it is the original against the server's
+  enhanced file, as before.
+- Without the API there is no server to produce an "after", so `src/lib/previewEnhance.ts` makes one in the
+  browser: a canvas filter lifting brightness, contrast and saturation, capped at 1400px because filtering a
+  phone photo at full resolution janks the page for no visible gain. The caption under the slider says plainly
+  that it is made in the browser and that the server's own enhancement replaces it — it is a demonstration of
+  the control, not a result, and it must not read as one.
+
+**Checked both ways in headless Chrome.** Demo: slider renders with a visible difference between the two sides,
+caption says "made in your browser", both cards gone. Live: slider with the real enhanced file, caption says
+"the original is never overwritten", both cards gone.
+
+**Files:** `src/lib/previewEnhance.ts` (new), `src/pages/user/UploadSingle.tsx`.
+
+
 ### 2026-10-02 — Upload result back to two cards: the photo left, the comparison right
 *Status: committed (this commit)*
 
