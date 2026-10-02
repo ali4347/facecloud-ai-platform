@@ -33,6 +33,7 @@ function mockReviewToApiShape(item: ReviewItem, index: number): ModeratorReview 
     id: index + 1,
     organization: 1,
     image_id: index + 1,
+    image_name: item.filename,
     source: item.isDuplicate ? 'duplicate' : MOCK_SOURCES[index % MOCK_SOURCES.length],
     status: item.status === 'pending' ? 'pending' : item.status,
     ai_recommendation: item.isDuplicate ? 'perceptual' : item.rejectionReason,

@@ -1,4 +1,4 @@
-import { apiFetch } from './client'
+import { apiFetch, apiFetchBlob } from './client'
 
 export type ReviewSource = 'quality' | 'duplicate' | 'identity'
 export type ReviewStatus =
@@ -14,6 +14,8 @@ export interface ModeratorReview {
   id: number
   organization: number
   image_id: number
+  /** The photo's own filename, so a row reads before its thumbnail arrives. */
+  image_name: string
   source: ReviewSource
   status: ReviewStatus
   ai_recommendation: string
@@ -126,6 +128,21 @@ export function listReviews(
 
 export function getReview(organizationId: number, reviewId: number): Promise<ModeratorReview> {
   return apiFetch<ModeratorReview>(`${base(organizationId)}/reviews/${reviewId}/`)
+}
+
+/**
+ * The photo behind a review, as a thumbnail.
+ *
+ * Fetched rather than linked because the API authenticates with a bearer
+ * header, which `<img src>` cannot send. The caller turns the blob into an
+ * object URL and must revoke it when the image goes away, or the browser holds
+ * the bytes for the life of the page.
+ */
+export function getReviewImage(
+  organizationId: number, reviewId: number, size?: number, signal?: AbortSignal,
+): Promise<Blob> {
+  const query = size ? `?size=${size}` : ''
+  return apiFetchBlob(`${base(organizationId)}/reviews/${reviewId}/image/${query}`, { signal })
 }
 
 export function getDashboard(organizationId: number, signal?: AbortSignal): Promise<ModeratorDashboard> {

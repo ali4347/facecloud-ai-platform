@@ -168,7 +168,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 
 ### Moderator Routes (under `/moderator`)
 * `/moderator` (Dashboard: overdue and due-soon counts against the review deadline, unassigned work, oldest waiting review, and per-moderator performance over a 7/30/90-day window)
-* `/moderator/queue` (Review queue: filter by status, source, assignment and overdue-only, order by deadline, claim or release a review so two moderators cannot work the same photo, and approve, reject or escalate a selection in bulk)
+* `/moderator/queue` (Review queue: the photo under review shown as a thumbnail, filters by status, source, assignment and overdue-only, deadline ordering, claim or release a review so two moderators cannot work the same photo, and bulk approve, reject or escalate)
 * `/moderator/images/:id` (Human-in-the-loop audit detail view)
 * `/moderator/audit` (Historical review log matching decisions to actors)
 * `/moderator/settings` (Moderator interface threshold settings)

@@ -93,13 +93,14 @@ export interface RequestOptions {
 }
 
 /**
- * One call to the API.
+ * One call to the API, returned unparsed.
  *
- * Adds the bearer token, parses the response, and on an expired access token
- * refreshes once and retries. A revoked token is not retried: refreshing cannot
- * fix it, so the caller is told to send the person back to sign in.
+ * Adds the bearer token, and on an expired access token refreshes once and
+ * retries. A revoked token is not retried: refreshing cannot fix it, so the
+ * caller is told to send the person back to sign in. `apiFetch` reads JSON out
+ * of this; `apiFetchBlob` reads binary, so neither has to repeat the auth.
  */
-export async function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request(path: string, options: RequestOptions = {}): Promise<Response> {
   if (!API_URL) {
     throw new ApiError(0, 'No API URL is configured. Set VITE_API_URL.')
   }
@@ -138,6 +139,13 @@ export async function apiFetch<T = unknown>(path: string, options: RequestOption
     }
   }
 
+  return response
+}
+
+/** One call to the API, with a JSON body in and a parsed body out. */
+export async function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
+  const response = await request(path, options)
+
   if (response.status === 204) return undefined as T
 
   const text = await response.text()
@@ -147,4 +155,22 @@ export async function apiFetch<T = unknown>(path: string, options: RequestOption
     throw new ApiError(response.status, messageFrom(parsed, response.status), parsed)
   }
   return parsed as T
+}
+
+/**
+ * One call to the API that answers with a file rather than JSON.
+ *
+ * Needed because the API authenticates with a bearer header, which an
+ * `<img src>` or `<a download>` cannot send: the bytes have to be fetched here
+ * and handed to the browser as an object URL. An error still comes back as
+ * JSON, so it is parsed the same way and raised as the same ApiError.
+ */
+export async function apiFetchBlob(path: string, options: RequestOptions = {}): Promise<Blob> {
+  const response = await request(path, options)
+
+  if (!response.ok) {
+    const parsed = await response.json().catch(() => null)
+    throw new ApiError(response.status, messageFrom(parsed, response.status), parsed)
+  }
+  return response.blob()
 }

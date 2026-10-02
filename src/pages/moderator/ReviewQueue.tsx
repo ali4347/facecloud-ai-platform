@@ -16,6 +16,7 @@ import {
   type ReviewStatus,
 } from '../../lib/api/moderation'
 import { useModeratorOrganization } from '../../lib/moderationData'
+import { ReviewThumbnail } from '../../components/features/ReviewThumbnail'
 import { formatDateTime } from '../../lib/utils'
 import { AlertTriangle, Check, Clock, Eye, Loader2, Lock, RefreshCw, Unlock, X } from 'lucide-react'
 
@@ -256,7 +257,7 @@ export default function ReviewQueue() {
 
       <ChartCard
         title="Verification backlog"
-        subtitle="Correcting a review needs the full record, so open it individually"
+        subtitle="Previews are thumbnails; correcting a review needs the full record, so open it individually"
       >
         {loading && (
           <div className="text-center py-16 text-ink-faint">
@@ -290,6 +291,7 @@ export default function ReviewQueue() {
                       aria-label="Select every open review"
                     />
                   </th>
+                  <th>Photo</th>
                   <th>Review</th>
                   <th>Raised by</th>
                   <th>AI confidence</th>
@@ -311,9 +313,18 @@ export default function ReviewQueue() {
                       />
                     </td>
                     <td>
-                      <p className="font-bold text-ink text-xs">Review #{review.id}</p>
+                      <ReviewThumbnail
+                        organizationId={organizationId}
+                        reviewId={review.id}
+                        alt={`Photo for review ${review.id}`}
+                      />
+                    </td>
+                    <td>
+                      <p className="font-bold text-ink text-xs truncate max-w-[220px]" title={review.image_name}>
+                        {review.image_name || `Review #${review.id}`}
+                      </p>
                       <p className="text-[10px] text-ink-faint mt-0.5">
-                        Image {review.image_id} &middot; raised {formatDateTime(review.created_at)}
+                        Review #{review.id} &middot; raised {formatDateTime(review.created_at)}
                       </p>
                     </td>
                     <td>

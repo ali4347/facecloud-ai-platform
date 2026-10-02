@@ -25,11 +25,11 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
 | User portal (16 routes under `/dashboard`) | ✅ Complete (mock) | Uploads, processing, images, groups, downloads, live webcam enhancement |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
-| Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance); image review, members, batches, notifications, reports, audit and settings are still on mock data |
+| Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
 | Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
-| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1153 tests**, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics) added 2026-10-02. This repo is the browser app only |
+| Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1172 tests**, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics, and org-scoped access to the photo under review) added 2026-10-02. This repo is the browser app only |
 | Frontend ↔ backend integration | 🔄 In progress | Sign-in, the moderator dashboard and the review queue read the live API behind `VITE_USE_API`; the remaining screens still read `src/data/mock.ts` |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
 | Tests (unit / e2e) | ❌ None | Listed as future work |
@@ -45,6 +45,48 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-02 — The moderator can now see the photo being judged
+*Status: committed (this commit); backend change is PR #58 on FaceCloud_backend*
+
+Closing the gap flagged in the entry below. Thumbnails were owner-only
+(`thumbnails/views.py` filters on `owner=request.user`), so a moderator was being asked to decide on a photo they
+could not see — which is not a decision anybody can make.
+
+**Backend (PR #58).** New `GET .../moderator/reviews/{id}/image/?size=` serving the photo as a JPEG thumbnail. It is
+deliberately the narrowest access that makes the decision possible, not general access to an organization's images:
+
+- **Keyed by review, not by image.** A moderator can only see photos they have actually been asked to judge; an image
+  with no review in this organization has no URL here at all.
+- **Thumbnails only**, at the configured sizes (256 default, 1024 also allowed; a photo is never enlarged). Judging
+  blur, lighting, framing and whether a face is even present does not need the original — and not serving the original
+  means a moderation role cannot be used to pull people's photos out of the system.
+- **The same gate as the review itself**, so losing the role closes it at the same moment. Tests cover both a demotion
+  (403) and a suspension (404).
+- **Views are not audited, on purpose.** A thumbnail is fetched every time the queue renders, so logging each one would
+  bury the membership and decision history the audit log exists for; who worked a review is already recorded by its
+  claim and its decision.
+
+Each review also carries `image_name` now, so a queue row is recognisable before its thumbnail arrives, and the list
+view fetches the image alongside the review instead of one query per row. 19 new tests; suite **1172 passing**.
+
+**Frontend (this repo).** The API authenticates with a bearer header, which `<img src>` cannot send, so the bytes are
+fetched and handed to the browser as an object URL:
+
+- `apiFetch` split into a shared `request()` plus `apiFetch` (JSON) and a new `apiFetchBlob` (binary), so authentication
+  and the token-refresh retry are not repeated for file responses.
+- `src/components/features/ReviewThumbnail.tsx` loads the photo, **revokes the object URL** on unmount or when the
+  review changes (otherwise the page holds every thumbnail it has ever shown), and falls back to a placeholder tinted
+  from the review id when there is no preview — which covers both the demo data and a photo whose file is gone.
+- The queue has a Photo column and shows the real filename as the row title.
+
+**Verified end to end:** over HTTP the endpoint answers `200 image/jpeg` with `Cache-Control: private`, decodes as a
+real 256×192 JPEG, refuses an unauthenticated request with 401 and another organization with 404. In headless Chrome
+all six queue rows render a loaded `blob:` image at 256×192 with the correct filenames. `npm run build` passes.
+
+**Files:** `src/lib/api/client.ts`, `src/lib/api/moderation.ts`, `src/lib/moderationData.ts`,
+`src/components/features/ReviewThumbnail.tsx` (new), `src/pages/moderator/ReviewQueue.tsx`, `README.md`.
+
 
 ### 2026-10-02 — Moderator queue operations in the backend, and the moderator panel attached to it
 *Status: committed (this commit); backend changes are PRs #56 and #57 on FaceCloud_backend*
