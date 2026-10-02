@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-01
+**Last updated:** 2026-10-02
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://www.facecloudai.pro (Vercel)
 
@@ -45,6 +45,22 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-02 — Model names hidden, password reveal, working mark-as-read
+*Status: committed (this commit)*
+- **Sidebar no longer names the model.** The "Zero-DCE AI — Model active" card told users which model runs, which is
+  an implementation detail. In its place the user portal shows the plan and storage used, with a bar — something a
+  person actually acts on. Admin and moderator have no quota, so they show nothing there rather than filler.
+- **Upload Center** no longer names the model either: the step reads "Enhance image", and the card is titled "What
+  happens to your upload" instead of "Methodology Trace Steps".
+- **Password fields have a reveal toggle.** New `src/components/ui/PasswordInput.tsx`, used on the three sign-in
+  screens and the three fields in Settings → Security. The toggle is a real button with a label that says which way
+  it goes, and it is out of the tab order so it does not sit between the field and the submit button.
+- **"Mark all as read" works.** It had no handler at all. New `src/lib/notifications.ts` keeps read ids per account;
+  the bell only carries a dot while something is unread, the header badge counts unread rather than total, read rows
+  lose their dot and emphasis, and the button becomes a disabled "All caught up" when nothing is left.
+- Verified in the running app: the model name is gone from both screens, three reveal buttons switch their field to
+  text, and marking all as read clears the badge and the dot and survives in storage.
 
 ### 2026-10-01 — One account menu, in the sidebar
 *Status: committed (this commit)*
@@ -477,7 +493,10 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
 - Deployment is a manual upload, and `.htaccess` is a hidden file that most file managers do not show. If a deploy
   drops it, every deep link breaks again with the host's 404 page.
-- Profile details and avatars live in this browser's `localStorage`, so they do not follow the account to another device and are lost
+- The model names are still visible on other user screens — the notification and activity feeds, Processing, Single
+  Upload, Person Folders and Live Enhancement — because only the two screens named were changed. Decide whether the
+  rest should be scrubbed too, and whether the admin console (which legitimately lists services) is exempt.
+- Profile details, avatars and notification read state live in this browser's `localStorage`, so they do not follow the account to another device and are lost
   if site data is cleared. They move to the server once the API exists.
 - Role separation is enforced in the browser only, against a `localStorage` session. That is appropriate for the
   current mock build, but once the API exists the checks have to move server-side — a determined visitor can still

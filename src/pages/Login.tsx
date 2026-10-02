@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Lock, Mail, AlertTriangle } from 'lucide-react'
+import { PasswordInput } from '../components/ui/PasswordInput'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 
 export default function Login() {
@@ -118,17 +119,18 @@ export default function Login() {
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Password
               </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                  style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="fc-input !pl-11"
-                  required
-                />
-              </div>
+              <PasswordInput
+                leading={
+                  <Lock
+                    className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none z-10"
+                    style={{ color: 'rgb(var(--a-ink) / 0.35)' }}
+                  />
+                }
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="fc-input !pl-11"
+                required
+              />
             </div>
 
             <button type="submit" className="fc-btn-primary w-full mt-2" disabled={loading}>

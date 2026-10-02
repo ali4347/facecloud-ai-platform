@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Lock, Mail } from 'lucide-react'
+import { PasswordInput } from '../../components/ui/PasswordInput'
 import { FaceCloudLogo } from '../../components/branding/FaceCloudLogo'
 
 export default function ModeratorLogin() {
@@ -103,17 +104,18 @@ export default function ModeratorLogin() {
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Moderator Password
               </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
-                  style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
-                <input 
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  className="fc-input !pl-11"
-                  required
-                />
-              </div>
+              <PasswordInput
+                leading={
+                  <Lock
+                    className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none z-10"
+                    style={{ color: 'rgb(var(--a-ink) / 0.35)' }}
+                  />
+                }
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="fc-input !pl-11"
+                required
+              />
             </div>
 
             <button 

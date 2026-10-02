@@ -4,11 +4,12 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, Code2, ShieldCheck, Key, Eye, ScrollText,
-  Sparkles, X, Bell, Briefcase
+  HardDrive, X, Bell, Briefcase
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 import { UserMenu } from '../ui/UserMenu'
+import { userStats } from '../../data/mock'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -81,6 +82,10 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
   const nav = navByRole[role]
   const cfg = roleConfig[role]
+  const storagePercent = Math.min(
+    100,
+    Math.round((userStats.storageUsedMb / userStats.storageQuotaMb) * 100)
+  )
 
   // Auto-close on route change for mobile width
   useEffect(() => {
@@ -167,19 +172,35 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         </div>
       </nav>
 
-      {/* ── Model status card ──────────────────────────────────────── */}
-      <div className="bg-surface border border-line rounded-[18px] shadow-soft p-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-4 h-4 text-accent" />
+      {/* ── Storage card ───────────────────────────────────────────
+           Replaces a card that named the enhancement model. Which model runs
+           is an implementation detail; how much room is left is not. Only the
+           user portal has a quota, so the other roles do not show this. */}
+      {role === 'user' && (
+        <div className="bg-surface border border-line rounded-[18px] shadow-soft p-3.5">
+          <div className="flex items-center gap-2.5 mb-2.5">
+            <div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center flex-shrink-0">
+              <HardDrive className="w-4 h-4 text-accent" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-ink leading-none">{userStats.plan} plan</p>
+              <p className="text-[11px] text-ink-mute mt-1 leading-none">
+                {userStats.storageUsedMb} MB of {userStats.storageQuotaMb} MB
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-ink leading-none">Zero-DCE AI</p>
-            <p className="text-[11px] text-ink-mute mt-1 leading-none">Model active</p>
+          <div
+            className="h-1.5 rounded-full bg-surface-mute overflow-hidden"
+            role="progressbar"
+            aria-valuenow={storagePercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Storage used"
+          >
+            <div className="h-full rounded-full bg-accent" style={{ width: `${storagePercent}%` }} />
           </div>
-          <span className="ml-auto w-2 h-2 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
         </div>
-      </div>
+      )}
 
       {/* ── Account menu ────────────────────────────────────────── */}
       <UserMenu role={role} />

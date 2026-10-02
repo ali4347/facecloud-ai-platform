@@ -1013,6 +1013,9 @@ export const enhancementSuccessData = [
 ]
 
 export const userStats = {
+  plan: 'Free',
+  storageUsedMb: 312,
+  storageQuotaMb: 500,
   totalUploads: 142,
   enhancedImages: 120,
   rejectedImages: 22,

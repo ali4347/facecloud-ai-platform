@@ -80,7 +80,7 @@ export default function UploadCenter() {
           </div>
         </ChartCard>
 
-        <ChartCard title="Methodology Trace Steps" subtitle="Active pipeline stages">
+        <ChartCard title="What happens to your upload" subtitle="Each stage your photo goes through">
           <div className="grid grid-cols-2 gap-3 text-[11px] text-ink-mute">
             {[
               '1. Select upload type',
@@ -89,7 +89,7 @@ export default function UploadCenter() {
               '9. Face embedding extraction',
               '3. Store original image',
               '10. Person folder clustering',
-              '4. Zero-DCE enhancement',
+              '4. Enhance image',
               '11. Secure downloads ready',
               '5. Save enhanced image',
               '12. In-app notification sent',

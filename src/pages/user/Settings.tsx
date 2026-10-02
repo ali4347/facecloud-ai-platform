@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { Avatar } from '../../components/ui/Avatar'
+import { PasswordInput } from '../../components/ui/PasswordInput'
 import { User, Lock, Bell, Camera, Save, Upload, Trash2, Check } from 'lucide-react'
 import { useSessionUser, updateSessionName } from '../../lib/session'
 import { useProfile, saveProfile } from '../../lib/profile'
@@ -169,7 +170,7 @@ function SecuritySettings() {
       ].map(f => (
         <div key={f.id}>
           <label className="text-xs font-semibold text-ink block mb-1.5">{f.label}</label>
-          <input id={f.id} type="password" placeholder={f.placeholder} className="fc-input" />
+          <PasswordInput id={f.id} placeholder={f.placeholder} className="fc-input" />
         </div>
       ))}
       <GradientButton variant="secondary">Update Password</GradientButton>

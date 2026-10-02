@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Bell, Check, X } from 'lucide-react'
 import { formatDateTime } from '../../lib/utils'
 import { mockActivity } from '../../data/mock'
 import { announcePopoverOpen, onOtherPopoverOpen } from '../../lib/popover'
+import { useReadNotifications } from '../../lib/notifications'
+import { getSession } from '../../lib/session'
 
 interface NotificationDropdownProps {
   onOpen?: () => void
@@ -14,6 +16,9 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
   const [open, setOpen] = useState(false)
   const [notifications] = useState(mockActivity.slice(0, 5))
   const location = useLocation()
+  const email = getSession()?.email ?? ''
+  const ids = useMemo(() => notifications.map(n => String(n.id)), [notifications])
+  const { isRead, unreadCount, markAllRead } = useReadNotifications(email, ids)
 
   const btnRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -102,7 +107,9 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
         aria-label="Notifications"
       >
         <Bell className="w-[18px] h-[18px]" />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-surface" />
+        {unreadCount > 0 && (
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-surface" />
+        )}
       </button>
 
       {open && (
@@ -119,9 +126,11 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
             <div className="flex items-center gap-2">
               <Bell className="w-4 h-4 text-accent" />
               <span className="text-[13px] font-semibold text-ink">Notifications</span>
-              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-accent-tint text-accent-soft">
-                {notifications.length}
-              </span>
+              {unreadCount > 0 && (
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-accent-tint text-accent-soft">
+                  {unreadCount}
+                </span>
+              )}
             </div>
             <button
               onClick={() => setOpen(false)}
@@ -142,10 +151,10 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
               >
                 <div
                   className="w-2 h-2 mt-1.5 rounded-full flex-shrink-0"
-                  style={{ background: dotColor(n.status) }}
+                  style={{ background: isRead(String(n.id)) ? 'transparent' : dotColor(n.status) }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-medium text-ink-soft leading-snug">{n.message}</p>
+                  <p className={`text-[12px] leading-snug ${isRead(String(n.id)) ? 'font-normal text-ink-mute' : 'font-medium text-ink-soft'}`}>{n.message}</p>
                   <p className="text-[10px] mt-1 font-mono text-ink-faint">
                     {formatDateTime(n.timestamp)}
                   </p>
@@ -158,10 +167,13 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
           <div className="px-4 py-3 border-t border-line-soft">
             <button
               type="button"
-              className="flex items-center gap-1.5 text-[12px] font-semibold text-accent hover:text-accent-soft transition-colors"
+              onClick={markAllRead}
+              disabled={unreadCount === 0}
+              className="flex items-center gap-1.5 text-[12px] font-semibold text-accent hover:text-accent-soft
+                         transition-colors cursor-pointer disabled:text-ink-faint disabled:cursor-default"
             >
               <Check className="w-3.5 h-3.5" />
-              Mark all as read
+              {unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
             </button>
           </div>
         </div>
