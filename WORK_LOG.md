@@ -46,6 +46,32 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-03 — Biometric consent switched on, and the 24 tests it broke
+*Status: backend PR #61, merged*
+
+Owner asked for `BIOMETRIC_CONSENT_REQUIRED=True`. Setting it immediately **failed 24 tests** across
+`identities`, `collages` and `moderation` — which turned out to be a real gap, not a side effect.
+
+`config/production_guard.py` refuses to boot without that flag, so **production always runs with it on**, while
+the suite only passed with it off. The suite was testing whatever the developer's `.env` happened to say rather
+than what production does — the same shape as the SQLite portability fix in PR #56.
+
+**Fixed in PR #61 (merged).** Tests that exercise facial processing grant consent in `setUp` through a new
+`privacy/testing.py` helper, so they take production's path. Granting is harmless when the requirement is off, so
+the suite now passes **either way** and no longer depends on the environment for this flag. The four tests that
+deliberately check behaviour *without* consent were relying on nothing having granted it — which passes for the
+wrong reason the moment a fixture changes — so they now withdraw consent explicitly.
+
+Verified: **1188 passing with the flag True and 1188 with it False**, `check`/`makemigrations --check`/
+`spectacular --validate` clean, bandit quiet. No application code changed.
+
+**Worth recording:** two of the three bugs found in this repo so far have been the same bug — the test suite
+agreeing with a local `.env` instead of with production. Worth a look at whether any other production-guard
+setting is untested the same way.
+
+**Files:** none in this repo. Backend: `privacy/testing.py` (new) plus seven test modules.
+
+
 ### 2026-10-03 — The AI models are installed and running; enhancement is no longer falling back
 *Status: backend runtime only — no code changed in either repository*
 
