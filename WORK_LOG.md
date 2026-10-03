@@ -46,6 +46,45 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-03 — Identity grouping switched on; the licence it needed was open source all along
+*Status: backend runtime only — no code changed*
+
+**A correction to the previous entry.** It said the identity licence record was something only the owner held, on
+the strength of the attestation's phrase *"license retained in owner records"*. That was an assumption, not a
+check. Both licences are permissive open source and publicly available:
+
+| Model | Licence |
+|---|---|
+| YuNet (ShiqiYu/libfacedetection) | **BSD 3-Clause** |
+| SFace (OpenCV Zoo) | **Apache License 2.0** |
+
+Neither needed a negotiated agreement. "Retained in owner records" means the owner keeps a copy — which is what
+BSD-3-Clause requires of a redistribution anyway, and what the attestation means by "Production distribution must
+preserve all required license and attribution files".
+
+So the record was assembled from the **real upstream licence texts**, reproduced in full, with both artifacts'
+SHA-256 matching the attestation exactly. Nothing was invented: the earlier refusal to fabricate an empty file
+still stands, and this is the opposite — the actual documents.
+
+**Identity grouping is now live.** `IDENTITY_PROVIDER=sface_2021dec_v1`, `IDENTITY_AUTO_ANALYZE=True`,
+`IDENTITY_LICENSE_RECORD_PATH` pointing at the record. `manage.py check` reports **"no issues"** for the first
+time — the standing `identities.W001` warning is gone. Suite: **1188 passing**.
+
+**The consent gate behaves properly**, checked against the running server with two accounts:
+- Consented account: upload accepted, `identity_analysis: {status: completed, provider: sface_2021dec_v1}`.
+- Account with no consent: upload still succeeds (**201**), quality and validation still run, and identity
+  analysis simply **does not run** — no error, no failed job. That is the right shape: consent gates the
+  biometric step, not the product.
+
+**Still unproven on a real face.** Every test photo here is a drawn oval, which YuNet correctly refuses, so face
+count is 0 and no groups form. The wiring is confirmed end to end; the recognition itself needs a real
+photograph.
+
+**Nothing entered git** — the record lives under `.runtime/licenses/` and the settings in `.env`, both gitignored.
+
+**Files:** none tracked. Runtime only: `.runtime/licenses/identity-models.md` and `.env`.
+
+
 ### 2026-10-03 — Biometric consent switched on, and the 24 tests it broke
 *Status: backend PR #61, merged*
 
