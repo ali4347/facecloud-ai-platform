@@ -82,6 +82,14 @@ photograph.
 
 **Nothing entered git** — the record lives under `.runtime/licenses/` and the settings in `.env`, both gitignored.
 
+**Owner's own licence copy added the same day.** It is **MIT License, Copyright (c) 2020 Shiqi Yu** — the same
+author as the upstream BSD 3-Clause text, but from an earlier point in the project's life. Both are now in the
+record, with the distinction stated plainly: the artifact in use was taken from the current upstream tree, so
+**BSD 3-Clause governs this file**; the owner's MIT copy is kept because it is the project's own record and
+because an earlier distribution of the same model carried it. Both are permissive and both allow this use — the
+difference only affects which attribution text must travel with a redistribution, so the stricter of the two is
+reproduced first.
+
 **Files:** none tracked. Runtime only: `.runtime/licenses/identity-models.md` and `.env`.
 
 
