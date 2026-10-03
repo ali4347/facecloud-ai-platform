@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-02
+**Last updated:** 2026-10-03
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://www.facecloudai.pro (Vercel)
 
@@ -45,6 +45,51 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-03 — The AI models are installed and running; enhancement is no longer falling back
+*Status: backend runtime only — no code changed in either repository*
+
+Owner asked whether the enhancement pipeline was actually working or blocked. **It was working, but without any
+of its models**, so every photo was getting the classical OpenCV path.
+
+**Diagnosis, by test rather than reading.** A well-lit photo came back with
+`zero_dce: {requested: false}` — correct, since Zero-DCE is a low-light model and the photo was not dark. A
+deliberately under-exposed photo (mean luminance 24) came back with
+`{requested: true, applied: false, fallback_reason: "The configured Zero-DCE ONNX model is unavailable."}`.
+So the pipeline was choosing correctly and reporting honestly; the weights simply were not on the machine. Every
+model path pointed at `.runtime/models/`, which did not exist. Worth recording that the fallback is deliberate
+and tested (`test_zero_dce_failure_uses_auditable_opencv_fallback`) — it degrades and says so rather than
+pretending.
+
+**Installed, with the project's own licensing control respected.**
+`docs/model-licenses/feature-18-yunet-sface-attestation.md` records approved artifacts by **SHA-256**, so the
+checksum is the identity control:
+- **SFace** `face_recognition_sface_2021dec.onnx` from the OpenCV Zoo — SHA-256 matches the attested value exactly.
+- **YuNet** `yunet_s_dynamic.onnx` from libfacedetection (not the OpenCV Zoo build, whose checksums do not match)
+  — SHA-256 matches the attested value exactly.
+- **Zero-DCE** has no attestation entry because it is not downloaded: `scripts/export_zero_dce_onnx.py` converts
+  the official Epoch99 checkpoint to ONNX. Done in a throwaway `.runtime/export-venv`, since torch is a
+  conversion-only dependency and production inference uses OpenCV DNN.
+
+**Result: the same dark photo now enhances for real.**
+`zero_dce: {applied: true, provider: facecloud_private_curve_onnx_opencv_dnn, curve_iterations: 8,
+chroma_protection: preserve_source_lab_chroma, mean_gain: 2.29}`, 982 ms on CPU. No GPU involved.
+
+**Face detection upgraded** from the Haar cascade to YuNet (`FACE_DETECTOR_PROVIDER=yunet_v1`). **Not verified on
+a real face** — the synthetic test images here are drawn ovals, which YuNet correctly refuses and the looser Haar
+cascade accepted. Needs a real photograph to confirm, and reverts with one line in `.env`.
+
+**Identity grouping deliberately left off.** `identities/checks.py` additionally requires
+`IDENTITY_LICENSE_RECORD_PATH` to point at the owner's own licence record, which the attestation says is
+intentionally kept out of the repository. Fabricating that file would defeat a control that exists on purpose,
+so it stays for the owner to supply.
+
+**Nothing entered git:** weights live under `.runtime/` and the settings in `.env`, both gitignored — confirmed
+with `git check-ignore`. This also matches the attestation's rule that production workers never download weights
+dynamically.
+
+**Files:** none tracked. Runtime only: `~/Projects/FaceCloud_backend/.runtime/models/` and `.env`.
+
 
 ### 2026-10-02 — Upload result pared back to the two cards and a working slider
 *Status: committed (this commit)*
