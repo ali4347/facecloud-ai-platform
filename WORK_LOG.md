@@ -46,6 +46,48 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-03 — Five real photographs, and the two bugs they found
+*Status: backend PR #62, merged*
+
+Owner supplied five real portraits of one person — the first real faces this pipeline has seen. Identity
+grouping works, and the photos found two genuine defects that synthetic test images never could.
+
+**Bug 1 — face size judged as a share of the frame penalises a better camera (PR #62, merged).**
+
+| Photo | Frame | Face | Area | Score | Old verdict |
+|---|---|---|---|---|---|
+| A | 1251×1349 | 288×386 | 6.59% | 0.933 | accepted |
+| D | 1448×1086 | **258×342** | 5.61% | **0.945** | ❌ "too small" |
+| E | 2386×3124 | **495×590** | 3.92% | 0.743 | ❌ "too small" |
+
+Photo E's face is **the largest in the set at 495×590 pixels** and was refused for being too small; the higher
+the camera resolution, the smaller a face looks as a fraction. A face is now refused only when it fails **both**
+measures — small share of frame *and* too few pixels — with a new `FACE_MIN_EDGE_PIXELS` setting (default 160 on
+the shorter edge). D is now accepted and E is processed. 9 new tests; suite **1197 passing**.
+
+**Bug 2 — the detector's confidence threshold was slightly too high.** `YUNET_SCORE_THRESHOLD=0.75`, and photo
+E's clearly visible face scored **0.743** — missed entirely, zero faces. 0.60 caught it with no false positives
+on this sample. One sample is not enough to move a shipped default, so it is set in local `.env` only and flagged
+in the PR for revisiting with a larger set.
+
+**Identity grouping, on real faces, works and is appropriately cautious:**
+
+```
+Person 001  <- 25.jpg, 27.jpg   (confident)   + 28.jpg at 0.760, flagged for review
+Person 002  <- 26.jpg           (confident)   + 29.jpg at 0.710, flagged for review
+```
+
+All five are the same person, so the system made two groups where one was right. That is the strict
+`IDENTITY_MATCH_THRESHOLD` of 0.82 doing its job: the two studio shots matched confidently, the outdoor shots in
+different lighting and clothing did not, and rather than guess it **sent them to the moderator queue** — which is
+what that queue, with its deadlines and claim lock, exists for. Loosening the threshold would merge these
+correctly and would also start merging different people, which is the worse failure. Left as is, and reported
+rather than quietly tuned.
+
+**Files:** none in this repo. Backend: `validation/services.py`, `config/settings.py`,
+`validation/test_face_size_rule.py` (new).
+
+
 ### 2026-10-03 — Identity grouping switched on; the licence it needed was open source all along
 *Status: backend runtime only — no code changed*
 
