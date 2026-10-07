@@ -79,3 +79,37 @@ const LEVEL_LABELS: Record<EnhancementLevel, string> = {
 export function levelLabel(level: EnhancementLevel): string {
   return LEVEL_LABELS[level] ?? level
 }
+
+
+export type WatermarkMode = 'none' | 'small' | 'facecloud' | 'username' | 'custom'
+
+export interface ShareLink {
+  id: number
+  state: string
+  expires_at: string | null
+  /** The raw token comes back **once**. Copy it immediately; it is never shown again. */
+  token: string
+  public_url: string
+  info_url: string
+}
+
+/**
+ * A public link to one enhanced photo.
+ *
+ * The token is returned exactly once and never again, so whatever asks for it
+ * must hand it to the person there and then rather than storing it to show
+ * later. Watermarked by default, because the point of the link is that anyone
+ * holding it can open the image without signing in.
+ */
+export function createShareLink(
+  resultId: number,
+  options: { ttlHours?: number; watermark?: WatermarkMode } = {},
+): Promise<ShareLink> {
+  return apiFetch<ShareLink>('/api/shares/', {
+    body: {
+      result: resultId,
+      ttl_hours: options.ttlHours ?? 24,
+      watermark: options.watermark ?? 'facecloud',
+    },
+  })
+}

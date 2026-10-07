@@ -13,6 +13,7 @@ import {
   type ImageListItem,
 } from '../../lib/api/images'
 import {
+  createShareLink,
   downloadEnhanced,
   enhanceImage,
   getEnhancementResult,
@@ -25,7 +26,7 @@ import { makeLocalPreview } from '../../lib/previewEnhance'
 import { demoImages, formatBytes } from '../../lib/imageData'
 import {
   AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Info, Loader2,
-  RefreshCw, Sparkles, Upload, Wand2, XCircle,
+  Check, Download, Link2, RefreshCw, Sparkles, Upload, Wand2, XCircle,
 } from 'lucide-react'
 
 /**
@@ -53,6 +54,14 @@ const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp,image/bmp,image/tiff,ima
 
 type Phase = 'idle' | 'uploading' | 'processing' | 'done' | 'failed'
 
+/** Green when comfortably clear of the 60% acceptance mark, amber at it, red under. */
+function scoreTone(score: number | null | undefined): string {
+  if (typeof score !== 'number') return 'text-ink-faint'
+  if (score >= 80) return 'text-[#10B981]'
+  if (score >= 60) return 'text-[#F59E0B]'
+  return 'text-[#F87171]'
+}
+
 function stageIndex(stage: string): number {
   const found = STAGES.findIndex(entry => entry.key === stage)
   return found === -1 ? 0 : found
@@ -74,6 +83,73 @@ export default function UploadSingle() {
   // Both sides of the comparison, fetched with the token and handed to the
   // browser as object URLs. Revoked together when the screen resets.
   const [comparison, setComparison] = useState<{ before: string; after: string } | null>(null)
+  const [busyAction, setBusyAction] = useState<'' | 'download' | 'share'>('')
+  const [shareCopied, setShareCopied] = useState(false)
+  const [shareNote, setShareNote] = useState('')
+  const [shareUrl, setShareUrl] = useState('')
+  const [actionError, setActionError] = useState('')
+
+  /** The person folder this photo was filed under, if the pipeline assigned one. */
+  const person = image?.identity_groups?.[0] ?? null
+
+  /* The file is behind the bearer token, so it cannot be a plain <a download>:
+     fetch the bytes, hand them to the browser, then release the object URL. */
+  const downloadEnhancedFile = async () => {
+    if (!enhancement) return
+    setBusyAction('download')
+    setActionError('')
+    try {
+      const blob = await downloadEnhanced(enhancement.id)
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = enhancement.output_name || `${image?.original_name ?? 'photo'}-enhanced.jpg`
+      anchor.click()
+      URL.revokeObjectURL(url)
+    } catch (caught) {
+      setActionError(caught instanceof Error ? caught.message : 'The download failed.')
+    } finally {
+      setBusyAction('')
+    }
+  }
+
+  /**
+   * A public link anyone can open without signing in.
+   *
+   * The backend returns the token **once and never again**, so the link is put
+   * on screen the moment it arrives. Copying to the clipboard is a convenience
+   * on top of that, not the way the person receives it: a clipboard write can
+   * fail — no permission, no focus, an insecure context — and if that counted
+   * as failure the link would be lost for good while still existing on the
+   * server, and clicking again would just orphan another one.
+   */
+  const copyShareLink = async () => {
+    if (!enhancement) return
+    setBusyAction('share')
+    setActionError('')
+    setShareNote('')
+    setShareUrl('')
+    let link
+    try {
+      link = await createShareLink(enhancement.id, { ttlHours: 24, watermark: 'facecloud' })
+    } catch (caught) {
+      setActionError(caught instanceof Error ? caught.message : 'The link could not be created.')
+      setBusyAction('')
+      return
+    }
+    // The link exists from here on, whatever the clipboard does.
+    setShareUrl(link.public_url)
+    try {
+      await navigator.clipboard.writeText(link.public_url)
+      setShareCopied(true)
+      setShareNote('Watermarked link copied. It opens without signing in and expires in 24 hours.')
+      setTimeout(() => setShareCopied(false), 4000)
+    } catch {
+      setShareNote('Your browser would not let the page copy for you — select the link below. It expires in 24 hours.')
+    } finally {
+      setBusyAction('')
+    }
+  }
 
   // The preview is a local object URL; revoke it rather than leaking one per
   // file the person tries.
@@ -115,6 +191,11 @@ export default function UploadSingle() {
     setEnhancing(false)
     setEnhanceError('')
     setComparison(null)
+    setBusyAction('')
+    setShareCopied(false)
+    setShareNote('')
+    setShareUrl('')
+    setActionError('')
   }
 
   /**
@@ -486,11 +567,109 @@ export default function UploadSingle() {
                   </div>
                 )}
 
+                {/* The three figures the old screen showed, now measured
+                    rather than invented. Each is a real sub-score from the
+                    quality decision; a dash means it was not measured. */}
+                {accepted && (
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { label: 'Sharpness', value: image?.quality_decision?.sharpness_score },
+                      { label: 'Brightness', value: image?.quality_decision?.brightness_score },
+                      { label: 'Overall', value: image?.quality_decision?.overall_score },
+                    ].map(card => (
+                      <div key={card.label} className="p-3 rounded-2xl bg-surface-mute border border-line text-center">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-ink-mute">
+                          {card.label}
+                        </p>
+                        <p className={`text-lg font-bold mt-1 ${scoreTone(card.value)}`}>
+                          {typeof card.value === 'number' ? `${Math.round(card.value)}%` : '—'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Which person folder the photo was filed under. Shown only
+                    when the pipeline actually assigned one -- an unassigned
+                    photo is usually waiting on a moderator, which the row says
+                    rather than leaving a blank. */}
+                {accepted && USE_API && (
+                  <div className="p-4 rounded-3xl bg-surface-mute border border-line flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-bold uppercase tracking-wider text-ink-mute">
+                        Person folder
+                      </p>
+                      {person ? (
+                        <Link
+                          to={`/dashboard/groups/${person.id}`}
+                          className="text-sm font-bold text-[#FB923C] hover:underline inline-flex items-center gap-1.5 mt-0.5"
+                        >
+                          {person.display_name}<Link2 className="w-3.5 h-3.5" />
+                        </Link>
+                      ) : (
+                        <p className="text-sm font-bold text-ink mt-0.5">Not filed yet</p>
+                      )}
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      person
+                        ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/25'
+                        : 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/25'
+                    }`}>
+                      {person ? 'Matched' : 'With a moderator'}
+                    </span>
+                  </div>
+                )}
+
                 {progress && progress.status === 'partial' && (
                   <p className="text-[11px] text-[#F59E0B]">
                     The batch finished partly — check My Images for the full picture.
                   </p>
                 )}
+
+                {/* Download and share, both real: the file comes from the
+                    enhancement result, and the link is a genuine public share
+                    the backend issues, watermarked and time-limited. */}
+                {accepted && USE_API && enhancement?.status === 'completed' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={downloadEnhancedFile}
+                      disabled={busyAction === 'download'}
+                      className="fc-btn-primary !py-2.5 justify-center text-xs font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60"
+                    >
+                      {busyAction === 'download'
+                        ? <><Loader2 className="w-4 h-4 animate-spin" />Preparing…</>
+                        : <><Download className="w-4 h-4" />Download enhanced</>}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={copyShareLink}
+                      disabled={busyAction === 'share'}
+                      className="px-4 py-2.5 rounded-xl text-xs font-bold border border-line text-ink-soft hover:text-ink transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      {busyAction === 'share'
+                        ? <><Loader2 className="w-4 h-4 animate-spin" />Creating…</>
+                        : shareCopied
+                          ? <><Check className="w-4 h-4 text-[#10B981]" />Link copied</>
+                          : <><Link2 className="w-4 h-4" />Copy secure link</>}
+                    </button>
+                  </div>
+                )}
+
+                {shareNote && <p className="text-[11px] text-ink-faint">{shareNote}</p>}
+
+                {/* On screen as well as on the clipboard: the token comes back
+                    once, so it must never depend on a copy having worked. */}
+                {shareUrl && (
+                  <input
+                    readOnly
+                    value={shareUrl}
+                    onFocus={event => event.currentTarget.select()}
+                    aria-label="Public share link"
+                    className="fc-input !py-2 text-[11px] font-mono"
+                  />
+                )}
+                {actionError && <p className="text-[11px] text-[#F87171]">{actionError}</p>}
 
                 <div className="flex flex-wrap gap-3">
                   {image && USE_API && (

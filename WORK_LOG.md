@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-03
+**Last updated:** 2026-10-07
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://www.facecloudai.pro (Vercel)
 
@@ -45,6 +45,36 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-07 — The old upload result restored, with every figure real this time
+*Status: committed (this commit)*
+
+Owner asked for the earlier design back — the score cards, the identity row and the download button. Restored,
+but filled from the API rather than from the invented values the original had:
+
+| Old screen | Now |
+|---|---|
+| Blur / Brightness / Face size, all `82%` from one fake seed | **Sharpness 97%, Brightness 95%, Overall 83%** — the real quality sub-scores |
+| `IDENTITY MATCH: Zainab Bibi` — a random pick from five hardcoded names | **Person folder: Person 001** — the group the pipeline actually filed it under, linking to it |
+| `Download Enhanced` → a `sec-mock` URL | **Download enhanced** → the real enhanced file from the enhancement result |
+| `Copy Secure Link` → a fabricated link | **Copy secure link** → a real share link from `POST /api/shares/` |
+
+The share link is genuinely public: fetched with **no Authorization header** it returns `200 image/jpeg`, a
+1251×1349 watermarked JPEG, expiring in 24 hours.
+
+**A real bug found while testing it.** The share token comes back from the backend **once and never again**. The
+first implementation copied it to the clipboard inside the same `try`, so when the clipboard write failed — no
+permission, no focus, an insecure context — the whole thing reported "the link could not be created" while the
+link *had* been created and was sitting on the server. The token was then lost for good, and clicking again
+would only orphan another link. Confirmed in the database: two links existed after one "failure".
+
+Now the link is put on screen the instant it arrives, in a selectable field, and the clipboard is treated as a
+convenience on top. A blocked clipboard says so and points at the field instead of claiming failure. Verified
+with the clipboard unavailable: no failure reported, the note explains, and the link is readable on screen.
+
+**Files:** `src/pages/user/UploadSingle.tsx`, `src/lib/api/enhancements.ts`, `src/lib/api/images.ts`,
+`src/lib/imageData.ts`.
+
 
 ### 2026-10-03 — Five real photographs, and the two bugs they found
 *Status: backend PR #62, merged*

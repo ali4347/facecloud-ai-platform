@@ -75,6 +75,7 @@ function demoImage(record: ImageRecord, index: number): ImageListItem {
     latest_enhancement: record.enhanced
       ? { id: index + 1, status: 'completed', applied_level: 'medium' }
       : null,
+    identity_groups: record.personFolderId ? [{ id: index + 1, display_name: 'Demo person' }] : [],
     created_at: record.uploadedAt,
     updated_at: record.uploadedAt,
   }

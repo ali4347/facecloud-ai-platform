@@ -37,17 +37,35 @@ export interface QualityDecisionSummary {
   status?: string
 }
 
+export interface FaceBox {
+  x: number
+  y: number
+  width: number
+  height: number
+  /** The face's share of the frame, 0 to 1. */
+  area_ratio: number
+  confidence: number
+}
+
 export interface FaceValidationSummary {
   decision?: string
   face_count?: number
+  faces?: FaceBox[]
   rejection_reason?: string
   message?: string
+}
+
+/** A person folder this photo was filed under. */
+export interface IdentityGroupRef {
+  id: number
+  display_name: string
 }
 
 export interface EnhancementSummary {
   id: number
   status: string
   applied_level?: string
+  download_url?: string | null
 }
 
 export interface ImageListItem {
@@ -70,6 +88,7 @@ export interface ImageListItem {
   quality_decision: QualityDecisionSummary | null
   face_validation: FaceValidationSummary | null
   latest_enhancement: EnhancementSummary | null
+  identity_groups: IdentityGroupRef[] | null
   created_at: string
   updated_at: string
 }
