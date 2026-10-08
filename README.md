@@ -275,7 +275,7 @@ To transition this project into a production-grade application, a microservices 
 * **Work Queue**: Redis + BullMQ (asynchronous job tracking)
 * **Storage**: AWS S3 / Cloudflare R2
 * **AI Worker Service**: Python + FastAPI
-* **Deployment**: Frontend hosted on Vercel; Backend services deployed on Railway, Render, or AWS ECS via Docker.
+* **Deployment**: Frontend is uploaded to Hostinger as a static build; SPA routing comes from `public/.htaccess`. The Django backend is not deployed yet and runs locally.
 
 > [!NOTE]
 > **Supabase MCP is NOT required.** Local development uses Docker PostgreSQL (`docker-compose.yml`). Prisma handles all schema migrations and database access.
@@ -370,7 +370,6 @@ deployed backend.
 * **SPA Routing Configuration**: React Router owns every path, so the server must return `index.html` for any route
   that is not a real file. Two config files cover this, and both are built from `public/`:
   * `public/.htaccess` — the one that matters for the live site. It ships inside `dist/` on every build.
-  * `vercel.json` — kept for Vercel deployments; it has no effect on Hostinger.
 
 > [!IMPORTANT]
 > **`.htaccess` is a hidden file.** Most file managers and FTP clients do not show names beginning with a dot, so it

@@ -10,7 +10,7 @@
 
 **Last updated:** 2026-10-08
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
-**Live site:** https://www.facecloudai.pro (Vercel)
+**Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
 ---
 
@@ -27,8 +27,8 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
-| SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml, Vercel Analytics |
-| Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. `vercel.json` is kept for Vercel but has no effect on the live host |
+| SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml |
+| Deployment | ✅ Hostinger | `facecloudai.com` is served from Hostinger (Apache/LiteSpeed), by manual upload of `dist/`. SPA routing comes from `public/.htaccess`, which ships inside every build. Vercel was dropped entirely on 2026-10-08 |
 | Backend | ✅ Separate Django project | [FaceCloud_backend](https://github.com/ijaz-student021/FaceCloud_backend) — Django 6 + DRF, 180 endpoints, 43 models, **1172 tests**, all merged to `main`, CI with pip-audit and bandit across every app. Moderator queue operations (deadlines, claim lock, bulk decisions, performance metrics, and org-scoped access to the photo under review) added 2026-10-02. This repo is the browser app only |
 | Frontend ↔ backend integration | 🔄 In progress | Sign-in, the moderator dashboard and queue, and the user portal's upload → processing → images chain read the live API behind `VITE_USE_API`; the remaining screens still read `src/data/mock.ts` |
 | Queue (Redis + BullMQ) / AI workers (Python) | ❌ Not started | Redis container exists in `docker-compose.yml`, nothing consumes it |
@@ -45,6 +45,38 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-08 — Vercel removed from the repository
+*Status: committed (this commit)*
+
+Owner deleted the Vercel project but GitHub kept showing failed Production deployments. Two separate things:
+
+- **The 60 old records are history and do not disappear.** Deleting a Vercel project does not clear GitHub's own
+  deployment log; those entries stay and are harmless.
+- **New ones were still being created.** The most recent was dated the day before, on commit `95b00b3`, and the
+  creator was `vercel[bot]` — so the **Vercel GitHub App is still installed on the repository** and still
+  attempts a deploy on every push. That part cannot be fixed from here: `gh api user/installations` returns 403
+  because the CLI token is not authorised for App installation management. The owner has to remove it at
+  **GitHub → Settings → Integrations → Applications → Vercel → Configure**.
+
+**What was fixed here.** Checking the repo turned up more than the config file:
+
+- **`@vercel/analytics` was still shipping** — imported in `App.tsx`, mounted on every page, loading a
+  third-party script and reporting to a Vercel project that no longer exists. Removed from the app and from
+  `package.json`; the built bundle now contains no reference to Vercel at all.
+- `vercel.json` deleted. It was the SPA rewrite rule for Vercel; `public/.htaccess` does that job on Hostinger.
+- `.claude/hooks/check-work-log.sh` was watching `vercel.json`, `backend/` and `docker-compose.yml`, none of
+  which exist in this repo any more. Trimmed; the hook still runs clean.
+- Documentation corrected: the log header said the live site was `facecloudai.pro (Vercel)`, and README §16 said
+  the frontend was hosted on Vercel. Both now say Hostinger, and the README no longer claims the backend is
+  deployed — it is not.
+
+`README_BACKEND_ROADMAP.md` still shows Vercel in its architecture diagram. Left alone: that file is a
+pre-existing plan document describing an intended design, not a statement about what is running.
+
+**Files:** `src/App.tsx`, `package.json`, `package-lock.json`, `vercel.json` (deleted), `README.md`,
+`.claude/hooks/check-work-log.sh`.
+
 
 ### 2026-10-08 — Upload actions shown without a server, and the invented scores removed again
 *Status: committed (this commit)*

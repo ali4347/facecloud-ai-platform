@@ -13,8 +13,8 @@ fi
 cd "${CLAUDE_PROJECT_DIR:-$(pwd)}" || exit 0
 [ -f WORK_LOG.md ] || exit 0
 
-changed=$(find src backend public index.html package.json tailwind.config.ts vite.config.ts vercel.json \
-              postcss.config.js docker-compose.yml .env.example tsconfig.json tsconfig.app.json tsconfig.node.json \
+changed=$(find src public index.html package.json tailwind.config.ts vite.config.ts \
+              postcss.config.js .env.example tsconfig.json tsconfig.app.json tsconfig.node.json \
             \( -name node_modules -o -name dist -o -name .git \) -prune -o \
             -type f -newer WORK_LOG.md -print 2>/dev/null | head -8)
 

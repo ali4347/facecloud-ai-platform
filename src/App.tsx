@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
 import { AppShell } from './components/layout/AppShell'
 import { ProtectedRoute } from './components/layout/ProtectedRoute'
 import { ModeratorAccessGate } from './components/layout/ModeratorAccessGate'
@@ -150,7 +149,6 @@ export default function App() {
         {/* Fallback 404 handler */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <Analytics />
     </BrowserRouter>
   )
 }
