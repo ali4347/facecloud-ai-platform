@@ -95,6 +95,20 @@ export default function UploadSingle() {
   /* The file is behind the bearer token, so it cannot be a plain <a download>:
      fetch the bytes, hand them to the browser, then release the object URL. */
   const downloadEnhancedFile = async () => {
+    const base = (image?.original_name ?? file?.name ?? 'photo').replace(/\.[^.]+$/, '')
+
+    /* Without a server there is no server-enhanced file, but the preview on
+       screen is a real image the person can keep. Hand them that, named as a
+       preview so it is not mistaken for the backend's own result. */
+    if (!USE_API) {
+      if (!comparison) return
+      const anchor = document.createElement('a')
+      anchor.href = comparison.after
+      anchor.download = `${base}-preview.jpg`
+      anchor.click()
+      return
+    }
+
     if (!enhancement) return
     setBusyAction('download')
     setActionError('')
@@ -124,6 +138,12 @@ export default function UploadSingle() {
    * server, and clicking again would just orphan another one.
    */
   const copyShareLink = async () => {
+    if (!USE_API) {
+      // A share link is a record the backend issues; there is nothing to issue
+      // one against here, and a link that leads nowhere is worse than none.
+      setShareNote('A shareable link is created by the server, so this needs the API connected.')
+      return
+    }
     if (!enhancement) return
     setBusyAction('share')
     setActionError('')
@@ -573,9 +593,13 @@ export default function UploadSingle() {
                 {accepted && (
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { label: 'Sharpness', value: image?.quality_decision?.sharpness_score },
-                      { label: 'Brightness', value: image?.quality_decision?.brightness_score },
-                      { label: 'Overall', value: image?.quality_decision?.overall_score },
+                      // Only ever the server's own measurements. Without one
+                      // these read as dashes rather than borrowing the demo
+                      // sample's numbers, which would be the same photo-blind
+                      // figure on every upload.
+                      { label: 'Sharpness', value: USE_API ? image?.quality_decision?.sharpness_score : null },
+                      { label: 'Brightness', value: USE_API ? image?.quality_decision?.brightness_score : null },
+                      { label: 'Overall', value: USE_API ? image?.quality_decision?.overall_score : null },
                     ].map(card => (
                       <div key={card.label} className="p-3 rounded-2xl bg-surface-mute border border-line text-center">
                         <p className="text-[9px] font-bold uppercase tracking-wider text-ink-mute">
@@ -587,6 +611,13 @@ export default function UploadSingle() {
                       </div>
                     ))}
                   </div>
+                )}
+
+                {accepted && !USE_API && (
+                  <p className="text-[10px] text-ink-faint -mt-2">
+                    The checks run on the server, so the real scores for this photo
+                    appear once the API is connected.
+                  </p>
                 )}
 
                 {/* Which person folder the photo was filed under. Shown only
@@ -629,23 +660,29 @@ export default function UploadSingle() {
                 {/* Download and share, both real: the file comes from the
                     enhancement result, and the link is a genuine public share
                     the backend issues, watermarked and time-limited. */}
-                {accepted && USE_API && enhancement?.status === 'completed' && (
+                {accepted && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={downloadEnhancedFile}
-                      disabled={busyAction === 'download'}
+                      disabled={busyAction === 'download' || (!USE_API && !comparison)}
                       className="fc-btn-primary !py-2.5 justify-center text-xs font-bold cursor-pointer flex items-center gap-2 disabled:opacity-60"
                     >
                       {busyAction === 'download'
                         ? <><Loader2 className="w-4 h-4 animate-spin" />Preparing…</>
-                        : <><Download className="w-4 h-4" />Download enhanced</>}
+                        : <><Download className="w-4 h-4" />
+                            {USE_API ? 'Download enhanced' : 'Download preview'}</>}
                     </button>
                     <button
                       type="button"
                       onClick={copyShareLink}
                       disabled={busyAction === 'share'}
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold border border-line text-ink-soft hover:text-ink transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      title={USE_API ? undefined : 'Needs the API connected'}
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold border border-line transition-colors flex items-center justify-center gap-2 ${
+                        USE_API
+                          ? 'text-ink-soft hover:text-ink cursor-pointer'
+                          : 'text-ink-faint cursor-help'
+                      } disabled:opacity-60`}
                     >
                       {busyAction === 'share'
                         ? <><Loader2 className="w-4 h-4 animate-spin" />Creating…</>

@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-07
+**Last updated:** 2026-10-08
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://www.facecloudai.pro (Vercel)
 
@@ -45,6 +45,39 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-08 — Upload actions shown without a server, and the invented scores removed again
+*Status: committed (this commit)*
+
+Owner reported the download buttons still missing on the live site. They were gated on the API being connected,
+and the live site runs in demo mode, so they never appeared there.
+
+**Two things, one reported and one not.**
+
+The buttons are now always shown once a photo is accepted, and each does what it honestly can without a server:
+- **Download** saves the browser-made preview — a real image file, named `…-preview.jpg` and labelled "Download
+  preview" rather than "Download enhanced", so it is not mistaken for the backend's own result. With the API it
+  is unchanged: the real enhanced file.
+- **Copy secure link** cannot work without a server — a share link is a record the backend issues, and a link
+  that leads nowhere is worse than no link. It explains that on click instead of failing.
+
+**The unreported one: the score cards were inventing numbers again.** The screenshot showed
+`SHARPNESS 88% · BRIGHTNESS 78% · OVERALL 88%` — the demo sample's figures, not measurements of that photo. This
+is the same complaint raised on 2026-10-03 ("har image par 88% aa rha ha"), reintroduced when the cards were
+restored on 2026-10-07 by gating them on `accepted` without also gating on `USE_API`. Without a server they now
+read as dashes, with one line saying the checks run there.
+
+**Checked both ways in headless Chrome.** Demo: `Download preview | Copy secure link | Upload another`, download
+enabled, cards showing dashes, share click explaining itself. Live: `Download enhanced | Copy secure link`,
+cards showing **97% / 95% / 83%**, person row **Person 001**.
+
+**A note on the test harness, not the app.** A run showed the preview broken and "This photo could not be
+previewed" — that was a missing test file, cleared when the session restarted, so the file input received an
+empty File. The app was right to say so and right to disable the download. Worth remembering before treating a
+failure in a driven browser as an application bug.
+
+**Files:** `src/pages/user/UploadSingle.tsx`.
+
 
 ### 2026-10-07 — The old upload result restored, with every figure real this time
 *Status: committed (this commit)*
