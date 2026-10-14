@@ -357,7 +357,7 @@ export default function Contact() {
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-ink/[0.06] flex flex-col gap-1">
-                  <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.pro</span>
+                  <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.com</span>
                   <span className="text-[9px] text-ink-faint font-medium">We typically reply within 1-2 business days.</span>
                 </div>
               </div>
@@ -376,7 +376,7 @@ export default function Contact() {
                   </p>
                 </div>
                 <div className="pt-1.5 border-t border-ink/[0.06] flex flex-col gap-1">
-                  <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.pro</span>
+                  <span className="text-xs font-bold text-[#FB923C]">ali@facecloudai.com</span>
                   <span className="text-[9px] text-ink-faint font-medium">Fast-track response channels for production partners.</span>
                 </div>
               </div>
@@ -386,7 +386,7 @@ export default function Contact() {
             <RevealOnScroll delay={0.15}>
               <a
                 href="/#faq"
-                className="fc-panel p-5 bg-black/30 border border-ink/[0.06] rounded-2xl flex items-center justify-between text-left hover:border-[#F97316]/50 transition-all block cursor-pointer group"
+                className="fc-panel p-5 bg-black/30 [html[data-theme=light]_&]:bg-[var(--s-panel)] border border-ink/[0.06] rounded-2xl flex items-center justify-between text-left hover:border-[#F97316]/50 transition-all block cursor-pointer group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-7 h-7 rounded-md bg-[#EA580C]/10 flex items-center justify-center border border-[#EA580C]/20 text-[#F97316] group-hover:bg-[#EA580C]/25 transition-all">

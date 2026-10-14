@@ -46,6 +46,54 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-15 — Light mode: hover no longer overpowering; contact email moved to .com
+*Status: committed (this commit)*
+
+Two requests: hover effects were too strong in light mode across the site, and the contact email should end in
+`.com`, not `.pro`.
+
+**Contact email.** `ali@facecloudai.pro` → `ali@facecloudai.com`, both occurrences in `src/pages/Contact.tsx`
+(General Support and Enterprise & Partnerships). They are plain text, not `mailto:` links. No other contact
+address existed; the remaining `@facecloud.ai` / `@dtm.io` strings are demo-login credentials and were left alone.
+
+**Hover.** Root cause: `.fc-panel:hover`, `.fc-card:hover` and `.fc-glass-hover:hover` hardcoded the dark theme's
+hover shadow — `0 30px 110px rgba(0,0,0,0.40)` plus an orange glow — and had no light-mode override. On a black
+page that shadow disappears; on a white one it renders as a heavy grey smudge. The light theme already defined a
+soft *resting* shadow; only the hover step was missing.
+
+Fix: a new `--s-shadow-hover` token, defined for dark (the exact old values) and for light (`0 1px 2px
+rgba(15,23,42,0.05), 0 16px 40px rgba(15,23,42,0.10)` — one step up from the resting shadow, not a different kind
+of shadow). The three hover rules now read the token. The glass-hover lift (`translateY(-2px) scale(1.01)`) is also
+reduced to `translateY(-1px)` in light only, matching what the dashboard already does.
+
+The Contact "Looking for quick answers?" card had a second, separate problem: a hardcoded `bg-black/30` fill, which
+is a subtle inset on a dark page but a grey slab on a light one, and left its subtitle nearly unreadable. In light
+it now uses the same panel surface as the cards above it; in dark the fill is unchanged. The other `bg-black`
+fills in the app were checked and left: they are the `on-dark` terminal panels, which are meant to stay dark, and
+the mobile menu scrim.
+
+**Verified by measurement, not by eye.**
+- Computed hover shadow on the Contact form card — dark: `rgba(0,0,0,0.4) 30px 110px` + orange glow, identical to
+  the pre-change value read from `git show HEAD`; light: `rgba(15,23,42,0.10) 16px 40px`.
+- Hovered all **58** marketing panels across Landing, About and Contact in both themes. Dark: strongest blur
+  110px, alpha 0.40 (unchanged). Light: strongest blur 40px; the one reading of 0.15 is the Admin Console card's
+  deliberate faint orange glow, set inline by framer-motion, left as is.
+- Dashboard hover is untouched and was already soft in light (`0.07` at 12px/32px); it has its own `.fc-app` rule.
+- FAQ card: dark background still `rgba(0,0,0,0.3)`; light `rgb(255,255,255)`.
+
+**A mistake caught by that measurement.** The first version of the token landed in the `.on-dark {}` block, not
+`:root`, because a text search for the neighbouring `--s-shadow:` line matched the first occurrence. With no token
+in `:root` the dark hover shadow resolved to `none` — a silent dark-mode regression that a light-mode-only check
+would never have shown. Added to `:root` as well; the dark readout above is the proof it matches the original.
+
+**Not changed, flagged for the owner.** `index.html` (canonical, `og:url`, JSON-LD), `public/robots.txt` and
+`public/sitemap.xml` still point at `https://www.facecloudai.pro/`. That is the website address, not the email, so
+it was out of scope — but the site is being served from `.com`, and a canonical pointing at a different domain
+tells search engines the other domain is the real one. Worth deciding which domain is primary.
+
+**Files:** `src/index.css`, `src/pages/Contact.tsx`.
+
+
 ### 2026-10-15 — Landing page: Admin Console and Moderator Review cards made the same size
 *Status: committed (this commit)*
 

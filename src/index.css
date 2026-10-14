@@ -186,8 +186,7 @@ section[id] {
     border-color: rgba(249,115,22,0.28);
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
-      0 30px 110px rgba(0,0,0,0.40),
-      0 0 60px rgba(249,115,22,0.12);
+      var(--s-shadow-hover);
   }
 
   .fc-panel-strong {
@@ -209,8 +208,7 @@ section[id] {
     border-color: rgba(249,115,22,0.28);
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
-      0 30px 110px rgba(0,0,0,0.40),
-      0 0 60px rgba(249,115,22,0.12);
+      var(--s-shadow-hover);
     transform: translateY(-1px);
   }
 
@@ -224,8 +222,7 @@ section[id] {
     background: rgba(255,255,255,0.065);
     box-shadow:
       inset 0 1px 1px rgba(255,255,255,0.12),
-      0 30px 110px rgba(0,0,0,0.42),
-      0 0 70px rgba(249,115,22,0.16);
+      var(--s-shadow-hover);
   }
 
   /* ── Deliberately dark blocks ───────────────────────────────────
@@ -259,6 +256,9 @@ section[id] {
     --s-pill-border:   rgba(255,255,255,0.10);
     --s-inset:         rgba(255,255,255,0.10);
     --s-shadow:        0 24px 90px rgba(0,0,0,0.32);
+    /* Hover lift for marketing panels. Dark keeps the deep shadow and orange
+       glow, which read as light on a black page. */
+    --s-shadow-hover:  0 30px 110px rgba(0,0,0,0.40), 0 0 60px rgba(249,115,22,0.12);
     --s-ok:            #4FFFB0;
 
     color-scheme: dark;
@@ -653,6 +653,9 @@ section[id] {
   --s-pill-border:   rgba(255,255,255,0.10);
   --s-inset:         rgba(255,255,255,0.10);
   --s-shadow:        0 24px 90px rgba(0,0,0,0.32);
+  /* Hover lift for marketing panels. Dark keeps the deep shadow and orange
+     glow, which read as light on a black page. */
+  --s-shadow-hover:  0 30px 110px rgba(0,0,0,0.40), 0 0 60px rgba(249,115,22,0.12);
   --s-glow:          rgba(249,115,22,0.08);
   --s-blur:          blur(20px) saturate(170%);
   --s-scroll-track:  #000000;
@@ -700,12 +703,22 @@ html[data-theme='light'] {
   --s-pill-border:   #E6E9EF;
   --s-inset:         rgba(255,255,255,0);
   --s-shadow:        0 1px 2px rgba(15,23,42,0.04), 0 12px 32px rgba(15,23,42,0.06);
+  /* One step up from the resting shadow, not a different kind of shadow. The
+     dark value (a 110px black blur) is what turned into a grey smudge here. */
+  --s-shadow-hover:  0 1px 2px rgba(15,23,42,0.05), 0 16px 40px rgba(15,23,42,0.10);
   --s-glow:          rgba(249,115,22,0.05);
   --s-blur:          blur(12px) saturate(120%);
   --s-scroll-track:  #F7F8FA;
   --s-ok:            #047857;
 
   color-scheme: light;
+}
+
+/* Light pages need a lighter touch on hover as well as a lighter shadow: a 1%
+   scale-up plus a 2px lift reads as a pop on white, where on black it reads as
+   a gentle rise. Matches what the dashboard already does. */
+html[data-theme='light'] .fc-glass-hover:hover {
+  transform: translateY(-1px);
 }
 
 /* The shell paints its own ground; the marketing pages paint theirs on body. */
