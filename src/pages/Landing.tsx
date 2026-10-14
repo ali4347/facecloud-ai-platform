@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion, useInView } from 'framer-motion'
 import {
-  Shield, Zap, Check, ArrowUpRight, Activity, AlertTriangle, FolderOpen,
+  Shield, Zap, Check, ArrowUpRight, ArrowRight, Activity, AlertTriangle, FolderOpen,
   Cpu, Eye, Users, BarChart3, Upload, Mail, ScrollText, Key, Terminal,
   ChevronDown, HardDrive, Image, Briefcase, Building2, Camera, UserCheck,
   Code2, ExternalLink
@@ -976,6 +976,13 @@ export default function Landing() {
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Subject Re-grouping</div>
                       <div className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-[var(--s-ok)]" /> Email notifications</div>
                     </div>
+
+                    <Link
+                      to="/roles/moderator"
+                      className="inline-flex items-center gap-1.5 pt-2 text-[11px] font-bold text-[#FB923C] hover:underline"
+                    >
+                      How the moderator role works <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 </motion.div>
               </RevealOnScroll>

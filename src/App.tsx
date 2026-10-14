@@ -7,6 +7,7 @@ import { ModeratorAccessGate } from './components/layout/ModeratorAccessGate'
 import Landing from './pages/Landing'
 import About from './pages/About'
 import Contact from './pages/Contact'
+import ModeratorRole from './pages/ModeratorRole'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import VerifyEmail from './pages/VerifyEmail'
@@ -67,6 +68,9 @@ export default function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        {/* An information page about the role. Deliberately not under /moderator,
+            which is the protected portal. */}
+        <Route path="/roles/moderator" element={<ModeratorRole />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/signup" element={<Navigate to="/register" replace />} />

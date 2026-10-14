@@ -46,6 +46,63 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-15 — A Moderator role guide page, and a backend permission gap found while writing it
+*Status: committed (this commit); the backend finding is reported, not fixed — the backend is frozen*
+
+Owner asked for the moderator role to be studied and a proper separate page built around it: what a moderator can
+do, how, and its plans. New public page at **`/roles/moderator`** (`src/pages/ModeratorRole.tsx`).
+
+**Studied before writing**, from the backend's rules rather than only its design notes — they disagree in places.
+Sources: the feature doc, the `FEATURES.md` Done/Partial/Open list, `organizations/services.py` for who may do
+what, and the moderation views. Each claim on the page is something the code enforces; where something is built
+but its panel screen is still mock data, or is not built, the page's roadmap section says so.
+
+**Page contents:** a hero with the role in plain terms; twelve capability cards, each with the concrete detail
+(claim lasts 15 minutes by default, bulk is 50 at a time, and so on — all marked as defaults); the seven-step life
+of a review; a role comparison table (moderator / owner / member, ten abilities) with screen-reader text for every
+tick and cross; a "cannot / safeguards" pair; how someone becomes a moderator; and a three-column roadmap.
+
+**"Plans" was ambiguous and the answer is deliberately unglamorous.** There is no moderator pricing anywhere to
+show. The backend does give an organization a plan label (Free / Team / Enterprise) but **nothing in the code
+changes behaviour by plan**, and the public Pricing section uses different names again (Free / Basic / Pro,
+priced per individual user, also unenforced). So the page does not invent seat prices or tiers. It reads
+"plans" as the roadmap — what is built, what is being connected, what is planned — and states plainly that seat
+limits and pricing for moderators have not been decided.
+
+**Corrections made to the draft before it shipped:** "100% of moderator actions are audited" was an over-claim
+(viewing the queue and thumbnails is deliberately not audited) and became "every decision, escalation, claim and
+member change"; step 2 of the workflow said the right people are notified when a review is created, but nothing
+notifies at creation — only assignment, escalation and a missed deadline do; and "Working now" became "Built and
+connected", since the live site is still in demo mode.
+
+**Where the code is stricter than the docs.** The design doc says a moderator cannot remove an owner. The code
+also stops a moderator managing **another moderator**, and the page says so.
+
+**Reachability.** Linked from one place only: a "How the moderator role works →" line on the existing Moderator
+Review card in the landing page's Administrative Control section. It is not in the navbar or footer, and it
+contains **no link to the moderator or admin login** — staff portals stay reachable by direct link only, as asked.
+The route is `/roles/moderator`, not under `/moderator`, which is the protected portal. `sitemap.xml` was not
+touched.
+
+**Verified:** typecheck, lint and build clean. Both themes at desktop width, with all 12 capability cards, 7
+steps, 10 table rows and every section revealing after a real scroll-through; at 390px there is no horizontal
+overflow in either theme and the role table scrolls inside its own box; every in-page anchor resolves; the
+Landing link lands on the page. A first screenshot showed two sections blank — that was the screenshot taking the
+page before smooth-scroll had revealed them, confirmed by measuring that no panel stays hidden after a proper
+scroll, not a page defect.
+
+**Found while verifying one claim — a real backend permission gap (reported, not fixed).** To decide whether the
+page could say a moderator cannot create moderators, the member-update path was exercised inside a transaction
+that was rolled back (the probe user was confirmed gone afterwards; nothing persisted). Result: **a moderator can
+promote a normal member to moderator** through `PATCH /api/organizations/{id}/members/{id}/`. The invitation path
+correctly refuses ("Moderators may only invite normal members"), and promotion to *owner* is refused, but
+`update_member()` has no equivalent guard for the *moderator* role, and the serializer accepts any role. The
+page therefore makes no claim that a moderator cannot appoint moderators; its table row is the narrower, true
+"Invite someone as a moderator". Recorded in §7 below. The backend is frozen, so no change or PR was made.
+
+**Files:** `src/pages/ModeratorRole.tsx` (new), `src/App.tsx`, `src/pages/Landing.tsx`, `README.md`.
+
+
 ### 2026-10-15 — Light mode: hover no longer overpowering; contact email moved to .com
 *Status: committed (this commit)*
 
@@ -1211,6 +1268,15 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 ---
 
 ## 7. Known Issues / Tech Debt
+
+- **Backend permission gap — a moderator can promote a member to moderator.** Found 2026-10-15 by exercising
+  `update_member()` in a rolled-back transaction. Invitations refuse it and the owner role is refused, but the
+  moderator role is not guarded on the PATCH path. Not fixed: the backend is frozen at the owner's request. When
+  it is unfrozen, the fix belongs next to the owner-role check in `organizations/services.py::update_member`, with a
+  test, and the role guide's wording can then be strengthened.
+- **Two plan vocabularies, neither enforced.** The landing page prices Free / Basic / Pro per individual user
+  (storage and image counts); the backend's `Organization.plan` is Free / Team / Enterprise. Nothing in the backend
+  changes behaviour by plan, so none of the limits shown publicly are real. The role guide avoids the subject.
 
 - `aigocy.zip` (10 MB), `reference-templates/aigocy/` (399 files) and `aigocy/` (182 files) are tracked in git; they
   bloat the repo and are not used by the app.
