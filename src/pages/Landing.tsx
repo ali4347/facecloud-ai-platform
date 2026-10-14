@@ -921,12 +921,15 @@ export default function Landing() {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Admin console */}
-              <RevealOnScroll direction="left">
+              {/* Admin console and Moderator Review share one height: the grid row
+                  stretches both wrappers, h-full makes the card fill its wrapper,
+                  and both use the same min-height. Previously 340px against 300px
+                  with no h-full, so the two cards were never the same size. */}
+              <RevealOnScroll direction="left" className="h-full">
                 <motion.div
                   whileHover={{ y: -4, borderColor: 'rgba(234, 88, 12,0.4)', boxShadow: '0 0 40px rgba(234, 88, 12,0.15)' }}
                   transition={{ duration: 0.25 }}
-                  className="fc-panel p-8 flex flex-col justify-between min-h-[340px]"
+                  className="fc-panel p-8 flex flex-col justify-between h-full min-h-[320px]"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-ink">
@@ -950,11 +953,11 @@ export default function Landing() {
               </RevealOnScroll>
 
               {/* Moderator Review */}
-              <RevealOnScroll direction="right">
+              <RevealOnScroll direction="right" className="h-full">
                 <motion.div
                   whileHover={{ y: -4, borderColor: 'rgba(79,255,176,0.35)', boxShadow: '0 0 40px rgba(79,255,176,0.12)' }}
                   transition={{ duration: 0.25 }}
-                  className="fc-panel p-8 flex flex-col justify-between min-h-[300px]"
+                  className="fc-panel p-8 flex flex-col justify-between h-full min-h-[320px]"
                 >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-ink">

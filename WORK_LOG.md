@@ -46,6 +46,40 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-15 — Landing page: Admin Console and Moderator Review cards made the same size
+*Status: committed (this commit)*
+
+Owner reported that in the "Control, review, and monitor every workflow" section one card was larger than the
+other. Two causes, both in `src/pages/Landing.tsx`:
+
+- The cards had **different minimum heights** — `min-h-[340px]` on Admin Console against `min-h-[300px]` on
+  Moderator Review — so they could never match.
+- Each card sits inside a `RevealOnScroll` wrapper, and the grid row stretched the *wrapper* but the card inside
+  did not fill it, so even with equal minimums they would not have lined up.
+
+Fix: both cards now use the same `min-h-[320px]`, both are `h-full`, and both wrappers take `className="h-full"`
+(`RevealOnScroll` already accepts one). Whichever card has more content now drives the height of both.
+
+**Measured rather than eyeballed**, in headless Chrome by exact card title:
+
+| Viewport | Admin Console | Moderator Review |
+|---|---|---|
+| 1440px | 600×320 | 600×320 |
+| 1100px | 508×320 | 508×320 |
+| 800px | 358×320 | 358×320 |
+| 390px (stacked) | 342×320 | 342×320 |
+
+A first measurement reported "different" at every width — that was the test, not the page: a loose text filter
+also picked up an unrelated "Moderator Review **Queue**" card from another section. Re-measured with exact title
+matching, which is what the table shows.
+
+**Not changed, and worth knowing:** both cards have a band of empty space below their last row of tick items.
+That comes from the minimum height, was there before, and was not part of the request — it can be tightened by
+lowering `min-h` if wanted.
+
+**Files:** `src/pages/Landing.tsx`.
+
+
 ### 2026-10-15 — Landing page: the stock photo under "AI Infrastructure" removed
 *Status: committed (this commit)*
 
