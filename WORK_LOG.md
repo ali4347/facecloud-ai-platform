@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-08
+**Last updated:** 2026-10-15
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,28 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-15 — Landing page: the stock photo under "AI Infrastructure" removed
+*Status: committed (this commit)*
+
+Owner asked for the image at the bottom-left of the "FaceCloud turns raw uploads into organized AI-ready folders"
+section to be removed.
+
+It was a stock photograph hot-linked from Unsplash, dimmed and tinted orange, with a fake scanner overlay drawn
+on top: `SCAN_RESOLUTION: 512px`, `CONFIDENCE: 99.8%` and a pulsing `[MODEL_SCAN: IN_PROGRESS]`. None of that
+described anything the product did — it was decoration styled to read as a live readout, the same habit that
+produced the invented scores and the random "Identity match" name on the upload screen. Removing it also drops an
+external image request from the home page.
+
+The checklist (Zero-DCE enhancement, Face validation, Quality scoring, Identity grouping) and the right-hand
+"Active AI Restructuring" panel are untouched. The left column now ends at the checklist.
+
+**Checked in headless Chrome at 1440px:** no `unsplash` image in the DOM, none of the scan overlay text anywhere
+on the page, the four checklist items and the pipeline panel both still present, and the section reading
+cleanly down into "Ingestion Suite". `tsc` clean, `npm run build` passes.
+
+**Files:** `src/pages/Landing.tsx`.
+
 
 ### 2026-10-08 — Vercel removed from the repository
 *Status: committed (this commit)*

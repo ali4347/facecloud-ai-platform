@@ -526,35 +526,6 @@ export default function Landing() {
                   </RevealOnScroll>
                 ))}
               </div>
-
-              {/* Subtly treated face detection illustrative image */}
-              <RevealOnScroll delay={0.4} direction="up">
-                <div className="fc-panel p-2 relative overflow-hidden group max-w-sm mt-6 border border-ink/[0.06] rounded-2xl">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl">
-                    <img 
-                      src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&q=80&w=800" 
-                      alt="Biometric facial analysis simulation" 
-                      className="w-full h-full object-cover grayscale opacity-45 group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                    {/* Indigo/cyan duotone coloring overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#050816] via-transparent to-transparent opacity-80 pointer-events-none" />
-                    <div className="absolute inset-0 bg-[#F97316]/20 mix-blend-color pointer-events-none" />
-                    <div className="absolute inset-0 bg-[#EA580C]/10 mix-blend-overlay pointer-events-none" />
-                    
-                    {/* Simulated tech scanning grids/lines overlay */}
-                    <div className="absolute inset-0 flex flex-col justify-between p-3 pointer-events-none select-none font-mono text-[8px] text-ink-faint">
-                      <div className="flex justify-between items-center">
-                        <span>SCAN_RESOLUTION: 512px</span>
-                        <span>CONFIDENCE: 99.8%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span>[MODEL_SCAN: IN_PROGRESS]</span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--s-ok)] animate-pulse" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </RevealOnScroll>
             </div>
 
             {/* Right animated pipeline panel */}
