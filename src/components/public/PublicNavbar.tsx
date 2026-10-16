@@ -147,13 +147,15 @@ export function PublicNavbar() {
             {/* Desktop CTAs */}
             <div className="hidden md:flex items-center gap-1">
               <Link
-                to="/login"
+                to="/roles/moderator"
                 className={cn(
                   "px-4 py-2 text-[13px] font-medium transition-colors duration-200",
-                  onMedia ? "text-white/65 hover:text-white" : "text-ink-mute hover:text-ink"
+                  location.pathname === '/roles/moderator'
+                    ? (onMedia ? "text-white font-semibold" : "text-ink font-semibold")
+                    : (onMedia ? "text-white/65 hover:text-white" : "text-ink-mute hover:text-ink")
                 )}
               >
-                User Login
+                Moderator
               </Link>
               <Link
                 to="/login"
@@ -277,11 +279,16 @@ export function PublicNavbar() {
               {/* CTAs */}
               <div className="flex flex-col gap-3">
                 <Link
-                  to="/login"
+                  to="/roles/moderator"
                   onClick={() => setMobileOpen(false)}
-                  className="text-left text-ink-soft hover:text-ink text-sm font-medium py-2 transition-colors"
+                  className={cn(
+                    "text-left text-sm font-medium py-2 transition-colors",
+                    location.pathname === '/roles/moderator'
+                      ? "text-[#F97316] font-semibold"
+                      : "text-ink-soft hover:text-ink"
+                  )}
                 >
-                  User Login
+                  Moderator
                 </Link>
                 <Link
                   to="/login"

@@ -127,7 +127,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 ### Public / Auth Routes
 * `/` (Landing Page)
 * `/about`, `/contact` (public pages)
-* `/roles/moderator` (Moderator role guide — what the role can and cannot do, how a review works, build status; an information page, not the portal, and not linked from the navigation)
+* `/roles/moderator` (Moderator role guide — what the role can and cannot do, how a review works, build status; an information page, not the portal; linked from the navbar as "Moderator" and from the Moderator Review card on the landing page)
 * `/login` (User Login)
 * `/register` (User Registration)
 * `/signup` (Redirects to `/register`)

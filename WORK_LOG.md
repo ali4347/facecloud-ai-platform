@@ -46,6 +46,20 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Navbar: "User Login" replaced by "Moderator" (role guide)
+*Status: committed (this commit)*
+
+"User Login" and "Get Started" both went to `/login`, so the navbar had two buttons doing the same thing. "User Login"
+is removed from the public navbar (desktop bar and mobile menu); in its place is **Moderator**, linking to the public
+role guide `/roles/moderator` (highlighted when that page is open). It links to the information page, not to the
+moderator login, so the staff portal is still reachable by direct link only. "Get Started" still goes to `/login`, and
+the footer's "User Login" link is unchanged.
+
+- **Files:** `src/components/public/PublicNavbar.tsx`, `README.md`.
+- **Verified:** `npm run build` clean; rendered header DOM has no "User Login", has Moderator → `/roles/moderator` and
+  Get Started → `/login`; headless-Chrome screenshot of the bar on `/about` (desktop). The mobile menu uses the same
+  link but was not screenshotted.
+
 ### 2026-10-16 — Forgot-password on every login page, and "Coming soon" on the pricing cards
 *Status: committed (this commit)*
 
