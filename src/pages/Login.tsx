@@ -171,6 +171,13 @@ export default function Login() {
               />
             </div>
 
+            <div className="flex justify-end -mt-1">
+              <Link to="/forgot-password" className="text-xs font-semibold transition-colors hover:underline"
+                style={{ color: '#FB923C' }}>
+                Forgot password?
+              </Link>
+            </div>
+
             <button type="submit" className="fc-btn-primary w-full mt-2" disabled={loading}>
               {loading ? 'Authenticating…' : 'Sign In as User'}
             </button>

@@ -112,8 +112,8 @@ const FAQ_ITEMS = [
   { q: 'How is my data secured?', a: 'All uploads are encrypted at rest using AES-256 and in transit via TLS 1.3. JWT-based authentication enforces role-based access control across all API endpoints.' },
   { q: 'Can I delete my data?', a: 'Yes. Users can delete individual images or entire person folders from the dashboard at any time. Deleted data is permanently removed from all storage systems within 24 hours.' },
   { q: 'What happens to rejected images?', a: 'Images that fail quality checks (blur, exposure, or face detection) are flagged for moderator review. Moderators can override rejections or confirm the automated decision.' },
-  { q: 'Is there an API for integrations?', a: 'Pro plan subscribers get access to the FaceCloud REST API. Full Swagger documentation and testing playgrounds are available at the /docs endpoint.' },
-  { q: 'What are the plan limits?', a: 'The Free plan allows 50 images/month with 500 MB storage. Basic supports 2,000 images with 10 GB. Pro offers unlimited uploads with 100 GB storage and priority processing.' },
+  { q: 'Is there an API for integrations?', a: 'API access for integrations is planned together with paid plans, in a later version. Interactive API documentation is generated from the backend.' },
+  { q: 'What are the plan limits?', a: 'Plans, pricing and limits are coming in a later version, so the figures on the pricing cards are not final and are not enforced yet.' },
 ]
 
 const SECURITY_LOGS_POOL = [
@@ -761,13 +761,13 @@ export default function Landing() {
                   <div className={`fc-panel p-6 flex flex-col h-full relative ${
                     plan.highlight ? 'ring-2 ring-[#F97316]/50 border-[#F97316]/40' : ''
                   }`}>
-                    {plan.highlight && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] text-[9px] font-bold text-white uppercase tracking-wider shadow-[0_2px_12px_rgba(249,115,22,0.4)]">
-                        Most Popular
-                      </div>
-                    )}
                     <div className="space-y-4 mb-6">
-                      <h3 className="text-lg font-bold text-ink">{plan.name}</h3>
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-lg font-bold text-ink">{plan.name}</h3>
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F97316]/10 border border-[#F97316]/30 text-[9px] font-bold text-[#FB923C] uppercase tracking-wider">
+                          Coming soon
+                        </span>
+                      </div>
                       <div className="flex items-end gap-1">
                         <span className="text-4xl font-bold text-ink tracking-tight">${price}</span>
                         {price > 0 && <span className="text-sm text-ink-faint font-medium pb-1">/mo</span>}
@@ -795,16 +795,14 @@ export default function Landing() {
                       ))}
                     </div>
 
-                    <Link
-                      to={plan.link}
-                      className={`mt-6 text-center text-sm font-bold py-3 rounded-2xl transition-all duration-300 block ${
-                        plan.highlight
-                          ? 'bg-gradient-to-r from-[#F97316] to-[#FB923C] text-white shadow-[0_4px_20px_rgba(249,115,22,0.35)] hover:shadow-[0_6px_28px_rgba(249,115,22,0.55)] hover:-translate-y-0.5'
-                          : 'bg-ink/[0.06] border border-ink/[0.12] text-ink hover:bg-ink/[0.1] hover:border-ink/20'
-                      }`}
+                    <button
+                      type="button"
+                      disabled
+                      aria-label={`${plan.name} plan, coming soon`}
+                      className="mt-6 text-center text-sm font-bold py-3 rounded-2xl block w-full bg-ink/[0.04] border border-ink/[0.08] text-ink-faint cursor-not-allowed"
                     >
-                      {plan.cta}
-                    </Link>
+                      Coming soon
+                    </button>
                   </div>
                 </StaggerItem>
               )
@@ -813,7 +811,7 @@ export default function Landing() {
 
           <RevealOnScroll delay={0.3}>
             <p className="text-center text-xs text-ink-faint mt-8 font-medium">
-              Need a custom enterprise plan?{' '}
+              Plans and pricing are coming in a later version. Need a custom enterprise plan?{' '}
               <a href="#contact" className="text-[#FB923C] hover:text-ink transition-colors underline underline-offset-2">Contact us</a>.
             </p>
           </RevealOnScroll>
@@ -1149,7 +1147,7 @@ export default function Landing() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-ink/[0.08] flex items-center justify-between">
-                  <p className="text-[10px] text-ink-faint font-medium">Full Swagger documentation available for Pro subscribers.</p>
+                  <p className="text-[10px] text-ink-faint font-medium">API documentation is generated from the backend; API access for integrations is planned for a later version.</p>
                   <Link to="/docs" className="flex items-center gap-1.5 text-[11px] font-bold text-[#FB923C] hover:text-ink transition-colors">
                     View API Docs <ExternalLink className="w-3.5 h-3.5" />
                   </Link>

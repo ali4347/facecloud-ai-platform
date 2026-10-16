@@ -73,7 +73,7 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 9. **06 / Methodology (Freedom Section)** — Responsive three-column layout with an HLS-hosted processing video, pain points list, and benefits list.
 10. **07 / Interactive Demo** — Before/after slider with auto-demo scroll trigger (0→50%).
 11. **08 / Processing Options** — Single, Multiple, ZIP upload cards.
-12. **09 / Pricing** — Monthly/Yearly toggle, 3 tier cards (Free/Basic/Pro) with highlighted Pro tier.
+12. **09 / Pricing** — Monthly/Yearly toggle, 3 tier cards (Free/Basic/Pro), each marked "Coming soon" with a disabled button — plans and pricing are deferred to V2.
 13. **10 / User Interface** — 3 dashboard preview mockup cards.
 14. **11 / Administrative Control** — Admin Console and Moderator Review cards with orange-colored hover glows.
 15. **12 / Enterprise Security** — Security points grid + animated terminal log feed with typewriter effect.
@@ -132,6 +132,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/register` (User Registration)
 * `/signup` (Redirects to `/register`)
 * `/verify-email` (Mock Email Verification screen)
+* `/forgot-password` (request a reset link by email; linked from all three sign-in pages)
+* `/reset-password/:uid/:token` (the page the emailed reset link opens: choose a new password)
 * `/admin/login` (Admin Console Login)
 * `/moderator/login` (Moderator Panel Login)
 * `/unauthorized` (Access Denied page)

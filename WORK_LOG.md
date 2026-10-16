@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-15
+**Last updated:** 2026-10-16
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,34 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-16 — Forgot-password on every login page, and "Coming soon" on the pricing cards
+*Status: committed (this commit)*
+
+Two owner requests. Frontend only; the backend was not touched (frozen).
+
+- **Forgot password.** All three sign-in pages (`/login`, `/admin/login`, `/moderator/login`) now carry a
+  "Forgot password?" link under the password field. It goes to a new **`/forgot-password`** page (email → "check your
+  email"), and the link the backend emails (`FRONTEND_URL/reset-password/{uid}/{token}`) now lands on a new
+  **`/reset-password/:uid/:token`** page (new password + confirmation → back to sign-in). Both use the API wrappers that
+  already existed in `src/lib/api/auth.ts` (`requestPasswordReset`, `confirmPasswordReset`) against the backend's
+  existing `/api/auth/password-reset/` endpoints. The forgot page never reveals whether an address has an account (the
+  backend answers identically); 429 shows a "wait and try again" message; backend validation errors on the new password
+  are shown as sent, with a "Request a new link" link for expired tokens. In demo mode (`VITE_USE_API` off) there is no
+  server to send mail, so the screen says "no email is sent" instead of pretending. The staff login pages link to the
+  same generic page; no staff-portal link was added anywhere public.
+- **Pricing.** Each of the three cards now shows a "Coming soon" badge and a disabled "Coming soon" button in place of
+  Get Started / Upgrade / Go Pro; the "Most Popular" ribbon is gone; a line under the cards says plans and pricing arrive
+  in a later version. Two FAQ answers and one API-teaser line that stated plan limits and "Pro API access" as live fact
+  were reworded to say these are planned, not final or enforced. The card data (prices, storage) is kept in
+  `PRICING_PLANS` for when the plans are built.
+- **Files:** new `src/components/auth/AuthShell.tsx`, `src/pages/ForgotPassword.tsx`, `src/pages/ResetPassword.tsx`;
+  edited `src/App.tsx`, `src/pages/Login.tsx`, `src/pages/admin/AdminLogin.tsx`,
+  `src/pages/moderator/ModeratorLogin.tsx`, `src/pages/Landing.tsx`, `README.md`.
+- **Verified:** `npm run build` clean; headless-Chrome screenshots of the user, admin and forgot-password screens (link
+  placement, layout); rendered DOM of the landing page shows exactly three "Coming soon" badges and three disabled
+  buttons and no "Most Popular". **Not verified:** a real reset email end to end (needs the backend running with SMTP and
+  `FRONTEND_URL` pointing at this app) and the moderator login / reset screens visually (same markup as the checked ones).
 
 ### 2026-10-15 — A Moderator role guide page, and a backend permission gap found while writing it
 *Status: committed (this commit); the backend finding is reported, not fixed — the backend is frozen*
@@ -1274,6 +1302,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
   moderator role is not guarded on the PATCH path. Not fixed: the backend is frozen at the owner's request. When
   it is unfrozen, the fix belongs next to the owner-role check in `organizations/services.py::update_member`, with a
   test, and the role guide's wording can then be strengthened.
+- **Plans are shown as "Coming soon" (2026-10-16).** Pricing is deferred to V2, so the cards are disabled.
 - **Two plan vocabularies, neither enforced.** The landing page prices Free / Basic / Pro per individual user
   (storage and image counts); the backend's `Organization.plan` is Free / Team / Enterprise. Nothing in the backend
   changes behaviour by plan, so none of the limits shown publicly are real. The role guide avoids the subject.

@@ -11,6 +11,8 @@ import ModeratorRole from './pages/ModeratorRole'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import VerifyEmail from './pages/VerifyEmail'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Unauthorized from './pages/Unauthorized'
 import AdminLogin from './pages/admin/AdminLogin'
 import ModeratorLogin from './pages/moderator/ModeratorLogin'
@@ -75,6 +77,8 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/signup" element={<Navigate to="/register" replace />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         
         {/* Protected Admin & Moderator Login Paths */}
