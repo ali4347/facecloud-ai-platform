@@ -28,10 +28,6 @@ export default function Login() {
     if (USE_API) {
       try {
         const result = await signInToPortal(email.trim(), password, 'any')
-        if (result.kind === 'two-factor') {
-          setError('This account has two-factor authentication on. That screen is not built yet.')
-          return
-        }
         if (result.kind !== 'ok') return // only the staff screens can be sent to the wrong portal
         navigate(result.dashboard === 'admin' ? '/admin'
                : result.dashboard === 'moderator' ? '/moderator'

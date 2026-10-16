@@ -46,6 +46,20 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Two-factor sign-in removed from the frontend
+*Status: committed (this commit)*
+
+The frontend never had a two-factor screen; the three sign-in pages only showed "that screen is not built yet". That dead branch is
+gone: `TwoFactorRequired`, `verifyTwoFactor()` and the `'two-factor'` result are removed from `src/lib/api/auth.ts`, and the user, admin
+and moderator login pages no longer test for it. One guard stays on purpose: if the backend ever answers a sign-in **without tokens**
+(which is what an account with two-factor on gets while the backend still supports it), `login()` now refuses with a plain message
+instead of storing a session that has no credentials. The backend's own two-factor code (6 endpoints, a model, ~7 files) is a separate
+change: Ijaz's draft PR #72 already deletes it (migration `0010_remove_two_factor`). The dev database has 0 two-factor credentials.
+
+- **Files:** `src/lib/api/auth.ts`, `src/pages/Login.tsx`, `src/pages/admin/AdminLogin.tsx`, `src/pages/moderator/ModeratorLogin.tsx`.
+- **Verified:** `npm run build` clean; headless Chrome against the sign-up branch (own ports): user door → `/dashboard`, a user refused
+  at the admin and moderator doors, admin → `/admin`, membership moderator → `/moderator`.
+
 ### 2026-10-16 — Authentication wired to the real backend: sign-up, email link, user / admin / moderator sign-in, sign-out
 *Status: committed (this commit). Built against backend PR #73 (`feat/signup-link-verification`), which is open, not merged.*
 

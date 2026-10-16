@@ -1,4 +1,4 @@
-import { apiFetch } from './client'
+import { apiFetch, ApiError } from './client'
 import { setAccessToken, setRefreshToken, getRefreshToken, clearTokens } from './tokens'
 import type { Role } from '../../data/mock'
 import { initialsFrom } from '../session'
@@ -23,13 +23,7 @@ export interface SignedIn {
   user: ApiUser
 }
 
-/** The account has two-factor on; finish with `verifyTwoFactor`. */
-export interface TwoFactorRequired {
-  kind: 'two-factor'
-  loginToken: string
-}
-
-export type LoginResult = SignedIn | TwoFactorRequired
+export type LoginResult = SignedIn
 
 interface TokenPayload {
   access?: string
@@ -37,8 +31,6 @@ interface TokenPayload {
   role?: Role
   dashboard?: Role
   user?: ApiUser
-  two_factor_required?: boolean
-  login_token?: string
 }
 
 function storeSession(data: TokenPayload): SignedIn {
@@ -66,18 +58,12 @@ export async function login(identifier: string, password: string): Promise<Login
     body: { identifier, password },
     anonymous: true,
   })
-  if (data.two_factor_required && data.login_token) {
-    return { kind: 'two-factor', loginToken: data.login_token }
+  /* A successful sign-in always carries tokens. An answer without them means the
+     backend wants a further step this app does not have; treating it as signed in
+     would leave a session with no credentials behind, so refuse it plainly. */
+  if (!data.access) {
+    throw new ApiError(0, 'This account needs a sign-in step that is not available here. Please contact support.')
   }
-  return storeSession(data)
-}
-
-/** Second step for an account with two-factor on. Accepts a recovery code too. */
-export async function verifyTwoFactor(loginToken: string, code: string): Promise<SignedIn> {
-  const data = await apiFetch<TokenPayload>('/api/auth/2fa/verify/', {
-    body: { login_token: loginToken, code },
-    anonymous: true,
-  })
   return storeSession(data)
 }
 
@@ -169,7 +155,6 @@ export type Portal = 'any' | 'admin' | 'moderator'
 
 export type PortalSignIn =
   | { kind: 'ok'; dashboard: Role }
-  | { kind: 'two-factor' }
   | { kind: 'wrong-portal' }
 
 /**
@@ -185,7 +170,6 @@ export async function signInToPortal(
   identifier: string, password: string, portal: Portal
 ): Promise<PortalSignIn> {
   const result = await login(identifier, password)
-  if (result.kind === 'two-factor') return { kind: 'two-factor' }
 
   if (portal !== 'any' && result.dashboard !== portal) {
     await logout()

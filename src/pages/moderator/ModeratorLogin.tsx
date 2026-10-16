@@ -24,9 +24,7 @@ export default function ModeratorLogin() {
     if (USE_API) {
       try {
         const result = await signInToPortal(email.trim(), password, 'moderator')
-        if (result.kind === 'two-factor') {
-          setError('This account has two-factor authentication on. That screen is not built yet.')
-        } else if (result.kind === 'wrong-portal') {
+        if (result.kind === 'wrong-portal') {
           setError('This account does not have moderator access.')
         } else {
           navigate('/moderator')
