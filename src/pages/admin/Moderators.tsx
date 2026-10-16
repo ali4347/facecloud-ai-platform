@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Loader2, RefreshCw, ShieldCheck, UserCog, UserPlus, Wand2, X } from 'lucide-react'
+import { AlertTriangle, Loader2, RefreshCw, ShieldCheck, UserPlus } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { DataTable } from '../../components/ui/DataTable'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { EmptyState } from '../../components/ui/EmptyState'
-import { PasswordInput } from '../../components/ui/PasswordInput'
-import { ChartCard } from '../../components/ui/ChartCard'
+import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
+import type { NewAccount } from '../../components/admin/NewAccountForm'
 import { listAdminUsers } from '../../lib/api/adminUsers'
-import { USE_API } from '../../lib/api/config'
 import { useApiResource } from '../../lib/useApiResource'
 import { mockUsers } from '../../data/mock'
 import { formatDate } from '../../lib/utils'
@@ -20,15 +19,6 @@ interface ModeratorRow {
   email: string
   suspended: boolean
   joinedAt: string
-}
-
-const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
-
-/** A readable random password: no look-alike characters, so it can be read out or typed from a note. */
-function generatePassword(length = 14): string {
-  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
-  const bytes = crypto.getRandomValues(new Uint32Array(length))
-  return Array.from(bytes, b => alphabet[b % alphabet.length]).join('')
 }
 
 const demoModerators = (): ModeratorRow[] =>
@@ -42,12 +32,7 @@ const demoModerators = (): ModeratorRow[] =>
 export default function Moderators() {
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [formError, setFormError] = useState('')
-  const [justCreated, setJustCreated] = useState<{ username: string; password: string } | null>(null)
+  const [justCreated, setJustCreated] = useState<NewAccount | null>(null)
   const [addedInDemo, setAddedInDemo] = useState<ModeratorRow[]>([])
 
   const { data, loading, error, isDemo, reload } = useApiResource<ModeratorRow[]>(
@@ -69,23 +54,13 @@ export default function Moderators() {
 
   const total = (data?.length ?? 0) + addedInDemo.length
 
-  const resetForm = () => {
-    setUsername(''); setEmail(''); setPassword(''); setConfirm(''); setFormError('')
-  }
-
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormError('')
-    if (password.length < 8) { setFormError('The password needs at least 8 characters.'); return }
-    if (password !== confirm) { setFormError('The two passwords do not match.'); return }
-    /* Only reachable in demo mode: with the API on, the button is disabled because
-       the backend has no endpoint that creates an account for someone else. */
+  /* Only reachable in demo mode: with the API on, the form's button is disabled. */
+  const handleCreate = (account: NewAccount) => {
     setAddedInDemo(rows => [{
-      id: `demo-${Date.now()}`, username: username.trim(), email: email.trim(),
+      id: `demo-${Date.now()}`, username: account.username, email: account.email,
       suspended: false, joinedAt: new Date().toISOString(),
     }, ...rows])
-    setJustCreated({ username: username.trim(), password })
-    resetForm()
+    setJustCreated(account)
     setFormOpen(false)
   }
 
@@ -108,86 +83,16 @@ export default function Moderators() {
         </div>
       )}
 
-      {justCreated && (
-        <div className="p-4 rounded-2xl text-xs border bg-[#10B981]/10 border-[#10B981]/25 space-y-2">
-          <div className="flex items-start justify-between gap-3">
-            <p className="font-semibold text-[#10B981]">Moderator account created (demo)</p>
-            <button type="button" onClick={() => setJustCreated(null)} aria-label="Dismiss" className="text-ink-mute hover:text-ink cursor-pointer">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <p className="text-ink-soft">
-            Share these sign-in details with <span className="font-semibold text-ink">{justCreated.username}</span> now.
-            The password is not shown again.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-2">
-            <div><p className={labelClass}>Username</p><p className="fc-kbd inline-block mt-1">{justCreated.username}</p></div>
-            <div><p className={labelClass}>Password</p><p className="fc-kbd inline-block mt-1">{justCreated.password}</p></div>
-          </div>
-        </div>
-      )}
+      {justCreated && <CreatedAccountNotice account={justCreated} onDismiss={() => setJustCreated(null)} />}
 
       {formOpen && (
-        <ChartCard title="New moderator" subtitle="Creates a sign-in for a moderator, who reaches the moderator panel by its direct link">
-          <form onSubmit={handleCreate} className="space-y-4 max-w-xl">
-            {USE_API && (
-              <div className="p-3 rounded-2xl text-xs flex items-start gap-2 bg-[#F59E0B]/10 border border-[#F59E0B]/25 text-ink-soft">
-                <AlertTriangle className="w-4 h-4 text-[#F59E0B] flex-shrink-0 mt-0.5" />
-                <span>
-                  The backend cannot create an account for someone else yet — it only lists accounts and changes their
-                  role. This form is ready, and is switched on once that endpoint exists.
-                </span>
-              </div>
-            )}
-
-            {formError && (
-              <div role="alert" className="p-3 rounded-2xl text-xs bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">
-                {formError}
-              </div>
-            )}
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label htmlFor="mod-username" className={labelClass}>Username</label>
-                <input id="mod-username" className="fc-input" value={username} autoComplete="off"
-                  onChange={e => setUsername(e.target.value)} required />
-              </div>
-              <div className="space-y-1.5">
-                <label htmlFor="mod-email" className={labelClass}>Email</label>
-                <input id="mod-email" type="email" className="fc-input" value={email} autoComplete="off"
-                  onChange={e => setEmail(e.target.value)} required />
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="mod-password" className={labelClass}>Password</label>
-                  <button type="button" className="text-[11px] font-semibold text-[#FB923C] hover:underline inline-flex items-center gap-1 cursor-pointer"
-                    onClick={() => { const p = generatePassword(); setPassword(p); setConfirm(p) }}>
-                    <Wand2 className="w-3 h-3" />Generate
-                  </button>
-                </div>
-                <PasswordInput id="mod-password" className="fc-input" value={password}
-                  autoComplete="new-password" onChange={e => setPassword(e.target.value)} required />
-              </div>
-              <div className="space-y-1.5">
-                <label htmlFor="mod-confirm" className={labelClass}>Confirm password</label>
-                <PasswordInput id="mod-confirm" className="fc-input" value={confirm}
-                  autoComplete="new-password" onChange={e => setConfirm(e.target.value)} required />
-              </div>
-            </div>
-
-            <div className="flex gap-2 pt-1">
-              <GradientButton type="submit" disabled={USE_API} leftIcon={<UserCog className="w-4 h-4" />}>
-                Create account
-              </GradientButton>
-              <GradientButton type="button" variant="secondary" onClick={() => { resetForm(); setFormOpen(false) }}>
-                Cancel
-              </GradientButton>
-            </div>
-          </form>
-        </ChartCard>
+        <NewAccountForm
+          title="New moderator"
+          subtitle="Creates a sign-in for a moderator, who reaches the moderator panel by its direct link"
+          roles={['moderator']}
+          onCreate={handleCreate}
+          onCancel={() => setFormOpen(false)}
+        />
       )}
 
       <div className="flex items-center gap-3">

@@ -46,6 +46,31 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Admin Users: "Add User" now works (demo), Suspend/Activate wired to the backend
+*Status: committed (this commit); creating an account against the live API still needs a backend endpoint — reported, not built (backend frozen)*
+
+The **Add User** button on `/admin/users` did nothing — and neither did View / Suspend / Activate; the whole screen was static mock data.
+
+- **Add User** opens a form (username, email, password + confirmation, "Generate" for a readable random password, Role =
+  User or Moderator) and, after creating, shows the sign-in details once. Extracted into a shared component,
+  `src/components/admin/NewAccountForm.tsx`, which the Moderators page now uses too (it offers only the Moderator role).
+  Against the live API the form's button is disabled with the reason on screen: the backend cannot create an account for
+  someone else (same gap as the Moderators page entry above — it needs `role`, an organization membership for moderators,
+  email verification, a forced password change and an audit event). In demo mode the account exists for the session only.
+- **Users list is live.** `GET /api/user/admin/users/` through `src/lib/api/adminUsers.ts`, with loading, error-and-retry
+  and empty states; search works on both. The Uploads column appears in demo mode only — the accounts API reports no
+  upload count and none is invented. Names show the account's username (the API has no full-name field).
+- **Suspend / Activate** call the backend's existing `PATCH /api/user/admin/users/<id>/` (`is_suspended`), then reload;
+  suspending asks for confirmation; a backend refusal (for example suspending your own account) is shown as an error
+  banner. In demo mode it toggles locally.
+- **Removed** the "View" link: it had no destination and no page behind it.
+- **Files:** new `src/components/admin/NewAccountForm.tsx`; rewritten `src/pages/admin/Users.tsx`; edited
+  `src/pages/admin/Moderators.tsx`, `src/lib/api/adminUsers.ts`.
+- **Verified:** `npm run build` clean; headless Chrome in demo mode as admin — 5 rows at start; Add User opens the form with a
+  role select; creating a Moderator gives 6 rows with the Moderator badge and the one-time sign-in card; Suspend flips a row
+  to Suspended / Activate; a 3-character password is refused with a message. **Not verified:** Suspend/Activate and the
+  live list against a signed-in admin on the running backend.
+
 ### 2026-10-16 — Admin: API pages removed, new Moderators page (list + create form)
 *Status: committed (this commit); the create action needs a backend endpoint that does not exist — reported, not built (backend frozen)*
 

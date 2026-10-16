@@ -17,3 +17,11 @@ export interface AdminUser {
 export function listAdminUsers(signal?: AbortSignal): Promise<AdminUser[]> {
   return apiFetch<AdminUser[]>('/api/user/admin/users/', { signal })
 }
+
+/** Suspend or reactivate an account. Reactivating clears the stored reason on the backend. */
+export function setAdminUserSuspended(id: number, suspended: boolean): Promise<AdminUser> {
+  return apiFetch<AdminUser>(`/api/user/admin/users/${id}/`, {
+    method: 'PATCH',
+    body: { is_suspended: suspended },
+  })
+}
