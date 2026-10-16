@@ -46,6 +46,29 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — About, Contact and Moderator headings get the landing page's heading animation
+*Status: committed (this commit)*
+
+The landing page's headings scramble into place when they scroll into view and put one key phrase on an orange block.
+The About, Contact and Moderator role-guide pages used plain headings. A new shared component,
+`src/components/animation/HeadingText.tsx`, applies the same treatment: it reuses `ScrambleText`, takes a string where
+`[square brackets]` mark the highlighted phrase and `\n` starts a new line. The scrambling letters are `aria-hidden`
+and a screen-reader-only copy carries the plain sentence, so assistive technology never reads the random characters.
+
+- **Applied to:** About (page title, "Solving the Dataset Challenge", "How We Operate", "Meet the Team", closing
+  call-to-action), Contact (page title), Moderator guide (page title, every section heading through its shared
+  `Heading`, "Questions about the role?"). Fonts and sizes are unchanged. Highlights are kept to one short word
+  because the orange block does not wrap and a long one would overflow a phone screen.
+- **Not changed:** the Landing page's own headings (they keep their local `parseTitle`), the "Submission Received"
+  heading on Contact, and the Contact FAQ/cards.
+- **Files:** new `src/components/animation/HeadingText.tsx`; edited `src/pages/About.tsx`, `src/pages/Contact.tsx`,
+  `src/pages/ModeratorRole.tsx`.
+- **Verified:** `npm run build` clean; headless-Chrome screenshots of all three pages show the orange block on the
+  highlighted word; the rendered DOM carries the plain-sentence copy for each heading. The scramble motion itself is
+  not visible in a still, so it was not seen playing. On the Moderator page the title now wraps to three lines at
+  desktop width because the highlighted block takes its own line. Phone width was not checked reliably (the headless
+  window will not go narrower than its minimum), only reasoned from the longest unbreakable word.
+
 ### 2026-10-16 — Navbar: "User Login" replaced by "Moderator" (role guide)
 *Status: committed (this commit)*
 

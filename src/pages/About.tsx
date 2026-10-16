@@ -4,6 +4,7 @@ import { Shield, Users, Activity } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
+import { HeadingText } from '../components/animation/HeadingText'
 
 export default function About() {
   useEffect(() => {
@@ -32,8 +33,7 @@ export default function About() {
 
             <RevealOnScroll delay={0.05}>
               <h1 className="text-4xl sm:text-6xl font-medium text-ink tracking-tight leading-[1.15]" style={{ fontFamily: "'Space Mono', serif" }}>
-                Built to bring order to <br />
-                facial image data
+                <HeadingText text={'Built to bring [order] to\nfacial image data'} />
               </h1>
             </RevealOnScroll>
 
@@ -54,7 +54,7 @@ export default function About() {
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
                 <h2 className="text-2xl sm:text-3xl font-medium text-ink tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-                  Solving the Dataset Challenge
+                  <HeadingText text="Solving the Dataset [Challenge]" />
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={0.1}>
@@ -104,7 +104,7 @@ export default function About() {
             </RevealOnScroll>
             <RevealOnScroll delay={0.05}>
               <h2 className="text-3xl font-medium text-ink tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-                How We Operate
+                <HeadingText text="How We [Operate]" />
               </h2>
             </RevealOnScroll>
           </div>
@@ -163,7 +163,7 @@ export default function About() {
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
                 <h2 className="text-3xl font-medium text-ink tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-                  Meet the Team
+                  <HeadingText text="Meet the [Team]" />
                 </h2>
               </RevealOnScroll>
             </div>
@@ -220,8 +220,7 @@ export default function About() {
                 className="text-4xl sm:text-5xl font-medium text-ink leading-tight tracking-tight"
                 style={{ fontFamily: "'Space Mono', serif" }}
               >
-                Ready to enhance, validate, and <br />
-                organize facial images with AI?
+                <HeadingText text={'Ready to enhance, validate, and\norganize facial images [with AI?]'} />
               </h2>
               <p className="text-xs text-ink-mute max-w-md mx-auto leading-relaxed font-medium">
                 Start with the user portal to enhance and organize your facial image datasets.

@@ -3,6 +3,7 @@ import { Mail, ShieldCheck, HelpCircle, CheckCircle2, AlertTriangle, ArrowRight 
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
+import { HeadingText } from '../components/animation/HeadingText'
 
 interface FormFields {
   name: string
@@ -147,7 +148,7 @@ export default function Contact() {
           </RevealOnScroll>
           <RevealOnScroll delay={0.05}>
             <h1 className="text-4xl sm:text-5xl font-medium text-ink tracking-tight leading-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-              Let's talk about your image workflow
+              <HeadingText text="Let's talk about your image [workflow]" />
             </h1>
           </RevealOnScroll>
           <RevealOnScroll delay={0.1}>

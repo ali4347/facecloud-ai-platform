@@ -7,6 +7,7 @@ import {
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
+import { HeadingText } from '../components/animation/HeadingText'
 
 /*
  * The moderator role, written from what the platform actually enforces.
@@ -213,7 +214,7 @@ function Heading({ tag, title, subtitle }: { tag: string; title: string; subtitl
     <div className="max-w-2xl space-y-3 mb-10">
       <span className="text-[11px] font-bold text-[#FB923C] uppercase tracking-[0.2em]">{tag}</span>
       <h2 className="text-3xl sm:text-4xl font-medium text-ink tracking-tight leading-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-        {title}
+        <HeadingText text={title} />
       </h2>
       {subtitle && <p className="text-sm text-ink-mute leading-relaxed">{subtitle}</p>}
     </div>
@@ -244,8 +245,7 @@ export default function ModeratorRole() {
             </RevealOnScroll>
             <RevealOnScroll delay={0.05}>
               <h1 className="text-4xl sm:text-6xl font-medium text-ink tracking-tight leading-[1.15]" style={{ fontFamily: "'Space Mono', serif" }}>
-                The human check on <br />
-                every uncertain decision
+                <HeadingText text={'The human check on\nevery uncertain [decision]'} />
               </h1>
             </RevealOnScroll>
             <RevealOnScroll delay={0.1}>
@@ -288,7 +288,7 @@ export default function ModeratorRole() {
           <div className="max-w-6xl mx-auto px-6">
             <Heading
               tag="01 · Responsibilities"
-              title="What a moderator can do"
+              title="What a moderator can [do]"
               subtitle="Twelve things, from the daily queue to the organization’s housekeeping. Where a figure is given, it is the default and an organization can change it."
             />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -315,7 +315,7 @@ export default function ModeratorRole() {
           <div className="max-w-4xl mx-auto px-6">
             <Heading
               tag="02 · Workflow"
-              title="How a review works, start to finish"
+              title="How a review works, start to [finish]"
               subtitle="The same path every time, whether the question is a blurry photo, a possible duplicate or a face that might belong to two people."
             />
             <ol className="relative space-y-4">
@@ -347,7 +347,7 @@ export default function ModeratorRole() {
           <div className="max-w-4xl mx-auto px-6">
             <Heading
               tag="03 · Roles"
-              title="How the role compares"
+              title="How the role [compares]"
               subtitle="Inside an organization there are three roles. A moderator sits between an owner, who is accountable for the organization, and a member, who uploads and uses the product."
             />
             <RevealOnScroll>
@@ -390,7 +390,7 @@ export default function ModeratorRole() {
           <div className="max-w-6xl mx-auto px-6">
             <Heading
               tag="04 · Guardrails"
-              title="What a moderator cannot do, and what protects everyone"
+              title="What a moderator cannot do, and what protects [everyone]"
               subtitle="The role is deliberately narrow. These limits are enforced by the platform, not left to good behaviour."
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -429,7 +429,7 @@ export default function ModeratorRole() {
           <div className="max-w-5xl mx-auto px-6">
             <Heading
               tag="05 · Access"
-              title="How someone becomes a moderator"
+              title="How someone becomes a [moderator]"
               subtitle="Moderator is a role inside an organization, not a separate account type. Owners grant it by invitation."
             />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -463,7 +463,7 @@ export default function ModeratorRole() {
           <div className="max-w-6xl mx-auto px-6">
             <Heading
               tag="06 · Roadmap"
-              title="What is built, and what comes next"
+              title="What is built, and what comes [next]"
               subtitle="An honest account of where the moderator role stands today."
             />
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -502,7 +502,7 @@ export default function ModeratorRole() {
           <div className="max-w-3xl mx-auto px-6 text-center space-y-5">
             <RevealOnScroll>
               <h2 className="text-2xl sm:text-3xl font-medium text-ink tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-                Questions about the role?
+                <HeadingText text="Questions about the [role]?" />
               </h2>
               <p className="text-sm text-ink-mute leading-relaxed mt-3">
                 If you are setting up an organization and want to talk through who should be a moderator, we are happy to help.
