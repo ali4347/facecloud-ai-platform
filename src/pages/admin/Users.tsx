@@ -8,7 +8,8 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
-import { listAdminUsers, setAdminUserSuspended } from '../../lib/api/adminUsers'
+import { createAdminUser, listAdminUsers, setAdminUserSuspended } from '../../lib/api/adminUsers'
+import { USE_API } from '../../lib/api/config'
 import { useApiResource } from '../../lib/useApiResource'
 import { mockUsers } from '../../data/mock'
 import { formatDate } from '../../lib/utils'
@@ -65,12 +66,17 @@ export default function UsersPage() {
 
   const total = (data?.length ?? 0) + addedInDemo.length
 
-  /* Only reachable in demo mode: with the API on, the form's button is disabled. */
-  const handleCreate = (account: NewAccount) => {
-    setAddedInDemo(rows => [{
-      id: `demo-${Date.now()}`, name: account.username, email: account.email, role: account.role,
-      suspended: false, uploads: 0, joinedAt: new Date().toISOString(),
-    }, ...rows])
+  /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
+  const handleCreate = async (account: NewAccount) => {
+    if (USE_API) {
+      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: account.role })
+      reload()
+    } else {
+      setAddedInDemo(rows => [{
+        id: `demo-${Date.now()}`, name: account.username, email: account.email, role: account.role,
+        suspended: false, uploads: 0, joinedAt: new Date().toISOString(),
+      }, ...rows])
+    }
     setJustCreated(account)
     setFormOpen(false)
   }
@@ -120,7 +126,7 @@ export default function UsersPage() {
           </div>
         )}
 
-        {justCreated && <CreatedAccountNotice account={justCreated} onDismiss={() => setJustCreated(null)} />}
+        {justCreated && <CreatedAccountNotice account={justCreated} demo={!USE_API} onDismiss={() => setJustCreated(null)} />}
 
         {formOpen && (
           <NewAccountForm

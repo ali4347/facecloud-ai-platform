@@ -25,3 +25,21 @@ export function setAdminUserSuspended(id: number, suspended: boolean): Promise<A
     body: { is_suspended: suspended },
   })
 }
+
+export interface NewAccountRequest {
+  username: string
+  email: string
+  password: string
+  role: 'user' | 'moderator'
+}
+
+/**
+ * Create an already-verified account for someone, with a password the administrator hands over.
+ *
+ * The backend sends no email and never returns the password. A moderator is placed in the one
+ * shared organization, or refused with a plain message when there is none or several. Errors come
+ * back as field messages (email, username, password, role) or a `detail`; ApiError carries them.
+ */
+export function createAdminUser(request: NewAccountRequest): Promise<AdminUser> {
+  return apiFetch<AdminUser>('/api/user/admin/users/', { method: 'POST', body: request })
+}

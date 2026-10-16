@@ -46,6 +46,30 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Admin "Add User" and "Create moderator" now create real accounts
+*Status: committed (this commit). Built against backend PR #75, which is merged.*
+
+Backend PR #75 (merged) added `POST /api/user/admin/users/`, so the two forms that were switched off against the live API are on.
+
+- **`src/lib/api/adminUsers.ts`:** `createAdminUser({username, email, password, role})`.
+- **`NewAccountForm`:** the "backend cannot create accounts yet" note and the disabled button are gone. The form now awaits the parent's
+  create call, shows "Creating…", and on a refusal shows the backend's own message (duplicate email, weak password, "Create an organization
+  first, then try again", more than one organization…) while keeping what was typed. It no longer knows about `VITE_USE_API`.
+- **Users and Moderators pages:** with the API on, create → the list is read again and the new account appears; in the demo build it is kept for the
+  session as before.
+- **The "account created" card** shows the **email** to sign in with and the password, once. The sign-in screens take an email address (their field is
+  `type="email"`), so showing only the username would have sent the new person to a login they could not complete. The label of the card says
+  "(demo — nothing is saved)" only in the demo build.
+- **Files:** `src/lib/api/adminUsers.ts`, `src/components/admin/NewAccountForm.tsx`, `src/pages/admin/Users.tsx`, `src/pages/admin/Moderators.tsx`.
+- **Verified:** `npm run build` clean. Headless Chrome against a throwaway copy of backend `main` (PR #75 included) on its own ports with an empty database,
+  one organization and an admin: admin signs in; a moderator is created (card, list updates; database: role moderator, verified, moderator membership in the
+  organization); a duplicate email and a weak password show the backend's message with the typed values kept; Cancel closes the form; Add User creates a
+  user and, with role Moderator, a moderator; the new moderator then signs in to `/moderator`; the card shows the email; the demo build still works.
+  **Not verified:** against the owner's own server and database (not touched); the case of more than one organization (the form has no organization
+  field, so the admin would see the backend's "send organization_id" message and could not proceed from this screen).
+- **Known limits:** sign-in forms accept an email only, although the backend also accepts a username (so an admin whose username is not an email address
+  must sign in with the email); the first organization has to be created through the API (`POST /api/organizations/admin/` with `owner_id`) because no screen does it.
+
 ### 2026-10-16 — Face-grouping consent: a card on My Images when photos are selected, plus a Settings card (for the owner's review)
 *Status: committed (this commit); the owner reviewed it and approved.*
 
@@ -1484,8 +1508,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - **Authentication is attached (2026-10-16):** sign-up with an emailed link, user / admin / moderator sign-in, sign-out, forgot and reset
   password — against backend PR #73, not yet merged. Other already-attached screens: user upload / processing / gallery / dashboard,
   moderator queue and dashboard, admin Users and Moderators lists. Everything else is still demo data.
-- **Backend gaps the frontend is waiting on:** an endpoint for an administrator to create a user or moderator (the Add User and
-  Create moderator forms are switched off against the live API); `create_superuser` should mark the email verified.
+- **Backend gaps:** none for authentication or for the admin Add User / Create moderator forms (PR #75 is merged). The user-dashboard work (search,
+  Person Folder images, Downloads fields, Activity schema, profile and sessions) is the next backend piece.
 
 ---
 

@@ -162,7 +162,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/users` (User directories, state controls, suspension logs)
 * `/admin/audit-logs` (System activity logs and administrative audit traces)
 * `/admin/security` (Risk alerts, failed logins monitor, IP blocking logs)
-* `/admin/moderators` (list of moderator accounts, and a form to create one — the form is switched off against the live API until the backend can create accounts; `/admin/api-docs` and `/admin/api-test` were removed and redirect to `/admin`)
+* `/admin/moderators` (list of moderator accounts, and a form to create one — `/admin/api-docs` and `/admin/api-test` were removed and redirect to `/admin`)
 * `/admin/system` (Server instances CPU/RAM levels, service uptime statuses)
 * `/admin/upload-statistics` (Upload volume charts and file sizes charts)
 * `/admin/rejection-summary` (Quality-based rejection charts and metrics)
