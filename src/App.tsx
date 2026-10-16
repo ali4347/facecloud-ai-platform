@@ -40,8 +40,7 @@ import AdminOverview from './pages/admin/AdminOverview'
 import UsersPage from './pages/admin/Users'
 import AuditLogs from './pages/admin/AuditLogs'
 import Security from './pages/admin/Security'
-import ApiDocs from './pages/admin/ApiDocs'
-import ApiTest from './pages/admin/ApiTest'
+import Moderators from './pages/admin/Moderators'
 import SystemMonitoring from './pages/admin/SystemMonitoring'
 import UploadStatistics from './pages/admin/UploadStatistics'
 import RejectionSummary from './pages/admin/RejectionSummary'
@@ -125,8 +124,9 @@ export default function App() {
           <Route path="users" element={<UsersPage />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="security" element={<Security />} />
-          <Route path="api-docs" element={<ApiDocs />} />
-          <Route path="api-test" element={<ApiTest />} />
+          <Route path="moderators" element={<Moderators />} />
+          <Route path="api-docs" element={<Navigate to="/admin" replace />} />
+          <Route path="api-test" element={<Navigate to="/admin" replace />} />
           <Route path="system" element={<SystemMonitoring />} />
           <Route path="upload-statistics" element={<UploadStatistics />} />
           <Route path="rejection-summary" element={<RejectionSummary />} />

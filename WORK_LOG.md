@@ -46,6 +46,34 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Admin: API pages removed, new Moderators page (list + create form)
+*Status: committed (this commit); the create action needs a backend endpoint that does not exist — reported, not built (backend frozen)*
+
+- **Removed** "API Documentation" and "Test API Endpoints" from the admin sidebar, deleted `src/pages/admin/ApiDocs.tsx` and
+  `ApiTest.tsx`, and made `/admin/api-docs` and `/admin/api-test` redirect to `/admin` so old bookmarks do not 404.
+- **Added** "Moderators" to the admin sidebar → **`/admin/moderators`** (`src/pages/admin/Moderators.tsx`):
+  a searchable list of moderator accounts (username, email, active/suspended, created date) and a **Create moderator** form
+  (username, email, password + confirmation, a "Generate" button that makes a readable random password, and a one-time
+  "share these sign-in details" card). The list is live: `src/lib/api/adminUsers.ts` calls the backend's existing
+  `GET /api/user/admin/users/` and keeps accounts whose role is `moderator`; loading, error-with-retry and empty states match
+  the other migrated screens. In demo mode it shows the one moderator already in the demo data, and a created account only
+  exists for the session, with a banner saying nothing is saved.
+- **Backend gap (not fixed — frozen):** the backend can only *list* accounts and *patch* their role/suspension
+  (`accounts/user_urls.py`: `admin/users/` and `admin/users/<id>/`). There is no endpoint that creates an account for
+  someone else, so with `VITE_USE_API=true` the form's submit button is disabled and says so, rather than calling an
+  endpoint that is not there. What that endpoint needs, for whoever builds it: create the user with `role="moderator"`,
+  **and** an `OrganizationMembership` (role moderator) in a chosen organization — moderation is organization-scoped, so
+  an account with only `User.role` would reach the panel and find nothing; mark the email verified or send a verification;
+  prefer a forced password change on first sign-in over a password the admin keeps knowing; write an audit event.
+  This is the same account-role-vs-organization-role split already recorded in the earlier backend findings.
+- **Files:** new `src/pages/admin/Moderators.tsx`, `src/lib/api/adminUsers.ts`; edited `src/components/layout/Sidebar.tsx`,
+  `src/App.tsx`, `README.md`; deleted `src/pages/admin/ApiDocs.tsx`, `src/pages/admin/ApiTest.tsx`.
+- **Verified:** `npm run build` clean; driven in headless Chrome as an admin session — sidebar no longer has the two API items
+  and has Moderators; in demo mode the list shows 1 row, creating one gives 2 rows plus the credentials card; `/admin/api-docs`
+  lands on `/admin`; with the API on and no real sign-in the page shows the backend's "Administrator access is required"
+  error with a retry link and the form's button disabled. **Not verified:** the live list against a signed-in admin on the
+  running backend (no admin session was available in the test browser).
+
 ### 2026-10-16 — About, Contact and Moderator headings get the landing page's heading animation
 *Status: committed (this commit)*
 

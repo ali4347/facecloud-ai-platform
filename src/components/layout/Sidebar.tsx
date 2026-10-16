@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
-  ClipboardList, Server, Code2, ShieldCheck, Key, Eye, ScrollText,
+  ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
   HardDrive, X, Bell, Briefcase
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
@@ -30,10 +30,9 @@ const userNav = [
 const adminNav = [
   { label: 'Overview',           icon: LayoutDashboard, to: '/admin' },
   { label: 'Manage Users',       icon: Users,            to: '/admin/users' },
+  { label: 'Moderators',         icon: UserCog,          to: '/admin/moderators' },
   { label: 'Audit Logs',         icon: ClipboardList,    to: '/admin/audit-logs' },
   { label: 'Security Monitoring',icon: ShieldCheck,      to: '/admin/security' },
-  { label: 'API Documentation',  icon: Code2,            to: '/admin/api-docs' },
-  { label: 'Test API Endpoints', icon: Key,              to: '/admin/api-test' },
   { label: 'System Monitoring',  icon: Server,           to: '/admin/system' },
   { label: 'Upload Statistics',  icon: BarChart3,        to: '/admin/upload-statistics' },
   { label: 'Rejection Summary',  icon: AlertCircle,      to: '/admin/rejection-summary' },
