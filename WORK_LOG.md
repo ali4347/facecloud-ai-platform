@@ -46,6 +46,58 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Face-grouping consent: a card on My Images when photos are selected, plus a Settings card (for the owner's review)
+*Status: committed (this commit); the owner reviewed it and approved.*
+
+The backend refuses to analyse faces (and so to build Person Folders) for anyone who has not said yes
+(`BIOMETRIC_CONSENT_REQUIRED=True`, and production refuses to start without it), but the frontend had no way to ask. This adds that,
+**frontend only** — the backend's existing `GET/POST /api/privacy/consents/`, `GET /api/privacy/export/` and
+`POST /api/identities/images/{id}/` are used as they are. First version was a pop-up on every sign-in; the owner asked for the
+question to appear only where it matters, so it was reworked:
+
+- **My Images now lets photos be selected** (a checkbox on each card whose upload was accepted; rejected or still-processing photos
+  cannot be ticked, because the backend answers 404 for them). A bar at the bottom shows "N selected", Clear, "Select all on this
+  page" and **Group by person**.
+- **The consent card appears only when something is selected** and the person has not agreed (or agreed to an older policy).
+  Nothing is shown at sign-in, on the dashboard or on the Person Folders page. "Not now" hides it while the selection stays;
+  pressing "Group by person" brings it back; "Allow face grouping" saves the yes and, if they had pressed Group by person, carries on.
+  Once they have agreed, selecting never shows the card again. The card is a card, not a pop-up.
+- **Group by person** asks the backend to analyse each selected photo (`POST /api/identities/images/{id}/`, queued), then says how many
+  started and shows the backend's own message for any that could not be (for example "Identity inference is unavailable until an
+  approved provider is configured" on a server without the face models). It is disabled in the demo build.
+- **Settings → Camera & Privacy:** a "Face grouping" card — status badge (On / Off / Needs confirming) and **two separate buttons**:
+  **Turn off face grouping** (withdraws consent only) and **Delete my face data** (red). Delete is its own action and is offered whether
+  grouping is on or off, because stored data can outlive a "no". It first asks the backend what is stored (`GET /api/privacy/facial-data/`),
+  says "There is no face data stored for you" when there is nothing, and otherwise shows how many detected faces and Person Folders will
+  go, that edit history and exports go too, that the photos themselves stay, that grouping stays on if it was on, and "This cannot be
+  undone" — then "Yes, delete my face data" (`DELETE /api/privacy/facial-data/` with `confirm: true`) or Cancel. The old single checkbox
+  "Also delete my face data" was removed. Also "Download my data" (the backend's JSON export; face templates are counted, never
+  included). Demo build: the card says nothing is saved.
+- **Person Folders page:** a banner says why there may be none ("Face grouping is off, so no new Person Folders are being created", or
+  "…paused until you confirm again"). "Turn on face grouping" opens the **full consent card**; a yes is never saved by one click, and the
+  database was checked to hold nothing until "Allow" is pressed. After a yes the banner becomes a note: photos uploaded from now on are
+  grouped, and older ones are grouped by selecting them in My Images and pressing Group by person (with a link). A second note says the
+  folders on this page are examples, because the list is still demo data (a new real user used to see "Person 1/2/3" with no hint they
+  were not theirs). The banner exists only on this page, and not in the demo build.
+- **Why here:** the owner asked that the question not appear at sign-in or on the dashboard; someone who opens Person Folders is looking
+  for their folders, so it is the natural place to explain that they are off. Other places considered and not built: a checkbox on the
+  upload screens (the best moment, since new uploads are analysed automatically once consent exists), a sidebar badge, a dashboard line,
+  and a sign-up checkbox (needs a small backend change).
+- **Files:** new `src/lib/api/privacy.ts` (consent, export, facial-data counts and erase), `src/lib/api/identities.ts`, `src/lib/consent.ts` (one shared store so every place agrees),
+  `src/components/features/ConsentPrompt.tsx` (`ConsentCard`, `ConsentBanner`); edited `src/pages/user/MyImages.tsx`, `src/components/features/ImageCard.tsx`,
+  `src/pages/user/Settings.tsx`, `src/pages/user/IdentityGroups.tsx`.
+- **Verified:** `npm run build` clean. Headless Chrome against backend PR #73's code on its own port and an empty database, consent required,
+  face models available: no card or pop-up at sign-in, on the dashboard or on Person Folders; My Images shows checkboxes and no bar until
+  something is picked; selecting shows the card naming the selection; Not now hides it and keeps the selection; Group by person brings it
+  back; Allow carries on and reports "Grouping started for 1 photo"; afterwards selecting shows no card; Select all and Clear work. On a
+  server without the face models the failure message was shown and the selection kept. Settings flows (Allow, Turn off, erase with confirmation,
+  Download my data, re-confirm after a policy-version change), light mode and the demo build (selection works, no card, Group by person disabled)
+  were also checked. **Not verified:** the owner's own server and account (their data was not touched); that grouping actually produces folders
+  from real faces (the test photos had none); the wording from a legal point of view — it describes only what the backend does and nobody qualified has reviewed it.
+- **Consequence to know:** a person who never opens My Images or Person Folders is never asked, so Person Folders stay off for them.
+  Uploads made before they agree are not analysed automatically; "Group by person" on My Images is how they get grouped afterwards.
+- **Still open:** the Person Folders list itself is demo data (its text still names "FaceNet/ArcFace"); a signup-time checkbox would need a small backend change.
+
 ### 2026-10-16 — Two-factor sign-in removed from the frontend
 *Status: committed (this commit)*
 

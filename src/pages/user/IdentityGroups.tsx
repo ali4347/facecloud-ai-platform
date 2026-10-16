@@ -2,7 +2,9 @@ import { Users } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { IdentityGroupCard } from '../../components/features/IdentityGroupCard'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { ConsentBanner } from '../../components/features/ConsentPrompt'
 import { mockGroups } from '../../data/mock'
+import { USE_API } from '../../lib/api/config'
 
 export default function IdentityGroups() {
   return (
@@ -11,6 +13,14 @@ export default function IdentityGroups() {
         title="Identity Groups"
         subtitle={`${mockGroups.length} identity groups · ${mockGroups.reduce((a, g) => a + g.imageCount, 0)} total images`}
       />
+
+      <ConsentBanner />
+
+      {USE_API && (
+        <div className="mb-5 p-3 rounded-2xl text-xs bg-surface-mute border border-line text-ink-soft">
+          These folders are examples. Your own Person Folders will appear here once this screen is connected to your account.
+        </div>
+      )}
 
       {mockGroups.length === 0 ? (
         <EmptyState

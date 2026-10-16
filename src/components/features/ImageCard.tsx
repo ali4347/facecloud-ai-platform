@@ -9,9 +9,13 @@ import { formatDateTime } from '../../lib/utils'
 
 interface ImageCardProps {
   image: ImageListItem
+  /** Show a checkbox so the photo can be picked along with others. */
+  selectable?: boolean
+  selected?: boolean
+  onToggleSelect?: () => void
 }
 
-export function ImageCard({ image }: ImageCardProps) {
+export function ImageCard({ image, selectable = false, selected = false, onToggleSelect }: ImageCardProps) {
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState('')
 
@@ -41,8 +45,25 @@ export function ImageCard({ image }: ImageCardProps) {
   }
 
   return (
-    <div className="fc-card overflow-hidden group hover:shadow-card-md transition-all duration-200">
+    <div className={`fc-card overflow-hidden group hover:shadow-card-md transition-all duration-200 ${
+      selected ? 'ring-2 ring-accent' : ''
+    }`}>
       <div className="h-44 relative bg-surface-mute">
+        {selectable && (
+          <label
+            className="absolute top-2 left-2 z-10 w-6 h-6 rounded-lg bg-surface/90 border border-line shadow-sm flex items-center justify-center cursor-pointer"
+            title={`Select ${image.original_name}`}
+          >
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={onToggleSelect}
+              className="w-4 h-4 accent-[#F97316] cursor-pointer"
+              aria-label={`Select ${image.original_name}`}
+            />
+          </label>
+        )}
+
         <AuthedImage
           load={canPreview ? signal => getImageThumbnail(image.id, 256, signal) : null}
           cacheKey={`image-${image.id}`}

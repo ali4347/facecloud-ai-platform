@@ -3,11 +3,16 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { Avatar } from '../../components/ui/Avatar'
 import { PasswordInput } from '../../components/ui/PasswordInput'
-import { User, Lock, Bell, Camera, Save, Upload, Trash2, Check } from 'lucide-react'
+import { User, Lock, Bell, Camera, Save, Upload, Trash2, Check, ScanFace, Download } from 'lucide-react'
 import { useSessionUser, updateSessionName } from '../../lib/session'
 import { useProfile, saveProfile } from '../../lib/profile'
 import type { Profile } from '../../lib/profile'
 import { AVATAR_PRESETS, fileToAvatarDataUrl, useAvatar } from '../../lib/avatar'
+import { StatusBadge } from '../../components/ui/StatusBadge'
+import { useFaceConsent } from '../../lib/consent'
+import { downloadMyData, getFacialDataCounts, eraseFacialData } from '../../lib/api/privacy'
+import type { FacialDataCounts } from '../../lib/api/privacy'
+import { USE_API } from '../../lib/api/config'
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -256,6 +261,7 @@ function CameraSettings() {
   return (
     <div className="space-y-5">
       <h2 className="text-base font-bold text-ink">Camera & Privacy Settings</h2>
+      <FaceGroupingSettings />
       {[
         { label: 'Allow camera access', desc: 'Required for live enhancement sessions' },
         { label: 'Auto-save snapshots', desc: 'Automatically save enhanced live snapshots' },
@@ -279,6 +285,173 @@ function CameraSettings() {
         <p className="text-xs text-ink-mute mt-1">Higher values increase processing time</p>
       </div>
       <GradientButton leftIcon={<Save className="w-4 h-4" />}>Save Settings</GradientButton>
+    </div>
+  )
+}
+
+/* Face grouping: the person's yes or no to having their photos analysed for faces,
+   which is what lets Person Folders exist. Withdrawing can also delete the face
+   data already held. In the demo build there is no server, so the card says so. */
+function FaceGroupingSettings() {
+  const consent = useFaceConsent()
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  /* Deleting face data is its own action, separate from turning grouping off: it works
+     whether grouping is on or off (data can outlive a "no"), and it asks first, saying how
+     much will go. */
+  const [erase, setErase] = useState<
+    | { step: 'idle' }
+    | { step: 'checking' }
+    | { step: 'confirm'; counts: FacialDataCounts }
+    | { step: 'empty' }
+    | { step: 'deleting' }
+    | { step: 'done' }
+  >({ step: 'idle' })
+  const [eraseError, setEraseError] = useState<string | null>(null)
+
+  const startErase = async () => {
+    setEraseError(null)
+    setErase({ step: 'checking' })
+    try {
+      const counts = await getFacialDataCounts()
+      const total = counts.faces + counts.analyses + (counts.groups ?? 0) + (counts.exports ?? 0)
+      setErase(total === 0 ? { step: 'empty' } : { step: 'confirm', counts })
+    } catch (error) {
+      setErase({ step: 'idle' })
+      setEraseError(error instanceof Error ? error.message : 'Could not check your face data.')
+    }
+  }
+
+  const confirmErase = async () => {
+    setEraseError(null)
+    setErase({ step: 'deleting' })
+    try {
+      await eraseFacialData()
+      setErase({ step: 'done' })
+    } catch (error) {
+      setErase({ step: 'idle' })
+      setEraseError(error instanceof Error ? error.message : 'Could not delete your face data.')
+    }
+  }
+
+  const handleExport = async () => {
+    setExporting(true)
+    setExportError(null)
+    try {
+      const blob = await downloadMyData()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'facecloud-my-data.json'
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      setExportError(error instanceof Error ? error.message : 'Could not prepare your data.')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const ready = USE_API && !consent.loading && consent.error === null
+  const required = USE_API && (consent.needsConsent || consent.active)
+  const erasing = erase.step === 'checking' || erase.step === 'deleting'
+
+  return (
+    <div className="p-4 rounded-2xl border border-line bg-surface-mute space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <ScanFace className="w-5 h-5 text-accent mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-ink">Face grouping</p>
+            <p className="text-xs text-ink-mute leading-relaxed">
+              Lets FaceCloud analyse the faces in the photos you upload and group photos of the same person into Person Folders.
+            </p>
+          </div>
+        </div>
+        {USE_API && ready && required && (
+          <StatusBadge
+            status={consent.active ? 'success' : consent.needsReconfirm ? 'warning' : 'muted'}
+            label={consent.active ? 'On' : consent.needsReconfirm ? 'Needs confirming' : 'Off'}
+          />
+        )}
+      </div>
+
+      {!USE_API && (
+        <p className="text-xs text-ink-mute">This is the demo, so nothing here is saved. Connect the live service to manage it.</p>
+      )}
+      {USE_API && consent.loading && <p className="text-xs text-ink-mute">Loading…</p>}
+      {USE_API && consent.error && (
+        <div role="alert" className="p-3 rounded-xl text-xs bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">
+          {consent.error}{' '}
+          <button type="button" onClick={() => consent.reload()} className="underline font-semibold cursor-pointer">Try again</button>
+        </div>
+      )}
+      {USE_API && ready && !required && (
+        <p className="text-xs text-ink-mute">This server does not ask for consent, so face grouping is always on.</p>
+      )}
+
+      {/* Turning grouping on or off */}
+      {USE_API && ready && required && !consent.active && (
+        <GradientButton size="sm" disabled={consent.busy} onClick={async () => { await consent.allow() }}>
+          {consent.busy ? 'Saving…' : consent.needsReconfirm ? 'Confirm face grouping' : 'Allow face grouping'}
+        </GradientButton>
+      )}
+
+      {/* Two separate actions: turn grouping off, and delete what is stored. */}
+      {USE_API && ready && (
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            {consent.active && (
+              <GradientButton size="sm" variant="secondary" disabled={consent.busy || erasing}
+                onClick={async () => { await consent.withdraw(false) }}>
+                {consent.busy ? 'Saving…' : 'Turn off face grouping'}
+              </GradientButton>
+            )}
+            {(erase.step === 'idle' || erase.step === 'checking' || erase.step === 'done') && (
+              <GradientButton size="sm" variant="danger" leftIcon={<Trash2 className="w-3.5 h-3.5" />}
+                disabled={erasing || consent.busy} onClick={startErase}>
+                {erase.step === 'checking' ? 'Checking…' : 'Delete my face data'}
+              </GradientButton>
+            )}
+          </div>
+
+          {erase.step === 'confirm' && (
+            <div className="p-3 rounded-xl border border-[#EF4444]/25 bg-[#EF4444]/10 space-y-2.5">
+              <p className="text-xs text-ink-soft leading-relaxed">
+                This permanently deletes {erase.counts.faces} detected face{erase.counts.faces === 1 ? '' : 's'}
+                {erase.counts.groups !== undefined && <> and {erase.counts.groups} Person Folder{erase.counts.groups === 1 ? '' : 's'}</>},
+                with their edit history and exports. Your photos themselves are not deleted.
+                {consent.active && ' Face grouping stays on, so new photos will be grouped again.'} This cannot be undone.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <GradientButton size="sm" variant="danger" onClick={confirmErase}>Yes, delete my face data</GradientButton>
+                <GradientButton size="sm" variant="secondary" onClick={() => setErase({ step: 'idle' })}>Cancel</GradientButton>
+              </div>
+            </div>
+          )}
+          {erase.step === 'deleting' && <p className="text-xs text-ink-mute">Deleting…</p>}
+          {erase.step === 'empty' && (
+            <p role="status" className="text-xs text-ink-mute">
+              There is no face data stored for you.{' '}
+              <button type="button" onClick={() => setErase({ step: 'idle' })} className="underline font-semibold cursor-pointer">OK</button>
+            </p>
+          )}
+          {erase.step === 'done' && (
+            <p role="status" className="text-xs text-[#10B981]">Your face data was deleted.</p>
+          )}
+          {eraseError && <p role="alert" className="text-xs text-[#F87171]">{eraseError}</p>}
+        </div>
+      )}
+
+      {USE_API && ready && (
+        <div className="pt-3 border-t border-line">
+          <GradientButton size="sm" variant="ghost" leftIcon={<Download className="w-3.5 h-3.5" />} disabled={exporting} onClick={handleExport}>
+            {exporting ? 'Preparing…' : 'Download my data'}
+          </GradientButton>
+          {exportError && <p role="alert" className="text-xs text-[#F87171] mt-2">{exportError}</p>}
+        </div>
+      )}
     </div>
   )
 }

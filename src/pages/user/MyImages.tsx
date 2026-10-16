@@ -1,10 +1,14 @@
-import { useMemo, useState } from 'react'
-import { AlertTriangle, Images, Loader2, RefreshCw } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { AlertTriangle, Images, Loader2, RefreshCw, ScanFace, X } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ImageCard } from '../../components/features/ImageCard'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { GradientButton } from '../../components/ui/GradientButton'
+import { ConsentCard } from '../../components/features/ConsentPrompt'
 import { useMyImages } from '../../lib/imageData'
+import { useFaceConsent } from '../../lib/consent'
+import { requestIdentityAnalysis } from '../../lib/api/identities'
 
 /** Mirrors the pipeline's own verdicts, which is what the API filters on. */
 const STATUS_FILTERS = [
@@ -20,6 +24,15 @@ export default function MyImages() {
   const [status, setStatus] = useState('')
   const [page, setPage] = useState(1)
 
+  /* Picking photos is what leads to the face-grouping question, so the consent card lives
+     here and only appears once something is selected. */
+  const consent = useFaceConsent()
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [cardHidden, setCardHidden] = useState(false)
+  const [wantsToGroup, setWantsToGroup] = useState(false)
+  const [grouping, setGrouping] = useState(false)
+  const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
+
   const { data, loading, error, isDemo, reload } = useMyImages(page, status || undefined)
   const images = useMemo(() => data?.results ?? [], [data])
   const total = data?.count ?? 0
@@ -32,9 +45,68 @@ export default function MyImages() {
     ? images.filter(image => image.original_name.toLowerCase().includes(search.toLowerCase()))
     : images
 
+  /* Only an accepted upload can be analysed: the backend answers 404 for a rejected or
+     still-processing photo, so those cannot be ticked. */
+  const eligibleIds = useMemo(() => visible.filter(image => image.status === 'uploaded').map(image => image.id), [visible])
+
+  const clearSelection = () => setSelected(new Set())
+  const toggle = (id: number) => setSelected(current => {
+    const next = new Set(current)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    return next
+  })
+
+  // The question starts afresh the next time something is picked.
+  useEffect(() => {
+    if (selected.size === 0) { setCardHidden(false); setWantsToGroup(false) }
+  }, [selected.size])
+
+  const showConsentCard = selected.size > 0 && consent.needsConsent && !cardHidden
+
   const changeStatus = (next: string) => {
     setStatus(next)
     setPage(1)
+    clearSelection()
+  }
+
+  const goToPage = (next: number) => {
+    setPage(next)
+    clearSelection()
+  }
+
+  const groupSelected = async () => {
+    const ids = [...selected]
+    setGrouping(true)
+    setNotice(null)
+    let started = 0
+    let firstError = ''
+    for (const id of ids) {
+      try {
+        await requestIdentityAnalysis(id)
+        started += 1
+      } catch (caught) {
+        if (!firstError) firstError = caught instanceof Error ? caught.message : 'Could not group a photo.'
+      }
+    }
+    setGrouping(false)
+    if (started > 0) clearSelection()
+    const failed = ids.length - started
+    setNotice(
+      failed === 0
+        ? { kind: 'ok', text: `Grouping started for ${started} photo${started === 1 ? '' : 's'}. Person Folders update when it finishes.` }
+        : { kind: 'error', text: `${started} started, ${failed} could not be grouped: ${firstError}` },
+    )
+  }
+
+  const handleGroupClick = () => {
+    if (consent.needsConsent) {
+      // They asked for grouping, so once they agree it carries straight on.
+      setWantsToGroup(true)
+      setCardHidden(false)
+      return
+    }
+    void groupSelected()
   }
 
   return (
@@ -127,15 +199,77 @@ export default function MyImages() {
       {!loading && !error && visible.length > 0 && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
-            {visible.map(image => <ImageCard key={image.id} image={image} />)}
+            {visible.map(image => (
+              <ImageCard
+                key={image.id}
+                image={image}
+                selectable={image.status === 'uploaded'}
+                selected={selected.has(image.id)}
+                onToggleSelect={() => toggle(image.id)}
+              />
+            ))}
           </div>
+
+          {(selected.size > 0 || notice) && (
+            <div className="sticky bottom-4 z-30 mt-6 space-y-3">
+              {showConsentCard && (
+                <ConsentCard
+                  selectedCount={selected.size}
+                  onNotNow={() => { setCardHidden(true); setWantsToGroup(false) }}
+                  onAllowed={() => {
+                    setCardHidden(true)
+                    if (wantsToGroup) { setWantsToGroup(false); void groupSelected() }
+                  }}
+                />
+              )}
+
+              {notice && (
+                <div
+                  role="status"
+                  className={`p-3 rounded-2xl text-xs border flex items-start justify-between gap-3 ${
+                    notice.kind === 'ok'
+                      ? 'bg-[#10B981]/10 border-[#10B981]/25 text-[#10B981]'
+                      : 'bg-[#EF4444]/10 border-[#EF4444]/25 text-[#F87171]'
+                  }`}
+                >
+                  <span>{notice.text}</span>
+                  <button type="button" onClick={() => setNotice(null)} aria-label="Dismiss" className="cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {selected.size > 0 && (
+                <div className="fc-panel-strong px-4 py-3 flex flex-wrap items-center gap-3 shadow-soft-lg">
+                  <span className="text-[13px] font-semibold text-ink">{selected.size} selected</span>
+                  <button type="button" onClick={clearSelection} className="text-xs font-semibold text-ink-mute hover:text-ink cursor-pointer">
+                    Clear
+                  </button>
+                  {selected.size < eligibleIds.length && (
+                    <button type="button" onClick={() => setSelected(new Set(eligibleIds))} className="text-xs font-semibold text-[#FB923C] hover:underline cursor-pointer">
+                      Select all on this page
+                    </button>
+                  )}
+                  <div className="flex-1" />
+                  <GradientButton
+                    size="sm" leftIcon={<ScanFace className="w-4 h-4" />}
+                    disabled={grouping || isDemo}
+                    title={isDemo ? 'Connect the live service to group photos' : undefined}
+                    onClick={handleGroupClick}
+                  >
+                    {grouping ? 'Starting…' : 'Group by person'}
+                  </GradientButton>
+                </div>
+              )}
+            </div>
+          )}
 
           {(data?.next || data?.previous) && (
             <div className="flex items-center justify-center gap-3 mt-8 text-xs">
               <button
                 type="button"
                 disabled={!data?.previous}
-                onClick={() => setPage(current => Math.max(1, current - 1))}
+                onClick={() => goToPage(Math.max(1, page - 1))}
                 className="px-4 py-2 rounded-xl font-semibold border border-line text-ink-soft hover:text-ink transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default"
               >
                 Previous
@@ -144,7 +278,7 @@ export default function MyImages() {
               <button
                 type="button"
                 disabled={!data?.next}
-                onClick={() => setPage(current => current + 1)}
+                onClick={() => goToPage(page + 1)}
                 className="px-4 py-2 rounded-xl font-semibold border border-line text-ink-soft hover:text-ink transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default"
               >
                 Next
