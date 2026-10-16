@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Mail, Lock, User } from 'lucide-react'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
+import { register, savePendingRegistration } from '../lib/api/auth'
+import { ApiError } from '../lib/api/client'
+import { USE_API } from '../lib/api/config'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -17,9 +20,27 @@ export default function Register() {
     if (password !== confirmPassword) { setError('Passwords do not match'); return }
     setError('')
     setLoading(true)
+
+    /* With VITE_USE_API=true the account is created for real: the backend emails
+       a verification link and the account exists once it is opened. The password
+       goes to the backend and nowhere else — it is never kept in the browser. */
+    if (USE_API) {
+      try {
+        const { registrationId, maskedEmail } = await register({
+          fullName: name, email: email.trim(), password, passwordConfirm: confirmPassword,
+        })
+        savePendingRegistration({ id: registrationId, maskedEmail })
+        navigate('/verify-email')
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : 'Could not create the account. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
     await new Promise(r => setTimeout(r, 800))
     setLoading(false)
-    localStorage.setItem('fc_draft_user', JSON.stringify({ name, email, password }))
     localStorage.setItem('fc_email_verified', 'false')
     navigate('/verify-email')
   }

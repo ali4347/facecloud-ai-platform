@@ -46,6 +46,51 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Authentication wired to the real backend: sign-up, email link, user / admin / moderator sign-in, sign-out
+*Status: committed (this commit). Built against backend PR #73 (`feat/signup-link-verification`), which is open, not merged.*
+
+Scope agreed with the owner: **authentication only**, UI unchanged, backend adapted to the frontend (see the backend
+review below). Everything is behind `VITE_USE_API`; with it off every screen behaves exactly as before (demo build).
+
+- **Sign-up (`/register`)** sends `full_name`, email, password and confirmation to `POST /api/auth/register/` (no username field —
+  the backend derives one). Backend wording is shown for errors (duplicate email, weak password, rate limits). The password is
+  no longer written to `localStorage`: the old demo kept `{name, email, password}` there as `fc_draft_user`; that is gone.
+  Only the registration id and the masked address are kept, in `sessionStorage`, for the resend button.
+- **Email verification (`/verify-email`)** reads `registration_id` and `token` from the emailed link, removes them from the address
+  bar, and `POST`s them to `/api/auth/verify-email/`; success goes to `/login`. Opening a link that was already used also reads as
+  success (the backend answers 200 without saying whose account). Without a link the button is disabled and the text says to open
+  the email. "Resend Verification Link" calls the resend endpoint; a resend inside the cooldown shows the backend's wait message.
+- **Sign-in:** `/login`, `/admin/login` and `/moderator/login` share `signInToPortal()` in `src/lib/api/auth.ts`. All three use
+  `POST /api/auth/login/` (email or username). The admin and moderator doors check the backend's `dashboard`: any other account is
+  refused with "does not have administrator / moderator access" **and its tokens are revoked** (nothing is left in the browser).
+  The user door routes by `dashboard`. The displayed name is the backend's `full_name`. In API mode the three forms start empty
+  (the demo credentials are pre-filled only in demo mode). Two-factor still shows the existing "not built" message.
+- **Sign-out** (`UserMenu`) now also revokes the refresh token on the backend.
+- **Removed:** `src/pages/Signup.tsx` — an orphan (`/signup` already redirected to `/register`) that also stored the password.
+- **429 wording:** the generic "wait a few minutes" text was dropped on sign-up, verify, forgot and reset; the backend's own message
+  says how long to wait.
+- **Files:** `src/lib/api/auth.ts`, `src/pages/{Login,Register,VerifyEmail}.tsx`, `src/pages/admin/AdminLogin.tsx`,
+  `src/pages/moderator/ModeratorLogin.tsx`, `src/pages/{ForgotPassword,ResetPassword}.tsx`, `src/components/ui/UserMenu.tsx`,
+  `README.md`; deleted `src/pages/Signup.tsx`.
+- **Backend side (reported, not done by me):** the owner ran the login/sign-up prompt in the backend repo → PR #73. I reviewed it and
+  ran it from a throwaway copy of the branch on its own port with an empty database (the owner's server and database were not
+  touched). It matched the prompt: optional username + required `full_name`; link verification (single use, resend retires the old
+  link, replay = 200 without `user`); `full_name` on user objects; a membership moderator gets `role` and `dashboard` "moderator" while
+  an organization owner stays "user"; production guard refuses a localhost `FRONTEND_URL`. Open items on the backend: its migration
+  `accounts/0007` clashes with Ijaz's PR #68 (merge order); the audit event is still named `verification_code_sent`; register still
+  answers "A user with this email already exists" for a taken address (existing behaviour, a deliberate enumeration trade-off).
+  The first admin (`FaceCloud`) was created by hand with `createsuperuser` and then marked verified, because a superuser is otherwise
+  stuck on "Email verification is required" — a backend follow-up (`create_superuser` should set it) is still to be run.
+- **Verified:** `npm run build` clean. Headless Chrome against the PR branch (own port, empty database, console email backend):
+  sign-up form has no username field; sign-up → "check your email" with the masked address and a disabled verify button; the emailed
+  link opens with the token stripped from the URL; verify → success → `/login`; login starts empty; user lands on `/dashboard` with
+  the right name; sign-out clears session and refresh token; a normal user is refused at the admin and moderator doors with nothing
+  left behind; the membership moderator reaches `/moderator`; the admin reaches `/admin`; wrong password shows the backend message;
+  replaying a used link reads as success; a wrong token shows an error; resend inside the cooldown shows the wait message and after
+  it the new link works and the old one stops; duplicate email and a weak password are refused with the backend text. Demo mode
+  (`VITE_USE_API=false`) re-checked: the three logins, sign-up and verify behave as before. **Not verified:** the HTML email in a
+  real inbox; PostgreSQL; the flow against the owner's own server on :8000 (which runs the same branch); two-factor.
+
 ### 2026-10-16 — Admin Users: "Add User" now works (demo), Suspend/Activate wired to the backend
 *Status: committed (this commit); creating an account against the live API still needs a backend endpoint — reported, not built (backend frozen)*
 
@@ -1365,15 +1410,16 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 ## 5. Backend Status
 
-- **Stack:** PostgreSQL 16 (Docker) + Prisma ORM 5.22 + ts-node seed. Redis 7 container defined but unused.
-- **Schema (`backend/prisma/schema.prisma`)** — 15 models: `User`, `Session`, `Upload`, `Image`, `DetectedFace`,
-  `ImageQualityCheck`, `FaceEmbedding`, `PersonFolder`, `PersonFolderImage`, `ProcessingJob`, `ProcessingStep`,
-  `Notification`, `ActivityLog`, `AdminAuditLog`, `ModeratorReview`. 8 enums: `Role`, `UserStatus`, `JobStatus`,
-  `QualityStatus`, `ReviewStatus`, `RiskLevel`, `NotificationType`, `StepStatus`.
-- **Migrations:** `20260714_init` (applied 2026-07-14).
-- **Seed:** `npm run seed` in `backend/` creates the three role accounts (bcrypt-hashed password `password`).
-- **Not built yet:** API gateway, JWT auth, upload presigning, S3/R2 storage, BullMQ queue, Python AI workers,
-  email delivery, frontend API client. The frontend still talks to nothing.
+- **The backend is a separate repository** — `github.com/ijaz-student021/FaceCloud_backend` (Django 6.1 + DRF + SimpleJWT + Celery +
+  Redis + PostgreSQL in production, SQLite in development), cloned at `~/Projects/FaceCloud_backend`. The Prisma / NestJS design this
+  section used to describe was never built; `README_BACKEND_ROADMAP.md` is stale for the same reason.
+- **Not deployed anywhere.** It runs only on the owner's machine (`manage.py runserver`, API docs at `/api/docs/`, Django admin at
+  `/admin/`). The live site (facecloudai.com on Hostinger) is the demo build and does not call it.
+- **Authentication is attached (2026-10-16):** sign-up with an emailed link, user / admin / moderator sign-in, sign-out, forgot and reset
+  password — against backend PR #73, not yet merged. Other already-attached screens: user upload / processing / gallery / dashboard,
+  moderator queue and dashboard, admin Users and Moderators lists. Everything else is still demo data.
+- **Backend gaps the frontend is waiting on:** an endpoint for an administrator to create a user or moderator (the Add User and
+  Create moderator forms are switched off against the live API); `create_superuser` should mark the email verified.
 
 ---
 

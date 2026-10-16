@@ -5,6 +5,8 @@ import { Avatar } from './Avatar'
 import { useSessionUser } from '../../lib/session'
 import { announcePopoverOpen, onOtherPopoverOpen } from '../../lib/popover'
 import type { Role } from '../../data/mock'
+import { logout } from '../../lib/api/auth'
+import { USE_API } from '../../lib/api/config'
 
 interface UserMenuProps {
   role: Role
@@ -97,6 +99,10 @@ export function UserMenu({ role }: UserMenuProps) {
      /login, which left the session in place, so the guard sent you back in. */
   const handleLogout = () => {
     localStorage.removeItem('facecloud_session')
+    /* Against the real backend this also revokes the refresh token, so the
+       session cannot be revived from another tab. It clears the local tokens
+       even if the call fails, so it does not need to be awaited. */
+    if (USE_API) void logout()
     setOpen(false)
     navigate(loginPath[role])
   }

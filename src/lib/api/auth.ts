@@ -1,11 +1,14 @@
 import { apiFetch } from './client'
 import { setAccessToken, setRefreshToken, getRefreshToken, clearTokens } from './tokens'
 import type { Role } from '../../data/mock'
+import { initialsFrom } from '../session'
 
 export interface ApiUser {
   id?: number | string
   username?: string
   email: string
+  /** First and last name, or the username when the person has no name on record. */
+  full_name?: string
   first_name?: string
   last_name?: string
   [key: string]: unknown
@@ -79,33 +82,67 @@ export async function verifyTwoFactor(loginToken: string, code: string): Promise
 }
 
 /**
- * Start registration. No account exists until the emailed six-digit code is
- * verified, so keep the returned id and send the person to the code screen.
+ * Start registration. No account exists until the emailed link is opened, so
+ * keep the returned id and send the person to the "check your email" screen.
+ * The username is left out on purpose: the backend derives one from the email.
  */
-export async function register(
-  username: string, email: string, password: string
-): Promise<{ registrationId: string }> {
-  const data = await apiFetch<{ registration_id: string }>('/api/auth/register/', {
-    body: { username, email, password },
+export async function register(input: {
+  fullName: string; email: string; password: string; passwordConfirm: string
+}): Promise<{ registrationId: string; maskedEmail: string }> {
+  const data = await apiFetch<{ registration_id: string; email?: string }>('/api/auth/register/', {
+    body: {
+      full_name: input.fullName,
+      email: input.email,
+      password: input.password,
+      password_confirm: input.passwordConfirm,
+    },
     anonymous: true,
   })
-  return { registrationId: data.registration_id }
+  return { registrationId: data.registration_id, maskedEmail: data.email ?? '' }
 }
 
-/** Finish registration with the six-digit code. The account exists after this. */
-export async function verifyEmail(registrationId: string, code: string): Promise<void> {
+/**
+ * Finish registration with the two values from the emailed link. The account
+ * exists afterwards. Opening a link that was already used answers success too
+ * (without saying whose account it is), so both cases read as "go and sign in".
+ */
+export async function verifyEmail(registrationId: string, token: string): Promise<void> {
   await apiFetch('/api/auth/verify-email/', {
-    body: { registration_id: registrationId, code },
+    body: { registration_id: registrationId, token },
     anonymous: true,
   })
 }
 
-/** Send a fresh code. Has a cooldown; a 429 means "wait and try again". */
-export async function resendVerificationCode(registrationId: string): Promise<void> {
+/** Email a fresh link and retire the old one. Has a cooldown; a 429 says how long to wait. */
+export async function resendVerificationLink(registrationId: string): Promise<void> {
   await apiFetch('/api/auth/verify-email/resend/', {
     body: { registration_id: registrationId },
     anonymous: true,
   })
+}
+
+/* The registration in progress, kept for this browser tab only. It holds the
+   public id and the masked address (never the password) so the "check your
+   email" screen can offer a resend without the person typing anything again. */
+const PENDING_KEY = 'fc_pending_registration'
+
+export interface PendingRegistration { id: string; maskedEmail: string }
+
+export function savePendingRegistration(pending: PendingRegistration): void {
+  try { sessionStorage.setItem(PENDING_KEY, JSON.stringify(pending)) } catch { /* blocked storage */ }
+}
+
+export function getPendingRegistration(): PendingRegistration | null {
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(PENDING_KEY) ?? 'null')
+    return parsed && typeof parsed.id === 'string' ? parsed : null
+  } catch {
+    return null
+  }
+}
+
+export function clearPendingRegistration(): void {
+  try { sessionStorage.removeItem(PENDING_KEY) } catch { /* blocked storage */ }
 }
 
 /** Always answers the same way, so never reveal whether the address exists. */
@@ -121,6 +158,49 @@ export async function confirmPasswordReset(
     body: { uidb64, token, new_password: newPassword },
     anonymous: true,
   })
+}
+
+/** The name to show for a signed-in person. */
+export function displayNameOf(user: ApiUser): string {
+  return user.full_name?.trim() || user.username || user.email
+}
+
+export type Portal = 'any' | 'admin' | 'moderator'
+
+export type PortalSignIn =
+  | { kind: 'ok'; dashboard: Role }
+  | { kind: 'two-factor' }
+  | { kind: 'wrong-portal' }
+
+/**
+ * Sign in and remember who it was, for the user, admin and moderator login screens.
+ *
+ * All three use the same endpoint; the backend's `dashboard` says which portal
+ * the account belongs to. The admin and moderator screens pass their portal, and
+ * an account that belongs elsewhere is signed straight back out — its tokens are
+ * revoked rather than just forgotten — so a user cannot sit logged in behind the
+ * staff door. The user screen passes 'any' and routes by `dashboard`.
+ */
+export async function signInToPortal(
+  identifier: string, password: string, portal: Portal
+): Promise<PortalSignIn> {
+  const result = await login(identifier, password)
+  if (result.kind === 'two-factor') return { kind: 'two-factor' }
+
+  if (portal !== 'any' && result.dashboard !== portal) {
+    await logout()
+    return { kind: 'wrong-portal' }
+  }
+
+  const name = displayNameOf(result.user)
+  localStorage.setItem('facecloud_session', JSON.stringify({
+    role: result.role,
+    email: result.user.email,
+    name,
+    initials: initialsFrom(name),
+    emailVerified: true,
+  }))
+  return { kind: 'ok', dashboard: result.dashboard }
 }
 
 /** Sign out this device. The tokens are cleared even if the call fails. */

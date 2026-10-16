@@ -3,11 +3,14 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Lock, Mail } from 'lucide-react'
 import { PasswordInput } from '../../components/ui/PasswordInput'
 import { FaceCloudLogo } from '../../components/branding/FaceCloudLogo'
+import { signInToPortal } from '../../lib/api/auth'
+import { ApiError } from '../../lib/api/client'
+import { USE_API } from '../../lib/api/config'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('admin@dtm.io')
-  const [password, setPassword] = useState('password')
+  const [email, setEmail] = useState(USE_API ? '' : 'admin@dtm.io')
+  const [password, setPassword] = useState(USE_API ? '' : 'password')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -15,7 +18,27 @@ export default function AdminLogin() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
+    /* With VITE_USE_API=true this is a real sign-in against the backend; the
+       mock path below keeps the demo working until every screen is migrated. */
+    if (USE_API) {
+      try {
+        const result = await signInToPortal(email.trim(), password, 'admin')
+        if (result.kind === 'two-factor') {
+          setError('This account has two-factor authentication on. That screen is not built yet.')
+        } else if (result.kind === 'wrong-portal') {
+          setError('This account does not have administrator access.')
+        } else {
+          navigate('/admin')
+        }
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : 'Could not sign in. Please try again.')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
     await new Promise(r => setTimeout(r, 800))
     setLoading(false)
 

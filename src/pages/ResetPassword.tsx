@@ -32,11 +32,7 @@ export default function ResetPassword() {
       setDone(true)
       setTimeout(() => navigate('/login'), 2000)
     } catch (err) {
-      setError(
-        err instanceof ApiError && err.isThrottled
-          ? 'Too many attempts. Please wait a few minutes and try again.'
-          : err instanceof ApiError ? err.message : 'Could not reset the password. Please try again.'
-      )
+      setError(err instanceof ApiError ? err.message : 'Could not reset the password. Please try again.')
     } finally {
       setLoading(false)
     }

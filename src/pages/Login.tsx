@@ -2,17 +2,17 @@ import { useState } from 'react'
 import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Lock, Mail, AlertTriangle } from 'lucide-react'
 import { PasswordInput } from '../components/ui/PasswordInput'
-import { login } from '../lib/api/auth'
+import { signInToPortal } from '../lib/api/auth'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
-import { initialsFrom } from '../lib/session'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState('user@facecloud.ai')
-  const [password, setPassword] = useState('password')
+  /* The demo account is pre-filled only in demo mode; a real sign-in starts empty. */
+  const [email, setEmail] = useState(USE_API ? '' : 'user@facecloud.ai')
+  const [password, setPassword] = useState(USE_API ? '' : 'password')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -27,22 +27,12 @@ export default function Login() {
        mock path below keeps the demo working until every screen is migrated. */
     if (USE_API) {
       try {
-        const result = await login(email, password)
+        const result = await signInToPortal(email.trim(), password, 'any')
         if (result.kind === 'two-factor') {
           setError('This account has two-factor authentication on. That screen is not built yet.')
           return
         }
-        const name =
-          [result.user.first_name, result.user.last_name].filter(Boolean).join(' ').trim() ||
-          result.user.username ||
-          result.user.email
-        localStorage.setItem('facecloud_session', JSON.stringify({
-          role: result.role,
-          email: result.user.email,
-          name,
-          initials: initialsFrom(name),
-          emailVerified: true,
-        }))
+        if (result.kind !== 'ok') return // only the staff screens can be sent to the wrong portal
         navigate(result.dashboard === 'admin' ? '/admin'
                : result.dashboard === 'moderator' ? '/moderator'
                : '/dashboard')

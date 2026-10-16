@@ -23,11 +23,7 @@ export default function ForgotPassword() {
       if (USE_API) await requestPasswordReset(email.trim())
       setSent(true)
     } catch (err) {
-      setError(
-        err instanceof ApiError && err.isThrottled
-          ? 'Too many attempts. Please wait a few minutes and try again.'
-          : err instanceof ApiError ? err.message : 'Could not send the email. Please try again.'
-      )
+      setError(err instanceof ApiError ? err.message : 'Could not send the email. Please try again.')
     } finally {
       setLoading(false)
     }
