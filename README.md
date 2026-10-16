@@ -148,8 +148,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/processing/:id` (Real-time single job processing tracker)
 * `/dashboard/images` (My Images gallery browser)
 * `/dashboard/images/:id` (Image Detail, EXIF data, and enhancement controls)
-* `/dashboard/groups` (Person Folders / Identity Groups collection)
-* `/dashboard/groups/:id` (Group Detail view showing all images matching that cluster)
+* `/dashboard/groups` (Person Folders: with the API on, your real folders with a mosaic of their photos; the consent banner appears here when face grouping is off)
+* `/dashboard/groups/:id` (one Person Folder: its photos, rename, Download All / Download Selected as a ZIP, and a time-limited Secure Link to the whole folder's ZIP)
 * `/dashboard/downloads` (Secured downloads and PDF reports generation list)
 * `/dashboard/notifications` (System alert logs and settings notifications)
 * `/dashboard/activity` (Personal user auditing event stream)
@@ -373,6 +373,13 @@ deployed backend.
 * **SPA Routing Configuration**: React Router owns every path, so the server must return `index.html` for any route
   that is not a real file. Two config files cover this, and both are built from `public/`:
   * `public/.htaccess` — the one that matters for the live site. It ships inside `dist/` on every build.
+
+> [!WARNING]
+> **Build the hosting copy as the demo, not with your local settings.** `.env.local` (which points at `http://127.0.0.1:8000` and turns the API on)
+> is read by every `npm run build` on your own machine, so a build made there carries that address and every visitor's browser would try to
+> reach *their* localhost. Build it with the settings overridden:
+> `VITE_USE_API=false VITE_API_URL= npm run build`, and check that `grep -c "127.0.0.1:8000" dist/assets/index-*.js` prints `0`
+> before uploading. (A build made from a clean checkout, which has no `.env.local`, is safe too.)
 
 > [!IMPORTANT]
 > **`.htaccess` is a hidden file.** Most file managers and FTP clients do not show names beginning with a dot, so it

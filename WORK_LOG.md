@@ -46,6 +46,39 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-16 — Person Folders connected to the backend: list, folder page, rename, ZIP downloads and secure link
+*Status: committed (this commit). Built against backend PRs #76 and #77 (merged).*
+
+- **List (`/dashboard/groups`):** real folders from `GET /api/identities/groups/` with a mosaic of up to four of their photos (protected thumbnails fetched
+  with the token), the photo count and the update date; loading, error-with-retry and empty states; the consent banner stays. The "FaceNet/ArcFace" wording
+  on this page was replaced by neutral text. With the API off it shows the demo folders as before.
+- **Folder page (`/dashboard/groups/:id`):** the real name, photo count, **average confidence** (the backend's percentage; "—" when it has none, never
+  invented), dates, a cover photo, and the folder's photos (name, size, real dimensions, per-photo match %, status badge) with paging (24 per page) and
+  selection that survives paging. **Rename** saves through `PATCH …/rename/`. **Download All / Download Selected** ask for a ZIP
+  (`POST …/exports/`, with `image_ids` for a selection), wait for the background job (`queued → generating → ready`), then download it with the token;
+  the ZIP holds the originals plus a manifest and report. **Secure Link** prepares the whole-folder ZIP and calls `POST …/exports/{id}/share/`; the link is
+  shown on screen with its expiry and a "shown only now" warning (the server keeps only a hash, so it is gone on leaving the page), with a Copy button as a
+  convenience. A folder that is not yours or does not exist shows "This folder could not be found." (not the raw 404 text) and a way back.
+  The original mock page is kept as `GroupDetailDemo` and is what the demo build renders.
+- **Files:** new `src/lib/personFolders.ts`, `src/pages/user/GroupDetailLive.tsx`, `src/pages/user/GroupDetailDemo.tsx` (the old page, renamed);
+  rewritten `src/pages/user/GroupDetail.tsx` (a switch), `src/pages/user/IdentityGroups.tsx`, `src/components/features/IdentityGroupCard.tsx`;
+  extended `src/lib/api/identities.ts`; `README.md` (routes, and a warning about building the hosting copy).
+- **Verified:** `npm run build` clean. Headless Chrome against a throwaway copy of backend `main` (#76/#77 included), real photo files in storage, two users:
+  the list shows only your folders with real thumbnails; the folder page shows 5 photos with the real 93.4% average; rename persists across a reload;
+  Download Selected produced a ZIP with exactly the 2 chosen photos (+ manifest + report), Download All one with all 5; the Secure Link opened with no
+  sign-in and served the whole-folder ZIP; another person's folder id and an unknown id both say "could not be found" and show none of the other
+  person's data; an empty folder says so and its download buttons are disabled; a 26-photo folder pages 24 + 2, keeps the selection across pages, and
+  "select this page" adds only that page; the demo build still renders the demo list and the original demo folder page.
+  Two things the test caught and were fixed: per-photo match % was shown ×100 ("9000%", the backend already sends a percentage), and the raw backend 404 text
+  was showing for a missing folder.
+- **Not verified:** real faces (the test folders were seeded, so how well real photos group is the backend's business); the owner's own server and data; the
+  folder's `merged`/`archived` states (the list only returns active folders); merge, move and delete of folders (the backend has them, no screen does).
+- **Heads-up:** the link's address comes from the backend setting `PUBLIC_BACKEND_URL` (default `http://127.0.0.1:8000`), so on a server where that is not set it
+  points at the wrong host. It must be the real public address in production.
+- **Live site checked the same day:** `facecloudai.com` serves a demo build whose bundle names (`index-CVO94ZWl.js`, `index-DzX0cciM.css`) are identical to a
+  clean build of the then-latest pushed commit (`0e2fcc7`), with the API off and no localhost address in it. The `dist/` folder left on the owner's machine by
+  `npm run build` is *not* safe to upload (it carries `.env.local`'s API address); see the README warning.
+
 ### 2026-10-16 — Admin "Add User" and "Create moderator" now create real accounts
 *Status: committed (this commit). Built against backend PR #75, which is merged.*
 
