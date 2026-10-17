@@ -113,3 +113,23 @@ export function createShareLink(
     },
   })
 }
+
+/** A request to enhance every ready photo of a batch. */
+export interface EnhancementBatchJob {
+  id: number
+  source_batch: number
+  status: EnhancementStatus
+  total_images: number
+  successful_images: number
+  failed_images: number
+  failure_reason: string
+}
+
+/** Enhance the accepted photos of a batch (the level is chosen per photo, as for a single one). */
+export function enhanceBatch(batchId: number): Promise<EnhancementBatchJob> {
+  return apiFetch<EnhancementBatchJob>(`/api/enhancements/batches/${batchId}/`, { method: 'POST', body: {} })
+}
+
+export function getEnhancementBatchJob(jobId: number, signal?: AbortSignal): Promise<EnhancementBatchJob> {
+  return apiFetch<EnhancementBatchJob>(`/api/enhancements/jobs/${jobId}/`, { signal })
+}
