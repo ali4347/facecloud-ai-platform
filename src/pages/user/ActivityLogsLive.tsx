@@ -3,7 +3,7 @@ import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { StatusBadge } from '../../components/ui/StatusBadge'
-import { listActivity, type ActivityPage } from '../../lib/api/activity'
+import { listActivity, listActivityWindow, type ActivityPage } from '../../lib/api/activity'
 import { useApiResource } from '../../lib/useApiResource'
 import { formatDateTime } from '../../lib/utils'
 
@@ -14,20 +14,23 @@ export default function ActivityLogsLive() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('All')
 
+  /* Browsing is one server page at a time. The moment someone searches or picks a type, the newest events
+     (up to the backend's window) are loaded in one go and filtered here, because the backend's own filter
+     uses storage categories that do not match the types on the chips. */
+  const narrowed = search.trim() !== '' || filter !== 'All'
+
   const { data, loading, error, reload } = useApiResource<ActivityPage>(
-    signal => listActivity(page, signal),
+    signal => (narrowed ? listActivityWindow(signal) : listActivity(page, signal)),
     () => ({ page: 1, page_size: 0, has_next: false, results: [] }),
-    [page],
+    [page, narrowed],
   )
   const entries = data?.results ?? []
 
-  /* The server hands over one page at a time, so searching and the type filter narrow the page in
-     view, and the subtitle says so rather than implying it searched everything. */
   const visible = entries.filter(entry =>
     (filter === 'All' || entry.type === filter) &&
     entry.message.toLowerCase().includes(search.trim().toLowerCase()),
   )
-  const narrowed = search.trim() !== '' || filter !== 'All'
+  const countOf = (type: string) => entries.filter(entry => entry.type === type).length
 
   return (
     <div className="page-enter">
@@ -35,13 +38,13 @@ export default function ActivityLogsLive() {
         title="Activity Logs"
         subtitle={
           loading ? 'Loading…'
-          : narrowed ? `${visible.length} of ${entries.length} on this page match`
+          : narrowed ? `${visible.length} match in your latest ${entries.length} events${data?.has_next ? '; older events are not searched' : ''}`
           : 'Complete history of your uploads, enhancements, and downloads.'
         }
       />
 
       <div className="flex flex-wrap items-center gap-3 mb-5">
-        <SearchInput placeholder="Search this page…" value={search} onChange={e => setSearch(e.target.value)} className="w-64" />
+        <SearchInput placeholder="Search your activity…" value={search} onChange={e => setSearch(e.target.value)} className="w-64" />
         <div className="flex flex-wrap gap-2">
           {TYPE_FILTERS.map(f => {
             const isActive = filter === f
@@ -57,7 +60,7 @@ export default function ActivityLogsLive() {
                   boxShadow: isActive ? '0 0 15px rgba(249,115,22, 0.1)' : 'none',
                 }}
               >
-                {f}
+                {f}{narrowed && f !== 'All' && !loading ? <span className="ml-1.5 opacity-60">{countOf(f)}</span> : null}
               </button>
             )
           })}
@@ -105,13 +108,15 @@ export default function ActivityLogsLive() {
             ))}
             {visible.length === 0 && (
               <div className="py-12 text-center text-sm text-ink-faint">
-                {entries.length === 0 ? 'Nothing has happened on your account yet.' : 'No activity on this page matches.'}
+                {entries.length === 0 ? 'Nothing has happened on your account yet.'
+                  : filter !== 'All' && search.trim() === '' ? `No ${filter} activity in your latest ${entries.length} events.`
+                  : 'Nothing in your latest activity matches.'}
               </div>
             )}
           </div>
         )}
 
-        {!loading && !error && (page > 1 || data?.has_next) && (
+        {!loading && !error && !narrowed && (page > 1 || data?.has_next) && (
           <div className="flex items-center justify-center gap-3 py-4 border-t border-line text-xs">
             <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}
               className="px-4 py-2 rounded-xl font-semibold border border-line text-ink-soft hover:text-ink transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default">Previous</button>

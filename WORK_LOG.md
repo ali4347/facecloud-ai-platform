@@ -46,6 +46,18 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-17 — Activity Logs: the type chips and search now work across your activity
+*Status: committed (this commit).*
+
+- **Problem found by the owner:** clicking upload, group, reject, login or email did nothing. The chips only filtered the 20 events on the page in view, so a type with no events there showed an empty list or looked broken.
+- **Fix:** picking a chip (or typing in the search) loads the newest events in one go (up to the backend's 500-event window, 100 per request) and filters them on screen. Each chip shows its count; a type with none says
+  "No group activity in your latest N events." instead of looking inert; the subtitle says how many matched and that older events are not searched. Without a filter it browses page by page as before.
+  The backend's own `?category=` filter was not used because its storage categories (processing, moderation, auth ...) do not match the types on the chips (enhance, reject, login, email ...).
+- **Files:** `src/lib/api/activity.ts` (`listActivity` page size, `listActivityWindow`), `src/pages/user/ActivityLogsLive.tsx`, `README.md`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome vs. a throwaway backend with real events: upload chip showed exactly the 2 uploads, reject the rejected photo, login the sign-ins, group and email said none,
+  All restored the full list, and search found an event beyond the first page.
+- **Backend suggestion (optional):** a `?type=` filter using the same mapping as `activity/presentation.py` would make this exact beyond 500 events.
+
 ### 2026-10-17 — Photo editor: "Hold to compare" now shows the original upload
 *Status: committed (this commit).*
 
