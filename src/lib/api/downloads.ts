@@ -1,5 +1,5 @@
 import { apiFetch, apiFetchBlob, ApiError } from './client'
-import { enhanceBatch, getEnhancementBatchJob } from './enhancements'
+import { enhanceAcceptedPhotos } from '../batchEnhance'
 import type { Page } from './images'
 
 export type DownloadResourceType =
@@ -87,16 +87,12 @@ export async function waitForPackage(start: DownloadPackage): Promise<DownloadPa
   return current
 }
 
-/** Wait for a batch's enhancement job to settle (it runs in the background on a real server). */
+/** Enhance the batch's accepted photos (not the rejected ones) before packaging them. */
 async function waitForEnhancement(batchId: number): Promise<void> {
-  let job = await enhanceBatch(batchId)
-  const deadline = Date.now() + 180_000
-  while (job.status === 'pending' || job.status === 'queued' || job.status === 'processing') {
-    if (Date.now() > deadline) throw new Error('Enhancing the photos is taking longer than expected. Please try again in a minute.')
-    await sleep(1500)
-    job = await getEnhancementBatchJob(job.id)
+  const outcome = await enhanceAcceptedPhotos(batchId)
+  if (outcome.total > 0 && outcome.failed === outcome.total) {
+    throw new Error(outcome.firstError || 'The photos could not be enhanced.')
   }
-  if (job.status === 'failed') throw new Error(job.failure_reason || 'The photos could not be enhanced.')
 }
 
 /**

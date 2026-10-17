@@ -5,6 +5,7 @@ import { useBatchProgress } from '../../lib/imageData'
 import { statusLabel } from '../../lib/imageData'
 import { PIPELINE_STAGES, cancelBatch, retryBatch } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
+import { explainReason } from '../../lib/reasons'
 import { useState } from 'react'
 import {
   AlertCircle, AlertTriangle, ArrowLeft, CheckCircle2, Circle, Loader2, RefreshCw, XCircle,
@@ -173,8 +174,8 @@ export default function ProcessingPage() {
                           <td className="text-xs font-mono text-ink-mute">
                             {Math.round(image.progress_percentage)}%
                           </td>
-                          <td className="text-xs text-[#F87171] max-w-[220px] truncate" title={image.failure_reason}>
-                            {image.failure_reason || '—'}
+                          <td className="text-xs text-[#F87171] max-w-[220px] truncate" title={image.failure_reason ? `${explainReason(image.failure_reason).title}. ${explainReason(image.failure_reason).hint}` : undefined}>
+                            {image.failure_reason ? explainReason(image.failure_reason).title : '—'}
                           </td>
                         </tr>
                       ))}

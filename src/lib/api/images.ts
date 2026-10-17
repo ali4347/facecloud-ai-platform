@@ -193,11 +193,13 @@ export function uploadZip(file: File, signal?: AbortSignal): Promise<UploadBatch
 }
 
 export function listMyImages(
-  params: { page?: number; status?: string } = {}, signal?: AbortSignal,
+  params: { page?: number; status?: string; batch?: number; pageSize?: number } = {}, signal?: AbortSignal,
 ): Promise<Page<ImageListItem>> {
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.status) query.set('status', params.status)
+  if (params.batch) query.set('batch', String(params.batch))
+  if (params.pageSize) query.set('page_size', String(params.pageSize))
   const suffix = query.toString() ? `?${query}` : ''
   return apiFetch<Page<ImageListItem>>(`/api/images/my/${suffix}`, { signal })
 }

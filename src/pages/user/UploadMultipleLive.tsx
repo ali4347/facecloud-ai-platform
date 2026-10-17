@@ -10,7 +10,10 @@ import { uploadMultiple, type ImageListItem } from '../../lib/api/images'
 import { fetchBatchZip } from '../../lib/api/downloads'
 import { formatBytes, statusLabel } from '../../lib/imageData'
 import { saveBlob } from '../../lib/saveBlob'
-import { tally, useFinishedBatch } from '../../lib/uploadBatch'
+import { tally, useFinishedBatch, useReasonBreakdown } from '../../lib/uploadBatch'
+import { BatchStageList } from '../../components/features/BatchStageList'
+import { BatchEnhancementPanel } from '../../components/features/BatchEnhancementPanel'
+import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
 
 /** What the backend accepts in one batch. */
 const MAX_FILES = 150
@@ -28,6 +31,7 @@ export default function UploadMultipleLive() {
 
   const { progress, finished } = useFinishedBatch(batchId)
   const results = tally(progress)
+  const breakdown = useReasonBreakdown(progress, finished)
 
   // Previews are object URLs: let go of them when the screen goes away.
   const pickedRef = useRef(picked)
@@ -283,6 +287,8 @@ export default function UploadMultipleLive() {
                   </div>
                 </div>
 
+                {stage === 'processing' && <div className="p-4 rounded-2xl bg-surface-mute border border-line"><BatchStageList progress={progress} /></div>}
+
                 {stage === 'done' && (
                   <div className="space-y-2.5 p-4 rounded-2xl bg-surface-mute border border-line text-xs text-ink-mute">
                     <div className="flex justify-between"><span>Photos accepted:</span><span className="font-bold text-emerald-400">{results.accepted}</span></div>
@@ -290,6 +296,9 @@ export default function UploadMultipleLive() {
                     <div className="flex justify-between"><span>Photos rejected:</span><span className="font-bold text-accent-soft">{results.rejected + results.failed}</span></div>
                   </div>
                 )}
+
+                {stage === 'done' && <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />}
+                {stage === 'done' && batchId !== null && <BatchEnhancementPanel batchId={batchId} />}
 
                 {(stage === 'preview') && (
                   <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium">

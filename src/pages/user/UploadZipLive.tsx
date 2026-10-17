@@ -9,7 +9,10 @@ import { uploadZip, type UploadBatch } from '../../lib/api/images'
 import { fetchBatchZip } from '../../lib/api/downloads'
 import { formatBytes, statusLabel } from '../../lib/imageData'
 import { saveBlob } from '../../lib/saveBlob'
-import { tally, useFinishedBatch } from '../../lib/uploadBatch'
+import { tally, useFinishedBatch, useReasonBreakdown } from '../../lib/uploadBatch'
+import { BatchStageList } from '../../components/features/BatchStageList'
+import { BatchEnhancementPanel } from '../../components/features/BatchEnhancementPanel'
+import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
 
 /** What the backend takes: a ZIP up to 2 GB. */
 const MAX_ZIP_BYTES = 2 * 1024 * 1024 * 1024
@@ -24,6 +27,7 @@ export default function UploadZipLive() {
   const { progress, finished } = useFinishedBatch(made?.id ?? null)
   const results = tally(progress)
   const done = finished
+  const breakdown = useReasonBreakdown(progress, finished)
 
   const stage: 'select' | 'preview' | 'uploading' | 'processing' | 'done' =
     made ? (done ? 'done' : 'processing') : uploading ? 'uploading' : zipFile ? 'preview' : 'select'
@@ -121,9 +125,9 @@ export default function UploadZipLive() {
                     <p className="font-bold">What happens next?</p>
                     <ul className="space-y-0.5 text-[#FB923C]/70 list-disc list-inside">
                       <li>Photos are extracted from the ZIP</li>
-                      <li>Each photo is enhanced and validated</li>
+                      <li>Each photo is checked: face, sharpness, light and size</li>
                       <li>Accepted photos are grouped by person, if face grouping is on</li>
-                      <li>You can download the accepted photos when it is done</li>
+                      <li>Then you can enhance the accepted photos and download them</li>
                     </ul>
                   </div>
 
@@ -151,9 +155,9 @@ export default function UploadZipLive() {
                   <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
                     <div className="h-full bg-accent transition-all duration-500 rounded-full" style={{ width: `${progress?.progress_percentage ?? 0}%` }} />
                   </div>
-                  <div className="text-[10px] text-ink-mute space-y-1 bg-surface-mute p-3 rounded-2xl border border-line">
-                    <div>Found {made.total_files} photo{made.total_files === 1 ? '' : 's'} in the archive</div>
-                    {progress && <div className="text-accent">{statusLabel(progress.status)} · {progress.stage.replace(/_/g, ' ')}</div>}
+                  <div className="bg-surface-mute p-4 rounded-2xl border border-line space-y-3">
+                    <p className="text-[10px] text-ink-mute">Found {made.total_files} photo{made.total_files === 1 ? '' : 's'} in the archive{progress ? ` · ${statusLabel(progress.status)}` : ''}</p>
+                    <BatchStageList progress={progress} />
                   </div>
                 </div>
               )}
@@ -200,6 +204,9 @@ export default function UploadZipLive() {
                   <div className="flex justify-between"><span>Sent to a moderator:</span><span className="font-bold text-[#FCD34D]">{results.inReview}</span></div>
                   <div className="flex justify-between"><span>Photos rejected:</span><span className="font-bold text-accent-soft">{results.rejected + results.failed}</span></div>
                 </div>
+
+                <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />
+                {made && <BatchEnhancementPanel batchId={made.id} />}
 
                 <div className="space-y-3">
                   {results.accepted > 0 && (

@@ -46,6 +46,25 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-17 — ZIP and multiple upload: processing steps, why photos were rejected, and enhancement made visible
+*Status: committed (this commit).*
+
+- **Problems found by the owner:** (1) after a ZIP upload some face photos were rejected and nothing said why; (2) the ZIP page showed no processing steps and never said whether the photos were being enhanced.
+  The page also claimed "Each photo is enhanced and validated", which was not true: checking a photo does not enhance it, and the backend does not enhance accepted photos by itself yet.
+- **Processing steps:** while a batch runs the page lists the backend's real stages (received, preparing, face check, quality check, grouping, enhancing, finishing) with the current one marked and how many photos are on it.
+  Nothing is timed or simulated. The copy now says what really happens (photos are checked; accepted ones can then be enhanced).
+- **Why photos were not accepted:** a "Why some photos were not accepted" card groups the reasons in plain words with the numbers and the photo names (for example "Face too small in the frame · 1 photo", with what it means and what to do).
+  For a rejected photo only the rejecting reasons are shown, not the milder ones that would only have meant review. The photo page's "Why" uses the same explanations (`src/lib/reasons.ts`), and the processing page's Problem column too.
+- **Enhancement section:** says "N of M accepted photos enhanced" and offers **Enhance accepted photos** with a progress bar; it only counts and only enhances accepted photos. It enhances them one request per photo, three at a time,
+  because the backend's whole-batch call (`POST /api/enhancements/batches/{id}/`) also enhances the photos that were rejected (found in testing: all 3 rejected photos of a ZIP got enhanced copies). "Download Accepted" now uses the same
+  per-photo approach when it has to enhance first.
+- **Files:** new `src/lib/reasons.ts`, `src/lib/batchEnhance.ts`, `src/components/features/{BatchStageList,BatchEnhancementPanel,RejectionBreakdown}.tsx`; edited `src/lib/uploadBatch.ts`, `src/lib/api/images.ts`, `src/lib/api/downloads.ts`,
+  `src/pages/user/{UploadZipLive,UploadMultipleLive,ImageDetail,ProcessingPage}.tsx`, `README.md`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome vs. a throwaway backend (all PRs merged) with a ZIP of 5 photos (2 good, 1 face too small, 1 tiny, 1 with no face): counts 2 accepted / 3 rejected,
+  each reason explained with its photo, no milder reasons on rejected photos, "0 of 2 accepted photos enhanced" then after the button "All 2 accepted photos are enhanced", and the backend shows the 3 rejected photos were not enhanced.
+  A bug found on the way (a React dev double-mount left the panel blank) was fixed.
+- **Backend follow-ups:** batch enhancement must skip photos that were not accepted; accepted photos should be enhanced automatically (WP2); the small-face rule (WP1) is what rejects photos like the "face too small" one.
+
 ### 2026-10-17 — Activity Logs: the type chips and search now work across your activity
 *Status: committed (this commit).*
 

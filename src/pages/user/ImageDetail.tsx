@@ -10,6 +10,7 @@ import { USE_API } from '../../lib/api/config'
 import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
 import { deleteImage, downloadImage, getImageThumbnail } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
+import { explainReason, REJECTING_CODES } from '../../lib/reasons'
 import {
   AlertTriangle, ArrowLeft, CheckCircle2, Download, Loader2, RefreshCw, Trash2, XCircle,
 } from 'lucide-react'
@@ -60,7 +61,14 @@ export default function ImageDetail() {
   const verdict = image?.display_status
   const accepted = verdict === 'accepted'
   const rejected = verdict === 'rejected'
-  const reasons = image?.quality_decision?.rejection_reasons ?? []
+  const allReasons = [...new Set([
+    ...(image?.quality_decision?.rejection_reasons ?? []),
+    ...(image?.face_validation?.rejection_reason ? [image.face_validation.rejection_reason] : []),
+  ])]
+  /* The backend lists the reasons that rejected a photo together with milder ones that would only have sent it
+     to review. A rejected photo's answer to "why" is the rejecting ones; a photo in review, the milder ones. */
+  const matching = allReasons.filter(code => (verdict === 'rejected') === REJECTING_CODES.has(code))
+  const reasons = matching.length > 0 ? matching : allReasons
 
   return (
     <div className="space-y-6 page-enter">
@@ -180,8 +188,16 @@ export default function ImageDetail() {
                     </p>
                     {image.rejection_reason && <p>{image.rejection_reason}</p>}
                     {reasons.length > 0 && (
-                      <ul className="list-disc list-inside space-y-0.5">
-                        {reasons.map(reason => <li key={reason}>{reason}</li>)}
+                      <ul className="space-y-2">
+                        {reasons.map(reason => {
+                          const info = explainReason(reason)
+                          return (
+                            <li key={reason}>
+                              <span className="font-semibold text-ink">{info.title}</span>
+                              {info.hint && <span className="block text-ink-mute">{info.hint}</span>}
+                            </li>
+                          )
+                        })}
                       </ul>
                     )}
                   </div>
