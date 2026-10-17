@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { Menu, Search, History, Sun, Moon } from 'lucide-react'
+import { Menu, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
+import { GlobalSearch } from './GlobalSearch'
 import type { Appearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 
@@ -25,7 +26,6 @@ const activityPath: Record<Role, string> = {
 
 export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
   const searchRef = useRef<HTMLInputElement>(null)
-  const [query, setQuery] = useState('')
 
   /* ⌘K / Ctrl+K focuses search — the shortcut the chip in the field advertises. */
   useEffect(() => {
@@ -53,23 +53,7 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appeara
 
       {/* Search */}
       <div className="flex-1 max-w-[460px]">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-faint pointer-events-none" />
-          <input
-            ref={searchRef}
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder="Search project..."
-            aria-label="Search images, groups and jobs"
-            className="w-full h-11 pl-10 pr-16 rounded-[14px] bg-surface border border-line text-[13px] text-ink
-                       placeholder:text-ink-faint shadow-[0_1px_2px_rgb(var(--a-shadow-rgb) / 0.45)] outline-none
-                       transition-colors focus:border-accent-soft"
-          />
-          <span className="fc-kbd absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center">
-            ⌘ K
-          </span>
-        </div>
+        <GlobalSearch role={role} inputRef={searchRef} />
       </div>
 
       <div className="flex-1" />
@@ -88,7 +72,7 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appeara
             ? <Sun className="w-[18px] h-[18px]" />
             : <Moon className="w-[18px] h-[18px]" />}
         </button>
-        <NotificationDropdown sidebarOpen={sidebarOpen} onOpen={onCloseSidebar} />
+        <NotificationDropdown sidebarOpen={sidebarOpen} onOpen={onCloseSidebar} role={role} />
         <Link
           to={activityPath[role]}
           className="fc-icon-btn hidden md:inline-flex"

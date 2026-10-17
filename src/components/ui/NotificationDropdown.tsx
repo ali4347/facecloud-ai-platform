@@ -1,24 +1,41 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Bell, Check, X } from 'lucide-react'
 import { formatDateTime } from '../../lib/utils'
 import { mockActivity } from '../../data/mock'
 import { announcePopoverOpen, onOtherPopoverOpen } from '../../lib/popover'
 import { useReadNotifications } from '../../lib/notifications'
 import { getSession } from '../../lib/session'
+import { USE_API } from '../../lib/api/config'
+import { useLiveBell, type BellItem } from '../../lib/useLiveBell'
+import type { Role } from '../../data/mock'
 
 interface NotificationDropdownProps {
   onOpen?: () => void
   sidebarOpen?: boolean
+  /** Only the user portal has real notifications; the other portals keep their demo feed. */
+  role?: Role
 }
 
-export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdownProps) {
+export function NotificationDropdown({ onOpen, sidebarOpen, role }: NotificationDropdownProps) {
   const [open, setOpen] = useState(false)
   const [notifications] = useState(mockActivity.slice(0, 5))
   const location = useLocation()
+  const navigate = useNavigate()
   const email = getSession()?.email ?? ''
   const ids = useMemo(() => notifications.map(n => String(n.id)), [notifications])
-  const { isRead, unreadCount, markAllRead } = useReadNotifications(email, ids)
+  const { isRead, unreadCount: demoUnread, markAllRead: demoMarkAllRead } = useReadNotifications(email, ids)
+
+  const live = role === 'user' && USE_API
+  const bell = useLiveBell(live)
+  const unreadCount = live ? bell.unread : demoUnread
+  const markAllRead = live ? () => void bell.markAllRead() : demoMarkAllRead
+  const items: BellItem[] = live
+    ? bell.items
+    : notifications.map(n => ({
+        id: String(n.id), text: n.message, time: n.timestamp, read: isRead(String(n.id)), to: null,
+        tone: n.status === 'success' ? 'success' : n.status === 'error' ? 'error' : n.status === 'warning' ? 'warning' : 'info',
+      }))
 
   const btnRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -81,6 +98,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
       if (next) {
         announcePopoverOpen('notifications')
         if (onOpen) onOpen()
+        if (live) void bell.loadItems()
       }
       return next
     })
@@ -91,6 +109,14 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
     if (status === 'error')   return '#EF4444'
     if (status === 'warning') return '#F59E0B'
     return '#F97316'
+  }
+
+  /* A real notification is read by opening it: it is marked read and its page is shown. */
+  const openItem = (item: BellItem) => {
+    if (!live) return
+    if (!item.read) void bell.markRead(item.id)
+    setOpen(false)
+    if (item.to) navigate(item.to)
   }
 
   return (
@@ -144,19 +170,32 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
 
           {/* Items */}
           <div className="max-h-80 overflow-y-auto p-2 space-y-1">
-            {notifications.map(n => (
+            {live && bell.loading && items.length === 0 && (
+              <p className="px-3 py-6 text-center text-[12px] text-ink-faint">Loading…</p>
+            )}
+            {live && bell.error && (
+              <p role="alert" className="px-3 py-3 text-[12px] text-[#F87171]">{bell.error}</p>
+            )}
+            {live && !bell.loading && !bell.error && items.length === 0 && (
+              <p className="px-3 py-6 text-center text-[12px] text-ink-faint">You have no notifications yet.</p>
+            )}
+            {items.map(n => (
               <div
                 key={n.id}
+                role={live ? 'button' : undefined}
+                tabIndex={live ? 0 : undefined}
+                onClick={() => openItem(n)}
+                onKeyDown={e => { if (live && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openItem(n) } }}
                 className="flex gap-3 px-3 py-3 rounded-xl cursor-pointer transition-colors duration-150 hover:bg-surface-mute"
               >
                 <div
                   className="w-2 h-2 mt-1.5 rounded-full flex-shrink-0"
-                  style={{ background: isRead(String(n.id)) ? 'transparent' : dotColor(n.status) }}
+                  style={{ background: n.read ? 'transparent' : dotColor(n.tone) }}
                 />
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[12px] leading-snug ${isRead(String(n.id)) ? 'font-normal text-ink-mute' : 'font-medium text-ink-soft'}`}>{n.message}</p>
+                  <p className={`text-[12px] leading-snug ${n.read ? 'font-normal text-ink-mute' : 'font-medium text-ink-soft'}`}>{n.text}</p>
                   <p className="text-[10px] mt-1 font-mono text-ink-faint">
-                    {formatDateTime(n.timestamp)}
+                    {formatDateTime(n.time)}
                   </p>
                 </div>
               </div>
@@ -164,7 +203,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-3 border-t border-line-soft">
+          <div className="px-4 py-3 border-t border-line-soft flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={markAllRead}
@@ -175,6 +214,12 @@ export function NotificationDropdown({ onOpen, sidebarOpen }: NotificationDropdo
               <Check className="w-3.5 h-3.5" />
               {unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
             </button>
+            {live && (
+              <Link to="/dashboard/notifications" onClick={() => setOpen(false)}
+                className="text-[12px] font-semibold text-ink-mute hover:text-ink transition-colors">
+                View all
+              </Link>
+            )}
           </div>
         </div>
       )}
