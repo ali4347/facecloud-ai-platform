@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, Images, Loader2, RefreshCw, ScanFace, X } from 'lucide-react'
+import { AlertTriangle, Images, Loader2, RefreshCw, ScanFace, Trash2, X } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ImageCard } from '../../components/features/ImageCard'
 import { SearchInput } from '../../components/ui/SearchInput'
@@ -9,6 +9,9 @@ import { ConsentCard } from '../../components/features/ConsentPrompt'
 import { useMyImages } from '../../lib/imageData'
 import { useFaceConsent } from '../../lib/consent'
 import { requestIdentityAnalysis } from '../../lib/api/identities'
+import { deleteImage } from '../../lib/api/images'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { USE_API } from '../../lib/api/config'
 
 /** Mirrors the pipeline's own verdicts, which is what the API filters on. */
 const STATUS_FILTERS = [
@@ -32,6 +35,8 @@ export default function MyImages() {
   const [wantsToGroup, setWantsToGroup] = useState(false)
   const [grouping, setGrouping] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const { data, loading, error, isDemo, reload } = useMyImages(page, status || undefined)
   const images = useMemo(() => data?.results ?? [], [data])
@@ -48,6 +53,8 @@ export default function MyImages() {
   /* Only an accepted upload can be analysed: the backend answers 404 for a rejected or
      still-processing photo, so those cannot be ticked. */
   const eligibleIds = useMemo(() => visible.filter(image => image.status === 'uploaded').map(image => image.id), [visible])
+  /* Any photo can be deleted, including a rejected one, so against the API every photo can be ticked. */
+  const selectableIds = useMemo(() => (USE_API ? visible.map(image => image.id) : eligibleIds), [visible, eligibleIds])
 
   const clearSelection = () => setSelected(new Set())
   const toggle = (id: number) => setSelected(current => {
@@ -76,7 +83,12 @@ export default function MyImages() {
   }
 
   const groupSelected = async () => {
-    const ids = [...selected]
+    // Only accepted photos can be grouped; the rest of the selection is left out rather than failing.
+    const ids = [...selected].filter(id => eligibleIds.includes(id))
+    if (ids.length === 0) {
+      setNotice({ kind: 'error', text: 'Only accepted photos can be grouped by person. Select at least one accepted photo.' })
+      return
+    }
     setGrouping(true)
     setNotice(null)
     let started = 0
@@ -96,6 +108,32 @@ export default function MyImages() {
       failed === 0
         ? { kind: 'ok', text: `Grouping started for ${started} photo${started === 1 ? '' : 's'}. Person Folders update when it finishes.` }
         : { kind: 'error', text: `${started} started, ${failed} could not be grouped: ${firstError}` },
+    )
+  }
+
+  /* Delete one by one, so a failure on one photo does not stop the others and is reported by name. */
+  const deleteSelected = async () => {
+    const ids = [...selected]
+    setDeleting(true)
+    let gone = 0
+    let firstError = ''
+    for (const id of ids) {
+      try {
+        await deleteImage(id)
+        gone += 1
+      } catch (caught) {
+        if (!firstError) firstError = caught instanceof Error ? caught.message : 'A photo could not be deleted.'
+      }
+    }
+    setDeleting(false)
+    setConfirmingDelete(false)
+    clearSelection()
+    reload()
+    const failed = ids.length - gone
+    setNotice(
+      failed === 0
+        ? { kind: 'ok', text: `${gone} photo${gone === 1 ? '' : 's'} deleted.` }
+        : { kind: 'error', text: `${gone} deleted, ${failed} could not be deleted: ${firstError}` },
     )
   }
 
@@ -203,7 +241,7 @@ export default function MyImages() {
               <ImageCard
                 key={image.id}
                 image={image}
-                selectable={image.status === 'uploaded'}
+                selectable={USE_API || image.status === 'uploaded'}
                 selected={selected.has(image.id)}
                 onToggleSelect={() => toggle(image.id)}
               />
@@ -245,8 +283,8 @@ export default function MyImages() {
                   <button type="button" onClick={clearSelection} className="text-xs font-semibold text-ink-mute hover:text-ink cursor-pointer">
                     Clear
                   </button>
-                  {selected.size < eligibleIds.length && (
-                    <button type="button" onClick={() => setSelected(new Set(eligibleIds))} className="text-xs font-semibold text-[#FB923C] hover:underline cursor-pointer">
+                  {selected.size < selectableIds.length && (
+                    <button type="button" onClick={() => setSelected(new Set(selectableIds))} className="text-xs font-semibold text-[#FB923C] hover:underline cursor-pointer">
                       Select all on this page
                     </button>
                   )}
@@ -259,6 +297,12 @@ export default function MyImages() {
                   >
                     {grouping ? 'Starting…' : 'Group by person'}
                   </GradientButton>
+                  {USE_API && (
+                    <button type="button" onClick={() => setConfirmingDelete(true)}
+                      className="text-xs font-bold text-error hover:underline inline-flex items-center gap-1.5 px-2 cursor-pointer">
+                      <Trash2 className="w-3.5 h-3.5" />Delete
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -286,6 +330,13 @@ export default function MyImages() {
             </div>
           )}
         </>
+      )}
+      {confirmingDelete && (
+        <ConfirmDialog title={`Delete ${selected.size} photo${selected.size === 1 ? '' : 's'}?`} confirmLabel="Delete" busyLabel="Deleting…" danger busy={deleting}
+          onConfirm={() => void deleteSelected()} onCancel={() => setConfirmingDelete(false)}>
+          <p>The selected photo{selected.size === 1 ? '' : 's'} and their enhanced versions will be permanently deleted.</p>
+          <p>This cannot be undone.</p>
+        </ConfirmDialog>
       )}
     </div>
   )

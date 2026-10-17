@@ -27,6 +27,11 @@ export interface EnhancementResult {
   standardized_download_url: string | null
   created_at: string
   finished_at: string | null
+  /** One plain sentence on what happened, safe to show. Newer backends only. */
+  enhancement_summary?: string | null
+  enhancement_outcome?: 'enhanced' | 'partially_enhanced' | 'original_preserved' | 'failed' | null
+  /** Set when the photo was faces-restored without a verified identity check. */
+  identity_notice?: string
 }
 
 const SETTLED = new Set<EnhancementStatus>(['completed', 'failed', 'cancelled', 'partial'])

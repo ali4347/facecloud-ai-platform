@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   AlertTriangle, ArrowLeft, Archive, Check, CheckCircle, CheckSquare, Copy, Download, Eye,
-  GitMerge, ImageOff, Link2, Loader2, Pencil, Square, Users, X,
+  GitMerge, ImageOff, Link2, Loader2, Pencil, Square, Trash2, Users, X,
 } from 'lucide-react'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { MergeFolderPanel } from '../../components/features/MergeFolderPanel'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
-import { getImageThumbnail } from '../../lib/api/images'
+import { deleteImage, getImageThumbnail } from '../../lib/api/images'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import {
   createGroupExport, downloadIdentityExport, getIdentityExport, renameIdentityGroup, shareIdentityExport,
   type IdentityGroupExport,
@@ -67,8 +68,15 @@ export default function GroupDetailLive() {
     }
   }
 
+  // ── Delete the selected photos ────────────────────────────────────────────
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteMessage, setDeleteMessage] = useState('')
+
   // ── Merge another folder into this one ────────────────────────────────────
   const [merging, setMerging] = useState(false)
+
+  // (the delete action itself is defined after the selection below)
 
   // ── Selection (kept across pages; "select all" means this page) ───────────
   const [selected, setSelected] = useState<Set<number>>(new Set())
@@ -85,6 +93,22 @@ export default function GroupDetailLive() {
     pageIds.forEach(imageId => (allOnPage ? next.delete(imageId) : next.add(imageId)))
     return next
   })
+
+  const deleteSelectedPhotos = async () => {
+    const ids = [...selected]
+    setDeleting(true); setDeleteMessage('')
+    let gone = 0
+    let firstError = ''
+    for (const photoId of ids) {
+      try { await deleteImage(photoId); gone += 1 }
+      catch (caught) { if (!firstError) firstError = caught instanceof Error ? caught.message : 'A photo could not be deleted.' }
+    }
+    setDeleting(false)
+    setSelected(new Set())
+    folder.reload(); photos.reload()
+    if (gone < ids.length) { setDeleteMessage(`${gone} deleted, ${ids.length - gone} could not be deleted: ${firstError}`); return }
+    setConfirmingDelete(false)
+  }
 
   // ── ZIP and secure link ───────────────────────────────────────────────────
   const [busy, setBusy] = useState<Busy>(null)
@@ -464,12 +488,24 @@ export default function GroupDetailLive() {
               : done === 'selected' ? <CheckCircle className="w-4 h-4" /> : <Download className="w-4 h-4" />}
             {zipLabel('selected')}
           </button>
+          <button onClick={() => { setDeleteMessage(''); setConfirmingDelete(true) }} disabled={busy !== null}
+            className="flex items-center gap-1.5 text-sm font-semibold text-error hover:underline disabled:opacity-60">
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </button>
           <button onClick={() => setSelected(new Set())} className="flex items-center gap-1 text-sm text-ink-mute hover:text-ink transition-colors">
             <X className="w-4 h-4" />
             Clear
           </button>
         </div>
       </div>
+      {confirmingDelete && (
+        <ConfirmDialog title={`Delete ${selected.size} photo${selected.size === 1 ? '' : 's'}?`} confirmLabel="Delete" busyLabel="Deleting…" danger busy={deleting} error={deleteMessage || null}
+          onConfirm={() => void deleteSelectedPhotos()} onCancel={() => setConfirmingDelete(false)}>
+          <p>The selected photo{selected.size === 1 ? '' : 's'} will be permanently deleted from your account, not only from this folder, together with their enhanced versions.</p>
+          <p>This cannot be undone.</p>
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

@@ -1,15 +1,17 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { QualityScores } from '../../components/features/QualityScores'
+import { EnhancedVersionCard } from '../../components/features/EnhancedVersionCard'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { USE_API } from '../../lib/api/config'
 import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
-import { downloadImage, getImageThumbnail } from '../../lib/api/images'
+import { deleteImage, downloadImage, getImageThumbnail } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
 import {
-  AlertTriangle, ArrowLeft, CheckCircle2, Download, Loader2, RefreshCw, XCircle,
+  AlertTriangle, ArrowLeft, CheckCircle2, Download, Loader2, RefreshCw, Trash2, XCircle,
 } from 'lucide-react'
 
 export default function ImageDetail() {
@@ -18,6 +20,23 @@ export default function ImageDetail() {
   const { data: image, loading, error, isDemo, reload } = useImage(imageId)
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState('')
+  const navigate = useNavigate()
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
+
+  const handleDelete = async () => {
+    if (!image) return
+    setDeleting(true)
+    setDeleteError('')
+    try {
+      await deleteImage(image.id)
+      navigate('/dashboard/images', { replace: true })
+    } catch (caught) {
+      setDeleteError(caught instanceof Error ? caught.message : 'Could not delete this photo.')
+      setDeleting(false)
+    }
+  }
 
   const handleDownload = async () => {
     if (!image) return
@@ -90,6 +109,9 @@ export default function ImageDetail() {
       {!loading && !error && image && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-7 space-y-6">
+            {USE_API && (image.display_status === 'accepted' || image.display_status === 'completed' || image.latest_enhancement) && (
+              <EnhancedVersionCard image={image} onChanged={reload} />
+            )}
             <ChartCard title="The photo" subtitle={image.original_name}>
               <div className="aspect-[4/3] rounded-3xl overflow-hidden border border-line bg-surface-mute">
                 {/* 1024 rather than the 256 the gallery uses: this is the
@@ -118,6 +140,15 @@ export default function ImageDetail() {
                       : <><Download className="w-3.5 h-3.5" />Download the full photo</>}
                   </button>
                   {downloadError && <p className="text-xs text-error mt-2">{downloadError}</p>}
+                </div>
+              )}
+
+              {USE_API && (
+                <div className="mt-4 pt-4 border-t border-line">
+                  <button type="button" onClick={() => { setDeleteError(''); setConfirmingDelete(true) }}
+                    className="text-xs font-bold text-error hover:underline inline-flex items-center gap-1.5 cursor-pointer">
+                    <Trash2 className="w-3.5 h-3.5" />Delete this photo
+                  </button>
                 </div>
               )}
             </ChartCard>
@@ -201,6 +232,13 @@ export default function ImageDetail() {
             </ChartCard>
           </div>
         </div>
+      )}
+      {confirmingDelete && image && (
+        <ConfirmDialog title="Delete this photo?" confirmLabel="Delete photo" busyLabel="Deleting…" danger busy={deleting} error={deleteError}
+          onConfirm={() => void handleDelete()} onCancel={() => setConfirmingDelete(false)}>
+          <p><strong className="text-ink">{image.original_name}</strong> and its enhanced versions will be permanently deleted.</p>
+          <p>This cannot be undone.</p>
+        </ConfirmDialog>
       )}
     </div>
   )

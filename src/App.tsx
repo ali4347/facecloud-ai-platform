@@ -26,6 +26,7 @@ import UploadZip from './pages/user/UploadZip'
 import ProcessingPage from './pages/user/ProcessingPage'
 import MyImages from './pages/user/MyImages'
 import ImageDetail from './pages/user/ImageDetail'
+import PhotoEditor from './pages/user/PhotoEditor'
 import IdentityGroups from './pages/user/IdentityGroups'
 import GroupDetail from './pages/user/GroupDetail'
 import Downloads from './pages/user/Downloads'
@@ -101,6 +102,7 @@ export default function App() {
           <Route path="processing/:id" element={<ProcessingPage />} />
           <Route path="images" element={<MyImages />} />
           <Route path="images/:id" element={<ImageDetail />} />
+          <Route path="images/:id/edit" element={<PhotoEditor />} />
           <Route path="groups" element={<IdentityGroups />} />
           <Route path="groups/:id" element={<GroupDetail />} />
           <Route path="downloads" element={<Downloads />} />

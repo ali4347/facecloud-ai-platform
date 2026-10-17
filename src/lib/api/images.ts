@@ -236,6 +236,11 @@ export function getImageThumbnail(
   return apiFetchBlob(`/api/images/${imageId}/thumbnail/?size=${size}`, { signal })
 }
 
+/** Delete one photo and its enhanced copies. This cannot be undone. */
+export function deleteImage(imageId: number): Promise<void> {
+  return apiFetch<void>(`/api/images/${imageId}/`, { method: 'DELETE' })
+}
+
 /** The real file. Only for an explicit download, never for display. */
 export function downloadImage(imageId: number, signal?: AbortSignal): Promise<Blob> {
   return apiFetchBlob(`/api/images/${imageId}/download/`, { signal })

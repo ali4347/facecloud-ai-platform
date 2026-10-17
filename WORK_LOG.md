@@ -46,6 +46,26 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-17 — Photo editor (sliders), Enhance again, and Delete for photos
+*Status: committed (this commit).*
+
+- **Delete:** `Delete this photo` on the photo page, and **Delete** for the photos ticked on My Images (rejected photos can now be ticked too; Group by person only uses the accepted ones) and on a Person Folder page.
+  A confirmation names what goes ("permanently deleted … cannot be undone"); a failure on one photo is reported and does not stop the others. Uses `DELETE /api/images/{id}/` one photo at a time.
+  The backend still needs to be checked for what else a delete should clean up (folder counts, share links, ZIPs): see the backend prompt, WP5.
+- **Enhanced version card (photo page):** shows the enhanced photo against the original (before/after slider), the plain-sentence summary and style/strength actually applied, **Enhance this photo** for an accepted photo
+  that was never enhanced, **Enhance again** with a chosen style (Natural, Dynamic, AI Enhance) and strength, **Download** (the current edit if there is one, otherwise the enhanced photo), and **Edit photo**.
+- **Photo editor (`/dashboard/images/:id/edit`):** the sliders come from the backend (`GET /api/enhancements/editor/configuration/`): brightness, contrast, shadows, highlights, saturation, warmth, sharpness, the AI tools
+  (low light, noise, deblur, face restoration; disabled with a note when the server has no model for them) and blend. Moving a slider renders a server preview (`POST …/results/{id}/previews/`, 600 ms after the last move, newest
+  revision wins); **Auto / Auto + brighten / Auto, keep tones** let the server choose and move the sliders to what it applied; **Reset**; **Hold to compare**; **Save as new version** renders the full-size edit
+  (`POST …/previews/{id}/save/`, polled until done) and it becomes the current version. Versions list with **Use this**, **Download** and **Delete** (with confirmation). Enhanced photo and original are never changed.
+- **Files:** new `src/lib/api/editor.ts`, `src/components/ui/ConfirmDialog.tsx`, `src/components/features/EnhancedVersionCard.tsx`, `src/pages/user/PhotoEditor.tsx`; edited `src/App.tsx` (route), `src/pages/user/ImageDetail.tsx`,
+  `src/pages/user/MyImages.tsx`, `src/pages/user/GroupDetailLive.tsx`, `src/lib/api/images.ts` (`deleteImage`), `src/lib/api/enhancements.ts` (summary fields), `README.md`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome against a throwaway copy of backend `main` (#67, #71, #72 merged): enhanced a photo from its page; opened the editor (12 sliders from the contract, first preview);
+  moving Brightness to 40 produced a server preview with that value and changed the picture; Auto + brighten set the sliders to what the server applied (brightness 6, shadows 18); Reset restored every slider; Save created one
+  completed, current version with the chosen values; the photo page then offered "Download edited"; deleting the version removed it on the backend; deleting a photo from its page and two rejected photos from My Images
+  removed them on the backend.
+- **Not done yet:** Person Folder review queue and move/remove, share-link list and revoke, Delete account, processing report button, duplicate result, backend WP1 to WP7.
+
 ### 2026-10-17 — A lost session now signs you out instead of showing "Authentication credentials were not provided"
 *Status: committed (this commit).*
 
