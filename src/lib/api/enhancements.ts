@@ -32,6 +32,29 @@ export interface EnhancementResult {
   enhancement_outcome?: 'enhanced' | 'partially_enhanced' | 'original_preserved' | 'failed' | null
   /** Set when the photo was faces-restored without a verified identity check. */
   identity_notice?: string
+  /** What changed the pixels, in order. Empty when nothing did. Newer backends only. */
+  applied_stages?: AppliedStage[]
+  /** Restoration the photo called for that did not run, with the reason. */
+  skipped_stages?: SkippedStage[]
+  /** One sentence when restoration was needed and could not be done; null otherwise. */
+  hd_unavailable_reason?: string | null
+  /** What the analyzer measured, and the operations it chose with reasons. Shapes may grow; shown generically. */
+  diagnosis?: unknown
+  plan?: unknown
+}
+
+export interface AppliedStage {
+  stage: string
+  engine?: string | null
+  variant?: string | null
+  scale?: number | null
+  input_size?: [number, number] | null
+  output_size?: [number, number] | null
+}
+
+export interface SkippedStage {
+  stage: string
+  reason: string
 }
 
 const SETTLED = new Set<EnhancementStatus>(['completed', 'failed', 'cancelled', 'partial'])

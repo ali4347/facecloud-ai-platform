@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Download, Loader2, Sliders, Sparkles } from 'lucide-react'
 import { ChartCard } from '../ui/ChartCard'
 import { BeforeAfterSlider } from './BeforeAfterSlider'
+import { EnhancementReport } from './EnhancementReport'
 import { ApiError } from '../../lib/api/client'
 import { getImageThumbnail, type ImageListItem } from '../../lib/api/images'
 import {
@@ -128,8 +129,8 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
         )}
 
         {done && result && (
-          <div className="text-xs text-ink-mute space-y-1">
-            {result.enhancement_summary && <p className="text-ink">{result.enhancement_summary}</p>}
+          <div className="text-xs text-ink-mute space-y-3">
+            <EnhancementReport result={result} />
             <p>
               Style {STYLE_LABEL[result.requested_style] ?? result.requested_style} · strength applied {levelLabel(result.applied_level)}
               {result.output_width && result.output_height ? ` · ${result.output_width} × ${result.output_height}` : ''}

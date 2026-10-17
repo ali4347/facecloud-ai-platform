@@ -23,6 +23,7 @@ import {
 } from '../../lib/api/enhancements'
 import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
 import { makeLocalPreview } from '../../lib/previewEnhance'
+import { EnhancementReport } from '../../components/features/EnhancementReport'
 import { demoImages, formatBytes } from '../../lib/imageData'
 import {
   AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Info, Loader2,
@@ -568,6 +569,7 @@ export default function UploadSingle() {
                             afterSrc={comparison.after}
                           />
                         </div>
+                        {USE_API && enhancement && <EnhancementReport result={enhancement} />}
                         <p className="text-[10px] text-ink-faint">
                           {USE_API
                             ? 'Drag the handle to compare. The original is never overwritten.'

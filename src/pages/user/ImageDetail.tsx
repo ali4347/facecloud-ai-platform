@@ -59,7 +59,7 @@ export default function ImageDetail() {
   }
 
   const verdict = image?.display_status
-  const accepted = verdict === 'accepted'
+  const accepted = verdict === 'accepted' || verdict === 'completed'
   const rejected = verdict === 'rejected'
   const allReasons = [...new Set([
     ...(image?.quality_decision?.rejection_reasons ?? []),
@@ -174,7 +174,7 @@ export default function ImageDetail() {
                   <div>
                     <p className="text-sm font-bold text-ink">{statusLabel(image.display_status)}</p>
                     <p className="text-[11px] text-ink-faint mt-0.5">
-                      {accepted ? 'This photo passed every check.'
+                      {verdict === 'completed' ? 'This photo passed every check and has been enhanced.' : accepted ? 'This photo passed every check.'
                         : rejected ? 'This photo did not meet the quality bar.'
                         : 'A moderator is taking a look at this one.'}
                     </p>

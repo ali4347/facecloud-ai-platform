@@ -46,6 +46,20 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-17 — "What was done" panel for an enhancement (stages that ran, stages that could not, HD availability)
+*Status: committed (this commit). Built against backend PR #85 (open, not merged); every field is optional so it also works before that PR.*
+
+- **New panel `EnhancementReport`:** on the photo page (Enhanced version card), on the Live Enhancement result and on the single-upload result. It shows the backend's one-sentence summary (or builds one from the stages),
+  each stage that really changed the photo (low light, noise, blur, face, HD) with the model and, for HD, the scale and size, and an honest amber notice **"HD restoration is not available on this server"** when restoration was needed
+  but could not run, instead of implying the photo was improved. "Show details" lists the stages that were needed but not run with a short reason, the technical reason, and (when the backend sends them) what the analyzer
+  measured (`diagnosis`) and planned (`plan`), rendered generically so those shapes can grow. With no stage data (older backend) the panel is simply not shown.
+- **Also fixed:** the photo page said "A moderator is taking a look at this one" for a photo whose status is "completed" (enhanced); it now says it passed every check and was enhanced.
+- **Files:** new `src/components/features/EnhancementReport.tsx`; edited `src/lib/api/enhancements.ts` (types `AppliedStage`, `SkippedStage`, optional result fields), `EnhancedVersionCard.tsx`, `LiveEnhancementPanel.tsx`,
+  `src/pages/user/UploadSingle.tsx`, `src/pages/user/ImageDetail.tsx`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome against a throwaway copy of PR #85's branch: a photo whose result had stage records showed "Removed blur, Enlarged ×2 to 1280 × 720, Restored the face" with the
+  models listed and no warning (the stage records were written into the throwaway database to see this view, because the models are not installed on this machine); a blurred photo whose restoration could not run showed the honest
+  notice, and its details named the stages that were needed but not run and the technical reason.
+
 ### 2026-10-17 — ZIP and multiple upload: processing steps, why photos were rejected, and enhancement made visible
 *Status: committed (this commit).*
 

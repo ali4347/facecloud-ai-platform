@@ -6,6 +6,7 @@ import { StatusBadge } from '../ui/StatusBadge'
 import { BeforeAfterSlider } from './BeforeAfterSlider'
 import { useNavigate } from 'react-router-dom'
 import { USE_API } from '../../lib/api/config'
+import { EnhancementReport } from './EnhancementReport'
 import { levelLabel } from '../../lib/api/enhancements'
 import type { EnhancementLevel, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
 import { ApiError } from '../../lib/api/client'
@@ -1457,6 +1458,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   ))}
                 </div>
               </div>
+
+              {USE_API && liveResult && <EnhancementReport result={liveResult} />}
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
