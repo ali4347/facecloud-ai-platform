@@ -80,6 +80,11 @@ export function listGroupImages(
   return apiFetch<Page<IdentityGroupImage>>(`/api/identities/groups/${groupId}/images/?page=${page}`, { signal })
 }
 
+/** Move every photo of `sourceId` into `targetId`; the source folder is retired. Cannot be undone from the app. */
+export function mergeIdentityGroups(targetId: number, sourceId: number): Promise<unknown> {
+  return apiFetch(`/api/identities/groups/${targetId}/merge/`, { method: 'POST', body: { source_group_id: sourceId } })
+}
+
 export function renameIdentityGroup(groupId: number, displayName: string): Promise<IdentityGroup> {
   return apiFetch<IdentityGroup>(`/api/identities/groups/${groupId}/rename/`, {
     method: 'PATCH', body: { display_name: displayName },

@@ -15,7 +15,14 @@ import { downloadMyData, getFacialDataCounts, eraseFacialData } from '../../lib/
 import type { FacialDataCounts } from '../../lib/api/privacy'
 import { USE_API } from '../../lib/api/config'
 import { ApiError } from '../../lib/api/client'
-import { updateProfileName, changePassword, logoutEverywhere } from '../../lib/api/auth'
+import { changePassword, logoutEverywhere } from '../../lib/api/auth'
+import {
+  loadAccountProfile, saveAccountProfile, hasProfileDetails, uploadAvatar, deleteAvatar,
+  listSessions, revokeSession,
+} from '../../lib/api/account'
+import type { AccountProfile, UserSession } from '../../lib/api/account'
+import { rememberAvatarSource } from '../../lib/useServerAvatar'
+import { formatDateTime } from '../../lib/utils'
 import { getNotificationPreferences, updateNotificationPreferences } from '../../lib/api/notifications'
 import type { NotificationPreferences } from '../../lib/api/notifications'
 
@@ -83,6 +90,31 @@ function ProfileSettings() {
 
   const [saving, setSaving] = useState(false)
 
+  /* Against a backend with profile details, those fields (and the picture) live
+     on the account; against an older one they stay on this device. */
+  const [remote, setRemote] = useState<AccountProfile | null>(null)
+  const [remoteChecked, setRemoteChecked] = useState(!USE_API)
+  const onAccount = hasProfileDetails(remote)
+  const pictureOnAccount = !!remote && 'avatar_url' in remote
+
+  useEffect(() => {
+    if (!USE_API) return
+    const ctl = new AbortController()
+    loadAccountProfile(ctl.signal)
+      .then(p => {
+        setRemote(p)
+        if (hasProfileDetails(p)) {
+          setProfile({
+            organization: p.organization_name ?? '', jobTitle: p.job_title ?? '',
+            phone: p.phone ?? '', country: p.country ?? '',
+          })
+        }
+      })
+      .catch(() => { /* keep the local copy */ })
+      .finally(() => { if (!ctl.signal.aborted) setRemoteChecked(true) })
+    return () => ctl.abort()
+  }, [])
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -94,9 +126,19 @@ function ProfileSettings() {
     try {
       /* The name is the one profile field the account stores; the rest stays
          on this device until the backend has fields for it. */
-      const savedName = USE_API ? await updateProfileName(name.trim()) : name
-      saveProfile(account.email, profile)
-      updateSessionName('user', savedName)
+      if (USE_API && onAccount) {
+        const next = await saveAccountProfile({
+          full_name: name.trim(),
+          organization_name: profile.organization.trim(), job_title: profile.jobTitle.trim(),
+          phone: profile.phone.trim(), country: profile.country.trim(),
+        })
+        setRemote(next)
+        updateSessionName('user', next.full_name || name.trim())
+      } else {
+        const savedName = USE_API ? (await saveAccountProfile({ full_name: name.trim() })).full_name || name.trim() : name
+        saveProfile(account.email, profile)
+        updateSessionName('user', savedName)
+      }
       setSaved(true)
     } catch (err) {
       setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : 'Could not save your profile.')
@@ -108,7 +150,7 @@ function ProfileSettings() {
   return (
     <form className="space-y-5" onSubmit={handleSave}>
       <h2 className="text-base font-bold text-ink">Profile Settings</h2>
-      <AvatarSettings email={account.email} initials={account.initials} name={account.name} />
+      <AvatarSettings email={account.email} initials={account.initials} name={account.name} onAccount={USE_API && pictureOnAccount} />
 
       <div>
         <label htmlFor="profile-name" className="text-xs font-semibold text-ink block mb-1.5">Full Name</label>
@@ -164,7 +206,7 @@ function ProfileSettings() {
                autoComplete="country-name" {...field('country')} />
       </div>
 
-      {USE_API && (
+      {USE_API && remoteChecked && !onAccount && (
         <p className="text-[11px] text-ink-faint">
           Your name is saved to your account. Organization, job title, phone, country and your picture are kept on this device only.
         </p>
@@ -197,6 +239,25 @@ function SecuritySettingsLive() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [signingOut, setSigningOut] = useState(false)
+
+  /* The device list needs a backend with sessions; without one only "sign out everywhere" is offered. */
+  const [sessions, setSessions] = useState<UserSession[] | null>(null)
+  const [sessionError, setSessionError] = useState<string | null>(null)
+  useEffect(() => {
+    const ctl = new AbortController()
+    listSessions(ctl.signal).then(setSessions).catch(() => { /* not available */ })
+    return () => ctl.abort()
+  }, [])
+
+  const revoke = async (id: string) => {
+    setSessionError(null)
+    try {
+      await revokeSession(id)
+      setSessions(list => list && list.filter(item => item.id !== id))
+    } catch (err) {
+      setSessionError(err instanceof ApiError ? err.message : 'Could not sign that device out.')
+    }
+  }
 
   const leave = () => {
     localStorage.removeItem('facecloud_session')
@@ -254,6 +315,29 @@ function SecuritySettingsLive() {
           Changing your password signs you out on every device, so you will be asked to sign in again.
         </p>
       </form>
+
+      {sessions && (
+        <div className="border-t border-line pt-5">
+          <h3 className="text-sm font-semibold text-ink mb-3">Active Sessions</h3>
+          {sessions.map(item => (
+            <div key={item.id} className="flex items-center justify-between py-2.5 border-b border-line last:border-0">
+              <div>
+                <p className="text-sm font-medium text-ink">
+                  {item.device}
+                  {item.is_current && <span className="ml-2 text-[10px] font-semibold text-emerald-500">This device</span>}
+                </p>
+                <p className="text-xs text-ink-mute">
+                  {item.ip_address ? `${item.ip_address} · ` : ''}{item.is_current ? 'Active now' : `Last active ${formatDateTime(item.last_seen_at)}`}
+                </p>
+              </div>
+              {!item.is_current && (
+                <button type="button" onClick={() => revoke(item.id)} className="text-xs text-error hover:underline">Revoke</button>
+              )}
+            </div>
+          ))}
+          {sessionError && <p role="alert" className="text-xs text-red-500 mt-2">{sessionError}</p>}
+        </div>
+      )}
 
       <div className="border-t border-line pt-5">
         <h3 className="text-sm font-semibold text-ink mb-1">Sign out everywhere</h3>
@@ -620,19 +704,31 @@ function FaceGroupingSettings() {
    A colour preset or an uploaded photo. There is no backend, so the choice is
    kept in this browser against the signed-in account; the photo is downscaled
    to 256px before it is stored. */
-function AvatarSettings({ email, initials, name }: { email: string; initials: string; name: string }) {
+function AvatarSettings({ email, initials, name, onAccount }: { email: string; initials: string; name: string; onAccount: boolean }) {
   const [avatar, setAvatar] = useAvatar(email)
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
+  /* A colour or a reset replaces the picture on the account too, so another device does not bring the old one back. */
+  const dropAccountPicture = () => {
+    if (!onAccount) return
+    rememberAvatarSource(email, null)
+    deleteAvatar().catch(() => { /* nothing to delete */ })
+  }
+
   const handleFile = async (file: File | undefined) => {
     if (!file) return
     setError(null)
     setBusy(true)
     try {
-      setAvatar({ kind: 'photo', dataUrl: await fileToAvatarDataUrl(file) })
+      const dataUrl = await fileToAvatarDataUrl(file)
+      if (onAccount) {
+        const saved = await uploadAvatar(await (await fetch(dataUrl)).blob())
+        rememberAvatarSource(email, saved.avatar_url ?? null)
+      }
+      setAvatar({ kind: 'photo', dataUrl })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'That image could not be used.')
     } finally {
@@ -669,7 +765,7 @@ function AvatarSettings({ email, initials, name }: { email: string; initials: st
                 <button
                   key={preset.id}
                   type="button"
-                  onClick={() => { setError(null); setAvatar({ kind: 'preset', id: preset.id }) }}
+                  onClick={() => { setError(null); setAvatar({ kind: 'preset', id: preset.id }); dropAccountPicture() }}
                   aria-label={preset.label}
                   aria-pressed={selected}
                   title={preset.label}
@@ -709,7 +805,7 @@ function AvatarSettings({ email, initials, name }: { email: string; initials: st
                 size="sm"
                 type="button"
                 leftIcon={<Trash2 className="w-3.5 h-3.5" />}
-                onClick={() => { setError(null); setAvatar(null) }}
+                onClick={() => { setError(null); setAvatar(null); dropAccountPicture() }}
               >
                 Reset
               </GradientButton>
@@ -717,7 +813,7 @@ function AvatarSettings({ email, initials, name }: { email: string; initials: st
           </div>
 
           <p className="text-[11px] text-ink-faint mt-2.5">
-            JPG, PNG or WebP up to 8 MB. The photo is cropped square, resized to 256px and kept in this browser.
+            JPG, PNG or WebP up to 8 MB. The photo is cropped square and resized to 256px{onAccount ? ' and saved to your account.' : ' and kept in this browser.'}
           </p>
           {error && <p className="text-[11px] text-red-500 mt-2" role="alert">{error}</p>}
         </div>

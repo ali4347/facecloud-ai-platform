@@ -111,8 +111,11 @@ export async function fetchBatchZip(batchId: number, packageType: PackageType): 
   try {
     start = await createBatchPackage(batchId, packageType)
   } catch (caught) {
+    /* Newer backends say so with a stable code; older ones only in the sentence. */
+    const code = caught instanceof ApiError && caught.body && typeof caught.body === 'object'
+      ? (caught.body as { code?: unknown }).code : undefined
     const noEnhancedYet = packageType === 'accepted_results' && caught instanceof ApiError
-      && caught.status === 409 && /enhanced images/i.test(caught.message)
+      && caught.status === 409 && (code === 'enhancement_required' || /enhanced images/i.test(caught.message))
     if (!noEnhancedYet) throw caught
     await waitForEnhancement(batchId)
     start = await createBatchPackage(batchId, packageType)

@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { Menu, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
 import { GlobalSearch } from './GlobalSearch'
+import { useSessionUser } from '../../lib/session'
+import { useServerAvatar } from '../../lib/useServerAvatar'
+import { USE_API } from '../../lib/api/config'
 import type { Appearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 
@@ -25,6 +28,9 @@ const activityPath: Record<Role, string> = {
 }
 
 export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
+  /* The picture lives on the account in API mode, so another device's picture shows here too. */
+  const accountEmail = useSessionUser(role).email
+  useServerAvatar(accountEmail, USE_API && role === 'user')
   const searchRef = useRef<HTMLInputElement>(null)
 
   /* ⌘K / Ctrl+K focuses search — the shortcut the chip in the field advertises. */

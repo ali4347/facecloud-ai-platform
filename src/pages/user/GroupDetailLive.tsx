@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import {
   AlertTriangle, ArrowLeft, Archive, Check, CheckCircle, CheckSquare, Copy, Download, Eye,
-  ImageOff, Link2, Loader2, Pencil, Square, Users, X,
+  GitMerge, ImageOff, Link2, Loader2, Pencil, Square, Users, X,
 } from 'lucide-react'
 import { AuthedImage } from '../../components/ui/AuthedImage'
+import { MergeFolderPanel } from '../../components/features/MergeFolderPanel'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
 import { getImageThumbnail } from '../../lib/api/images'
 import {
@@ -65,6 +66,9 @@ export default function GroupDetailLive() {
       setSavingName(false)
     }
   }
+
+  // ── Merge another folder into this one ────────────────────────────────────
+  const [merging, setMerging] = useState(false)
 
   // ── Selection (kept across pages; "select all" means this page) ───────────
   const [selected, setSelected] = useState<Set<number>>(new Set())
@@ -229,8 +233,22 @@ export default function GroupDetailLive() {
             {busy === 'link' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />}
             {busy === 'link' ? 'Making link…' : 'Secure Link'}
           </button>
+          <button
+            onClick={() => setMerging(open => !open)} aria-expanded={merging}
+            className="fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2"
+          >
+            <GitMerge className="w-4 h-4" /> Merge folder
+          </button>
         </div>
       </div>
+
+      {merging && (
+        <MergeFolderPanel
+          targetId={groupId} targetLabel={group.label}
+          onClose={() => setMerging(false)}
+          onMerged={() => { setMerging(false); setSelected(new Set()); setPage(1); folder.reload(); photos.reload() }}
+        />
+      )}
 
       {nameError && <p role="alert" className="text-xs text-[#F87171]">{nameError}</p>}
 

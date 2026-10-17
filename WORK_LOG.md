@@ -23,7 +23,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 |:-----|:-------|:------|
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
-| User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen except live webcam enhancement (client-side) runs on the live API when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list wait for backend PR #68 |
+| User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen except live webcam enhancement (client-side) runs on the live API when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list are built against backend PR #67 (fall back gracefully until it is merged) |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
@@ -45,6 +45,25 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-17 — Settings profile details, picture and devices; Merge folder; download follow-up
+*Status: committed (this commit). Profile details, picture and devices were built against backend PR #67 (open, not yet merged); the old-backend fallback was tested too.*
+
+- **Profile details on the account:** organization, job title, phone and country are loaded from and saved to `PATCH /api/user/profile/`; the backend's reasons are shown (e.g. an invalid phone number).
+  If the backend has no such fields (before PR #67), they stay on the device and the "kept on this device only" note shows, exactly as before.
+- **Picture on the account:** the avatar photo is saved with `PUT /api/user/avatar/` (and removed with `DELETE` when a colour is picked or Reset is used), and every device brings it back
+  (`src/lib/useServerAvatar.ts`, run from the top bar). Without backend support the picture stays in the browser as before.
+- **Devices:** the Security tab lists the signed-in devices (`GET /api/user/sessions/`: device, IP, last active, "This device") with Revoke per other device
+  (`POST …/revoke/`), above "Sign out of all devices". Without backend support the list is hidden (never invented).
+- **Merge folder (Person Folders):** a "Merge folder" button on a folder opens a panel to pick another of your folders; its photos move into this one and the other folder is retired
+  (`POST /api/identities/groups/{id}/merge/`). It warns that this cannot be undone here. Added after the same person ended up in two folders.
+- **Downloads:** the "no enhanced images yet" 409 is now recognised by the backend's `code` (`enhancement_required`, backend PR #79) as well as by its wording, so it works before and after that PR.
+- **Files:** new `src/lib/api/account.ts`, `src/lib/useServerAvatar.ts`, `src/components/features/MergeFolderPanel.tsx`; edited `src/pages/user/Settings.tsx`,
+  `src/pages/user/GroupDetailLive.tsx`, `src/components/layout/Topbar.tsx`, `src/lib/api/identities.ts`, `src/lib/api/downloads.ts`, `README.md`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome against a throwaway copy of backend PR #67's branch: all five profile fields saved and reloaded from the account
+  (also with the local copy wiped), invalid phone refused with the reason, picture stored as a PNG and restored on a browser with nothing stored, choosing a colour cleared it, the device list
+  showed this device and Revoke removed exactly one session on the backend, merging folders left the backend with one folder fewer. Against a throwaway copy of backend `main` (no #67): sign-in,
+  name save, local extras and picture, no device list, sign-out-everywhere and notification switches all behaved as before.
 
 ### 2026-10-17 — Settings connected to the backend: name, password, sign out everywhere, notification switches
 *Status: committed (this commit).*
@@ -1595,7 +1614,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 ## 6. Pending / Uncommitted Work (as of 2026-09-17)
 
-- Live site untouched (demo build). Next: deploy the backend (api.facecloudai.com), test, then cut the live frontend over in one step. Waiting on backend PR #68 for profile extras, picture and a device list.
+- Live site untouched (demo build). Next: deploy the backend (api.facecloudai.com), test, then cut the live frontend over in one step. Profile extras, picture and device list are built and wait only for backend PR #67 to be merged.
 - Open product question carried over from the discarded v3 work: the fifth problem/solution pair in the methodology
   section does not match (problem: inconsistent approval decisions; solution: multi-folder assignment).
 

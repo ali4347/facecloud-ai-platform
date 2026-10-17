@@ -149,11 +149,11 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/images` (My Images gallery browser)
 * `/dashboard/images/:id` (Image Detail, EXIF data, and enhancement controls)
 * `/dashboard/groups` (Person Folders: with the API on, your real folders with a mosaic of their photos; the consent banner appears here when face grouping is off)
-* `/dashboard/groups/:id` (one Person Folder: its photos, rename, Download All / Download Selected as a ZIP, and a time-limited Secure Link to the whole folder's ZIP)
+* `/dashboard/groups/:id` (one Person Folder: its photos, rename, Merge folder (move another folder's photos into this one), Download All / Download Selected as a ZIP, and a time-limited Secure Link to the whole folder's ZIP)
 * `/dashboard/downloads` (real download history; a new line is added each time a file is downloaded; time-limited secure links for enhanced photos and Person Folder ZIPs; expired batch ZIPs can be prepared again)
 * `/dashboard/notifications` (real notifications: mark read / mark all read, open, dismiss, paging; the top-bar bell shows the same unread count)
 * `/dashboard/activity` (your real activity history, paged; the type chips and search narrow the page on screen)
-* `/dashboard/settings` (name saved to the account; password change; sign out of all devices; notification switches saved to the account. Organization, job title, phone, country and the picture stay on this device until the backend has fields for them)
+* `/dashboard/settings` (name, organization, job title, phone, country and the picture saved to the account; password change; the list of signed-in devices with Revoke, and sign out of all devices; notification switches saved to the account. Against a backend that predates profile details/sessions (before backend PR #67) the extras and picture stay on this device and the device list is hidden)
 * `/dashboard/live-enhancement` (Webcam real-time face landmark viewer and enhancement controls)
 * `/dashboard/jobs` (Batch job history directory)
 
