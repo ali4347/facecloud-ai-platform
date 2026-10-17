@@ -46,6 +46,20 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-17 — A lost session now signs you out instead of showing "Authentication credentials were not provided"
+*Status: committed (this commit).*
+
+- **What the owner saw:** My Images, Person Folders and Downloads all showed "Authentication credentials were not provided" while the app still looked signed in, and the backend admin showed
+  `no such column: accounts_user.display_name`. Cause: the development database had not been migrated after backend PR #67 (profile columns), so restoring the session after a reload failed on the server;
+  the app then discarded the refresh token but kept its signed-in screen.
+- **Fix:** (1) a server error (5xx) or a network failure while restoring the session no longer throws the refresh token away; the call fails with "FaceCloud could not reach the server to restore your session"
+  and a retry works once the server is back. (2) If the API still answers 401 after every recovery (token revoked, expired, or no longer known), the app clears the session and goes to the sign-in page with the
+  "session expired" notice, for all three portals.
+- **Files:** `src/lib/api/client.ts` (refresh outcome ok / invalid / unavailable, `SESSION_LOST_EVENT`), `src/components/layout/AppShell.tsx` (signs out on that event).
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome against a stub API: refresh answered 500, stayed signed in with the "could not reach the server" message and the refresh token kept; refresh
+  answered 401, sent to `/login` with the banner and the local session cleared; stale session with no tokens, sent to `/login`.
+- **Database fix (backend side, not code):** the development database must be backed up and migrated per `docs/deployment/merge-and-migration-plan.md` in the backend repo.
+
 ### 2026-10-17 — Live Enhancement: captured frames now use the real pipeline; "Save to My Images" works
 *Status: committed (this commit).*
 

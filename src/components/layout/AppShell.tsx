@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { useAppearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
+import { SESSION_LOST_EVENT } from '../../lib/api/client'
 
 interface AppShellProps {
   role: Role
@@ -12,6 +13,18 @@ interface AppShellProps {
 export function AppShell({ role }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [appearance, toggleAppearance] = useAppearance()
+  const navigate = useNavigate()
+
+  /* The API says the session is over (revoked, expired, or the server no longer knows it): sign out and say why. */
+  useEffect(() => {
+    const onLost = () => {
+      localStorage.removeItem('facecloud_session')
+      const to = role === 'admin' ? '/admin/login' : role === 'moderator' ? '/moderator/login' : '/login'
+      navigate(to, { replace: true, state: { sessionExpired: true } })
+    }
+    window.addEventListener(SESSION_LOST_EVENT, onLost)
+    return () => window.removeEventListener(SESSION_LOST_EVENT, onLost)
+  }, [role, navigate])
 
   // Escape key listener to close sidebar
   useEffect(() => {

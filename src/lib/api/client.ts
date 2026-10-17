@@ -49,14 +49,19 @@ function isExpiredToken(body: unknown): boolean {
    because refresh tokens rotate only the first would succeed — the rest would
    invalidate the session they were trying to save. Everyone waits on the same
    promise instead. */
-let refreshInFlight: Promise<boolean> | null = null
+/** `invalid`: the refresh token is no good, sign in again. `unavailable`: the server could not answer, so the session may still be fine. */
+type RefreshOutcome = 'ok' | 'invalid' | 'unavailable'
+let refreshInFlight: Promise<RefreshOutcome> | null = null
 
-async function refreshAccessToken(): Promise<boolean> {
+/** Fired when the session cannot be recovered; the app shell sends the person back to sign in. */
+export const SESSION_LOST_EVENT = 'facecloud:session-lost'
+
+async function refreshAccessToken(): Promise<RefreshOutcome> {
   if (refreshInFlight) return refreshInFlight
 
-  refreshInFlight = (async () => {
+  refreshInFlight = (async (): Promise<RefreshOutcome> => {
     const refresh = getRefreshToken()
-    if (!refresh) return false
+    if (!refresh) return 'invalid'
     try {
       const response = await fetch(`${API_URL}/api/auth/refresh/`, {
         method: 'POST',
@@ -64,16 +69,18 @@ async function refreshAccessToken(): Promise<boolean> {
         body: JSON.stringify({ refresh }),
       })
       if (!response.ok) {
+        // A server error says nothing about the token, so it is kept for the next try.
+        if (response.status >= 500) return 'unavailable'
         clearTokens()
-        return false
+        return 'invalid'
       }
       const data = await response.json()
       setAccessToken(data.access ?? null)
       // The response carries a new refresh token; the old one is now dead.
       if (data.refresh) setRefreshToken(data.refresh)
-      return Boolean(data.access)
+      return data.access ? 'ok' : 'invalid'
     } catch {
-      return false
+      return 'unavailable'
     } finally {
       refreshInFlight = null
     }
@@ -112,7 +119,9 @@ async function request(path: string, options: RequestOptions = {}): Promise<Resp
      retry path below cannot recognise it and would sign the person out while
      a perfectly good refresh token sat unused. */
   if (!getAccessToken() && !options.anonymous && getRefreshToken()) {
-    await refreshAccessToken()
+    if ((await refreshAccessToken()) === 'unavailable') {
+      throw new ApiError(503, 'FaceCloud could not reach the server to restore your session. Please try again in a moment.')
+    }
   }
 
   const send = async (): Promise<Response> => {
@@ -134,9 +143,16 @@ async function request(path: string, options: RequestOptions = {}): Promise<Resp
 
   if (response.status === 401 && !options.anonymous) {
     const body = await response.clone().json().catch(() => null)
-    if (isExpiredToken(body) && (await refreshAccessToken())) {
+    if (isExpiredToken(body) && (await refreshAccessToken()) === 'ok') {
       response = await send()
     }
+  }
+
+  /* Still refused after every recovery: the session is gone. Say so once, so the app can sign the person
+     out instead of leaving them on a page full of "credentials were not provided". */
+  if (response.status === 401 && !options.anonymous) {
+    clearTokens()
+    window.dispatchEvent(new Event(SESSION_LOST_EVENT))
   }
 
   return response
