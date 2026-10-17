@@ -8,7 +8,7 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { ApiError } from '../../lib/api/client'
 import { USE_API } from '../../lib/api/config'
-import { getImage, type ImageListItem } from '../../lib/api/images'
+import { getImage, getImageThumbnail, type ImageListItem } from '../../lib/api/images'
 import { getEnhancementResult, type EnhancementResult } from '../../lib/api/enhancements'
 import {
   activateEdit, createPreview, deleteEdit, downloadEdit, fetchPreviewImage, getEditorConfiguration, getEdit,
@@ -53,6 +53,8 @@ export default function PhotoEditor() {
   const [settings, setSettings] = useState<EditorSettings>({})
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [baseUrl, setBaseUrl] = useState<string | null>(null)
+  /* The photo as it was uploaded: what "Hold to compare" shows against the edit. */
+  const [originalUrl, setOriginalUrl] = useState<string | null>(null)
   const [rendering, setRendering] = useState(false)
   const [previewError, setPreviewError] = useState('')
   const [showBefore, setShowBefore] = useState(false)
@@ -92,6 +94,9 @@ export default function PhotoEditor() {
       try {
         const photo = await getImage(imageId, ctl.signal)
         setImage(photo)
+        getImageThumbnail(photo.id, 1024, ctl.signal)
+          .then(blob => { if (!ctl.signal.aborted) setOriginalUrl(track(blob)) })
+          .catch(() => { /* the compare button falls back to the enhanced photo */ })
         const resultId = photo.latest_enhancement?.id
         if (!resultId) return
         const [enhanced, cfg] = await Promise.all([
@@ -280,14 +285,17 @@ export default function PhotoEditor() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* ── Picture ── */}
         <div className="lg:col-span-7 space-y-4">
-          <ChartCard title="Preview" subtitle={showBefore ? 'Showing the enhanced photo without your edits' : changedNow}>
+          <ChartCard title="Preview" subtitle={showBefore ? 'Showing your original photo' : changedNow}>
             <div className="relative rounded-3xl overflow-hidden border border-line bg-surface-mute min-h-[320px] flex items-center justify-center">
-              {(showBefore ? baseUrl : previewUrl) ? (
-                <img src={(showBefore ? baseUrl : previewUrl) as string} alt="Preview of your edit" className="w-full max-h-[70vh] object-contain" />
+              {(showBefore ? (originalUrl ?? baseUrl) : previewUrl) ? (
+                <img src={(showBefore ? (originalUrl ?? baseUrl) : previewUrl) as string} alt={showBefore ? 'Your original photo' : 'Preview of your edit'} className="w-full max-h-[70vh] object-contain" />
               ) : (
                 <Loader2 className="w-6 h-6 animate-spin text-ink-faint" />
               )}
-              {rendering && (
+              {showBefore && (
+                <span className="absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-black/70 text-white">Original</span>
+              )}
+              {rendering && !showBefore && (
                 <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-black/70 text-white">
                   <Loader2 className="w-3 h-3 animate-spin" />Updating
                 </span>
@@ -295,9 +303,12 @@ export default function PhotoEditor() {
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <button type="button"
-                onPointerDown={() => setShowBefore(true)} onPointerUp={() => setShowBefore(false)} onPointerLeave={() => setShowBefore(false)}
+                onPointerDown={() => setShowBefore(true)} onPointerUp={() => setShowBefore(false)} onPointerLeave={() => setShowBefore(false)} onPointerCancel={() => setShowBefore(false)}
+                onKeyDown={e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setShowBefore(true) } }}
+                onKeyUp={e => { if (e.key === ' ' || e.key === 'Enter') setShowBefore(false) }}
+                onBlur={() => setShowBefore(false)}
                 className="fc-btn-secondary !py-2 !px-3 text-xs font-bold flex items-center gap-2 select-none cursor-pointer">
-                <Eye className="w-3.5 h-3.5" />Hold to compare
+                <Eye className="w-3.5 h-3.5" />Hold to see the original
               </button>
               <span className="text-[11px] text-ink-faint">Previews are rendered on the server at a reduced size. Saving makes a full-size version.</span>
             </div>

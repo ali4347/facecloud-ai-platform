@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-17 — Photo editor: "Hold to compare" now shows the original upload
+*Status: committed (this commit).*
+
+- **Problem found by the owner:** holding the compare button in the editor showed the enhanced photo without edits (the first preview), which looks the same as the edit, so nothing seemed to happen.
+- **Fix:** while the button is held (mouse, touch, or Space/Enter) the editor shows the photo exactly as it was uploaded, labelled "Original"; releasing brings the edit back. The button now reads "Hold to see the original".
+- **Files:** `src/pages/user/PhotoEditor.tsx`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome vs. a throwaway backend: held, the picture is byte-identical to the backend's original thumbnail; released, the edited preview returns (a different picture).
+
 ### 2026-10-17 — Photo editor (sliders), Enhance again, and Delete for photos
 *Status: committed (this commit).*
 
