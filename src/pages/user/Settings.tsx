@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { Avatar } from '../../components/ui/Avatar'
@@ -13,6 +14,10 @@ import { useFaceConsent } from '../../lib/consent'
 import { downloadMyData, getFacialDataCounts, eraseFacialData } from '../../lib/api/privacy'
 import type { FacialDataCounts } from '../../lib/api/privacy'
 import { USE_API } from '../../lib/api/config'
+import { ApiError } from '../../lib/api/client'
+import { updateProfileName, changePassword, logoutEverywhere } from '../../lib/api/auth'
+import { getNotificationPreferences, updateNotificationPreferences } from '../../lib/api/notifications'
+import type { NotificationPreferences } from '../../lib/api/notifications'
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -76,19 +81,27 @@ function ProfileSettings() {
     },
   })
 
-  const handleSave = (e: React.FormEvent) => {
+  const [saving, setSaving] = useState(false)
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
     if (!name.trim()) {
       setError('Please enter your name.')
       return
     }
+    setSaving(true)
     try {
+      /* The name is the one profile field the account stores; the rest stays
+         on this device until the backend has fields for it. */
+      const savedName = USE_API ? await updateProfileName(name.trim()) : name
       saveProfile(account.email, profile)
-      updateSessionName('user', name)
+      updateSessionName('user', savedName)
       setSaved(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not save your profile.')
+      setError(err instanceof ApiError ? err.message : err instanceof Error ? err.message : 'Could not save your profile.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -151,8 +164,16 @@ function ProfileSettings() {
                autoComplete="country-name" {...field('country')} />
       </div>
 
+      {USE_API && (
+        <p className="text-[11px] text-ink-faint">
+          Your name is saved to your account. Organization, job title, phone, country and your picture are kept on this device only.
+        </p>
+      )}
+
       <div className="flex items-center gap-3 flex-wrap">
-        <GradientButton type="submit" leftIcon={<Save className="w-4 h-4" />}>Save Changes</GradientButton>
+        <GradientButton type="submit" disabled={saving} leftIcon={<Save className="w-4 h-4" />}>
+          {saving ? 'Saving…' : 'Save Changes'}
+        </GradientButton>
         {saved && (
           <span className="text-xs text-emerald-500 font-medium inline-flex items-center gap-1.5" role="status">
             <Check className="w-3.5 h-3.5" /> Profile saved
@@ -165,6 +186,90 @@ function ProfileSettings() {
 }
 
 function SecuritySettings() {
+  return USE_API ? <SecuritySettingsLive /> : <SecuritySettingsDemo />
+}
+
+function SecuritySettingsLive() {
+  const navigate = useNavigate()
+  const [current, setCurrent] = useState('')
+  const [next, setNext] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [signingOut, setSigningOut] = useState(false)
+
+  const leave = () => {
+    localStorage.removeItem('facecloud_session')
+    navigate('/login', { replace: true, state: { notice: 'Your password was changed. Please sign in again.' } })
+  }
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    if (!current || !next) { setError('Enter your current and new password.'); return }
+    if (next !== confirm) { setError('The new passwords do not match.'); return }
+    setBusy(true)
+    try {
+      await changePassword(current, next)
+      leave()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not change your password. Please try again.')
+      setBusy(false)
+    }
+  }
+
+  const signOutEverywhere = async () => {
+    setSigningOut(true)
+    try { await logoutEverywhere() } catch { /* tokens are cleared either way */ }
+    localStorage.removeItem('facecloud_session')
+    navigate('/login', { replace: true })
+  }
+
+  return (
+    <div className="space-y-5">
+      <h2 className="text-base font-bold text-ink">Security Settings</h2>
+      <form className="space-y-5" onSubmit={submit}>
+        <div>
+          <label htmlFor="sec-cur" className="text-xs font-semibold text-ink block mb-1.5">Current Password</label>
+          <PasswordInput id="sec-cur" placeholder="Enter current password" className="fc-input"
+            value={current} onChange={e => setCurrent(e.target.value)} autoComplete="current-password" />
+        </div>
+        <div>
+          <label htmlFor="sec-new" className="text-xs font-semibold text-ink block mb-1.5">New Password</label>
+          <PasswordInput id="sec-new" placeholder="Min. 8 characters" className="fc-input"
+            value={next} onChange={e => setNext(e.target.value)} autoComplete="new-password" />
+        </div>
+        <div>
+          <label htmlFor="sec-confirm" className="text-xs font-semibold text-ink block mb-1.5">Confirm New Password</label>
+          <PasswordInput id="sec-confirm" placeholder="Repeat new password" className="fc-input"
+            value={confirm} onChange={e => setConfirm(e.target.value)} autoComplete="new-password" />
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <GradientButton type="submit" variant="secondary" disabled={busy}>
+            {busy ? 'Updating…' : 'Update Password'}
+          </GradientButton>
+          {error && <span className="text-xs text-red-500" role="alert">{error}</span>}
+        </div>
+        <p className="text-[11px] text-ink-faint">
+          Changing your password signs you out on every device, so you will be asked to sign in again.
+        </p>
+      </form>
+
+      <div className="border-t border-line pt-5">
+        <h3 className="text-sm font-semibold text-ink mb-1">Sign out everywhere</h3>
+        <p className="text-xs text-ink-mute mb-3">
+          Ends your session on this device and every other one. Use it if you signed in on a computer you no longer trust.
+        </p>
+        <button type="button" onClick={signOutEverywhere} disabled={signingOut}
+          className="text-xs font-semibold text-error hover:underline disabled:opacity-60">
+          {signingOut ? 'Signing out…' : 'Sign out of all devices'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function SecuritySettingsDemo() {
   return (
     <div className="space-y-5">
       <h2 className="text-base font-bold text-ink">Security Settings</h2>
@@ -199,33 +304,75 @@ function SecuritySettings() {
 function NotificationSettings() {
   const items = [
     {
+      key: 'photo_accepted' as const,
       label: 'Photo accepted',
       desc: 'Email confirms enhancement and grouping when your photo passes all checks',
     },
     {
+      key: 'photo_rejected' as const,
       label: 'Photo rejected',
       desc: 'Email includes the exact rejection reason (e.g. "Image too blurry") so you know what to fix',
     },
     {
+      key: 'batch_upload_finished' as const,
       label: 'Batch upload finished',
       desc: 'When a multiple or ZIP upload finishes, get a summary of accepted and rejected counts',
     },
     {
+      key: 'person_group_created' as const,
       label: 'Person group created',
       desc: 'When a new person folder is created from your photos',
     },
     {
+      key: 'email_notifications' as const,
       label: 'Email notifications',
       desc: 'Receive all of the above as emails to your registered address',
     },
     {
+      key: 'live_session_alerts' as const,
       label: 'Live session alerts',
       desc: 'Notifications during live camera enhancement sessions',
     },
   ]
+
+  /* Against the API the switches are the account's real preferences; in the
+     demo they stay the decorative defaults they always were. */
+  const [prefs, setPrefs] = useState<NotificationPreferences | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!USE_API) return
+    const ctl = new AbortController()
+    getNotificationPreferences(ctl.signal)
+      .then(setPrefs)
+      .catch(err => {
+        if (ctl.signal.aborted) return
+        setLoadError(err instanceof ApiError ? err.message : 'Could not load your notification settings.')
+      })
+    return () => ctl.abort()
+  }, [])
+
+  const savePrefs = async () => {
+    if (!prefs) return
+    setSaving(true); setSaveError(null); setSaved(false)
+    try {
+      setPrefs(await updateNotificationPreferences(prefs))
+      setSaved(true)
+    } catch (err) {
+      setSaveError(err instanceof ApiError ? err.message : 'Could not save your preferences.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="space-y-5">
       <h2 className="text-base font-bold text-ink">Notification Settings</h2>
+      {USE_API && loadError && <p role="alert" className="text-xs text-red-500">{loadError}</p>}
+      {USE_API && !prefs && !loadError && <p className="text-xs text-ink-mute">Loading your settings…</p>}
 
       {/* Rejection email note */}
       <div
@@ -247,12 +394,25 @@ function NotificationSettings() {
             <p className="text-xs text-ink-mute">{item.desc}</p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" defaultChecked={i < 4} className="sr-only peer" />
+            {USE_API ? (
+              <input type="checkbox" className="sr-only peer" aria-label={item.label}
+                checked={prefs ? prefs[item.key] : false} disabled={!prefs}
+                onChange={e => { setPrefs(p => p && { ...p, [item.key]: e.target.checked }); setSaved(false) }} />
+            ) : (
+              <input type="checkbox" defaultChecked={i < 4} className="sr-only peer" aria-label={item.label} />
+            )}
             <div className="w-10 h-6 bg-border peer-checked:bg-accent rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-4" />
           </label>
         </div>
       ))}
-      <GradientButton leftIcon={<Save className="w-4 h-4" />}>Save Preferences</GradientButton>
+      <div className="flex items-center gap-3 flex-wrap">
+        <GradientButton leftIcon={<Save className="w-4 h-4" />} disabled={USE_API && (!prefs || saving)}
+          onClick={USE_API ? savePrefs : undefined}>
+          {saving ? 'Saving…' : 'Save Preferences'}
+        </GradientButton>
+        {saved && <span role="status" className="text-xs text-emerald-500 font-medium inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5" /> Preferences saved</span>}
+        {saveError && <span role="alert" className="text-xs text-red-500">{saveError}</span>}
+      </div>
     </div>
   )
 }

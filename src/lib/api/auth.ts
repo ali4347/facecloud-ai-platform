@@ -208,6 +208,24 @@ export async function logoutEverywhere(): Promise<void> {
   }
 }
 
+/** Save the display name. Returns the name as the backend stored it. */
+export async function updateProfileName(fullName: string): Promise<string> {
+  const user = await apiFetch<ApiUser>('/api/user/profile/', { method: 'PATCH', body: { full_name: fullName } })
+  return displayNameOf(user)
+}
+
+/**
+ * Change the password. The backend ends every session on success (including
+ * this one), so the caller must send the person back to sign in.
+ */
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await apiFetch('/api/user/change-password/', {
+    method: 'POST',
+    body: { current_password: currentPassword, new_password: newPassword },
+  })
+  clearTokens()
+}
+
 export function getProfile(): Promise<ApiUser> {
   return apiFetch<ApiUser>('/api/user/profile/')
 }

@@ -17,6 +17,7 @@ export default function Login() {
   const [error, setError] = useState('')
 
   const sessionExpired = (location.state as { sessionExpired?: boolean } | null)?.sessionExpired === true
+  const notice = (location.state as { notice?: string } | null)?.notice
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,6 +93,19 @@ export default function Login() {
           </p>
 
           {/* Session-expired banner */}
+          {notice && !sessionExpired && (
+            <div
+              role="status"
+              className="p-3 mb-5 rounded-2xl text-sm"
+              style={{
+                background: 'rgba(16,185,129,0.08)',
+                border: '1px solid rgba(16,185,129,0.25)',
+                color: '#34D399',
+              }}
+            >
+              {notice}
+            </div>
+          )}
           {sessionExpired && (
             <div
               className="p-3 mb-5 rounded-2xl text-sm flex items-start gap-2.5"

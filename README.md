@@ -27,7 +27,7 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
 
 * **Live on the API:** sign-in; the moderator dashboard and review queue; and the user portal's single upload, processing view, uploads list, My Images gallery and image detail.
-* **Still on mock data and `localStorage`:** the user dashboard, downloads, activity, notifications, identity groups, multiple/ZIP upload, the remaining moderator screens, and the admin console.
+* **Still on mock data and `localStorage`:** Live Enhancement (runs in the browser), the remaining moderator screens, and the admin console. Every other user-portal screen reads the live API when `VITE_USE_API=true`.
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
@@ -143,17 +143,17 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard` (User Dashboard Overview)
 * `/dashboard/upload` (Upload Center Gateway)
 * `/dashboard/upload/single` (Single Image Upload and AI comparison)
-* `/dashboard/upload/multiple` (Multiple Batch Upload queue)
-* `/dashboard/upload/zip` (ZIP Archive processing and metrics)
+* `/dashboard/upload/multiple` (up to 150 photos in one batch, real per-photo verdicts, Download Accepted as a ZIP)
+* `/dashboard/upload/zip` (a ZIP up to 2 GB, real counts, Download Accepted Photos as a ZIP)
 * `/dashboard/processing/:id` (Real-time single job processing tracker)
 * `/dashboard/images` (My Images gallery browser)
 * `/dashboard/images/:id` (Image Detail, EXIF data, and enhancement controls)
 * `/dashboard/groups` (Person Folders: with the API on, your real folders with a mosaic of their photos; the consent banner appears here when face grouping is off)
 * `/dashboard/groups/:id` (one Person Folder: its photos, rename, Download All / Download Selected as a ZIP, and a time-limited Secure Link to the whole folder's ZIP)
-* `/dashboard/downloads` (Secured downloads and PDF reports generation list)
-* `/dashboard/notifications` (System alert logs and settings notifications)
-* `/dashboard/activity` (Personal user auditing event stream)
-* `/dashboard/settings` (Profile controls and simulated email options)
+* `/dashboard/downloads` (real download history; a new line is added each time a file is downloaded; time-limited secure links for enhanced photos and Person Folder ZIPs; expired batch ZIPs can be prepared again)
+* `/dashboard/notifications` (real notifications: mark read / mark all read, open, dismiss, paging; the top-bar bell shows the same unread count)
+* `/dashboard/activity` (your real activity history, paged; the type chips and search narrow the page on screen)
+* `/dashboard/settings` (name saved to the account; password change; sign out of all devices; notification switches saved to the account. Organization, job title, phone, country and the picture stay on this device until the backend has fields for them)
 * `/dashboard/live-enhancement` (Webcam real-time face landmark viewer and enhancement controls)
 * `/dashboard/jobs` (Batch job history directory)
 

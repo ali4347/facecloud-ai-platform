@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-16
+**Last updated:** 2026-10-17
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -23,7 +23,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 |:-----|:-------|:------|
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
-| User portal (16 routes under `/dashboard`) | ✅ Complete | Single upload, processing, uploads list, My Images and image detail run on the live API; groups, downloads, activity, notifications, multiple/ZIP upload and live webcam enhancement are still on mock data |
+| User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen except live webcam enhancement (client-side) runs on the live API when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list wait for backend PR #68 |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
@@ -45,6 +45,53 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-17 — Settings connected to the backend: name, password, sign out everywhere, notification switches
+*Status: committed (this commit).*
+
+- **Profile:** Save Changes now sends the Full Name to `PATCH /api/user/profile/` and shows the name the backend stored (top bar updates). Organization, job title,
+  phone, country and the picture are not stored by the backend yet, so they stay on this device; a one-line note on the page says so (API mode only).
+- **Security:** Update Password calls `POST /api/user/change-password/` (current password, new password, confirm checked on screen, the backend's reasons shown, e.g.
+  "Current password is incorrect", "This password is too common"). The backend ends every session on success, so the app clears the local session and goes to
+  `/login` with a green "Your password was changed" notice. The invented "Active Sessions" list (fake Chrome/Firefox rows) is replaced in API mode by
+  **Sign out of all devices** (`POST /api/user/logout-all/`); a real device list needs backend PR #68. The demo build keeps its old list.
+- **Notifications tab:** the six switches load from and save to `GET/PATCH /api/notifications/preferences/` (Save Preferences, "Preferences saved"). Demo build unchanged.
+- **Files:** `src/pages/user/Settings.tsx`, `src/lib/api/auth.ts` (`updateProfileName`, `changePassword`), `src/pages/Login.tsx` (notice banner), `README.md`.
+- **Verified:** `npm run build` clean; headless Chrome against a throwaway backend copy: name persisted in the backend, switches flipped and persisted across reload,
+  mismatch / wrong-current / weak-password errors shown, successful change lands on `/login` with the notice and clears the session, the old password is refused (400)
+  and the new one signs in, Sign out of all devices ends the session and the dashboard redirects to `/login`. Demo build (`VITE_USE_API=false`) re-checked for every
+  user screen changed today: Multiple, ZIP, Downloads, Notifications, Activity, Settings, bell and search all render and behave as before.
+
+### 2026-10-17 — Activity, Notifications, top-bar bell and global search on the real backend
+*Status: committed (this commit).*
+
+- **Activity (`/dashboard/activity`):** your real history from `GET /api/user/activity/`, paged by `has_next`; type chips (upload, enhance, validate, download, group,
+  reject, login, email) and the search box narrow the loaded page (the subtitle says so).
+- **Notifications (`/dashboard/notifications`):** real list with count and per-page unread, Mark all read, Open (marks read then goes to the page), dismiss (delete), paging,
+  link to Settings → Notifications. "Clear alerts" removed. The backend's `/dashboard/uploads` links are mapped to `/dashboard/jobs`.
+- **Bell:** unread count polled every 60 s and after any change on the Notifications page; the panel shows the latest six, click marks read and opens, "Mark all as read", "View all".
+  Admin and moderator keep their demo bell.
+- **Search:** the top-bar field (⌘K) searches photos (with protected thumbnails), Person Folders and uploads via `GET /api/search/` from 2 characters, debounced, keyboard
+  navigable. Admin and moderator keep the plain field.
+- **Files:** new `src/lib/api/{notifications,activity,search}.ts`, `src/lib/useLiveBell.ts`, `src/components/layout/GlobalSearch.tsx`,
+  `src/pages/user/{ActivityLogs,Notifications}{Live,Demo}.tsx` (the old pages kept as `*Demo`, `ActivityLogs.tsx`/`Notifications.tsx` are switches);
+  edited `Topbar.tsx`, `NotificationDropdown.tsx`.
+- **Verified:** headless Chrome vs. throwaway backend: bell dot and counts equal the backend (39 → 38 → 0 on read / mark all), page count equals backend, dismiss deletes,
+  Open navigates, real activity entries and chip filter, search finds photos (real thumbnails), a Person Folder, and a ZIP upload by its name.
+
+### 2026-10-17 — Multiple upload, ZIP upload and Downloads on the real backend
+*Status: committed (this commit).*
+
+- **Multiple upload:** choose up to 150 photos, previews, add/remove, one batch upload, live progress, a verdict per photo (accepted / sent to moderator / rejected / failed)
+  from the batch progress rows, summary counts, **Download Accepted (N)** as a ZIP (enhances the batch first if needed), link to each photo and to processing details.
+- **ZIP upload:** a `.zip` up to 2 GB, "Found N photos", progress, final counts, **Download Accepted Photos (ZIP)**, links to My Images / Person Folders / processing details.
+  The fake "Copy Secure Download Link" button was removed.
+- **Downloads:** the real download history (paged). Each row's Download adds a new history line; the secure-link button appears only for enhanced photos and Person Folder
+  ZIPs (link shown once, with Copy and expiry); an expired batch ZIP says so and can be prepared again. The fake "Download All (ZIP)" was removed.
+- **Files:** new `src/lib/api/downloads.ts`, `src/lib/saveBlob.ts`, `src/lib/uploadBatch.ts`, `src/pages/user/{UploadMultiple,UploadZip,Downloads}{Live,Demo}.tsx` (old pages kept as `*Demo`,
+  the original names are switches); extended `src/lib/api/enhancements.ts` (`enhanceBatch`).
+- **Verified:** headless Chrome vs. throwaway backend with real face photos: on-screen counts equal the backend's verdicts; the ZIPs contain enhanced images + manifest + CSV report;
+  the downloads count equals the backend; a secure link opens without signing in.
 
 ### 2026-10-16 — Person Folders connected to the backend: list, folder page, rename, ZIP downloads and secure link
 *Status: committed (this commit). Built against backend PRs #76 and #77 (merged).*
@@ -1548,7 +1595,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 ## 6. Pending / Uncommitted Work (as of 2026-09-17)
 
-- None. Working tree is clean after the 2026-09-17 documentation commit.
+- Live site untouched (demo build). Next: deploy the backend (api.facecloudai.com), test, then cut the live frontend over in one step. Waiting on backend PR #68 for profile extras, picture and a device list.
 - Open product question carried over from the discarded v3 work: the fifth problem/solution pair in the methodology
   section does not match (problem: inconsistent approval decisions; solution: multi-folder assignment).
 
