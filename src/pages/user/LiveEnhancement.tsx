@@ -1,13 +1,16 @@
 import { PageHeader } from '../../components/layout/PageHeader'
 import { LiveEnhancementPanel } from '../../components/features/LiveEnhancementPanel'
 import { Info, Sparkles, Camera, Wifi } from 'lucide-react'
+import { USE_API } from '../../lib/api/config'
 
 export default function LiveEnhancement() {
   return (
     <div className="page-enter">
       <PageHeader
         title="Live Enhancement"
-        subtitle="Real-time webcam AI enhancement powered by Zero-DCE. See before/after in real-time."
+        subtitle={USE_API
+          ? 'Preview your camera live, capture a frame, and enhance it with FaceCloud\'s AI. The result is saved to My Images.'
+          : 'Real-time webcam AI enhancement powered by Zero-DCE. See before/after in real-time.'}
       />
 
       {/* Top explanation card */}
@@ -22,7 +25,9 @@ export default function LiveEnhancement() {
         <div>
           <p className="text-sm font-semibold text-ink">Live + Snapshot AI Enhancement</p>
           <p className="text-xs text-ink-mute mt-0.5">
-            Live preview runs fast browser-based enhancement. For higher-quality face restoration, capture a frame and run FaceCloud's AI snapshot enhancement pipeline.
+            {USE_API
+              ? 'The live preview uses simple browser filters so it stays smooth. Capture a frame to run FaceCloud\'s real enhancement on the whole image; the result is stored in My Images.'
+              : 'Live preview runs fast browser-based enhancement. For higher-quality face restoration, capture a frame and run FaceCloud\'s AI snapshot enhancement pipeline.'}
           </p>
         </div>
       </div>

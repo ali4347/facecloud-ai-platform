@@ -4,6 +4,14 @@ import { FilesetResolver, FaceDetector } from '@mediapipe/tasks-vision'
 import { GradientButton } from '../ui/GradientButton'
 import { StatusBadge } from '../ui/StatusBadge'
 import { BeforeAfterSlider } from './BeforeAfterSlider'
+import { useNavigate } from 'react-router-dom'
+import { USE_API } from '../../lib/api/config'
+import { levelLabel } from '../../lib/api/enhancements'
+import type { EnhancementLevel, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
+import { ApiError } from '../../lib/api/client'
+import {
+  LIVE_SNAPSHOT_STEPS, dataUrlToJpegFile, enhanceStoredPhoto, reasonText, submitSnapshot,
+} from '../../lib/liveSnapshot'
 
 interface LiveEnhancementPanelProps {
   className?: string
@@ -71,6 +79,17 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
     validation: '',
     resolution: '',
   })
+
+  /* Against the API a captured frame is stored as a real photo and enhanced by the real pipeline.
+     The id is kept so "Enhance again" re-enhances the same photo instead of uploading it twice. */
+  const navigate = useNavigate()
+  const [liveImageId, setLiveImageId] = useState<number | null>(null)
+  const [liveResult, setLiveResult] = useState<EnhancementResult | null>(null)
+  const [liveRefused, setLiveRefused] = useState<{ verdict: string; reasons: string[] } | null>(null)
+  const [liveError, setLiveError] = useState('')
+  const [liveStyle, setLiveStyle] = useState<EnhancementStyle>('ai_max')
+  const [liveLevel, setLiveLevel] = useState<EnhancementLevel>('auto')
+  const steps = USE_API ? LIVE_SNAPSHOT_STEPS : PIPELINE_STEPS
 
   // Developer info card
   const [devInfoOpen, setDevInfoOpen] = useState(false)
@@ -562,6 +581,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         setEnhancedSnapshotDataUrl(null)
         setPipelineComplete(false)
         setPipelineStep(-1)
+        setLiveImageId(null); setLiveResult(null); setLiveRefused(null); setLiveError('')
         setSnapshotsCount(s => s + 1)
         triggerToast('Snapshot captured.')
         // Auto-switch to snapshot tab
@@ -614,8 +634,50 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
   }, [])
 
   // Run mock AI pipeline
+  /** The real thing: store the frame, let the pipeline judge it, enhance it, show both sides. */
+  const runRealPipeline = useCallback(async () => {
+    if (!snapshotDataUrl) return
+    setSnapshotProcessing(true)
+    setPipelineComplete(false)
+    setEnhancedSnapshotDataUrl(null)
+    setLiveResult(null); setLiveRefused(null); setLiveError('')
+    try {
+      let imageId = liveImageId
+      if (imageId === null) {
+        setPipelineStep(0)
+        const file = await dataUrlToJpegFile(snapshotDataUrl, `webcam-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`)
+        setPipelineStep(1)
+        const photo = await submitSnapshot(file)
+        imageId = photo.id
+        setLiveImageId(photo.id)
+        if (photo.display_status !== 'accepted') {
+          const reasons = photo.quality_decision?.rejection_reasons?.filter(Boolean) ?? []
+          if (reasons.length === 0 && photo.face_validation?.rejection_reason) reasons.push(photo.face_validation.rejection_reason)
+          setLiveRefused({ verdict: photo.display_status, reasons })
+          return
+        }
+      }
+      setPipelineStep(2)
+      const { result, blob } = await enhanceStoredPhoto(imageId, liveStyle, liveLevel)
+      setPipelineStep(3)
+      setEnhancedSnapshotDataUrl(prev => {
+        if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
+        return URL.createObjectURL(blob)
+      })
+      setLiveResult(result)
+      setPipelineComplete(true)
+      triggerToast('Your frame was enhanced and saved to My Images.')
+    } catch (caught) {
+      setLiveError(caught instanceof ApiError || caught instanceof Error ? caught.message : 'Could not enhance this frame.')
+    } finally {
+      setSnapshotProcessing(false)
+    }
+  }, [snapshotDataUrl, liveImageId, liveStyle, liveLevel])
+
   const runEnhancePipeline = useCallback(async () => {
+    if (USE_API && snapshotDataUrl && liveImageId !== null) { await runRealPipeline(); return }
     if (!snapshotDataUrl || faceCount !== 1) return
+    if (USE_API) { await runRealPipeline(); return }
 
     setSnapshotProcessing(true)
     setPipelineComplete(false)
@@ -645,13 +707,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
     setPipelineComplete(true)
     setSnapshotProcessing(false)
     triggerToast('AI face restoration complete.')
-  }, [snapshotDataUrl, faceCount, resolution, applyMockEnhancement])
+  }, [snapshotDataUrl, faceCount, resolution, applyMockEnhancement, runRealPipeline, liveImageId])
 
   // Download enhanced snapshot
   const downloadEnhanced = () => {
     if (enhancedSnapshotDataUrl) {
       const link = document.createElement('a')
-      link.download = 'facecloud_enhanced_snapshot.png'
+      link.download = USE_API ? 'facecloud_enhanced_snapshot.jpg' : 'facecloud_enhanced_snapshot.png'
       link.href = enhancedSnapshotDataUrl
       link.click()
       triggerToast('Enhanced snapshot downloaded.')
@@ -660,7 +722,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
     }
   }
 
+  /* Against the API the frame is stored when it is enhanced, so there is nothing left to save: this opens it. */
   const saveEnhanced = () => {
+    if (USE_API && liveImageId !== null) { navigate(`/dashboard/images/${liveImageId}`); return }
     triggerToast('Enhanced frame saved to My Images.')
   }
 
@@ -726,8 +790,8 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
   }
 
   // Snapshot enhance button state
-  const canEnhance = faceCount === 1 && snapshotDataUrl && !snapshotProcessing
-  const snapshotValidationMsg = faceCount === 0
+  const canEnhance = (faceCount === 1 || (USE_API && liveImageId !== null)) && snapshotDataUrl && !snapshotProcessing
+  const snapshotValidationMsg = USE_API && liveImageId !== null ? null : faceCount === 0
     ? 'No face detected. Start camera and position your face.'
     : faceCount > 1
     ? 'Multiple faces detected — FaceCloud requires exactly one face per image.'
@@ -1216,8 +1280,33 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   <ScanFace className="w-5 h-5 text-[#A78BFA]" />
                   <h3 className="text-sm font-semibold text-ink">FaceCloud AI Face Restoration</h3>
                 </div>
-                <StatusBadge status="purple" label="Zero-DCE + Face Detail Recovery" dot={false} />
+                <StatusBadge status="purple" label={USE_API ? 'FaceCloud AI enhancement' : 'Zero-DCE + Face Detail Recovery'} dot={false} />
               </div>
+
+              {/* Style and strength: only meaningful against the real pipeline */}
+              {USE_API && !snapshotProcessing && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="live-style" className="text-[11px] font-semibold text-ink block mb-1.5">Style</label>
+                    <select id="live-style" className="fc-input" value={liveStyle}
+                      onChange={e => setLiveStyle(e.target.value as EnhancementStyle)}>
+                      <option value="natural">Natural, keeps the photo as it is</option>
+                      <option value="dynamic">Dynamic, more punch</option>
+                      <option value="ai_max">AI Enhance, strongest restoration</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="live-level" className="text-[11px] font-semibold text-ink block mb-1.5">Strength</label>
+                    <select id="live-level" className="fc-input" value={liveLevel}
+                      onChange={e => setLiveLevel(e.target.value as EnhancementLevel)}>
+                      <option value="auto">Automatic</option>
+                      <option value="low">Light</option>
+                      <option value="medium">Moderate</option>
+                      <option value="high">Strong</option>
+                    </select>
+                  </div>
+                </div>
+              )}
 
               {/* Enhance button */}
               {!snapshotProcessing && (
@@ -1229,8 +1318,28 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   className="w-full justify-center"
                   size="lg"
                 >
-                  Enhance Captured Face
+                  {USE_API && liveImageId !== null ? 'Enhance again' : 'Enhance Captured Face'}
                 </GradientButton>
+              )}
+
+              {USE_API && liveError && (
+                <p role="alert" className="text-xs text-red-500">{liveError}</p>
+              )}
+              {USE_API && liveRefused && (
+                <div role="alert" className="p-4 rounded-2xl text-xs space-y-2" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+                  <p className="font-bold text-[#F87171]">
+                    {liveRefused.verdict === 'needs_review' ? 'This frame was sent for review, so it was not enhanced.' : 'This frame was not accepted, so it was not enhanced.'}
+                  </p>
+                  {liveRefused.reasons.length > 0 && (
+                    <p className="text-ink-mute">{liveRefused.reasons.map(reasonText).join(' · ')}</p>
+                  )}
+                  <p className="text-ink-mute">Move a little closer or improve the light, then capture again. The frame is in My Images.</p>
+                  {liveImageId !== null && (
+                    <button type="button" onClick={() => navigate(`/dashboard/images/${liveImageId}`)} className="font-semibold text-accent hover:underline">
+                      See why in My Images
+                    </button>
+                  )}
+                </div>
               )}
 
               {/* Pipeline Progress */}
@@ -1240,7 +1349,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                     <div className="w-2 h-2 bg-[#F97316] rounded-full animate-pulse" />
                     <span className="text-xs font-bold text-[#FB923C]">Running AI Enhancement Pipeline...</span>
                   </div>
-                  {PIPELINE_STEPS.map((step, i) => {
+                  {steps.map((step, i) => {
                     const isComplete = i < pipelineStep
                     const isCurrent = i === pipelineStep
                     const isPending = i > pipelineStep
@@ -1276,7 +1385,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                     <div
                       className="h-full rounded-full transition-all duration-500 ease-out"
                       style={{
-                        width: `${((pipelineStep + 1) / PIPELINE_STEPS.length) * 100}%`,
+                        width: `${((pipelineStep + 1) / steps.length) * 100}%`,
                         background: 'linear-gradient(90deg, #F97316, #10B981)',
                       }}
                     />
@@ -1297,7 +1406,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   border: '1px solid rgba(16,185,129,0.25)',
                 }}>
                   <CheckCircle2 className="w-4 h-4 text-[#10B981]" />
-                  <span className="text-xs font-bold text-[#10B981]">Face Restored</span>
+                  <span className="text-xs font-bold text-[#10B981]">{USE_API ? 'Enhanced and saved to My Images' : 'Face Restored'}</span>
                 </div>
                 <StatusBadge status="info" label="AI Snapshot Enhancement" dot={false} />
               </div>
@@ -1325,16 +1434,22 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
               <div className="fc-card p-5 space-y-4">
                 <div className="flex items-center gap-2 border-b border-line pb-3">
                   <Zap className="w-4 h-4 text-[#F97316]" />
-                  <h4 className="text-xs font-bold text-ink uppercase tracking-wider">Enhancement Metrics</h4>
+                  <h4 className="text-xs font-bold text-ink uppercase tracking-wider">{USE_API ? 'What was done' : 'Enhancement Metrics'}</h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                  {[
+                  {(USE_API && liveResult ? [
+                    { label: 'Style', value: liveResult.requested_style === 'ai_max' ? 'AI Enhance' : liveResult.requested_style === 'dynamic' ? 'Dynamic' : 'Natural', color: '#A78BFA' },
+                    { label: 'Strength applied', value: levelLabel(liveResult.applied_level), color: '#FB923C' },
+                    { label: 'Face check', value: 'Accepted', color: '#10B981' },
+                    { label: 'Output size', value: liveResult.output_width && liveResult.output_height ? `${liveResult.output_width} × ${liveResult.output_height}` : '—', color: '#FB923C' },
+                    { label: 'Processing time', value: liveResult.processing_duration_ms ? `${(liveResult.processing_duration_ms / 1000).toFixed(1)} s` : '—', color: '#10B981' },
+                  ] : [
                     { label: 'Enhancement Confidence', value: `${enhancementMetrics.confidence}%`, color: '#10B981' },
                     { label: 'Brightness Improved', value: `+${enhancementMetrics.brightness}%`, color: '#FB923C' },
                     { label: 'Detail Recovery', value: `+${enhancementMetrics.detail}%`, color: '#A78BFA' },
                     { label: 'Face Validation', value: enhancementMetrics.validation, color: '#10B981' },
                     { label: 'Output Resolution', value: enhancementMetrics.resolution, color: '#FB923C' },
-                  ].map(metric => (
+                  ]).map(metric => (
                     <div key={metric.label} className="text-center space-y-1.5 p-3 rounded-xl" style={{ background: 'rgb(var(--a-surface-mute))', border: '1px solid rgb(var(--a-surface-mute))' }}>
                       <p className="text-[10px] text-ink-faint font-semibold uppercase tracking-wider">{metric.label}</p>
                       <p className="text-sm font-bold font-mono" style={{ color: metric.color }}>{metric.value}</p>
@@ -1357,7 +1472,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   leftIcon={<Save className="w-4 h-4" />}
                   onClick={saveEnhanced}
                 >
-                  Save to My Images
+                  {USE_API ? 'View in My Images' : 'Save to My Images'}
                 </GradientButton>
                 <GradientButton
                   variant="secondary"
@@ -1373,13 +1488,13 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                 </GradientButton>
               </div>
 
-              {/* Demo disclaimer */}
-              <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(249,115,22,0.04)', border: '1px solid rgba(249,115,22,0.15)' }}>
+              {/* Demo disclaimer: the demo build simulates the restoration; the real one does not */}
+              {!USE_API && <div className="p-4 rounded-2xl flex items-start gap-3" style={{ background: 'rgba(249,115,22,0.04)', border: '1px solid rgba(249,115,22,0.15)' }}>
                 <Info className="w-4 h-4 text-[#FB923C] flex-shrink-0 mt-0.5" />
                 <p className="text-[11px] text-ink-mute leading-relaxed font-medium">
                   This frontend demo simulates AI restoration. Production can connect GFPGAN/CodeFormer/Real-ESRGAN backend models for Remini-style results.
                 </p>
-              </div>
+              </div>}
             </div>
           )}
 

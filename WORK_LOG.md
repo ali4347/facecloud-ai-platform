@@ -23,7 +23,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 |:-----|:-------|:------|
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
-| User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen except live webcam enhancement (client-side) runs on the live API when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list are built against backend PR #67 (fall back gracefully until it is merged) |
+| User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen runs on the live API (live webcam enhancement: a captured frame is stored and enhanced for real; the live preview itself is browser filters) when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list are built against backend PR #67 (fall back gracefully until it is merged) |
 | Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
@@ -45,6 +45,22 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-17 — Live Enhancement: captured frames now use the real pipeline; "Save to My Images" works
+*Status: committed (this commit).*
+
+- **Problem found by the owner:** the snapshot result was only a browser brightness/contrast filter dressed up as "AI face restoration" with random "confidence / brightness / detail" numbers, and
+  **Save to My Images** only showed a toast (nothing was saved). Both were fake.
+- **Fix (API mode):** Enhance now stores the captured frame as a real photo (JPEG, full capture size), waits for the pipeline's verdict, then calls the real enhancement with a chosen **Style**
+  (Natural / Dynamic / AI Enhance, default AI Enhance) and **Strength** (Automatic / Light / Moderate / Strong), and shows the real before/after. A frame that is not accepted (or goes to review) says why and is
+  not "enhanced". **Enhance again** re-enhances the same stored photo with new settings instead of uploading it twice. The old random metrics are replaced by real facts only (style, strength applied,
+  face check, output size, processing time). **Save to My Images** became **View in My Images** (the frame is already stored when enhanced). The demo-only disclaimer and mock are kept for the demo build.
+  Page wording no longer claims the live preview is Zero-DCE (it uses simple browser filters).
+- **Files:** new `src/lib/liveSnapshot.ts`; edited `src/components/features/LiveEnhancementPanel.tsx`, `src/pages/user/LiveEnhancement.tsx`, `README.md`.
+- **Verified:** `npm run build` clean (and the demo build). Headless Chrome with a fake camera against a throwaway copy of backend `main`: captured a frame, enhanced it, got the real before/after and
+  real "what was done" values, and the frame appears in My Images (backend `display_status` completed, enhancement completed, style ai_max).
+- **Known limit (backend):** output size equals the capture size (1280 × 720 here). Real "HD" (2x upscaling, face restoration) needs the backend's `HD_RESTORATION_ENABLED` (default off) and its model
+  checkpoints; a prompt for that went to the backend owner.
 
 ### 2026-10-17 — Settings profile details, picture and devices; Merge folder; download follow-up
 *Status: committed (this commit). Profile details, picture and devices were built against backend PR #67 (open, not yet merged); the old-backend fallback was tested too.*

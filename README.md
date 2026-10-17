@@ -27,7 +27,7 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
 
 * **Live on the API:** sign-in; the moderator dashboard and review queue; and the user portal's single upload, processing view, uploads list, My Images gallery and image detail.
-* **Still on mock data and `localStorage`:** Live Enhancement (runs in the browser), the remaining moderator screens, and the admin console. Every other user-portal screen reads the live API when `VITE_USE_API=true`.
+* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), the remaining moderator screens, and the admin console. Every other user-portal screen reads the live API when `VITE_USE_API=true`.
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
@@ -154,7 +154,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/notifications` (real notifications: mark read / mark all read, open, dismiss, paging; the top-bar bell shows the same unread count)
 * `/dashboard/activity` (your real activity history, paged; the type chips and search narrow the page on screen)
 * `/dashboard/settings` (name, organization, job title, phone, country and the picture saved to the account; password change; the list of signed-in devices with Revoke, and sign out of all devices; notification switches saved to the account. Against a backend that predates profile details/sessions (before backend PR #67) the extras and picture stay on this device and the device list is hidden)
-* `/dashboard/live-enhancement` (Webcam real-time face landmark viewer and enhancement controls)
+* `/dashboard/live-enhancement` (webcam preview with face detection; a captured frame is stored in My Images and enhanced by the real pipeline with a chosen style and strength, real before/after and "what was done"; "Enhance again" re-enhances the same photo. The live preview itself uses simple browser filters. The demo build keeps the simulated version)
 * `/dashboard/jobs` (Batch job history directory)
 
 ### Admin Console Routes (under `/admin`)
