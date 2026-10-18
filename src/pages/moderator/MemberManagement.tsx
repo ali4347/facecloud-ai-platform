@@ -3,9 +3,12 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { mockOrgMembers, mockModeratorAudit } from '../../data/mock'
 import type { OrgMember } from '../../data/mock'
+import { USE_API } from '../../lib/api/config'
+import { LiveMemberManagement } from './MemberManagementLive'
 import { Search, UserPlus, Mail, Trash2, RefreshCw, X, ShieldAlert, CheckCircle } from 'lucide-react'
 
-export default function MemberManagement() {
+/** The demo build's version: local sample members, kept for the site that has no backend. */
+function DemoMemberManagement() {
   const [members, setMembers] = useState<OrgMember[]>(mockOrgMembers)
   const [searchTerm, setSearchTerm] = useState('')
   const [inviteModalOpen, setInviteModalOpen] = useState(false)
@@ -331,4 +334,9 @@ export default function MemberManagement() {
       )}
     </div>
   )
+}
+
+/** Live backend: the real, organization-scoped screen. Demo build: the sample one above. */
+export default function MemberManagement() {
+  return USE_API ? <LiveMemberManagement /> : <DemoMemberManagement />
 }

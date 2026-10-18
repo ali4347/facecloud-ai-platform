@@ -29,3 +29,62 @@ export async function resolveModeratorOrganization(): Promise<Organization | nul
   const organizations = await listOrganizations()
   return organizations.find(organization => !organization.is_personal) ?? organizations[0] ?? null
 }
+
+// ── Members and invitations (owner or moderator) ─────────────────────────────
+
+export interface OrgPerson { id: number; username: string; email: string }
+
+export interface OrgMembership {
+  id: number
+  organization: number
+  user: OrgPerson
+  role: 'owner' | 'moderator' | 'member'
+  status: 'invited' | 'active' | 'suspended' | 'removed'
+  /** Who brought them in: an invitation sender, or the administrator who created the account. */
+  invited_by: OrgPerson | null
+  created_at: string
+  updated_at: string
+}
+
+export interface OrgInvitation {
+  id: number
+  organization: number
+  email: string
+  role: 'moderator' | 'member'
+  status: 'pending' | 'accepted' | 'expired' | 'cancelled' | 'rejected'
+  invited_by: OrgPerson | null
+  expires_at: string
+  accepted_at: string | null
+  created_at: string
+}
+
+/** The backend answers a plain array here unless `?page=` is sent. Only this organization's members come back. */
+export function listOrgMembers(organizationId: number, signal?: AbortSignal): Promise<OrgMembership[]> {
+  return apiFetch<OrgMembership[]>(`/api/organizations/${organizationId}/members/`, { signal })
+}
+
+export function listOrgInvitations(organizationId: number, signal?: AbortSignal): Promise<OrgInvitation[]> {
+  return apiFetch<OrgInvitation[]>(`/api/organizations/${organizationId}/invitations/`, { signal })
+}
+
+/** A moderator may only invite the plain member role; the backend refuses anything else. */
+export function inviteOrgMember(organizationId: number, email: string): Promise<OrgInvitation> {
+  return apiFetch<OrgInvitation>(`/api/organizations/${organizationId}/invitations/`, { body: { email, role: 'member' } })
+}
+
+export function resendOrgInvitation(organizationId: number, invitationId: number): Promise<OrgInvitation> {
+  return apiFetch<OrgInvitation>(`/api/organizations/${organizationId}/invitations/${invitationId}/resend/`, { method: 'POST', body: {} })
+}
+
+export function cancelOrgInvitation(organizationId: number, invitationId: number): Promise<OrgInvitation> {
+  return apiFetch<OrgInvitation>(`/api/organizations/${organizationId}/invitations/${invitationId}/`, { method: 'DELETE' })
+}
+
+export function setOrgMemberStatus(organizationId: number, membershipId: number, status: 'active' | 'suspended'): Promise<OrgMembership> {
+  return apiFetch<OrgMembership>(`/api/organizations/${organizationId}/members/${membershipId}/`, { method: 'PATCH', body: { status } })
+}
+
+/** Removes organization access only; the person's account stays. */
+export function removeOrgMember(organizationId: number, membershipId: number): Promise<OrgMembership> {
+  return apiFetch<OrgMembership>(`/api/organizations/${organizationId}/members/${membershipId}/`, { method: 'DELETE' })
+}

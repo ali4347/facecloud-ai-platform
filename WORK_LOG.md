@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Moderator Member Management connected to the backend (organization-scoped)
+*Status: committed (this commit).*
+
+- **Reported:** the moderator's Member Management showed demo people (including ones from outside the moderator's organization). A moderator must only see their own organization's members.
+- **Changed:** with `VITE_USE_API=true` the screen (`src/pages/moderator/MemberManagementLive.tsx`) reads `GET /api/organizations/{id}/members/` and `/invitations/` for the moderator's organization, so nobody from another organization (or the platform administrator) can appear. Rows show role, status and who invited them; "Invited by me" narrows to the moderator's own invitees. Actions are real: Invite (member role only; the backend's duplicate/permission messages are shown), Resend and Cancel for pending invitations, Deactivate / Reactivate, and Remove (confirmation; removes organization access, not the account). Owners and other moderators show "Locked" because the backend refuses a moderator touching them. The organization audit is written by the backend, so the demo's local audit push is not used live. The demo build keeps the sample screen unchanged. New API functions in `src/lib/api/organizations.ts`.
+- **Also confirmed on the backend:** an administrator-created moderator is placed in the organization at once, so the other moderators' Members list shows them (invited by the administrator).
+- **Also:** `ErrorBoundary` now resets by `key` (lint warning fixed); the 2026-10-19 push that failed with a network error was retried and went through.
+- **Verified:** throwaway backend (origin/main) with an organization, two moderators, a member, and a user outside it; headless Chrome as the moderator: 12 checks passed (outsider and administrator not listed, other moderator Locked, invited-by shown, "Invited by me", invite, duplicate refused with the backend message, resend, cancel, deactivate, reactivate, remove); `tsc` and both builds pass, no lint finding in touched files.
+- **Left:** "Only users I created" means invitees here; the backend has no creator-only filter beyond `invited_by`, so the default view is the whole organization. Say if the default should be "Invited by me". An invited person accepting through `/invitations/{token}` still has no route in the frontend.
+
 ### 2026-10-19 — Admin pages no longer blank on an older backend; Moderators list shows only moderators
 *Status: committed (this commit).*
 
@@ -1804,8 +1814,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 **Frontend screens still on demo data (no backend call):**
 - Admin: all connected (2026-10-18). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Statistics`, `Rejections` and `System Health` pages work but have no route.
-- Moderator Member Management is on demo data and shows every demo member; it must read `/api/organizations/{id}/members/` and `/invitations/` so a moderator only sees their own organization (pending the owner's go-ahead).
-- Moderator (10): Batches, Identity Review, Members, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
+- Moderator Member Management is connected (2026-10-19). The invitation-accept route `/invitations/{token}` does not exist in the frontend yet.
+- Moderator (9): Batches, Identity Review, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
 - Public: the Contact form is connected (`POST /api/contact/`).
 - User portal: every screen is connected. Not yet in the UI although the backend has them:

@@ -76,7 +76,7 @@ export function AppShell({ role }: AppShellProps) {
           onToggleAppearance={toggleAppearance}
         />
         <main className="flex-1 px-4 sm:px-6 lg:px-7 py-6 page-enter">
-          <ErrorBoundary resetKey={location.pathname}>
+          <ErrorBoundary key={location.pathname}>
             <Outlet />
           </ErrorBoundary>
         </main>
