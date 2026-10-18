@@ -39,6 +39,7 @@ import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
 import AdminOverview from './pages/admin/AdminOverview'
+import Statistics from './pages/admin/Statistics'
 import UsersPage from './pages/admin/Users'
 import AuditLogs from './pages/admin/AuditLogs'
 import Security from './pages/admin/Security'
@@ -125,6 +126,7 @@ export default function App() {
           }
         >
           <Route index element={<AdminOverview />} />
+          <Route path="statistics" element={<Statistics />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="security" element={<Security />} />

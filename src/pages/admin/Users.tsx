@@ -172,10 +172,10 @@ export default function UsersPage() {
                 ...(users.some(u => u.uploads !== null) ? [{ key: 'uploads', label: 'Uploads', render: (row: Record<string, unknown>) => (
                   <span className="text-sm font-semibold text-ink-soft">{row.uploads === null ? '—' : String(row.uploads)}</span>
                 ) }] : []),
-                // The backend does not stamp sign-ins on every release; with none recorded the column would say "Never" for everyone.
-                ...(users.some(u => u.lastLogin) ? [{ key: 'lastLogin', label: 'Last sign-in', render: (row: Record<string, unknown>) => (
+                // The backend stamps last_login on every successful sign-in; null means the account never signed in.
+                { key: 'lastLogin', label: 'Last sign-in', render: row => (
                   <span className="text-sm text-ink-mute">{row.lastLogin ? formatDate(String(row.lastLogin)) : 'Never'}</span>
-                ) }] : []),
+                )},
                 { key: 'joinedAt', label: 'Joined', render: row => <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span> },
                 { key: 'actions', label: 'Actions', render: row => (
                   <button

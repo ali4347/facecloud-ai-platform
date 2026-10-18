@@ -24,7 +24,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
 | User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen runs on the live API (live webcam enhancement: a captured frame is stored and enhanced for real; the live preview itself is browser filters) when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list are built against backend PR #67 (fall back gracefully until it is merged) |
-| Admin console (9 routes under `/admin` plus 3 unrouted pages) | ✅ Connected to the live API (2026-10-18) | Overview, Users, Moderators, Audit Logs, Security (acknowledge), System Monitoring, Upload Statistics, Rejection Summary, Image Monitoring read the backend behind `VITE_USE_API`; demo data otherwise |
+| Admin console (10 routes under `/admin`, 2 pages deliberately unrouted) | ✅ Connected to the live API (2026-10-18) | Overview, Users, Moderators, Audit Logs, Security (acknowledge), System Monitoring, Upload Statistics, Rejection Summary, Image Monitoring read the backend behind `VITE_USE_API`; demo data otherwise |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml |
@@ -45,6 +45,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-19 — Admin: Statistics page added to the sidebar; Last sign-in column back
+*Status: committed (this commit).*
+
+- **Added:** `/admin/statistics` (route in `src/App.tsx`, sidebar item "Statistics" with a line-chart icon directly before "Upload Statistics"). It reads the live analytics (uploads trend, weekly enhancement success, live sessions, storage growth, 7 / 30 / 90-day chips) and keeps the demo data and the "Showing demo data" notice when `VITE_USE_API=false`.
+- **Not routed on purpose:** `src/pages/admin/SystemHealth.tsx` (System Monitoring at `/admin/system` already shows the same services and health) and `src/pages/admin/Rejections.tsx` (it duplicates Rejection Summary). Both files are kept, nothing was deleted.
+- **Changed:** Users and Moderators show the **Last sign-in** column again, always (the backend now stamps `last_login` on every successful sign-in; null still reads "Never"). The sidebar's home link no longer reports `aria-current="page"` on every page below it (`end` on `/admin`, `/dashboard`, `/moderator`); the visual highlight was already right.
+- **Verified:** throwaway copy of backend origin/main (`f26b3d9`, the same commit as the owner's `main`, which is not behind), seeded with 3 accounts, 7 uploads (2 rejected) and 4 enhancements; headless Chrome: Statistics loads real data (weekly bar `2026-W42` 4 completed / 0 failed, matching the API; storage 824 KB; live sessions empty message), the sidebar lists Statistics before Upload Statistics and highlights only it, System Monitoring is unchanged (services, workers, queue table), `/admin/health`, `/admin/rejections` and `/admin/system-health` are 404, Users shows a date for accounts that signed in and "Never" for one that did not, Moderators shows the column, and the demo build shows `/admin/statistics` with the notice. No uncaught exception. `tsc` and both builds pass, no lint finding in touched files.
+- **Note:** the brief asked for `git pull --ff-only` first; the owner's backend folder was already level with origin/main, and the throwaway copy was taken from origin/main with `git archive`, so that folder was not touched.
 
 ### 2026-10-19 — Member Management opens on "Invited by me"
 *Status: committed (this commit).*
@@ -1775,7 +1784,7 @@ and run locally):
 - User `/dashboard` (16): index, `upload`, `upload/single`, `upload/multiple`, `upload/zip`, `processing/:id`, `images`,
   `images/:id`, `groups`, `groups/:id`, `downloads`, `notifications`, `activity`, `settings`, `live-enhancement`, `jobs`.
 - Admin `/admin` (11): index, `users`, `moderators`, `audit-logs`, `security`, `system`, `upload-statistics`,
-  `rejection-summary`, `images`, `api-docs` and `api-test` → `/admin`, `logs`→`audit-logs`. `Statistics`, `Rejections` and `SystemHealth` pages exist without a route.
+  `statistics`, `rejection-summary`, `images`, `api-docs` and `api-test` → `/admin`, `logs`→`audit-logs`. `Rejections` and `SystemHealth` pages exist without a route on purpose.
 - Moderator `/moderator` (9): index, `members`, `queue`, `images/:id`, `batches`, `notifications`, `reports`, `audit`, `settings`.
 
 **Design scopes:** one palette site-wide — black, orange `#F97316`, white text. Public marketing pages use the
@@ -1818,7 +1827,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 **State:** the frontend is committed and pushed (see the 2026-10-18 entries). The live site (www.facecloudai.com) is still the demo build and is untouched.
 
 **Frontend screens still on demo data (no backend call):**
-- Admin: all connected (2026-10-18). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Statistics`, `Rejections` and `System Health` pages work but have no route.
+- Admin: all connected (2026-10-18); Statistics is routed (2026-10-19). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Rejections.tsx` and `SystemHealth.tsx` are deliberately not routed (duplicates).
 - Moderator Member Management is connected (2026-10-19). The invitation-accept route `/invitations/{token}` does not exist in the frontend yet.
 - Moderator (9): Batches, Identity Review, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
@@ -1838,9 +1847,8 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 ## 7. Known Issues / Tech Debt
 
 - **Owner's local backend is behind (2026-10-19).** `~/Projects/FaceCloud_backend` is on `main` at PR #72; PR #86 and later are on origin. The admin screens work but show an "older backend" notice until it is pulled and restarted.
-- **Backend: `last_login` is never recorded (2026-10-18).** The admin users list returns `last_login: null` for every account, even ones that signed in repeatedly, so the Last sign-in column stays hidden. Fix on the backend: stamp `last_login` on a successful sign-in.
 - **Live Enhancement never records a camera session (2026-10-18).** The admin "Live Sessions" card and chart stay 0 until the frontend posts `/api/camera/sessions`.
-- **Admin pages without a route (2026-10-18).** `Statistics`, `Rejections` and `System Health` are rewritten for the live API but nothing links to them.
+- **Two admin pages are not routed on purpose (2026-10-19).** `Rejections.tsx` duplicates Rejection Summary and `SystemHealth.tsx` duplicates System Monitoring; the files are kept.
 
 - **Backend permission gap — a moderator can promote a member to moderator.** Found 2026-10-15 by exercising
   `update_member()` in a rolled-back transaction. Invitations refuse it and the owner role is refused, but the

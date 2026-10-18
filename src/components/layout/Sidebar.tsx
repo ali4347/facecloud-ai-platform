@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase
+  HardDrive, X, Bell, Briefcase, LineChart
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useUserDashboard, formatBytes } from '../../lib/imageData'
@@ -34,6 +34,7 @@ const adminNav = [
   { label: 'Audit Logs',         icon: ClipboardList,    to: '/admin/audit-logs' },
   { label: 'Security Monitoring',icon: ShieldCheck,      to: '/admin/security' },
   { label: 'System Monitoring',  icon: Server,           to: '/admin/system' },
+  { label: 'Statistics',         icon: LineChart,        to: '/admin/statistics' },
   { label: 'Upload Statistics',  icon: BarChart3,        to: '/admin/upload-statistics' },
   { label: 'Rejection Summary',  icon: AlertCircle,      to: '/admin/rejection-summary' },
   { label: 'Image Monitoring',   icon: Images,           to: '/admin/images' },
@@ -146,6 +147,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
               <NavLink
                 key={item.to}
                 to={item.to}
+                // The portal's home link must not count as "current" on every page below it.
+                end={item.to === '/admin' || item.to === '/dashboard' || item.to === '/moderator'}
                 onClick={() => {
                   if (window.innerWidth < 1024 && onClose) onClose()
                 }}

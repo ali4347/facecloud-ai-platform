@@ -121,10 +121,10 @@ export default function Moderators() {
               { key: 'suspended', label: 'Status', render: row => (
                 <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />
               )},
-              // Hidden while the backend has recorded no sign-in at all: "Never" for everyone would be untrue.
-              ...(moderators.some(m => m.lastLogin) ? [{ key: 'lastLogin', label: 'Last sign-in', render: (row: Record<string, unknown>) => (
+              // The backend stamps last_login on every successful sign-in; null means the account never signed in.
+              { key: 'lastLogin', label: 'Last sign-in', render: row => (
                 <span className="text-sm text-ink-mute">{row.lastLogin ? formatDate(String(row.lastLogin)) : 'Never'}</span>
-              ) }] : []),
+              )},
               { key: 'joinedAt', label: 'Created', render: row => (
                 <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span>
               )},

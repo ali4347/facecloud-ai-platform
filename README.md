@@ -166,6 +166,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/security` (Alerts for repeated failed sign-ins, refused requests and rate limits, with an Acknowledge action that needs a note, and the rules behind them)
 * `/admin/moderators` (list of moderator accounts, and a form to create one — `/admin/api-docs` and `/admin/api-test` were removed and redirect to `/admin`)
 * `/admin/system` (Service checks, background workers, process uptime and the per-job queue table)
+* `/admin/statistics` (Upload trend, weekly enhancement success, live sessions and storage growth over a 7 / 30 / 90-day window)
 * `/admin/upload-statistics` (Photos received by route, daily intake, average file size)
 * `/admin/rejection-summary` (Rejected photos, rejection rate, the reasons behind them, daily rejections)
 * `/admin/images` (Every uploaded photo with its quality result, preview and a details panel)
