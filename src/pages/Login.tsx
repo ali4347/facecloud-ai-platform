@@ -28,11 +28,13 @@ export default function Login() {
        mock path below keeps the demo working until every screen is migrated. */
     if (USE_API) {
       try {
-        const result = await signInToPortal(email.trim(), password, 'any')
-        if (result.kind !== 'ok') return // only the staff screens can be sent to the wrong portal
-        navigate(result.dashboard === 'admin' ? '/admin'
-               : result.dashboard === 'moderator' ? '/moderator'
-               : '/dashboard')
+        const result = await signInToPortal(email.trim(), password, 'user')
+        if (result.kind === 'wrong-portal') {
+          // Staff accounts sign in on their own pages; this one is for users only.
+          setError('This account does not have user access.')
+        } else {
+          navigate('/dashboard')
+        }
       } catch (err) {
         // The backend answers the same way for wrong password, unverified and
         // suspended accounts, on purpose. Show its message rather than guessing.

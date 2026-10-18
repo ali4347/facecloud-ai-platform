@@ -151,7 +151,7 @@ export function displayNameOf(user: ApiUser): string {
   return user.full_name?.trim() || user.username || user.email
 }
 
-export type Portal = 'any' | 'admin' | 'moderator'
+export type Portal = 'user' | 'admin' | 'moderator'
 
 export type PortalSignIn =
   | { kind: 'ok'; dashboard: Role }
@@ -161,17 +161,18 @@ export type PortalSignIn =
  * Sign in and remember who it was, for the user, admin and moderator login screens.
  *
  * All three use the same endpoint; the backend's `dashboard` says which portal
- * the account belongs to. The admin and moderator screens pass their portal, and
- * an account that belongs elsewhere is signed straight back out — its tokens are
- * revoked rather than just forgotten — so a user cannot sit logged in behind the
- * staff door. The user screen passes 'any' and routes by `dashboard`.
+ * the account belongs to. Each screen passes its own portal, and an account that
+ * belongs elsewhere is signed straight back out (its tokens are revoked rather than
+ * just forgotten), so nobody sits logged in behind the wrong door: a user cannot use
+ * the staff screens, and staff cannot sign in on the user screen. Each portal has
+ * its own sign-in page.
  */
 export async function signInToPortal(
   identifier: string, password: string, portal: Portal
 ): Promise<PortalSignIn> {
   const result = await login(identifier, password)
 
-  if (portal !== 'any' && result.dashboard !== portal) {
+  if (result.dashboard !== portal) {
     await logout()
     return { kind: 'wrong-portal' }
   }
