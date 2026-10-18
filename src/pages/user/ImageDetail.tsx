@@ -5,6 +5,8 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { QualityScores } from '../../components/features/QualityScores'
 import { EnhancedVersionCard } from '../../components/features/EnhancedVersionCard'
+import { ReportButton } from '../../components/features/ReportButton'
+import { DuplicateNotice } from '../../components/features/DuplicateNotice'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { USE_API } from '../../lib/api/config'
 import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
@@ -152,7 +154,8 @@ export default function ImageDetail() {
               )}
 
               {USE_API && (
-                <div className="mt-4 pt-4 border-t border-line">
+                <div className="mt-4 pt-4 border-t border-line space-y-3">
+                  <ReportButton kind="image" id={image.id} label={image.original_name} />
                   <button type="button" onClick={() => { setDeleteError(''); setConfirmingDelete(true) }}
                     className="text-xs font-bold text-error hover:underline inline-flex items-center gap-1.5 cursor-pointer">
                     <Trash2 className="w-3.5 h-3.5" />Delete this photo
@@ -237,6 +240,8 @@ export default function ImageDetail() {
                     <QualityScores quality={image.quality_decision} compact sample={!USE_API} />
                   </div>
                 )}
+
+                {USE_API && <DuplicateNotice imageId={image.id} />}
 
                 <Link
                   to={`/dashboard/processing/${image.batch}`}

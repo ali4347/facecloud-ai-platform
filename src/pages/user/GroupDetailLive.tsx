@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle, ArrowLeft, Archive, Check, CheckCircle, CheckSquare, Copy, Download, Eye,
   GitMerge, ImageOff, Link2, Loader2, Pencil, Square, Trash2, Users, X,
@@ -9,6 +9,7 @@ import { MergeFolderPanel } from '../../components/features/MergeFolderPanel'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
 import { deleteImage, getImageThumbnail } from '../../lib/api/images'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { deleteEmptyFolder } from '../../lib/api/identityReview'
 import {
   createGroupExport, downloadIdentityExport, getIdentityExport, renameIdentityGroup, shareIdentityExport,
   type IdentityGroupExport,
@@ -72,6 +73,22 @@ export default function GroupDetailLive() {
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteMessage, setDeleteMessage] = useState('')
+
+  // ── Delete this folder when nothing is left in it ────────────────────────
+  const navigate = useNavigate()
+  const [deletingFolder, setDeletingFolder] = useState(false)
+  const [folderBusy, setFolderBusy] = useState(false)
+  const [folderError, setFolderError] = useState('')
+  const removeFolder = async () => {
+    setFolderBusy(true); setFolderError('')
+    try {
+      await deleteEmptyFolder(groupId)
+      navigate('/dashboard/groups', { replace: true })
+    } catch (caught) {
+      setFolderError(caught instanceof Error ? caught.message : 'Could not delete this folder.')
+      setFolderBusy(false)
+    }
+  }
 
   // ── Merge another folder into this one ────────────────────────────────────
   const [merging, setMerging] = useState(false)
@@ -263,6 +280,12 @@ export default function GroupDetailLive() {
           >
             <GitMerge className="w-4 h-4" /> Merge folder
           </button>
+          {total === 0 && (
+            <button onClick={() => { setFolderError(''); setDeletingFolder(true) }}
+              className="fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2 text-error">
+              <Trash2 className="w-4 h-4" /> Delete empty folder
+            </button>
+          )}
         </div>
       </div>
 
@@ -499,6 +522,13 @@ export default function GroupDetailLive() {
           </button>
         </div>
       </div>
+      {deletingFolder && (
+        <ConfirmDialog title="Delete this empty folder?" confirmLabel="Delete folder" busyLabel="Deleting…" danger busy={folderBusy} error={folderError || null}
+          onConfirm={() => void removeFolder()} onCancel={() => setDeletingFolder(false)}>
+          <p>This folder has no photos left. Deleting it only removes the folder.</p>
+        </ConfirmDialog>
+      )}
+
       {confirmingDelete && (
         <ConfirmDialog title={`Delete ${selected.size} photo${selected.size === 1 ? '' : 's'}?`} confirmLabel="Delete" busyLabel="Deleting…" danger busy={deleting} error={deleteMessage || null}
           onConfirm={() => void deleteSelectedPhotos()} onCancel={() => setConfirmingDelete(false)}>

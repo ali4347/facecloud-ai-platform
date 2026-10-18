@@ -11,13 +11,15 @@ interface ConfirmDialogProps {
   error?: string | null
   /** Destructive actions are red. */
   danger?: boolean
+  /** Keeps the confirm button off until something required (a password, a typed word) is filled in. */
+  confirmDisabled?: boolean
   onConfirm: () => void
   onCancel: () => void
 }
 
 /** A small modal for actions that cannot be undone. Escape cancels; focus starts on Cancel so Enter is safe. */
 export function ConfirmDialog({
-  title, children, confirmLabel, busyLabel, busy = false, error, danger = false, onConfirm, onCancel,
+  title, children, confirmLabel, busyLabel, busy = false, error, danger = false, confirmDisabled = false, onConfirm, onCancel,
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null)
 
@@ -40,7 +42,7 @@ export function ConfirmDialog({
           <button ref={cancelRef} type="button" onClick={onCancel} disabled={busy} className="fc-btn-secondary text-xs py-2 px-4">
             Cancel
           </button>
-          <button type="button" onClick={onConfirm} disabled={busy}
+          <button type="button" onClick={onConfirm} disabled={busy || confirmDisabled}
             className={`text-xs font-bold py-2 px-4 rounded-xl text-white inline-flex items-center gap-2 disabled:opacity-60 cursor-pointer ${danger ? 'bg-red-600 hover:bg-red-500' : 'bg-accent hover:opacity-90'}`}>
             {busy && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {busy ? (busyLabel ?? confirmLabel) : confirmLabel}

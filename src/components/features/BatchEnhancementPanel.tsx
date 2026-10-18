@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle2, Loader2, Sparkles } from 'lucide-react'
 import { enhanceAcceptedPhotos, listBatchPhotos } from '../../lib/batchEnhance'
+import type { ImageListItem } from '../../lib/api/images'
 
 const RUNNING = new Set(['pending', 'queued', 'processing'])
 
 /** How many of a batch's accepted photos can be enhanced, and how many already are, read from the photos themselves. */
 async function countBatch(batchId: number, signal?: AbortSignal) {
   const photos = await listBatchPhotos(batchId, signal)
-  // Only accepted photos count: a rejected photo is never enhanced.
-  const eligible = photos.filter(p => p.display_status === 'accepted' || p.display_status === 'completed')
+  // Only accepted photos count: a rejected photo is never enhanced. A photo being enhanced right now still counts,
+  // even though its status reads "processing" until the enhancement finishes.
+  const beingEnhanced = (p: ImageListItem) => !!p.latest_enhancement && RUNNING.has(p.latest_enhancement.status)
+  const eligible = photos.filter(p => p.display_status === 'accepted' || p.display_status === 'completed' || beingEnhanced(p))
   return {
     eligible: eligible.length,
     enhanced: eligible.filter(p => p.latest_enhancement?.status === 'completed').length,

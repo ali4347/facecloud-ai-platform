@@ -4,6 +4,8 @@ import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
+import { USE_API } from '../lib/api/config'
+import { apiFetch, ApiError } from '../lib/api/client'
 
 interface FormFields {
   name: string
@@ -35,6 +37,7 @@ export default function Contact() {
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [submitError, setSubmitError] = useState('')
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {}
@@ -69,6 +72,27 @@ export default function Contact() {
     if (!validate()) return
 
     setStatus('submitting')
+    setSubmitError('')
+
+    /* Against the API the message really goes to the backend, which answers 503 when no recipient is set up
+       and 429 when someone sends too many; those words are shown as they are. The demo keeps its simulation. */
+    if (USE_API) {
+      try {
+        await apiFetch('/api/contact/', {
+          anonymous: true,
+          body: {
+            name: fields.name.trim(), email: fields.email.trim(), company: fields.company.trim(),
+            reason: fields.reason, message: fields.message.trim(), website: '',
+          },
+        })
+        setStatus('success')
+        setFields({ name: '', email: '', company: '', reason: '', message: '' })
+      } catch (err) {
+        setSubmitError(err instanceof ApiError ? err.message : 'Could not reach the server. Please try again.')
+        setStatus('error')
+      }
+      return
+    }
 
     try {
       // Log the payload to the console as requested
@@ -193,7 +217,7 @@ export default function Contact() {
                         <div className="space-y-1">
                           <p className="text-xs font-bold text-[#EF4444]">Submission Failed</p>
                           <p className="text-[10px] text-ink-faint leading-relaxed font-medium">
-                            An error occurred while transmitting the contact form. Please try again.
+                            {submitError || 'An error occurred while transmitting the contact form. Please try again.'}
                           </p>
                         </div>
                       </div>

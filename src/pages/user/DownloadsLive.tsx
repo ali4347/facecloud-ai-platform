@@ -3,6 +3,7 @@ import {
   AlertTriangle, Check, Clock, Copy, Download, FileImage, FileText, FolderArchive, Link2, Loader2, RefreshCw, X,
 } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
+import { ShareLinksPanel } from '../../components/features/ShareLinksPanel'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import {
@@ -242,6 +243,8 @@ export default function DownloadsLive() {
           </div>
         )}
       </div>
+
+      <ShareLinksPanel />
     </div>
   )
 }

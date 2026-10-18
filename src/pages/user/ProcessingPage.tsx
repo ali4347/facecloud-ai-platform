@@ -6,6 +6,9 @@ import { statusLabel } from '../../lib/imageData'
 import { PIPELINE_STAGES, cancelBatch, retryBatch } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
 import { explainReason } from '../../lib/reasons'
+import { ReportButton } from '../../components/features/ReportButton'
+import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
+import { useReasonBreakdown } from '../../lib/uploadBatch'
 import { useState } from 'react'
 import {
   AlertCircle, AlertTriangle, ArrowLeft, CheckCircle2, Circle, Loader2, RefreshCw, XCircle,
@@ -28,6 +31,7 @@ export default function ProcessingPage() {
   const { id } = useParams<{ id: string }>()
   const batchId = id && /^\d+$/.test(id) ? Number(id) : null
   const { data, loading, error, isDemo, reload, finished } = useBatchProgress(batchId)
+  const breakdown = useReasonBreakdown(data, finished)
   const [action, setAction] = useState<{ busy: boolean; message: string }>({ busy: false, message: '' })
 
   const currentIndex = data ? PIPELINE_STAGES.indexOf(data.stage as typeof PIPELINE_STAGES[number]) : -1
@@ -226,6 +230,8 @@ export default function ProcessingPage() {
                   )}
                 </div>
 
+                {finished && <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />}
+
                 {partial && (
                   <div className="p-4 rounded-3xl bg-[#F59E0B]/5 border border-[#F59E0B]/20 flex gap-3 text-xs text-ink-mute">
                     <AlertCircle className="w-5 h-5 text-[#F59E0B] flex-shrink-0" />
@@ -268,6 +274,13 @@ export default function ProcessingPage() {
                     My Images
                   </Link>
                 </div>
+
+                {finished && batchId !== null && (
+                  <div className="pt-1">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-2">Processing report</p>
+                    <ReportButton kind="batch" id={batchId} label={`upload-${batchId}`} />
+                  </div>
+                )}
 
                 {data.cancellation_requested && !finished && (
                   <p className="text-[11px] text-[#F59E0B]">

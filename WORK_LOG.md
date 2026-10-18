@@ -46,6 +46,27 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-18 — User dashboard completed and checked end to end; review queue, secure-link list, delete account, reports, duplicates, contact form
+*Status: committed (this commit).*
+
+- **Added:** (1) **Review matches** (`/dashboard/groups/review`) with a banner on Person Folders: confirm, a different person (existing or new folder), or leave the face out (`PATCH /api/identities/assignments/{id}/review/`).
+  (2) **Your secure links** on Downloads: every link, its target, opens and state, and **Stop this link** (`GET /api/shares/`, `POST …/revoke/`). (3) **Delete my account** in Settings → Security (password and a typed word; `DELETE /api/user/delete-account/`).
+  (4) **Download report** for a photo and for an upload, as PDF, CSV or JSON (`/api/reports/images|batches/{id}/`, polled, then downloaded). (5) A notice on the photo page when it looks like another photo (`/api/duplicates/images/{id}/matches/`).
+  (6) **Delete empty folder** on a Person Folder page. (7) The processing page now also explains why photos were not accepted. (8) The **Contact form** now posts to `POST /api/contact/` and shows the backend's own errors (503 when no recipient is set up, 429 when throttled); the demo build keeps its simulation.
+  The Person Folders text no longer says uncertain photos go to a moderator (they wait for the person's own decision).
+- **Corrected earlier claim:** the privacy audit trail (`/api/privacy/audit/`) is administrator-only, not a user feature.
+- **Fixed on the way:** the "N accepted photos enhanced" panel ignored a photo that was still being enhanced, so it could say "All 1 accepted photo is enhanced" while another was in progress; photos being enhanced now count.
+- **Files:** new `src/pages/user/PersonReview.tsx`, `src/components/features/{ShareLinksPanel,ReportButton,DuplicateNotice}.tsx`, `src/lib/api/{identityReview,shares,reports,duplicates}.ts`; edited `src/App.tsx`, `src/pages/Contact.tsx`,
+  `src/pages/user/{DownloadsLive,GroupDetailLive,IdentityGroups,ImageDetail,ProcessingPage,Settings}.tsx`, `src/components/features/BatchEnhancementPanel.tsx`, `src/components/ui/ConfirmDialog.tsx`, `README.md`.
+- **Verified (headless Chrome, throwaway copy of backend `origin/main` including PR #85):** sign-in errors and success, reload keeps the session, sign out, register with the emailed link, verify, sign in, forgot and reset password, old password refused;
+  dashboard home; single, multiple and ZIP upload (blurred face accepted, tiny and no-face photos refused with plain reasons, counts equal the backend); processing list and detail; a real PDF report; My Images filters, search, delete, group by person;
+  photo page enhance again, editor save, edited download; Person Folders list, banner, review queue confirm, rename, merge, delete empty folder, Download All ZIP, secure link opens without signing in, Stop this link makes it 410; Downloads history;
+  notifications and bell, activity chips, global search; Settings profile, picture, notification switches, device list, privacy turn off, delete account, password change; Live Enhancement with a fake camera; contact form reaches the backend.
+  The demo build (no backend) renders all 21 user and public routes without errors. `npm run build` and `npx oxlint src` clean (warnings only).
+- **Findings for the owner and the backend:** the login rate limit is **20 per hour per address**, which can lock out a classroom or demo network (the test itself hit it); enhancement on a CPU with HD restoration on can take minutes and a backend restart leaves a result stuck at "processing"
+  (the batch then stays "processing" and its report button is hidden); Person Folder photo rows carry no `membership_id`, so **move / remove a photo and set a cover photo cannot be built yet**.
+- **Not built (needs the backend or is out of the user portal):** move / remove photo and cover photo (needs `membership_id`), "find this person" by uploading a face, folder change history, events, collages, camera sessions, the enhancement advisor and model comparison; the admin and moderator screens listed in section 6.
+
 ### 2026-10-18 — Each login page accepts only its own portal (the root `.env` was removed by mistake and recreated)
 *Status: committed (this commit).*
 
@@ -1741,16 +1762,16 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 ## 6. Pending Work (audit of 2026-10-18)
 
-**State:** the frontend working tree is clean and in step with `origin/main`. The live site (www.facecloudai.com) is still the demo build and is untouched.
+**State:** the frontend is committed and pushed (see the 2026-10-18 entries). The live site (www.facecloudai.com) is still the demo build and is untouched.
 
 **Frontend screens still on demo data (no backend call):**
 - Admin (10): Overview, Statistics, Upload Statistics, Audit Logs, System Health, System Monitoring, Image Monitoring, Rejections, Rejection Summary, Security. (Users and Moderators are connected.)
   The backend already has the endpoints (`/api/system/analytics`, `audit`, `health`, `queue`, `images`, `moderation`, `batches/failed`, `jobs/failed`, `security/alerts`, `security/rules`).
 - Moderator (10): Batches, Identity Review, Members, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
-- Public: the Contact form only simulates sending (`POST /api/contact/` exists, with a spam-trap field).
-- User portal: every screen is connected. Not yet in the UI although the backend has them: Person Folder review queue and move / remove / delete folder / cover photo / history / "find this person"; share-link list and revoke;
-  Delete account; privacy audit trail; processing reports; duplicate results; camera sessions and snapshots for Live Enhancement; events and collages; the enhancement advisor and model comparison.
+- Public: the Contact form is connected (`POST /api/contact/`).
+- User portal: every screen is connected. Not yet in the UI although the backend has them:
+  move / remove a photo and cover photo (the backend must add `membership_id` to the folder's photo rows); "find this person"; folder history; camera sessions and snapshots for Live Enhancement; events and collages; the enhancement advisor and model comparison.
 - Of 190 backend paths (230 operations) roughly 80 are called by the frontend today (the moderator queue builds its paths from a prefix, so a plain text search undercounts); the rest belong to the items above.
 
 **Backend (separate repository) still to do, as asked of the backend owner:** Phase 1 (blur never rejects, restoration chain) is merged (#85). Not started: Phase 1B (auto = HD and situation-aware by default, defocus deblur, speed and GPU plan),

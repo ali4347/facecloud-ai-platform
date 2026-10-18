@@ -1,14 +1,20 @@
-import { AlertTriangle, Loader2, RefreshCw, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { AlertTriangle, ArrowRight, Loader2, RefreshCw, Users } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { IdentityGroupCard } from '../../components/features/IdentityGroupCard'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { ConsentBanner } from '../../components/features/ConsentPrompt'
 import { usePersonFolders } from '../../lib/personFolders'
+import { useApiResource } from '../../lib/useApiResource'
+import { listReviewItems } from '../../lib/api/identityReview'
 
 export default function IdentityGroups() {
   const { data, loading, error, isDemo, reload } = usePersonFolders()
   const folders = data ?? []
   const totalImages = folders.reduce((sum, folder) => sum + folder.imageCount, 0)
+  // Photos the grouping was not sure about wait for the person's decision.
+  const review = useApiResource(signal => listReviewItems(signal), () => [], [])
+  const waiting = review.data?.length ?? 0
 
   return (
     <div>
@@ -21,6 +27,16 @@ export default function IdentityGroups() {
       />
 
       <ConsentBanner />
+
+      {waiting > 0 && (
+        <Link to="/dashboard/groups/review"
+          className="mb-5 p-4 rounded-2xl flex items-center justify-between gap-3 border border-[#F59E0B]/30 bg-[#F59E0B]/[0.06] hover:bg-[#F59E0B]/10 transition-colors">
+          <span className="text-sm text-ink">
+            <strong>{waiting} photo{waiting === 1 ? '' : 's'}</strong> need{waiting === 1 ? 's' : ''} your decision: FaceCloud was not sure whose face {waiting === 1 ? 'it shows' : 'they show'}.
+          </span>
+          <span className="text-xs font-bold text-[#FB923C] inline-flex items-center gap-1 flex-shrink-0">Review <ArrowRight className="w-3.5 h-3.5" /></span>
+        </Link>
+      )}
 
       {isDemo && (
         <div className="p-3 mb-5 rounded-2xl text-xs flex items-center gap-2 bg-surface-mute border border-line text-ink-soft">
@@ -67,7 +83,7 @@ export default function IdentityGroups() {
         <p className="text-sm font-semibold text-ink mb-1">How Person Folders work</p>
         <p className="text-xs text-ink-mute leading-relaxed">
           FaceCloud finds the faces in each accepted photo and files photos of the same person together.
-          When it is not sure, the photo goes to a moderator, who can review and correct the grouping.
+          When it is not sure, the photo waits for your decision under Review matches, and you can also merge two folders yourself.
         </p>
       </div>
     </div>

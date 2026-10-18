@@ -16,6 +16,9 @@ import type { FacialDataCounts } from '../../lib/api/privacy'
 import { USE_API } from '../../lib/api/config'
 import { ApiError } from '../../lib/api/client'
 import { changePassword, logoutEverywhere } from '../../lib/api/auth'
+import { apiFetch } from '../../lib/api/client'
+import { clearTokens } from '../../lib/api/tokens'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import {
   loadAccountProfile, saveAccountProfile, hasProfileDetails, uploadAvatar, deleteAvatar,
   listSessions, revokeSession,
@@ -240,6 +243,26 @@ function SecuritySettingsLive() {
   const [error, setError] = useState<string | null>(null)
   const [signingOut, setSigningOut] = useState(false)
 
+  // Deleting the account asks for the password and a typed word, and ends every session.
+  const [deleting, setDeleting] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleteWord, setDeleteWord] = useState('')
+  const [deleteBusy, setDeleteBusy] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  const deleteAccount = async () => {
+    setDeleteBusy(true); setDeleteError(null)
+    try {
+      await apiFetch('/api/user/delete-account/', { method: 'DELETE', body: { password: deletePassword } })
+      clearTokens()
+      localStorage.removeItem('facecloud_session')
+      navigate('/login', { replace: true, state: { notice: 'Your account was deleted.' } })
+    } catch (err) {
+      setDeleteError(err instanceof ApiError ? err.message : 'Could not delete the account. Please try again.')
+      setDeleteBusy(false)
+    }
+  }
+
   /* The device list needs a backend with sessions; without one only "sign out everywhere" is offered. */
   const [sessions, setSessions] = useState<UserSession[] | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
@@ -349,6 +372,31 @@ function SecuritySettingsLive() {
           {signingOut ? 'Signing out…' : 'Sign out of all devices'}
         </button>
       </div>
+
+      <div className="border-t border-line pt-5">
+        <h3 className="text-sm font-semibold text-error mb-1">Delete my account</h3>
+        <p className="text-xs text-ink-mute mb-3">
+          Permanently deletes your account and everything in it. This cannot be undone. Download anything you want to keep first.
+        </p>
+        <button type="button" onClick={() => { setDeletePassword(''); setDeleteWord(''); setDeleteError(null); setDeleting(true) }}
+          className="text-xs font-semibold text-error hover:underline">
+          Delete my account…
+        </button>
+      </div>
+
+      {deleting && (
+        <ConfirmDialog title="Delete your account?" confirmLabel="Delete my account" busyLabel="Deleting…" danger busy={deleteBusy} error={deleteError}
+          confirmDisabled={!deletePassword || deleteWord.trim().toUpperCase() !== 'DELETE'}
+          onConfirm={() => void deleteAccount()} onCancel={() => setDeleting(false)}>
+          <p>Your account, photos, enhanced copies, Person Folders and secure links will be permanently deleted. You will be signed out on every device.</p>
+          <div className="space-y-2 pt-1">
+            <label htmlFor="del-pw" className="text-[11px] font-semibold text-ink block">Your password</label>
+            <PasswordInput id="del-pw" className="fc-input" value={deletePassword} onChange={e => setDeletePassword(e.target.value)} autoComplete="current-password" />
+            <label htmlFor="del-word" className="text-[11px] font-semibold text-ink block">Type DELETE to confirm</label>
+            <input id="del-word" className="fc-input" value={deleteWord} onChange={e => setDeleteWord(e.target.value)} autoComplete="off" />
+          </div>
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

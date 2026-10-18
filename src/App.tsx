@@ -27,6 +27,7 @@ import ProcessingPage from './pages/user/ProcessingPage'
 import MyImages from './pages/user/MyImages'
 import ImageDetail from './pages/user/ImageDetail'
 import PhotoEditor from './pages/user/PhotoEditor'
+import PersonReview from './pages/user/PersonReview'
 import IdentityGroups from './pages/user/IdentityGroups'
 import GroupDetail from './pages/user/GroupDetail'
 import Downloads from './pages/user/Downloads'
@@ -104,6 +105,7 @@ export default function App() {
           <Route path="images/:id" element={<ImageDetail />} />
           <Route path="images/:id/edit" element={<PhotoEditor />} />
           <Route path="groups" element={<IdentityGroups />} />
+          <Route path="groups/review" element={<PersonReview />} />
           <Route path="groups/:id" element={<GroupDetail />} />
           <Route path="downloads" element={<Downloads />} />
           <Route path="notifications" element={<Notifications />} />
