@@ -1,38 +1,23 @@
 import { CheckCircle, AlertTriangle, XCircle, Activity } from 'lucide-react'
-import type { SystemService } from '../../data/mock'
+import type { ServiceRow } from '../../lib/api/adminSystem'
+import { serviceNote } from '../../lib/adminHealth'
+import { formatBytes } from '../../lib/imageData'
 import { formatDateTime } from '../../lib/utils'
 import { cn } from '../../lib/utils'
 
 interface SystemHealthCardProps {
-  service: SystemService
+  service: ServiceRow
 }
 
 const statusConfig = {
-  operational: {
-    icon: CheckCircle,
-    cls: 'bg-green-50 border-green-200',
-    iconCls: 'text-success',
-    badge: 'bg-green-100 text-success',
-    label: 'Operational',
-  },
-  degraded: {
-    icon: AlertTriangle,
-    cls: 'bg-amber-50 border-amber-500/30',
-    iconCls: 'text-warning',
-    badge: 'bg-amber-100 text-warning',
-    label: 'Degraded',
-  },
-  outage: {
-    icon: XCircle,
-    cls: 'bg-red-500/10 border-red-500/30',
-    iconCls: 'text-error',
-    badge: 'bg-red-500/20 text-error',
-    label: 'Outage',
-  },
+  operational: { icon: CheckCircle, cls: 'bg-green-50 border-green-200', iconCls: 'text-success', badge: 'bg-green-100 text-success', label: 'Operational' },
+  degraded: { icon: AlertTriangle, cls: 'bg-amber-50 border-amber-500/30', iconCls: 'text-warning', badge: 'bg-amber-100 text-warning', label: 'Degraded' },
+  down: { icon: XCircle, cls: 'bg-red-500/10 border-red-500/30', iconCls: 'text-error', badge: 'bg-red-500/20 text-error', label: 'Down' },
 }
 
+/** One service as the backend checked it: its state, how long the check took, and the backend's own note. */
 export function SystemHealthCard({ service }: SystemHealthCardProps) {
-  const cfg = statusConfig[service.status]
+  const cfg = statusConfig[service.status as keyof typeof statusConfig] ?? statusConfig.degraded
   const IconComp = cfg.icon
 
   return (
@@ -43,24 +28,37 @@ export function SystemHealthCard({ service }: SystemHealthCardProps) {
           <p className="text-sm font-semibold text-ink">{service.name}</p>
         </div>
         <span className={cn('px-2 py-0.5 rounded-full text-xs font-semibold', cfg.badge)}>
-          {cfg.label}
+          {statusConfig[service.status as keyof typeof statusConfig] ? cfg.label : service.status}
         </span>
       </div>
       <div className="grid grid-cols-2 gap-2 text-xs">
-        <div>
-          <p className="text-ink-mute">Uptime</p>
-          <p className="font-semibold text-ink">{service.uptime}</p>
-        </div>
-        {service.latency && (
+        {service.latency_ms !== null && (
           <div>
-            <p className="text-ink-mute">Latency</p>
-            <p className="font-semibold text-ink flex items-center gap-1">
-              <Activity className="w-3 h-3" /> {service.latency}
-            </p>
+            <p className="text-ink-mute">Check took</p>
+            <p className="font-semibold text-ink flex items-center gap-1"><Activity className="w-3 h-3" /> {service.latency_ms} ms</p>
+          </div>
+        )}
+        {service.workers !== undefined && (
+          <div>
+            <p className="text-ink-mute">Workers</p>
+            <p className="font-semibold text-ink">{service.workers}</p>
+          </div>
+        )}
+        {service.queue_size !== undefined && (
+          <div>
+            <p className="text-ink-mute">Queue</p>
+            <p className="font-semibold text-ink">{service.queue_size === null ? 'Unknown' : `${service.queue_size} waiting`}</p>
+          </div>
+        )}
+        {service.available_bytes !== undefined && (
+          <div>
+            <p className="text-ink-mute">Free space</p>
+            <p className="font-semibold text-ink">{formatBytes(service.available_bytes)}</p>
           </div>
         )}
       </div>
-      <p className="text-[10px] text-ink-mute mt-2">Checked {formatDateTime(service.lastChecked)}</p>
+      {service.detail && <p className="text-[11px] text-ink-mute mt-2">{serviceNote(service.detail)}</p>}
+      <p className="text-[10px] text-ink-mute mt-2">Checked {formatDateTime(service.checked_at)}</p>
     </div>
   )
 }

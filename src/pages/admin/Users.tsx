@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Loader2, RefreshCw, UserPlus, Users as UsersIcon } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Loader2, RefreshCw, UserPlus, Users as UsersIcon } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { DataTable } from '../../components/ui/DataTable'
 import { StatusBadge } from '../../components/ui/StatusBadge'
@@ -8,35 +8,17 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
-import { createAdminUser, listAdminUsers, setAdminUserSuspended } from '../../lib/api/adminUsers'
+import { createAdminUser, setAdminUserSuspended } from '../../lib/api/adminUsers'
 import { USE_API } from '../../lib/api/config'
-import { useApiResource } from '../../lib/useApiResource'
-import { mockUsers } from '../../data/mock'
+import { USERS_PAGE_SIZE, useAdminUserList, type AccountRow as UserRow } from '../../lib/useAdminUserList'
 import { formatDate } from '../../lib/utils'
 import { initialsFrom } from '../../lib/session'
 import type { Role } from '../../data/mock'
-
-interface UserRow {
-  id: string
-  name: string
-  email: string
-  role: Role
-  suspended: boolean
-  /** Only the demo data has an upload count; the accounts API does not report one. */
-  uploads: number | null
-  joinedAt: string
-}
 
 const roleBadge = (role: Role) => {
   const map = { user: 'info', admin: 'purple', moderator: 'warning' } as const
   return <StatusBadge status={map[role]} label={role.charAt(0).toUpperCase() + role.slice(1)} dot={false} />
 }
-
-const demoUsers = (): UserRow[] =>
-  mockUsers.map(u => ({
-    id: u.id, name: u.name, email: u.email, role: u.role,
-    suspended: u.status !== 'active', uploads: u.uploads, joinedAt: u.joinedAt,
-  }))
 
 export default function UsersPage() {
   const [search, setSearch] = useState('')
@@ -47,24 +29,18 @@ export default function UsersPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
-  const { data, loading, error, isDemo, reload } = useApiResource<UserRow[]>(
-    async signal => (await listAdminUsers(signal)).map(u => ({
-      id: String(u.id), name: u.username, email: u.email, role: u.role,
-      suspended: u.is_suspended || !u.is_active, uploads: null, joinedAt: u.date_joined,
-    })),
-    demoUsers,
-    [],
-  )
+  const [page, setPage] = useState(1)
+  const { data, loading, error, isDemo, reload } = useAdminUserList(search, page)
 
   const users = useMemo(() => {
-    const all = [...addedInDemo, ...(data ?? [])].map(u => ({
+    const first = page === 1 && !search.trim() ? addedInDemo : []
+    return [...first, ...(data?.rows ?? [])].map(u => ({
       ...u, suspended: u.id in demoSuspended ? demoSuspended[u.id] : u.suspended,
     }))
-    const q = search.trim().toLowerCase()
-    return q ? all.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) : all
-  }, [data, addedInDemo, demoSuspended, search])
+  }, [data, addedInDemo, demoSuspended, page, search])
 
-  const total = (data?.length ?? 0) + addedInDemo.length
+  const total = (data?.count ?? 0) + addedInDemo.length
+  const lastPage = Math.max(1, Math.ceil((data?.count ?? 0) / USERS_PAGE_SIZE))
 
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
@@ -74,7 +50,7 @@ export default function UsersPage() {
     } else {
       setAddedInDemo(rows => [{
         id: `demo-${Date.now()}`, name: account.username, email: account.email, role: account.role,
-        suspended: false, uploads: 0, joinedAt: new Date().toISOString(),
+        suspended: false, uploads: 0, lastLogin: null, joinedAt: new Date().toISOString(),
       }, ...rows])
     }
     setJustCreated(account)
@@ -139,7 +115,7 @@ export default function UsersPage() {
         )}
 
         <div className="flex items-center gap-3">
-          <SearchInput placeholder="Search users…" value={search} onChange={e => setSearch(e.target.value)} className="w-72" />
+          <SearchInput placeholder="Search users…" value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} className="w-72" />
         </div>
 
         <div className="fc-card overflow-hidden">
@@ -192,8 +168,13 @@ export default function UsersPage() {
                 { key: 'suspended', label: 'Status', render: row => (
                   <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />
                 )},
-                ...(isDemo ? [{ key: 'uploads', label: 'Uploads', render: (row: Record<string, unknown>) => (
-                  <span className="text-sm font-semibold text-ink-soft">{String(row.uploads)}</span>
+                // Hidden rather than guessed when the backend does not report a count.
+                ...(users.some(u => u.uploads !== null) ? [{ key: 'uploads', label: 'Uploads', render: (row: Record<string, unknown>) => (
+                  <span className="text-sm font-semibold text-ink-soft">{row.uploads === null ? '—' : String(row.uploads)}</span>
+                ) }] : []),
+                // The backend does not stamp sign-ins on every release; with none recorded the column would say "Never" for everyone.
+                ...(users.some(u => u.lastLogin) ? [{ key: 'lastLogin', label: 'Last sign-in', render: (row: Record<string, unknown>) => (
+                  <span className="text-sm text-ink-mute">{row.lastLogin ? formatDate(String(row.lastLogin)) : 'Never'}</span>
                 ) }] : []),
                 { key: 'joinedAt', label: 'Joined', render: row => <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span> },
                 { key: 'actions', label: 'Actions', render: row => (
@@ -210,6 +191,18 @@ export default function UsersPage() {
             />
           )}
         </div>
+
+        {!error && data && data.count > USERS_PAGE_SIZE && (
+          <div className="flex items-center justify-between text-xs text-ink-mute">
+            <span>Page {page} of {lastPage}</span>
+            <div className="flex items-center gap-2">
+              <button type="button" disabled={page <= 1} onClick={() => setPage(p => p - 1)}
+                className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1"><ChevronLeft className="w-3.5 h-3.5" />Previous</button>
+              <button type="button" disabled={page >= lastPage} onClick={() => setPage(p => p + 1)}
+                className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1">Next<ChevronRight className="w-3.5 h-3.5" /></button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

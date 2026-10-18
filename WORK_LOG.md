@@ -24,7 +24,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
 | User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen runs on the live API (live webcam enhancement: a captured frame is stored and enhanced for real; the live preview itself is browser filters) when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list are built against backend PR #67 (fall back gracefully until it is merged) |
-| Admin console (11 routes under `/admin`) | ✅ Complete (mock) | Users, audit, security, API docs/test, system, stats, image monitoring |
+| Admin console (9 routes under `/admin` plus 3 unrouted pages) | ✅ Connected to the live API (2026-10-18) | Overview, Users, Moderators, Audit Logs, Security (acknowledge), System Monitoring, Upload Statistics, Rejection Summary, Image Monitoring read the backend behind `VITE_USE_API`; demo data otherwise |
 | Moderator panel (9 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml |
@@ -45,6 +45,35 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-18 — Admin console connected to the live API (backend PR #86)
+*Status: committed (this commit).*
+
+- **Added / changed:** the admin screens now read the real backend when `VITE_USE_API=true` and keep the demo data when it is false (every screen shows a "Showing demo data" notice in that case).
+  - **Overview, Upload Statistics, Rejection Summary** ← `GET /api/system/analytics/?date_from=&date_to=` with 7 / 30 / 90-day chips. Percent changes that are `null` show "—", never 0%. The storage gauge only appears when `capacity_bytes` is a number (it is `null` on S3). Rejection reasons are worded through `src/lib/reasons.ts`.
+  - **Audit Logs** ← `GET /api/system/audit/` (25 per page, Newer / Older). Shows actor, role, status, message, resource and the address (sign-ins only). The search box narrows the page on screen only, because the API has no search.
+  - **Security** ← `GET /api/system/security/alerts/` and `/rules/`. "Dismiss Event" became **Acknowledge** (a note is required; `POST …/{id}/acknowledge/`), with open / acknowledged status. The invented "Threat Index" and firewall text were replaced by the backend's real rules.
+  - **System Monitoring** ← `GET /api/system/health/` and `/queue/`: real services, background workers, process uptime and a per-job queue table. CPU, memory and uptime-% columns removed (the API has none); `queue_size: null` shows "unknown".
+  - **Image Monitoring** ← `GET /api/system/images/`, `/{id}/`, `/{id}/preview/` (previews are fetched as blobs with the token). A details panel replaces the "Audit Details" link, which pointed at a user-only route.
+  - **Users / Moderators** ← `GET /api/user/admin/users/?q=&role=&page=&page_size=` with server search, paging, the real `uploads_count`, and Last sign-in only when the backend has recorded one.
+  - **Statistics, Rejections, System Health** (pages that are not in any route today) were rewritten the same way and checked through temporary routes that were then removed.
+- **Files:** new `src/lib/api/adminSystem.ts`, `src/lib/adminAnalytics.ts`, `src/lib/adminHealth.ts`, `src/lib/useAdminUserList.ts`, `src/components/admin/AsyncGate.tsx`, `src/components/admin/RangeChips.tsx`; rewritten `src/pages/admin/{AdminOverview,Statistics,UploadStatistics,Rejections,RejectionSummary,AuditLogs,Security,SystemHealth,SystemMonitoring,ImageMonitoring}.tsx`, `src/components/features/{RejectionReasonChart,SystemHealthCard}.tsx`; edited `src/pages/admin/{Users,Moderators}.tsx`, `src/components/ui/StatCard.tsx` (null change = neutral dash), `src/lib/api/adminUsers.ts`. No file deleted.
+- **Mismatches found between the screens and the real JSON (reported, none faked):**
+  1. Overview "Upload Trend — last 8 weeks" was per-day data for a window; now labelled "last N days".
+  2. "Total uploads" is windowed (default 30 days), not all-time.
+  3. `totals.images.rejected` is 0 while 4 photos were quality-rejected; `totals.images.accepted` means "not refused at upload". Rejected uses `overview.rejections.total`.
+  4. `success_rate_percent` is the quality pass rate, not enhancement success (relabelled "Quality pass rate"); the weekly chart uses `enhancement_success_per_week`.
+  5. Rejection reasons are mentions (a photo can carry several; review-level codes such as `face_validation_required` appear), so percentages are shares of reasons, not of photos.
+  6. Storage: the original / enhanced split exists only in the top-level `storage_bytes`; camera snapshots are already inside it; capacity is `null` on S3.
+  7. Live sessions stay 0 until the frontend Live Enhancement posts `/api/camera/sessions` (it does not).
+  8. Decorative "+12%" and "Optimized via S3 buckets" claims, the "64×64 pixels" note and the fixed "40" bar scale were invented and are gone.
+  9. Security: only `medium` and `high` risk exist (no `critical`, `low`, `suspicious`); the type is `failed_login`, `authorization_failure` or `rate_limit`.
+  10. Health: the status word is `down`, not `outage`; there is no uptime %, CPU or memory.
+  11. Image rows: `status` is "uploaded" for every file; the verdict is `quality.decision`, whose values are `accepted` / `rejected` / `needs_review` (the first draft guessed `accept` / `reject`, caught by the headless run). `duplicate_matches` is a **count**, not a list.
+  12. Audit: `ip_address` only on sign-ins; `actor_role` can be null for a failed sign-in by an unknown name.
+  13. **Backend: `last_login` is always `null`** — nothing stamps it on sign-in (the `adm` account had signed in many times). The Last sign-in column is therefore hidden until a value exists, instead of saying "Never" for everyone.
+  14. `Statistics`, `Rejections` and `System Health` pages exist but have no route in `App.tsx` (the sidebar has no link either); they work but cannot be opened. Needs the owner's decision.
+- **Verified:** `npx tsc` clean; `npm run build` and `VITE_USE_API=false VITE_API_URL= npm run build` pass; oxlint shows no finding in the new or edited files (existing warnings elsewhere unchanged). Headless Chrome against a throwaway copy of backend PR #86 (seeded with 10 photos, 6 enhancements, 4 rejections and 12 failed sign-ins → 2 alerts): 38 live checks passed, comparing each screen with the API JSON (counts, labels, per-type totals, first audit row and address, alerts, the acknowledge round trip with its note, every health service, queue table, image previews as blobs, upload counts, server search and role filter); the demo build opened all 12 admin pages with the demo notice, no `NaN` and no uncaught exception. In the dev server, 6 of 10 image previews were reset by Django's runserver when the dev build opened ~20 connections at once; the production bundle loaded 10 of 10, so that is a dev-server artifact.
 
 ### 2026-10-18 — User dashboard completed and checked end to end; review queue, secure-link list, delete account, reports, duplicates, contact form
 *Status: committed (this commit).*
@@ -1721,8 +1750,8 @@ and run locally):
   `/unauthorized`, `/admin/login`, `/moderator/login`, `*` (404).
 - User `/dashboard` (16): index, `upload`, `upload/single`, `upload/multiple`, `upload/zip`, `processing/:id`, `images`,
   `images/:id`, `groups`, `groups/:id`, `downloads`, `notifications`, `activity`, `settings`, `live-enhancement`, `jobs`.
-- Admin `/admin` (11): index, `users`, `audit-logs`, `security`, `api-docs`, `api-test`, `system`, `upload-statistics`,
-  `rejection-summary`, `images`, `logs`→`audit-logs`.
+- Admin `/admin` (11): index, `users`, `moderators`, `audit-logs`, `security`, `system`, `upload-statistics`,
+  `rejection-summary`, `images`, `api-docs` and `api-test` → `/admin`, `logs`→`audit-logs`. `Statistics`, `Rejections` and `SystemHealth` pages exist without a route.
 - Moderator `/moderator` (9): index, `members`, `queue`, `images/:id`, `batches`, `notifications`, `reports`, `audit`, `settings`.
 
 **Design scopes:** one palette site-wide — black, orange `#F97316`, white text. Public marketing pages use the
@@ -1765,8 +1794,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 **State:** the frontend is committed and pushed (see the 2026-10-18 entries). The live site (www.facecloudai.com) is still the demo build and is untouched.
 
 **Frontend screens still on demo data (no backend call):**
-- Admin (10): Overview, Statistics, Upload Statistics, Audit Logs, System Health, System Monitoring, Image Monitoring, Rejections, Rejection Summary, Security. (Users and Moderators are connected.)
-  The backend already has the endpoints (`/api/system/analytics`, `audit`, `health`, `queue`, `images`, `moderation`, `batches/failed`, `jobs/failed`, `security/alerts`, `security/rules`).
+- Admin: all connected (2026-10-18). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Statistics`, `Rejections` and `System Health` pages work but have no route.
 - Moderator (10): Batches, Identity Review, Members, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
 - Public: the Contact form is connected (`POST /api/contact/`).
@@ -1783,6 +1811,10 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 ---
 
 ## 7. Known Issues / Tech Debt
+
+- **Backend: `last_login` is never recorded (2026-10-18).** The admin users list returns `last_login: null` for every account, even ones that signed in repeatedly, so the Last sign-in column stays hidden. Fix on the backend: stamp `last_login` on a successful sign-in.
+- **Live Enhancement never records a camera session (2026-10-18).** The admin "Live Sessions" card and chart stay 0 until the frontend posts `/api/camera/sessions`.
+- **Admin pages without a route (2026-10-18).** `Statistics`, `Rejections` and `System Health` are rewritten for the live API but nothing links to them.
 
 - **Backend permission gap — a moderator can promote a member to moderator.** Found 2026-10-15 by exercising
   `update_member()` in a rolled-back transaction. Invitations refuse it and the owner role is refused, but the

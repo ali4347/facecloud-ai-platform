@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Loader2, RefreshCw, ShieldCheck, UserPlus } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, ChevronRight, Loader2, RefreshCw, ShieldCheck, UserPlus } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { DataTable } from '../../components/ui/DataTable'
 import { StatusBadge } from '../../components/ui/StatusBadge'
@@ -8,52 +8,27 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
-import { createAdminUser, listAdminUsers } from '../../lib/api/adminUsers'
+import { createAdminUser } from '../../lib/api/adminUsers'
 import { USE_API } from '../../lib/api/config'
-import { useApiResource } from '../../lib/useApiResource'
-import { mockUsers } from '../../data/mock'
+import { USERS_PAGE_SIZE, useAdminUserList, type AccountRow } from '../../lib/useAdminUserList'
 import { formatDate } from '../../lib/utils'
-
-interface ModeratorRow {
-  id: string
-  username: string
-  email: string
-  suspended: boolean
-  joinedAt: string
-}
-
-const demoModerators = (): ModeratorRow[] =>
-  mockUsers
-    .filter(u => u.role === 'moderator')
-    .map(u => ({
-      id: u.id, username: u.name, email: u.email,
-      suspended: u.status !== 'active', joinedAt: u.joinedAt,
-    }))
 
 export default function Moderators() {
   const [search, setSearch] = useState('')
   const [formOpen, setFormOpen] = useState(false)
   const [justCreated, setJustCreated] = useState<NewAccount | null>(null)
-  const [addedInDemo, setAddedInDemo] = useState<ModeratorRow[]>([])
+  const [addedInDemo, setAddedInDemo] = useState<AccountRow[]>([])
 
-  const { data, loading, error, isDemo, reload } = useApiResource<ModeratorRow[]>(
-    async signal => (await listAdminUsers(signal))
-      .filter(u => u.role === 'moderator')
-      .map(u => ({
-        id: String(u.id), username: u.username, email: u.email,
-        suspended: u.is_suspended || !u.is_active, joinedAt: u.date_joined,
-      })),
-    demoModerators,
-    [],
+  const [page, setPage] = useState(1)
+  const { data, loading, error, isDemo, reload } = useAdminUserList(search, page, 'moderator')
+
+  const moderators = useMemo(
+    () => [...(page === 1 && !search.trim() ? addedInDemo : []), ...(data?.rows ?? [])],
+    [data, addedInDemo, page, search],
   )
 
-  const moderators = useMemo(() => {
-    const all = [...addedInDemo, ...(data ?? [])]
-    const q = search.trim().toLowerCase()
-    return q ? all.filter(m => m.username.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)) : all
-  }, [data, addedInDemo, search])
-
-  const total = (data?.length ?? 0) + addedInDemo.length
+  const total = (data?.count ?? 0) + addedInDemo.length
+  const lastPage = Math.max(1, Math.ceil((data?.count ?? 0) / USERS_PAGE_SIZE))
 
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
@@ -62,7 +37,7 @@ export default function Moderators() {
       reload()
     } else {
       setAddedInDemo(rows => [{
-        id: `demo-${Date.now()}`, username: account.username, email: account.email,
+        id: `demo-${Date.now()}`, name: account.username, email: account.email, role: 'moderator', uploads: null, lastLogin: null,
         suspended: false, joinedAt: new Date().toISOString(),
       }, ...rows])
     }
@@ -102,7 +77,7 @@ export default function Moderators() {
       )}
 
       <div className="flex items-center gap-3">
-        <SearchInput placeholder="Search moderators…" value={search} onChange={e => setSearch(e.target.value)} className="w-72" />
+        <SearchInput placeholder="Search moderators…" value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} className="w-72" />
       </div>
 
       <div className="fc-card overflow-hidden">
@@ -137,15 +112,19 @@ export default function Moderators() {
             data={moderators as unknown as Record<string, unknown>[]}
             getKey={row => String(row.id)}
             columns={[
-              { key: 'username', label: 'Moderator', render: row => (
+              { key: 'name', label: 'Moderator', render: row => (
                 <div>
-                  <p className="text-sm font-semibold text-ink">{String(row.username)}</p>
+                  <p className="text-sm font-semibold text-ink">{String(row.name)}</p>
                   <p className="text-xs text-ink-mute">{String(row.email)}</p>
                 </div>
               )},
               { key: 'suspended', label: 'Status', render: row => (
                 <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />
               )},
+              // Hidden while the backend has recorded no sign-in at all: "Never" for everyone would be untrue.
+              ...(moderators.some(m => m.lastLogin) ? [{ key: 'lastLogin', label: 'Last sign-in', render: (row: Record<string, unknown>) => (
+                <span className="text-sm text-ink-mute">{row.lastLogin ? formatDate(String(row.lastLogin)) : 'Never'}</span>
+              ) }] : []),
               { key: 'joinedAt', label: 'Created', render: row => (
                 <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span>
               )},
@@ -153,6 +132,18 @@ export default function Moderators() {
           />
         )}
       </div>
+
+      {!error && data && data.count > USERS_PAGE_SIZE && (
+        <div className="flex items-center justify-between text-xs text-ink-mute">
+          <span>Page {page} of {lastPage}</span>
+          <div className="flex items-center gap-2">
+            <button type="button" disabled={page <= 1} onClick={() => setPage(p => p - 1)}
+              className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1"><ChevronLeft className="w-3.5 h-3.5" />Previous</button>
+            <button type="button" disabled={page >= lastPage} onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1">Next<ChevronRight className="w-3.5 h-3.5" /></button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

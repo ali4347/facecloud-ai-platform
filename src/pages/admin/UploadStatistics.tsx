@@ -1,105 +1,116 @@
+import { useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
-import { mockUploadStats } from '../../data/mock'
-import { FileImage, Files, FolderArchive, ArrowUpRight } from 'lucide-react'
+import { AsyncGate } from '../../components/admin/AsyncGate'
+import { RangeChips } from '../../components/admin/RangeChips'
+import { shortDate, useAdminAnalytics, type RangeDays } from '../../lib/adminAnalytics'
+import { formatBytes } from '../../lib/imageData'
+import { FileImage, Files, FolderArchive, ArrowDownRight, ArrowUpRight } from 'lucide-react'
 
 export default function UploadStatistics() {
-  const stats = mockUploadStats
+  const [days, setDays] = useState<RangeDays>(30)
+  const state = useAdminAnalytics(days)
 
   return (
     <div className="space-y-6 page-enter">
-      <PageHeader 
+      <PageHeader
         title="Upload Statistics"
-        subtitle="Audit raw ingestion counts, daily size charts, and pipeline throughput performance logs."
+        subtitle="How many photos came in, by which route, and how big they are."
       />
+      <RangeChips value={days} onChange={setDays} />
 
-      {/* Cards stats row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[
-          { label: 'Total Ingested Images', value: stats.totalUploads.toLocaleString(), sub: '+12% vs last week' },
-          { label: 'Uploads Today', value: stats.uploadsToday.toLocaleString(), sub: '+8% vs yesterday' },
-          { label: 'Average File Size', value: stats.averageUploadSize, sub: 'Optimized via S3 buckets' },
-          { label: 'ZIP Archive Uploads', value: stats.zipUploadsCount.toLocaleString(), sub: 'Calculated over 30 days' }
-        ].map(item => (
-          <div key={item.label} className="fc-card p-6 space-y-2">
-            <span className="text-[10px] text-ink-mute font-bold uppercase tracking-wider block">{item.label}</span>
-            <span className="text-xl font-bold text-ink block">{item.value}</span>
-            <span className="text-[10px] text-[#10B981] font-semibold flex items-center gap-1">
-              <ArrowUpRight className="w-3 h-3" /> {item.sub}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Left Column: Upload Ingestion Types breakdown */}
-        <div className="lg:col-span-5 space-y-6">
-          <ChartCard title="Upload Ingestion Pipeline Breakdown" subtitle="Relative distribution of file upload methods">
-            <div className="space-y-4">
-              {[
-                { label: 'Single Uploads', count: stats.singleUploadsCount, icon: FileImage, color: '#FB923C' },
-                { label: 'Batch Multiple Uploads', count: stats.multipleUploadsCount, icon: Files, color: '#10B981' },
-                { label: 'ZIP File Archives', count: stats.zipUploadsCount, icon: FolderArchive, color: '#A78BFA' }
-              ].map(item => {
-                const total = stats.singleUploadsCount + stats.multipleUploadsCount + stats.zipUploadsCount
-                const percent = Math.round((item.count / total) * 100)
-                return (
-                  <div key={item.label} className="p-4 rounded-3xl bg-surface-mute border border-line space-y-3">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <item.icon className="w-4 h-4" style={{ color: item.color }} />
-                        <span className="font-bold text-ink">{item.label}</span>
-                      </div>
-                      <span className="font-bold text-ink">{item.count.toLocaleString()} files ({percent}%)</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
-                      <div 
-                        className="h-full" 
-                        style={{
-                          width: `${percent}%`,
-                          background: item.color
-                        }}
-                      />
-                    </div>
+      <AsyncGate state={state} what="the upload statistics">
+        {a => {
+          const up = a.overview?.uploads
+          if (!up) return <p className="text-xs text-ink-mute">This backend does not report upload statistics yet.</p>
+          const change = a.overview?.change_vs_previous_period.uploads_percent
+          const types = [
+            { label: 'Single Uploads', count: up.by_type.single, icon: FileImage, color: '#FB923C' },
+            { label: 'Multiple-photo Uploads', count: up.by_type.multiple, icon: Files, color: '#10B981' },
+            { label: 'ZIP Archives', count: up.by_type.zip, icon: FolderArchive, color: '#A78BFA' },
+          ]
+          const typeTotal = types.reduce((sum, t) => sum + t.count, 0)
+          // The last seven days of the window, as the card says.
+          const lastDays = up.per_day_by_type.slice(-7)
+          return (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {[
+                  { label: `Photos received (last ${days} days)`, value: up.total.toLocaleString(), sub: change === null || change === undefined ? null : `${change > 0 ? '+' : ''}${change}% vs the period before`, up: (change ?? 0) >= 0 },
+                  { label: 'Received today', value: up.recent.today.toLocaleString(), sub: `${up.recent.this_week.toLocaleString()} this week · ${up.recent.this_month.toLocaleString()} this month`, up: true, plain: true },
+                  { label: 'Average file size', value: up.average_file_size_bytes === null ? '—' : formatBytes(up.average_file_size_bytes), sub: null, up: true },
+                  { label: 'ZIP archives', value: up.by_type.zip.toLocaleString(), sub: `Photos that came inside a ZIP, last ${days} days`, up: true, plain: true },
+                ].map(item => (
+                  <div key={item.label} className="fc-card p-6 space-y-2">
+                    <span className="text-[10px] text-ink-mute font-bold uppercase tracking-wider block">{item.label}</span>
+                    <span className="text-xl font-bold text-ink block">{item.value}</span>
+                    {item.sub && (
+                      <span className={`text-[10px] font-semibold flex items-center gap-1 ${item.plain ? 'text-ink-mute' : item.up ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                        {!item.plain && (item.up ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />)}{item.sub}
+                      </span>
+                    )}
                   </div>
-                )
-              })}
-            </div>
-          </ChartCard>
-        </div>
-
-        {/* Right Column: Daily ingestion loads */}
-        <div className="lg:col-span-7 space-y-6">
-          <ChartCard title="Daily Ingestion Load (Past 7 Days)" subtitle="Total files unpacked by worker nodes">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 text-[10px] font-bold text-ink-faint pb-2 border-b border-line">
-                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#F97316] rounded" /> Single</div>
-                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#10B981] rounded" /> Multiple</div>
-                <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#EA580C] rounded" /> ZIP</div>
+                ))}
               </div>
 
-              <div className="space-y-3.5 pt-2">
-                {stats.uploadsPerDay.map(day => {
-                  const dayTotal = day.single + day.multiple + day.zip
-                  return (
-                    <div key={day.date} className="grid grid-cols-12 items-center gap-3 text-xs">
-                      <span className="col-span-2 font-bold text-ink-soft">{day.date}</span>
-                      <div className="col-span-8 flex h-4 rounded overflow-hidden bg-surface-mute">
-                        <div className="bg-[#F97316]" style={{ width: `${(day.single / dayTotal) * 100}%` }} />
-                        <div className="bg-[#10B981]" style={{ width: `${(day.multiple / dayTotal) * 100}%` }} />
-                        <div className="bg-[#EA580C]" style={{ width: `${(day.zip / dayTotal) * 100}%` }} />
-                      </div>
-                      <span className="col-span-2 text-right font-bold text-ink">{dayTotal} files</span>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="lg:col-span-5 space-y-6">
+                  <ChartCard title="How photos arrive" subtitle="Share of photos by upload route">
+                    <div className="space-y-4">
+                      {types.map(item => {
+                        const percent = typeTotal ? Math.round((item.count / typeTotal) * 100) : 0
+                        return (
+                          <div key={item.label} className="p-4 rounded-3xl bg-surface-mute border border-line space-y-3">
+                            <div className="flex items-center justify-between text-xs">
+                              <div className="flex items-center gap-2">
+                                <item.icon className="w-4 h-4" style={{ color: item.color }} />
+                                <span className="font-bold text-ink">{item.label}</span>
+                              </div>
+                              <span className="font-bold text-ink">{item.count.toLocaleString()} photos ({percent}%)</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-surface rounded-full overflow-hidden">
+                              <div className="h-full" style={{ width: `${percent}%`, background: item.color }} />
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
-                  )
-                })}
-              </div>
-            </div>
-          </ChartCard>
-        </div>
+                  </ChartCard>
+                </div>
 
-      </div>
+                <div className="lg:col-span-7 space-y-6">
+                  <ChartCard title="Daily intake (last 7 days)" subtitle="Photos received each day, by route">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4 text-[10px] font-bold text-ink-faint pb-2 border-b border-line">
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#F97316] rounded" /> Single</div>
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#10B981] rounded" /> Multiple</div>
+                        <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#EA580C] rounded" /> ZIP</div>
+                      </div>
+                      <div className="space-y-3.5 pt-2">
+                        {lastDays.map(day => {
+                          const dayTotal = day.single + day.multiple + day.zip
+                          const share = (n: number) => (dayTotal ? (n / dayTotal) * 100 : 0)
+                          return (
+                            <div key={day.date} className="grid grid-cols-12 items-center gap-3 text-xs">
+                              <span className="col-span-2 font-bold text-ink-soft">{shortDate(day.date)}</span>
+                              <div className="col-span-8 flex h-4 rounded overflow-hidden bg-surface-mute">
+                                <div className="bg-[#F97316]" style={{ width: `${share(day.single)}%` }} />
+                                <div className="bg-[#10B981]" style={{ width: `${share(day.multiple)}%` }} />
+                                <div className="bg-[#EA580C]" style={{ width: `${share(day.zip)}%` }} />
+                              </div>
+                              <span className="col-span-2 text-right font-bold text-ink">{dayTotal} {dayTotal === 1 ? 'photo' : 'photos'}</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </ChartCard>
+                </div>
+              </div>
+            </>
+          )
+        }}
+      </AsyncGate>
     </div>
   )
 }

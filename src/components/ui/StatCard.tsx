@@ -6,7 +6,8 @@ import { cn } from '../../lib/utils'
 interface StatCardProps {
   title: string
   value: string | number
-  change?: number
+  /** A number shows the change; `null` means there is no earlier period to compare with and shows a dash; leave it out to show nothing. */
+  change?: number | null
   changeLabel?: string
   icon: LucideIcon
   gradient?: 'blue' | 'purple' | 'teal' | 'emerald'
@@ -24,7 +25,7 @@ const accentConfig = {
 }
 
 export function StatCard({ title, value, change, changeLabel, icon: Icon, gradient = 'blue', delay = 0, className }: StatCardProps) {
-  const isPositive = change !== undefined && change >= 0
+  const isPositive = typeof change === 'number' && change >= 0
   const accent = accentConfig[gradient]
 
   return (
@@ -42,7 +43,12 @@ export function StatCard({ title, value, change, changeLabel, icon: Icon, gradie
           <Icon className="w-[18px] h-[18px]" style={{ color: accent.iconColor }} />
         </div>
 
-        {change !== undefined && (
+        {change === null && (
+          <div title="No earlier period to compare with" className="flex items-center text-[11px] font-semibold px-2 py-1 rounded-full text-ink-faint bg-surface-mute">
+            —
+          </div>
+        )}
+        {typeof change === 'number' && (
           <div
             className="flex items-center gap-1 text-[11px] font-semibold px-2 py-1 rounded-full"
             style={{

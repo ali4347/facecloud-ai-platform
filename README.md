@@ -27,7 +27,7 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
 
 * **Live on the API:** sign-in; the moderator dashboard and review queue; and the user portal's single upload, processing view, uploads list, My Images gallery and image detail.
-* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), the remaining moderator screens, and the admin console. Every other user-portal screen reads the live API when `VITE_USE_API=true`.
+* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), the remaining moderator screens. The admin console and every user-portal screen read the live API when `VITE_USE_API=true`.
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
@@ -160,15 +160,15 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/jobs` (Batch job history directory)
 
 ### Admin Console Routes (under `/admin`)
-* `/admin` (Admin Overview metrics and telemetry)
-* `/admin/users` (User directories, state controls, suspension logs)
-* `/admin/audit-logs` (System activity logs and administrative audit traces)
-* `/admin/security` (Risk alerts, failed logins monitor, IP blocking logs)
+* `/admin` (Admin Overview: totals, uploads, enhanced, rejected, quality pass rate, storage, with 7 / 30 / 90-day chips)
+* `/admin/users` (User directory with server search and paging, upload counts, suspend / activate, Add User)
+* `/admin/audit-logs` (Paged audit trail: actor, role, status, message, resource, sign-in address)
+* `/admin/security` (Alerts for repeated failed sign-ins, refused requests and rate limits, with an Acknowledge action that needs a note, and the rules behind them)
 * `/admin/moderators` (list of moderator accounts, and a form to create one — `/admin/api-docs` and `/admin/api-test` were removed and redirect to `/admin`)
-* `/admin/system` (Server instances CPU/RAM levels, service uptime statuses)
-* `/admin/upload-statistics` (Upload volume charts and file sizes charts)
-* `/admin/rejection-summary` (Quality-based rejection charts and metrics)
-* `/admin/images` (Image surveillance stream and content logs)
+* `/admin/system` (Service checks, background workers, process uptime and the per-job queue table)
+* `/admin/upload-statistics` (Photos received by route, daily intake, average file size)
+* `/admin/rejection-summary` (Rejected photos, rejection rate, the reasons behind them, daily rejections)
+* `/admin/images` (Every uploaded photo with its quality result, preview and a details panel)
 * `/admin/logs` (Redirects to `/admin/audit-logs`)
 
 ### Moderator Routes (under `/moderator`)
@@ -236,12 +236,12 @@ graph TD
 
 ## 10. Admin Console Features
 
-* **System Telemetry**: Displays RAM, CPU, database load, and active job queues across servers.
-* **User Accounts Controls**: System operators can search users, inspect account upload quotas, and trigger status updates (e.g., active, suspended).
+* **System Health**: Shows the status of the API, database, cache, background workers, storage, email and AI models, the process uptime and the processing queues. There is no CPU or memory figure because the backend does not report one.
+* **User Accounts Controls**: System operators can search users on the server, see each account's upload count, and suspend or reactivate accounts.
 * **Live Audit Traces**: Shows audit logs detailing actors, roles, actions, resource targets, and source IP addresses.
-* **Security Monitoring**: Displays risk status graphs, failed logins, and suspicious API rate-limit alerts.
+* **Security Monitoring**: Lists the alerts the backend raises (medium or high risk) and lets an administrator acknowledge one with a note.
 * **Interactive API Playground**: Includes Swagger-styled REST details for `/api/auth/login`, `/api/user/images`, and others. Operators can hit "Send Request" to trigger simulation triggers and verify responses.
-* **Upload and Quality Statistics**: Incorporates Recharts charts demonstrating upload volumes, resolution distributions, and quality rejection categories.
+* **Upload and Quality Statistics**: Recharts charts of uploads, enhancements, rejections and storage over a chosen 7 / 30 / 90-day window. A figure the backend does not report is hidden, never estimated. The same pages show demo data when `VITE_USE_API` is false.
 
 ---
 

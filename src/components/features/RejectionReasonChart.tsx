@@ -1,35 +1,32 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { rejectionReasonsData } from '../../data/mock'
+
+export interface ReasonDatum { name: string; value: number; color: string }
 
 interface RejectionReasonChartProps {
-  data?: typeof rejectionReasonsData
+  data: ReasonDatum[]
 }
 
-export function RejectionReasonChart({ data = rejectionReasonsData }: RejectionReasonChartProps) {
+/** A donut of rejection reasons. Values are counts; the tooltip also gives each one's share of the reasons recorded. */
+export function RejectionReasonChart({ data }: RejectionReasonChartProps) {
+  const total = data.reduce((sum, item) => sum + item.value, 0)
+  if (data.length === 0) {
+    return <div className="h-[280px] flex items-center justify-center text-xs text-ink-mute">No rejection reasons recorded in this period.</div>
+  }
   return (
     <ResponsiveContainer width="100%" height={280}>
       <PieChart>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          innerRadius={65}
-          outerRadius={100}
-          paddingAngle={3}
-          dataKey="value"
-        >
-          {data.map((entry: any, i: number) => (
-            <Cell key={i} fill={entry.color} />
-          ))}
+        <Pie data={data} cx="50%" cy="50%" innerRadius={65} outerRadius={100} paddingAngle={3} dataKey="value">
+          {data.map((entry, i) => <Cell key={i} fill={entry.color} />)}
         </Pie>
         <Tooltip
           contentStyle={{
-            background: '#fff',
+            background: 'rgb(var(--a-surface))',
             border: '1px solid rgb(var(--a-line))',
             borderRadius: '12px',
-            boxShadow: '0 4px 6px -1px rgb(var(--a-shadow-rgb) / 0.45)',
+            fontSize: '12px',
+            color: 'rgb(var(--a-ink))',
           }}
-          formatter={(value) => [`${value}%`, 'Share']}
+          formatter={(value, name) => [`${value} (${total ? Math.round((Number(value) / total) * 100) : 0}%)`, String(name)]}
         />
         <Legend
           iconType="circle"
