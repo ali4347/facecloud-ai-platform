@@ -50,7 +50,7 @@ export default function AdminOverview() {
                   gradient="blue" change={change?.live_sessions_percent} delay={0.2} />
                 <StatCard title="Quality pass rate" value={percentOrDash(a.success_rate_percent)} icon={TrendingUp} gradient="purple" delay={0.25} />
                 <StatCard title="Rejection Rate" value={percentOrDash(overview?.rejections.rate_percent)} icon={Activity} gradient="teal" delay={0.3} />
-                <StatCard title="Storage Used" value={formatBytes(a.storage_bytes.total)} icon={HardDrive} gradient="emerald" delay={0.35} />
+                <StatCard title="Storage Used" value={size(a.storage_bytes.total)} icon={HardDrive} gradient="emerald" delay={0.35} />
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
@@ -86,7 +86,7 @@ export default function AdminOverview() {
               {/* The gauge needs a capacity, which object storage does not have; the breakdown is always real. */}
               <ChartCard
                 title="Storage Usage"
-                subtitle={storage?.capacity_bytes ? `${formatBytes(a.storage_bytes.total)} used of ${formatBytes(storage.capacity_bytes)} on this disk` : `${formatBytes(a.storage_bytes.total)} used`}
+                subtitle={storage?.capacity_bytes ? `${size(a.storage_bytes.total)} used of ${formatBytes(storage.capacity_bytes)} on this disk` : `${size(a.storage_bytes.total)} used`}
                 delay={0.2}
               >
                 {storage?.capacity_bytes != null && storage.used_percent != null && (

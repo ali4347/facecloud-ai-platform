@@ -171,6 +171,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/rejection-summary` (Rejected photos, rejection rate, the reasons behind them, daily rejections)
 * `/admin/images` (Every uploaded photo with its quality result, preview and a details panel)
 * `/admin/logs` (Redirects to `/admin/audit-logs`)
+* Top bar (admin): search jumps to a screen or finds an account (opens Manage Users filtered to it); the bell lists open security alerts and services that are not operational.
 
 ### Moderator Routes (under `/moderator`)
 * `/moderator` (Dashboard: overdue and due-soon counts against the review deadline, unassigned work, oldest waiting review, and per-moderator performance over a 7/30/90-day window)

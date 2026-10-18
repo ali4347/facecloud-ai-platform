@@ -8,12 +8,13 @@ import { useReadNotifications } from '../../lib/notifications'
 import { getSession } from '../../lib/session'
 import { USE_API } from '../../lib/api/config'
 import { useLiveBell, type BellItem } from '../../lib/useLiveBell'
+import { useAdminBell } from '../../lib/useAdminBell'
 import type { Role } from '../../data/mock'
 
 interface NotificationDropdownProps {
   onOpen?: () => void
   sidebarOpen?: boolean
-  /** Only the user portal has real notifications; the other portals keep their demo feed. */
+  /** The user portal has real notifications and the admin console has real alerts; the moderator portal keeps its demo feed. */
   role?: Role
 }
 
@@ -26,8 +27,12 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
   const ids = useMemo(() => notifications.map(n => String(n.id)), [notifications])
   const { isRead, unreadCount: demoUnread, markAllRead: demoMarkAllRead } = useReadNotifications(email, ids)
 
-  const live = role === 'user' && USE_API
-  const bell = useLiveBell(live)
+  const userLive = role === 'user' && USE_API
+  const adminLive = role === 'admin' && USE_API
+  const live = userLive || adminLive
+  const userBell = useLiveBell(userLive)
+  const adminBell = useAdminBell(adminLive)
+  const bell = adminLive ? adminBell : userBell
   const unreadCount = live ? bell.unread : demoUnread
   const markAllRead = live ? () => void bell.markAllRead() : demoMarkAllRead
   const items: BellItem[] = live
@@ -177,7 +182,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
               <p role="alert" className="px-3 py-3 text-[12px] text-[#F87171]">{bell.error}</p>
             )}
             {live && !bell.loading && !bell.error && items.length === 0 && (
-              <p className="px-3 py-6 text-center text-[12px] text-ink-faint">You have no notifications yet.</p>
+              <p className="px-3 py-6 text-center text-[12px] text-ink-faint">{adminLive ? 'Nothing needs your attention: no open security alerts and every service is up.' : 'You have no notifications yet.'}</p>
             )}
             {items.map(n => (
               <div
@@ -204,6 +209,9 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
 
           {/* Footer */}
           <div className="px-4 py-3 border-t border-line-soft flex items-center justify-between gap-3">
+            {adminLive ? (
+              <span className="text-[12px] text-ink-faint">{unreadCount === 0 ? 'All clear' : `${unreadCount} need${unreadCount === 1 ? 's' : ''} attention`}</span>
+            ) : (
             <button
               type="button"
               onClick={markAllRead}
@@ -214,10 +222,11 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
               <Check className="w-3.5 h-3.5" />
               {unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
             </button>
+            )}
             {live && (
-              <Link to="/dashboard/notifications" onClick={() => setOpen(false)}
+              <Link to={adminLive ? '/admin/security' : '/dashboard/notifications'} onClick={() => setOpen(false)}
                 className="text-[12px] font-semibold text-ink-mute hover:text-ink transition-colors">
-                View all
+                {adminLive ? 'Open Security' : 'View all'}
               </Link>
             )}
           </div>

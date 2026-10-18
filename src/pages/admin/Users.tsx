@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { AlertTriangle, ChevronLeft, ChevronRight, Loader2, RefreshCw, UserPlus, Users as UsersIcon } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { DataTable } from '../../components/ui/DataTable'
@@ -21,7 +22,12 @@ const roleBadge = (role: Role) => {
 }
 
 export default function UsersPage() {
-  const [search, setSearch] = useState('')
+  // The top-bar search opens this screen with ?q= already filled in.
+  const [params] = useSearchParams()
+  const urlSearch = params.get('q') ?? ''
+  const [search, setSearch] = useState(urlSearch)
+  const [page, setPage] = useState(1)
+  useEffect(() => { setSearch(urlSearch); setPage(1) }, [urlSearch])
   const [formOpen, setFormOpen] = useState(false)
   const [justCreated, setJustCreated] = useState<NewAccount | null>(null)
   const [addedInDemo, setAddedInDemo] = useState<UserRow[]>([])
@@ -29,7 +35,6 @@ export default function UsersPage() {
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
-  const [page, setPage] = useState(1)
   const { data, loading, error, isDemo, reload } = useAdminUserList(search, page)
 
   const users = useMemo(() => {

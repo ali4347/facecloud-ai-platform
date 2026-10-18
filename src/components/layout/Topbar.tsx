@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Menu, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
 import { GlobalSearch } from './GlobalSearch'
+import { AdminSearch } from './AdminSearch'
 import { useSessionUser } from '../../lib/session'
 import { useServerAvatar } from '../../lib/useServerAvatar'
 import { USE_API } from '../../lib/api/config'
@@ -59,7 +60,9 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appeara
 
       {/* Search */}
       <div className="flex-1 max-w-[460px]">
-        <GlobalSearch role={role} inputRef={searchRef} />
+        {role === 'admin'
+          ? <AdminSearch inputRef={searchRef} />
+          : <GlobalSearch role={role} inputRef={searchRef} />}
       </div>
 
       <div className="flex-1" />

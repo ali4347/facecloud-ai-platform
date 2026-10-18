@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Admin console finished: real top-bar search and bell
+*Status: committed (this commit).*
+
+- **Added:** the admin top bar no longer has a dead search box and a demo bell.
+  - **Search** (`src/components/layout/AdminSearch.tsx`): type a screen name to jump to it (works in the demo build too), and, against the live API, find an account by username, email or name (`GET /api/user/admin/users/?q=`, 5 results). Choosing an account opens Manage Users already filtered to it (`/admin/users?q=`; `Users.tsx` now reads `?q=`). Arrow keys, Enter and Escape work.
+  - **Bell** (`src/lib/useAdminBell.ts`, `NotificationDropdown.tsx`): shows what needs an administrator now: open security alerts and services that are not operational, refreshed every 2 minutes and when the panel opens. Clicking an alert opens Security, a service opens System Monitoring. There is nothing to "mark read" (an alert stays until acknowledged), so the Mark-all button is replaced by a count and an "Open Security" link. The demo build keeps the demo feed; the moderator bell is unchanged.
+  - Overview "Storage Used" shows `0 B` instead of `--` on an empty system.
+- **Verified:** throwaway copy of backend origin/main with 12 failed sign-ins (2 alerts) and the usual degraded worker service; headless Chrome: red dot and panel list exactly the 2 alerts and 1 service from the API with a matching count of 3, no demo text, alert → Security, service → System Monitoring; search finds Statistics screens, finds one account on the server and not the others, opens Manage Users filtered to that account (1 row), says "Nothing matches" otherwise, Enter opens the first result; demo build: demo bell feed and screen search still work. No uncaught exception. `tsc` and both builds pass, no lint finding in touched files.
+- **Admin status:** every admin screen, the top bar and the sidebar are on the live API. What remains for the admin side is outside the frontend admin code: backend `?q=` for the audit log (backend prompt item 5), the user portal's Live Enhancement posting camera sessions (so the Live Sessions card moves), and the optional screens for the backend's failed-batch and failed-job endpoints.
+
 ### 2026-10-19 — Admin: Statistics page added to the sidebar; Last sign-in column back
 *Status: committed (this commit).*
 
