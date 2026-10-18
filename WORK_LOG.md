@@ -1737,7 +1737,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 - Public: the Contact form only simulates sending (`POST /api/contact/` exists, with a spam-trap field).
 - User portal: every screen is connected. Not yet in the UI although the backend has them: Person Folder review queue and move / remove / delete folder / cover photo / history / "find this person"; share-link list and revoke;
   Delete account; privacy audit trail; processing reports; duplicate results; camera sessions and snapshots for Live Enhancement; events and collages; the enhancement advisor and model comparison.
-- Of 190 backend paths (230 operations) about 70 are called by the frontend today; the rest belong to the items above.
+- Of 190 backend paths (230 operations) roughly 80 are called by the frontend today (the moderator queue builds its paths from a prefix, so a plain text search undercounts); the rest belong to the items above.
 
 **Backend (separate repository) still to do, as asked of the backend owner:** Phase 1 (blur never rejects, restoration chain) is merged (#85). Not started: Phase 1B (auto = HD and situation-aware by default, defocus deblur, speed and GPU plan),
 Phase 2 (small-face floor, ignored background faces, completely-dark-only rejection, warnings list), Phase 3 (accepted photos enhanced automatically, batch-enhance must skip rejected photos), Phase 4 (groups enhanced per person),
