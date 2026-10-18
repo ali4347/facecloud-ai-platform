@@ -4,6 +4,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { mockAuditLogs } from '../../data/mock'
 import { getAudit, type AuditPage, type AuditRow } from '../../lib/api/adminSystem'
 import { useApiResource } from '../../lib/useApiResource'
@@ -41,6 +42,7 @@ export default function AuditLogs() {
             : data.results
           return (
             <>
+              {data.legacy && <OldBackendNotice what="the audit log shows each event without its actor role, status or resource" />}
               <div className="flex items-center gap-3 mb-5">
                 <SearchInput placeholder="Search this page…" value={search} onChange={e => setSearch(e.target.value)} className="w-72" />
               </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { RangeChips } from '../../components/admin/RangeChips'
 import { shortDate, useAdminAnalytics, type RangeDays } from '../../lib/adminAnalytics'
 import { formatBytes } from '../../lib/imageData'
@@ -22,7 +23,7 @@ export default function UploadStatistics() {
       <AsyncGate state={state} what="the upload statistics">
         {a => {
           const up = a.overview?.uploads
-          if (!up) return <p className="text-xs text-ink-mute">This backend does not report upload statistics yet.</p>
+          if (!up) return <OldBackendNotice what="it does not report upload statistics" />
           const change = a.overview?.change_vs_previous_period.uploads_percent
           const types = [
             { label: 'Single Uploads', count: up.by_type.single, icon: FileImage, color: '#FB923C' },

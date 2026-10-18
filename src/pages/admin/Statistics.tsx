@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { RangeChips } from '../../components/admin/RangeChips'
 import { shortDate, shortMonth, trendRows, useAdminAnalytics, type RangeDays } from '../../lib/adminAnalytics'
 import { formatBytes } from '../../lib/imageData'
@@ -36,6 +37,8 @@ export default function Statistics() {
           const unit = Math.max(0, ...growth.map(m => m.total_bytes)) >= 1e9 ? { name: 'GB', size: 1e9 } : { name: 'MB', size: 1e6 }
           const growthRows = growth.map(m => ({ name: shortMonth(m.month), value: Math.round((m.total_bytes / unit.size) * 100) / 100 }))
           return (
+            <>
+            {!overview && <OldBackendNotice what="the weekly, live-session and storage charts are not reported" />}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
               <ChartCard title="Upload Trend" subtitle={`Daily, last ${days} days: uploads, enhanced, and rejected`} delay={0.05}>
                 <ResponsiveContainer width="100%" height={220}>
@@ -102,6 +105,7 @@ export default function Statistics() {
                 )}
               </ChartCard>
             </div>
+            </>
           )
         }}
       </AsyncGate>

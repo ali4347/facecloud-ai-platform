@@ -5,6 +5,7 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { RejectionReasonChart } from '../../components/features/RejectionReasonChart'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { RangeChips } from '../../components/admin/RangeChips'
 import { percentOrDash, reasonSlices, trendRows, useAdminAnalytics, type RangeDays } from '../../lib/adminAnalytics'
 import { formatBytes } from '../../lib/imageData'
@@ -33,6 +34,7 @@ export default function AdminOverview() {
           const slices = reasonSlices(a)
           return (
             <>
+              {!overview && <OldBackendNotice what="the rejected, live-session and storage figures are not reported" />}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <StatCard title="Total Users" value={a.totals.users.total.toLocaleString()} icon={Users} gradient="blue" delay={0} />
                 <StatCard title={`Uploads (last ${days} days)`} value={(overview?.uploads.total ?? a.totals.images.total).toLocaleString()} icon={Upload}

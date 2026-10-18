@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
+import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { useAppearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 import { SESSION_LOST_EVENT } from '../../lib/api/client'
@@ -14,6 +15,7 @@ export function AppShell({ role }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [appearance, toggleAppearance] = useAppearance()
   const navigate = useNavigate()
+  const location = useLocation()
 
   /* The API says the session is over (revoked, expired, or the server no longer knows it): sign out and say why. */
   useEffect(() => {
@@ -74,7 +76,9 @@ export function AppShell({ role }: AppShellProps) {
           onToggleAppearance={toggleAppearance}
         />
         <main className="flex-1 px-4 sm:px-6 lg:px-7 py-6 page-enter">
-          <Outlet />
+          <ErrorBoundary resetKey={location.pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

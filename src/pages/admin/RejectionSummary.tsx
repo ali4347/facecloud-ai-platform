@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { RangeChips } from '../../components/admin/RangeChips'
 import { percentOrDash, reasonSlices, shortDate, useAdminAnalytics, type RangeDays } from '../../lib/adminAnalytics'
 
@@ -20,7 +21,7 @@ export default function RejectionSummary() {
       <AsyncGate state={state} what="the rejection summary">
         {a => {
           const rej = a.overview?.rejections
-          if (!rej) return <p className="text-xs text-ink-mute">This backend does not report rejection statistics yet.</p>
+          if (!rej) return <OldBackendNotice what="it does not report rejection statistics" />
           const slices = reasonSlices(a)
           const reasonTotal = slices.reduce((sum, s) => sum + s.count, 0)
           const daily = rej.per_day.slice(-7)

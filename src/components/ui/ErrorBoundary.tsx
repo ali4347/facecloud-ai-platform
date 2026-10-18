@@ -1,0 +1,26 @@
+import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { AlertTriangle } from 'lucide-react'
+
+interface Props { children: ReactNode; resetKey?: string }
+interface State { failed: boolean }
+
+/**
+ * Keeps one screen's crash from blanking the whole panel: the sidebar stays, the screen says what happened.
+ * `resetKey` (the route) clears the failure when the user moves to another screen.
+ */
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = { failed: false }
+  static getDerivedStateFromError(): State { return { failed: true } }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error('Screen crashed:', error, info.componentStack) }
+  componentDidUpdate(prev: Props) { if (prev.resetKey !== this.props.resetKey && this.state.failed) this.setState({ failed: false }) }
+  render() {
+    if (!this.state.failed) return this.props.children
+    return (
+      <div role="alert" className="text-center py-20">
+        <AlertTriangle className="w-7 h-7 mx-auto mb-3 text-[#EF4444]" />
+        <p className="text-sm font-semibold text-ink">This screen could not be shown.</p>
+        <p className="text-xs text-ink-mute mt-1">The data it received was not in the shape it expects. Reload the page, or try another screen.</p>
+      </div>
+    )
+  }
+}

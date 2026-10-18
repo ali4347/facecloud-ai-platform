@@ -92,10 +92,34 @@ export interface AuditRow {
   message: string
   resource: string
 }
-export interface AuditPage { page: number; page_size: number; has_next: boolean; results: AuditRow[] }
+export interface AuditPage {
+  page: number; page_size: number; has_next: boolean; results: AuditRow[]
+  /** True when the backend is older than PR #86: rows were worded here from category and event. */
+  legacy?: boolean
+}
 
-export function getAudit(page: number, pageSize: number, signal?: AbortSignal): Promise<AuditPage> {
-  return apiFetch<AuditPage>(`/api/system/audit/?page=${page}&page_size=${pageSize}`, { signal })
+export async function getAudit(page: number, pageSize: number, signal?: AbortSignal): Promise<AuditPage> {
+  const data = await apiFetch<AuditPage>(`/api/system/audit/?page=${page}&page_size=${pageSize}`, { signal })
+  const rows = Array.isArray(data.results) ? data.results : []
+  // A backend older than PR #86 sends the raw event only (no actor_name, message, status, resource).
+  const legacy = rows.some(r => r.message === undefined)
+  if (!legacy) return { ...data, results: rows }
+  const words = (v: string) => v.replace(/_/g, ' ')
+  return {
+    ...data, legacy: true,
+    results: rows.map(r => {
+      const raw = r as Partial<AuditRow> & { identifier?: string }
+      return {
+        ...r,
+        actor_name: raw.actor_name ?? raw.actor?.username ?? raw.identifier ?? 'Unknown',
+        actor_role: raw.actor_role ?? raw.actor?.role ?? null,
+        type: raw.type ?? r.category,
+        status: raw.status ?? 'info',
+        message: raw.message ?? `${words(r.category)}: ${words(r.event)}`,
+        resource: raw.resource ?? '',
+      }
+    }),
+  }
 }
 
 // ── Security alerts ──────────────────────────────────────────────────────────
@@ -157,10 +181,32 @@ export interface SystemHealth {
   status: string
   checked_at: string
   services: ServiceRow[]
-  process: { started_at: string; uptime_seconds: number }
+  process: { started_at: string; uptime_seconds: number } | null
+  /** True when the backend is older than PR #86: services were read from its `checks` object. */
+  legacy?: boolean
 }
-export function getHealth(signal?: AbortSignal): Promise<SystemHealth> {
-  return apiFetch<SystemHealth>('/api/system/health/', { signal })
+
+const SERVICE_NAMES: Record<string, string> = {
+  api: 'API', database: 'Database', redis: 'Cache and message broker', celery: 'Background workers',
+  storage: 'File storage', email: 'Email', models: 'AI models',
+}
+const LEGACY_STATUS: Record<string, string> = { healthy: 'operational', degraded: 'degraded', unhealthy: 'down', down: 'down', disabled: 'degraded' }
+
+export async function getHealth(signal?: AbortSignal): Promise<SystemHealth> {
+  const data = await apiFetch<SystemHealth & { checks?: Record<string, { status: string; latency_ms?: number; code?: string; workers?: number; available_bytes?: number }> }>(
+    '/api/system/health/', { signal },
+  )
+  if (Array.isArray(data.services)) return { ...data, process: data.process ?? null }
+  const checks = data.checks ?? {}
+  return {
+    status: LEGACY_STATUS[data.status] ?? data.status, checked_at: data.checked_at, process: null, legacy: true,
+    services: Object.entries(checks).map(([key, c]) => ({
+      key, name: SERVICE_NAMES[key] ?? key, status: LEGACY_STATUS[c.status] ?? c.status, latency_ms: c.latency_ms ?? null,
+      checked_at: data.checked_at, detail: c.code ?? '',
+      ...(c.workers !== undefined ? { workers: c.workers } : {}),
+      ...(c.available_bytes !== undefined ? { available_bytes: c.available_bytes } : {}),
+    })),
+  }
 }
 
 export interface QueueCounts {

@@ -40,9 +40,11 @@ export function useAdminUserList(search: string, page: number, role?: Role): Asy
   const state = useApiResource<AccountPage>(
     async signal => {
       const result = await listAdminUsersPage({ q: query || undefined, role, page, pageSize: USERS_PAGE_SIZE }, signal)
+      const rows = result.results.filter(u => !role || u.role === role)
       return {
-        count: result.count,
-        rows: result.results.map(u => ({
+        // A backend older than PR #86 ignores ?role=, so the list is narrowed here and the count follows what is left.
+        count: rows.length < result.results.length ? rows.length : result.count,
+        rows: rows.map(u => ({
           id: String(u.id), name: u.username, email: u.email, role: u.role,
           suspended: u.is_suspended || !u.is_active, uploads: u.uploads_count ?? null,
           lastLogin: u.last_login ?? null, joinedAt: u.date_joined,

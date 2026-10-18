@@ -1,6 +1,7 @@
 import { PageHeader } from '../../components/layout/PageHeader'
 import { SystemHealthCard } from '../../components/features/SystemHealthCard'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { useSystemHealth } from '../../lib/adminHealth'
 import { formatDateTime } from '../../lib/utils'
 import { CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react'
@@ -19,6 +20,7 @@ export default function SystemHealth() {
           const degraded = count('degraded')
           return (
             <>
+              {health.legacy && <OldBackendNotice what="some service details are not reported" />}
               <div className={`mb-5 flex items-center gap-3 p-4 rounded-2xl border ${
                 down > 0 ? 'bg-red-500/10 border-red-500/30' : degraded > 0 ? 'bg-amber-50 border-amber-500/30' : 'bg-green-50 border-green-200'
               }`}>

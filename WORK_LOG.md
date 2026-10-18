@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-18
+**Last updated:** 2026-10-19
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-19 — Admin pages no longer blank on an older backend; Moderators list shows only moderators
+*Status: committed (this commit).*
+
+- **Reported:** on the owner's machine `/admin/system` and `/admin/audit-logs` were blank, Upload Statistics and Rejection Summary said the backend reports nothing, and the Moderators list showed every account (including the admin).
+- **Cause:** the owner's local backend is `main` at PR #72; origin/main already has PR #86 merged. The older backend answers in another shape: audit rows without `message`/`status`/`actor_name`, health as a `checks` object instead of `services`, analytics without `overview`, and it ignores `?role=`. The audit and health screens crashed on the missing fields (with no error boundary, so the whole panel went blank), and the Moderators list lost the client-side role filter in the 2026-10-18 rewrite (my regression).
+- **Changed:** `getAudit` and `getHealth` (`src/lib/api/adminSystem.ts`) accept the older shape (events worded from category and event; services read from `checks`; uptime shown as "—") and mark it `legacy`; the screens show an amber "backend is older than PR #86 — `git pull origin main` and restart" notice (`src/components/admin/OldBackendNotice.tsx`) instead of crashing or a bare message. The user list narrows by role on the client too and its count follows. New `src/components/ui/ErrorBoundary.tsx` wraps the page outlet in `AppShell`, so a crash in one screen keeps the sidebar and says so.
+- **Verified:** throwaway copies of both backends (PR #72 and origin/main) with an admin, a moderator and a user; headless Chrome opened the 9 admin pages against each: none blank, no uncaught exception; on the old backend Moderators lists only the moderator and each affected page shows the notice; on the new backend the full figures show. `tsc`, both builds pass, no lint finding in touched files.
+- **Not done:** the moderator **Member Management** screen is still demo data (`mockOrgMembers`), so it cannot yet show only the moderator's own organization. The backend already scopes `/api/organizations/{id}/members/` and invitations by organization, and an admin-created moderator is placed in the organization. Wiring that screen is pending the owner's go-ahead (§6).
 
 ### 2026-10-18 — Admin console connected to the live API (backend PR #86)
 *Status: committed (this commit).*
@@ -1795,6 +1804,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 **Frontend screens still on demo data (no backend call):**
 - Admin: all connected (2026-10-18). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Statistics`, `Rejections` and `System Health` pages work but have no route.
+- Moderator Member Management is on demo data and shows every demo member; it must read `/api/organizations/{id}/members/` and `/invitations/` so a moderator only sees their own organization (pending the owner's go-ahead).
 - Moderator (10): Batches, Identity Review, Members, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
 - Public: the Contact form is connected (`POST /api/contact/`).
@@ -1812,6 +1822,7 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 
 ## 7. Known Issues / Tech Debt
 
+- **Owner's local backend is behind (2026-10-19).** `~/Projects/FaceCloud_backend` is on `main` at PR #72; PR #86 and later are on origin. The admin screens work but show an "older backend" notice until it is pulled and restarted.
 - **Backend: `last_login` is never recorded (2026-10-18).** The admin users list returns `last_login: null` for every account, even ones that signed in repeatedly, so the Last sign-in column stays hidden. Fix on the backend: stamp `last_login` on a successful sign-in.
 - **Live Enhancement never records a camera session (2026-10-18).** The admin "Live Sessions" card and chart stay 0 until the frontend posts `/api/camera/sessions`.
 - **Admin pages without a route (2026-10-18).** `Statistics`, `Rejections` and `System Health` are rewritten for the live API but nothing links to them.

@@ -2,6 +2,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { AsyncGate } from '../../components/admin/AsyncGate'
 import { StatusBadge } from '../../components/ui/StatusBadge'
+import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
 import { formatUptime, jobLabel, serviceNote, useSystemHealth } from '../../lib/adminHealth'
 import { CheckCircle2, AlertTriangle, AlertOctagon, Clock, Users, RefreshCw, RotateCw } from 'lucide-react'
 
@@ -25,12 +26,13 @@ export default function SystemMonitoring() {
           const waiting = jobs.reduce((sum, [, j]) => sum + j.queued, 0)
           const running = jobs.reduce((sum, [, j]) => sum + j.processing, 0)
           const stats = [
-            { title: 'Server running for', value: state.isDemo ? '—' : formatUptime(health.process.uptime_seconds), detail: 'Since the backend process last started', icon: Clock, color: '#10B981' },
+            { title: 'Server running for', value: health.process ? formatUptime(health.process.uptime_seconds) : '—', detail: health.process ? 'Since the backend process last started' : 'Not reported by this backend', icon: Clock, color: '#10B981' },
             { title: 'Background workers', value: celery?.workers === undefined ? '—' : String(celery.workers), detail: celery?.workers === 0 ? 'No worker is running' : 'Counted by the job runner', icon: Users, color: '#A78BFA' },
             { title: 'Jobs waiting', value: queue ? String(waiting) : '—', detail: queue ? `${running} running now` : 'Queue status unavailable', icon: RefreshCw, color: '#FB923C' },
           ]
           return (
             <>
+              {health.legacy && <OldBackendNotice what="the server uptime and some service details are not reported" />}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {stats.map(stat => (
                   <div key={stat.title} className="fc-card p-6 flex items-center justify-between">
