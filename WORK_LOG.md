@@ -46,6 +46,11 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Member Management opens on "Invited by me"
+*Status: committed (this commit).*
+
+- The owner chose the narrower default: the screen now opens on **Invited by me**; **Whole organization** is one click away and still limited to the moderator's own organization. Files: `src/pages/moderator/MemberManagementLive.tsx`. Verified with `tsc` and both builds; the earlier 12 headless checks used the same code paths.
+
 ### 2026-10-19 — Moderator Member Management connected to the backend (organization-scoped)
 *Status: committed (this commit).*
 
@@ -54,7 +59,7 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
 - **Also confirmed on the backend:** an administrator-created moderator is placed in the organization at once, so the other moderators' Members list shows them (invited by the administrator).
 - **Also:** `ErrorBoundary` now resets by `key` (lint warning fixed); the 2026-10-19 push that failed with a network error was retried and went through.
 - **Verified:** throwaway backend (origin/main) with an organization, two moderators, a member, and a user outside it; headless Chrome as the moderator: 12 checks passed (outsider and administrator not listed, other moderator Locked, invited-by shown, "Invited by me", invite, duplicate refused with the backend message, resend, cancel, deactivate, reactivate, remove); `tsc` and both builds pass, no lint finding in touched files.
-- **Left:** "Only users I created" means invitees here; the backend has no creator-only filter beyond `invited_by`, so the default view is the whole organization. Say if the default should be "Invited by me". An invited person accepting through `/invitations/{token}` still has no route in the frontend.
+- **Left:** "Only users I created" means invitees here (`invited_by`); the default was changed to "Invited by me" in the entry above. An invited person accepting through `/invitations/{token}` still has no route in the frontend.
 
 ### 2026-10-19 — Admin pages no longer blank on an older backend; Moderators list shows only moderators
 *Status: committed (this commit).*

@@ -35,7 +35,7 @@ export function LiveMemberManagement() {
     [organizationId],
     { ready: !resolving, skip: organizationId === null },
   )
-  const [scope, setScope] = useState<'all' | 'mine'>('all')
+  const [scope, setScope] = useState<'all' | 'mine'>('mine')
   const [search, setSearch] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -111,7 +111,7 @@ export function LiveMemberManagement() {
 
       <PageHeader
         title="Member Management"
-        subtitle="The people in your organization. You only ever see your own organization's members, never anyone else's."
+        subtitle="The people you invited. Switch to Whole organization to see everyone else in your organization; nobody from outside it is ever shown."
         action={
           <button type="button" onClick={() => { setFormError(null); setInviteOpen(true) }} disabled={organizationId === null}
             className="fc-btn-primary !py-2.5 !px-5 text-xs font-bold flex items-center gap-2 disabled:opacity-50">
@@ -210,7 +210,7 @@ export function LiveMemberManagement() {
               {rows.length === 0 && (
                 <div className="text-center py-12 text-ink-faint">
                   <Mail className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                  <p className="text-xs font-semibold">{scope === 'mine' ? 'You have not invited anyone yet.' : 'No members found.'}</p>
+                  <p className="text-xs font-semibold">{scope === 'mine' ? 'You have not invited anyone yet. Use Invite Member, or switch to Whole organization.' : 'No members found.'}</p>
                 </div>
               )}
             </>
