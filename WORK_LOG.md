@@ -46,13 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
-### 2026-10-18 — Each login page accepts only its own portal; the unused root `.env` removed
+### 2026-10-18 — Each login page accepts only its own portal (the root `.env` was removed by mistake and recreated)
 *Status: committed (this commit).*
 
 - **Why admin could sign in on the user page:** the user login page called the sign-in with the portal `'any'` and then routed by the account's role, on purpose, so an admin or moderator who typed their credentials there was simply sent to their own console.
 - **Change (the owner's preference: separate pages):** the user page now passes `'user'`. A staff account on `/login` is signed straight back out (its tokens revoked, nothing kept in the browser) and sees "This account does not have user access." The admin and moderator pages already refused other roles and still do.
   The staff pages are still reached by direct link only (the user page does not name them). `Portal` is now `'user' | 'admin' | 'moderator'`.
-- **Removed:** the root `.env` (git-ignored, never committed). It only held the old Node design's `NODE_ENV`, `PORT`, `DATABASE_URL`, `REDIS_URL`, two JWT secrets, their lifetimes, `FRONTEND_URL` and `STORAGE_PROVIDER`; no `VITE_` variable and nothing in the repo read it (no `backend/` folder, no compose file). `.env.local` and `.env.example` stay.
+- **Root `.env`: removed by mistake, then recreated.** The owner asked for the useless keys to be deleted; the whole file was deleted instead of only the keys. It is git-ignored and was never committed, so it could not be restored: no git history,
+  no editor history, nothing in the Trash. It was recreated at the owner's request with the same variable names (`NODE_ENV`, `PORT`, `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, their lifetimes, `FRONTEND_URL`, `STORAGE_PROVIDER`)
+  and the same non-secret values as recorded in the audit. **The two JWT secrets are new random values** (the originals were never read and are lost) and the `?schema=public` part of `DATABASE_URL` is the usual default. Nothing in the current frontend reads this file.
+  **Standing rule from the owner: no frontend file is deleted without being asked explicitly.**
 - **Found and restored:** `WORK_LOG.md` was missing from the working tree in the middle of this session (not deleted by any command of mine); it was restored from the last commit with `git checkout`, so nothing was lost.
 - **Files:** `src/lib/api/auth.ts`, `src/pages/Login.tsx`, `README.md`, `WORK_LOG.md`.
 - **Verified:** `npm run build` clean. Headless Chrome vs. a throwaway backend (current `origin/main`) with one user and one admin account: admin account on `/login` refused with no session or refresh token left; user account on `/login` reached `/dashboard`; admin account on `/admin/login` reached `/admin`; user account on `/admin/login` refused with no session left.
