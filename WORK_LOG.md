@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-17
+**Last updated:** 2026-10-18
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-18 — Project audit; lint error fixed in the photo editor
+*Status: committed (this commit).*
+
+- **Audit (frontend, backend, keys):** written into §6 above. Highlights: no API key, token or secret exists in the frontend source, `public/` or `index.html`; the only frontend settings are `VITE_API_URL` and `VITE_USE_API` (public values).
+  The root `.env` is a leftover of the old Node design (a database URL with a development password, Redis URL, two JWT secrets); it is git-ignored and has never been committed, and nothing in the app reads it.
+  Third-party assets loaded at run time: Google Fonts; the Live Enhancement face detector (MediaPipe wasm from jsdelivr at `@latest`, model from storage.googleapis.com); the landing page's "Freedom" section hotlinks a Mux video and two Webflow CDN SVGs that belong to another site.
+- **Fix:** `oxlint` reported an error in `src/pages/user/PhotoEditor.tsx` ("React Hook useVersion cannot be called inside a callback"): the "Use this" handler was named like a hook. Renamed to `switchToVersion`. No behaviour change.
+- **Files:** `src/pages/user/PhotoEditor.tsx`, `WORK_LOG.md`.
+- **Verified:** `npm run build` clean; `npx oxlint src` now shows warnings only.
 
 ### 2026-10-17 — "What was done" panel for an enhancement (stages that ran, stages that could not, HD availability)
 *Status: committed (this commit). Built against backend PR #85 (open, not merged); every field is optional so it also works before that PR.*
@@ -1715,11 +1725,25 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 ---
 
-## 6. Pending / Uncommitted Work (as of 2026-09-17)
+## 6. Pending Work (audit of 2026-10-18)
 
-- Live site untouched (demo build). Next: deploy the backend (api.facecloudai.com), test, then cut the live frontend over in one step. Profile extras, picture and device list are built and wait only for backend PR #67 to be merged.
-- Open product question carried over from the discarded v3 work: the fifth problem/solution pair in the methodology
-  section does not match (problem: inconsistent approval decisions; solution: multi-folder assignment).
+**State:** the frontend working tree is clean and in step with `origin/main`. The live site (www.facecloudai.com) is still the demo build and is untouched.
+
+**Frontend screens still on demo data (no backend call):**
+- Admin (10): Overview, Statistics, Upload Statistics, Audit Logs, System Health, System Monitoring, Image Monitoring, Rejections, Rejection Summary, Security. (Users and Moderators are connected.)
+  The backend already has the endpoints (`/api/system/analytics`, `audit`, `health`, `queue`, `images`, `moderation`, `batches/failed`, `jobs/failed`, `security/alerts`, `security/rules`).
+- Moderator (10): Batches, Identity Review, Members, Moderation Logs, Audit, Image Review, Notification Center, Rejected Images, Reports & Exports, Settings. (Dashboard and Review Queue are connected.)
+  Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
+- Public: the Contact form only simulates sending (`POST /api/contact/` exists, with a spam-trap field).
+- User portal: every screen is connected. Not yet in the UI although the backend has them: Person Folder review queue and move / remove / delete folder / cover photo / history / "find this person"; share-link list and revoke;
+  Delete account; privacy audit trail; processing reports; duplicate results; camera sessions and snapshots for Live Enhancement; events and collages; the enhancement advisor and model comparison.
+- Of 190 backend paths (230 operations) about 70 are called by the frontend today; the rest belong to the items above.
+
+**Backend (separate repository) still to do, as asked of the backend owner:** Phase 1 (blur never rejects, restoration chain) is merged (#85). Not started: Phase 1B (auto = HD and situation-aware by default, defocus deblur, speed and GPU plan),
+Phase 2 (small-face floor, ignored background faces, completely-dark-only rejection, warnings list), Phase 3 (accepted photos enhanced automatically, batch-enhance must skip rejected photos), Phase 4 (groups enhanced per person),
+photo delete clean-up and bulk delete, `best_score` on new-group decisions, an activity `?type=` filter; open PR #84 (readable emailed links in development) and five dependency PRs. Deployment (VPS, HTTPS, Postgres, Redis, Celery, SMTP) is not started.
+
+**Operations:** the development database must be migrated after every backend pull (`manage.py migrate`; the local backend clone is currently 7 commits behind `origin/main`).
 
 ---
 

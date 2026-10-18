@@ -213,7 +213,7 @@ export default function PhotoEditor() {
     }
   }
 
-  const useVersion = async (edit: EditVersion) => {
+  const switchToVersion = async (edit: EditVersion) => {
     try { await activateEdit(edit.id); setVersions(await listEdits(edit.enhancement_result)) }
     catch (caught) { setSaveError(caught instanceof Error ? caught.message : 'Could not switch version.') }
   }
@@ -335,7 +335,7 @@ export default function PhotoEditor() {
                     </div>
                     {edit.status === 'completed' && (
                       <div className="flex items-center gap-3 text-xs font-semibold">
-                        {!edit.is_current && <button type="button" onClick={() => void useVersion(edit)} className="text-accent hover:underline cursor-pointer">Use this</button>}
+                        {!edit.is_current && <button type="button" onClick={() => void switchToVersion(edit)} className="text-accent hover:underline cursor-pointer">Use this</button>}
                         <button type="button" onClick={() => void downloadVersion(edit)} className="text-ink-mute hover:text-ink inline-flex items-center gap-1 cursor-pointer"><Download className="w-3.5 h-3.5" />Download</button>
                         <button type="button" onClick={() => { setDeleteError(''); setToDelete(edit) }} aria-label="Delete this version" className="text-error hover:underline inline-flex items-center gap-1 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
