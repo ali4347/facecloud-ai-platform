@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Batch report: no download button for an upload whose photos were deleted
+*Status: committed (this commit).*
+
+- **Problem (Ali's screenshot of `upload-38-report.pdf`):** Total Images 0, Accepted Uploads 1, empty Status Counts, raw byte count, a table with only a header. Reproduced against a scratch backend: the batch report is built from the photos that still exist, so once an upload's photos are deleted the counts disagree and the table is empty. The PDF itself (ISO timestamp with microseconds, raw sizes and codes, truncated filenames) is drawn by the backend's `reports/renderers.py`, so its wording is a backend fix (prompt for Ijaz).
+- **Frontend:** the Processing page shows the batch "Processing report" button only while the upload still has photos; otherwise it says the photos were deleted so there is nothing left to report. Image reports are unchanged.
+- **Files:** `src/pages/user/ProcessingPage.tsx`.
+- **Verified:** scratch backend with one emptied batch and one batch with two photos: emptied batch shows the sentence and no button, the other shows the format picker; `npx tsc -b`, `npm run build` and the demo-safe build pass (existing lint warnings only).
+
 ### 2026-10-19 — Frontend for backend PRs #95–#103: plans and suspension, own-members scope, member messages, branding, sign-up from an invitation
 *Status: committed (this commit).*
 
@@ -1958,6 +1966,7 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 ## 7. Known Issues / Tech Debt
 
 - **Owner's local backend is behind (2026-10-19).** `~/Projects/FaceCloud_backend` is on `main` at PR #72; PR #86 and later are on origin. The admin screens work but show an "older backend" notice until it is pulled and restarted.
+- **Downloaded reports read badly and can contradict themselves (2026-10-19).** The PDF/JSON/CSV are produced by the backend (`reports/renderers.py`, `reports/services.py`): ISO timestamp, raw byte counts and codes, truncated filenames, and a batch report whose photos were deleted shows Total Images 0 next to Accepted Uploads N. The frontend now hides the batch report button for an emptied upload; the wording and counts are a backend fix (prompt given to Ali for Ijaz).
 - **Two admin pages are not routed on purpose (2026-10-19).** `Rejections.tsx` duplicates Rejection Summary and `SystemHealth.tsx` duplicates System Monitoring; the files are kept.
 
 - **Backend permission gap — a moderator can promote a member to moderator.** Found 2026-10-15 by exercising

@@ -278,7 +278,11 @@ export default function ProcessingPage() {
                 {finished && batchId !== null && (
                   <div className="pt-1">
                     <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint mb-2">Processing report</p>
-                    <ReportButton kind="batch" id={batchId} label={`upload-${batchId}`} />
+                    {data.images.length > 0
+                      ? <ReportButton kind="batch" id={batchId} label={`upload-${batchId}`} />
+                      /* A report lists the photos of the upload. Once they have all been deleted there is nothing to list, and
+                         the file would come out with no rows, so none is offered. */
+                      : <p className="text-[11px] text-ink-mute">The photos of this upload have been deleted, so there is nothing left to report.</p>}
                   </div>
                 )}
 
