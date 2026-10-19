@@ -434,38 +434,41 @@ function SecuritySettingsDemo() {
 }
 
 function NotificationSettings() {
+  /* What each switch really does (from the backend's rules): it decides whether that kind of notification is created at all, in
+     the bell and on the Notifications page. Several kinds share one switch, and two are always shown. Email is a separate switch
+     that sends a copy of the notifications that can be emailed. */
   const items = [
     {
       key: 'photo_accepted' as const,
       label: 'Photo accepted',
-      desc: 'Email confirms enhancement and grouping when your photo passes all checks',
+      desc: 'A photo passed the quality and face checks',
     },
     {
       key: 'photo_rejected' as const,
-      label: 'Photo rejected',
-      desc: 'Email includes the exact rejection reason (e.g. "Image too blurry") so you know what to fix',
+      label: 'Photo rejected, needs review or failed',
+      desc: 'A photo was rejected (with the reason, e.g. "Photo too small"), was sent to a moderator, or could not be processed',
     },
     {
       key: 'batch_upload_finished' as const,
-      label: 'Batch upload finished',
-      desc: 'When a multiple or ZIP upload finishes, get a summary of accepted and rejected counts',
+      label: 'Batches, downloads and reports',
+      desc: 'A multiple or ZIP upload finished, or a ZIP download or a report is ready or failed',
     },
     {
       key: 'person_group_created' as const,
-      label: 'Person group created',
-      desc: 'When a new person folder is created from your photos',
-    },
-    {
-      key: 'email_notifications' as const,
-      label: 'Email notifications',
-      desc: 'Receive all of the above as emails to your registered address',
+      label: 'Person folder created',
+      desc: 'A new Person Folder was started from your photos',
     },
     {
       key: 'live_session_alerts' as const,
-      label: 'Live session alerts',
-      desc: 'Notifications during live camera enhancement sessions',
+      label: 'Live camera alerts',
+      desc: 'Alerts during live camera sessions (shown in the app only, never emailed)',
     },
   ]
+  const emailItem = {
+    key: 'email_notifications' as const,
+    label: 'Also email me',
+    desc: 'Send a copy of the notifications above to your address. Off unless you turn it on, and only sent to a verified address.',
+  }
 
   /* Against the API the switches are the account's real preferences; in the
      demo they stay the decorative defaults they always were. */
@@ -506,26 +509,19 @@ function NotificationSettings() {
       {USE_API && loadError && <p role="alert" className="text-xs text-red-500">{loadError}</p>}
       {USE_API && !prefs && !loadError && <p className="text-xs text-ink-mute">Loading your settings…</p>}
 
-      {/* Rejection email note */}
-      <div
-        className="p-4 rounded-2xl text-xs font-medium space-y-1"
-        style={{
-          background: 'rgba(16,185,129,0.04)',
-          border: '1px solid rgba(16,185,129,0.15)',
-          color: 'rgb(var(--a-ink-mute))',
-        }}
-      >
-        <p className="font-bold" style={{ color: '#10B981' }}>Rejection emails are enabled by default</p>
-        <p>When one of your photos is rejected, you'll receive an email with the specific reason — such as "Image too blurry" or "No face detected" — so you know exactly what to fix before re-uploading.</p>
+      <div className="p-4 rounded-2xl text-xs font-medium space-y-1 bg-surface-mute border border-line text-ink-mute">
+        <p className="font-bold text-ink">What these switches do</p>
+        <p>Each switch decides whether that kind of notification is made for you at all: in the bell at the top and on your Notifications page. A new upload and the start of its processing are always shown.</p>
+        <p>Emails are separate: they are off by default, and you turn them on with &ldquo;Also email me&rdquo; below.</p>
       </div>
 
-      {items.map((item, i) => (
-        <div key={i} className="flex items-center justify-between py-2 border-b border-line last:border-0">
+      {[...items, { ...emailItem, separate: true }].map((item, i) => (
+        <div key={item.key} className={`flex items-center justify-between gap-4 py-2 border-b border-line last:border-0 ${'separate' in item ? 'mt-4 pt-4 border-t' : ''}`}>
           <div>
             <p className="text-sm font-semibold text-ink">{item.label}</p>
             <p className="text-xs text-ink-mute">{item.desc}</p>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
+          <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
             {USE_API ? (
               <input type="checkbox" className="sr-only peer" aria-label={item.label}
                 checked={prefs ? prefs[item.key] : false} disabled={!prefs}

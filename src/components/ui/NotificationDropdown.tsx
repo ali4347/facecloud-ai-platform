@@ -138,9 +138,12 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
         aria-label="Notifications"
       >
         <Bell className="w-[18px] h-[18px]" />
-        {unreadCount > 0 && (
+        {unreadCount > 0 && (live ? (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[1.1rem] h-[1.1rem] px-1 rounded-full bg-red-500 ring-2 ring-surface text-[10px] font-bold leading-[1.1rem] text-white text-center"
+            aria-label={`${unreadCount} unread`}>{unreadCount > 9 ? '9+' : unreadCount}</span>
+        ) : (
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-surface" />
-        )}
+        ))}
       </button>
 
       {open && (

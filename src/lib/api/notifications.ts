@@ -15,8 +15,9 @@ export interface UserNotification {
   created_at: string
 }
 
-export function listNotifications(page = 1, signal?: AbortSignal): Promise<Page<UserNotification>> {
-  return apiFetch<Page<UserNotification>>(`/api/notifications/?page=${page}`, { signal })
+export function listNotifications(page = 1, signal?: AbortSignal, options: { unreadOnly?: boolean } = {}): Promise<Page<UserNotification>> {
+  const unread = options.unreadOnly ? '&unread=true' : ''
+  return apiFetch<Page<UserNotification>>(`/api/notifications/?page=${page}${unread}`, { signal })
 }
 
 export async function getUnreadCount(signal?: AbortSignal): Promise<number> {

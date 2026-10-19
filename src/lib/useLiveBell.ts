@@ -38,7 +38,16 @@ export function useLiveBell(enabled: boolean) {
     void refreshCount()
     const timer = setInterval(() => void refreshCount(), POLL_MS)
     window.addEventListener(NOTIFICATIONS_CHANGED, refreshCount)
-    return () => { clearInterval(timer); window.removeEventListener(NOTIFICATIONS_CHANGED, refreshCount) }
+    // Coming back to the tab (or the window) asks at once, rather than waiting up to a minute for the next poll.
+    const onVisible = () => { if (document.visibilityState === 'visible') void refreshCount() }
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', onVisible)
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener(NOTIFICATIONS_CHANGED, refreshCount)
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', onVisible)
+    }
   }, [enabled, refreshCount])
 
   const loadItems = useCallback(async () => {
