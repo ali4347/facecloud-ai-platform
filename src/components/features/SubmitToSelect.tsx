@@ -1,5 +1,5 @@
 import { Users } from 'lucide-react'
-import type { Organization } from '../../lib/api/organizations'
+import { displayName, type Organization } from '../../lib/api/organizations'
 
 interface SubmitToSelectProps {
   teams: Organization[]
@@ -17,9 +17,9 @@ export function SubmitToSelect({ teams, value, onChange }: SubmitToSelectProps) 
       <select id="submit-to" value={value ?? ''} onChange={e => onChange(e.target.value ? Number(e.target.value) : undefined)}
         className="fc-input text-ink" style={{ background: 'rgb(var(--a-surface))', border: '1px solid rgb(var(--a-line))' }}>
         <option value="">My workspace (only I can see these photos)</option>
-        {teams.map(t => <option key={t.id} value={t.id}>{t.name} (team)</option>)}
+        {teams.map(t => <option key={t.id} value={t.id}>{displayName(t)} (team)</option>)}
       </select>
-      {team && <p className="text-[10px] text-ink-mute leading-relaxed">The moderators of {team.name} will be able to see these photos and review them.</p>}
+      {team && <p className="text-[10px] text-ink-mute leading-relaxed">The moderators of {displayName(team)} will be able to see these photos and review them.</p>}
     </div>
   )
 }

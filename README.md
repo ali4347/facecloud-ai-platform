@@ -129,6 +129,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/about`, `/contact` (public pages)
 * `/roles/moderator` (Moderator role guide — what the role can and cannot do, how a review works, build status; an information page, not the portal; linked from the navbar as "Moderator" and from the Moderator Review card on the landing page)
 * `/login` (User Login: for user accounts only; an admin or moderator account is refused here and signs in on its own page)
+* `/register?invitation=<token>` (the same page, opened from an organization invitation: the invited email is locked and one step creates the account and joins the organization)
 * `/register` (User Registration — full name, email, password; creates a real pending account when `VITE_USE_API=true`)
 * `/signup` (Redirects to `/register`)
 * `/verify-email` (Email verification. With the API on it opens from the emailed link `/verify-email?registration_id=…&token=…`, confirms it with the backend, then sends the person to `/login`; the demo build keeps a mock button)
@@ -177,7 +178,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/logs` (Redirects to `/admin/audit-logs`)
 * Top bar (admin): search jumps to a screen or finds an account (opens Manage Users filtered to it); the bell lists open security alerts and services that are not operational.
 
-* `/dashboard/organization` (My Organization: for the owner of an organization only, listed in the sidebar when you own one. People, moderators, invitations, recent activity, and an export of the organization's data)
+* `/dashboard/organization` (My Organization: for the owner of an organization only, listed in the sidebar when you own one. People and plan seats, roles, invitations, what moderators see, branding (name, colour, logo), recent activity, and an export of the organization's data)
 
 ### Moderator Routes (under `/moderator`)
 * `/moderator` (Dashboard: overdue and due-soon counts against the review deadline, unassigned work, oldest waiting review, and per-moderator performance over a 7/30/90-day window)
@@ -320,7 +321,7 @@ FaceCloud is **multi-tenant**: one deployment serves many organizations, and eac
 | Role | Belongs to | What they can do |
 |:-----|:-----------|:-----------------|
 | Platform administrator (FaceCloud staff) | The platform | Creates organizations and accounts, sees platform-wide statistics, security alerts and system health. Never part of a customer's organization. |
-| Organization owner | One organization | Invites moderators and members, changes roles, deactivates or removes people, sees the whole organization's activity and exports its data, from the My Organization page. |
+| Organization owner | One organization | Invites moderators and members, changes roles, deactivates or removes people, chooses what moderators see, sets the organization's name, colour and logo, sees the whole organization's activity and exports its data, from the My Organization page. |
 | Moderator | One organization | Reviews uncertain photos, fixes person folders, manages batches and members, makes reports. Sees that organization only. |
 | Member | One or more organizations | Uploads photos, optionally "Submit to" the team so its moderators can review them. Always sees their own workspace. |
 
@@ -338,7 +339,9 @@ FaceCloud is **multi-tenant**: one deployment serves many organizations, and eac
 
 **Before a customer's real faces go in:** face grouping needs each member's recorded consent (the consent card in My Images); photos are stored encrypted; a signed agreement should state what is stored, for how long, who in the organization can see it, and how to export or delete it.
 
-**Not built yet (say so to a customer)**: billing and plan limits (the plan is only a label today); per-organization quotas, logo and colours; single sign-on; deleting an organization and all its data in one step (an export exists); telling a member what a moderator decided about their photo; a moderator seeing only the members they added (today every moderator sees the whole organization).
+**Built since the first version**: plan seat limits (free 1 moderator and 10 members, team 5 and 100, enterprise unlimited; the administrator sets the plan by hand), suspending an organization, a moderator seeing only the members they invited (plus members nobody invited), telling a member what a moderator decided, organization name, colour and logo, and signing up straight from an invitation.
+
+**Not built yet (say so to a customer)**: payment and invoicing (there is no billing); per-organization storage quotas; single sign-on; deleting an organization and all its data in one step (an export exists; the removal design is written and waits for a decision).
 
 ---
 

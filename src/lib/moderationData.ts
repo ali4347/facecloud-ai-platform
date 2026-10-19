@@ -147,7 +147,7 @@ function mockPerformance(days: number): ModeratorPerformance {
  * works in one at a time: the choice is kept in this browser (per person) and changing it makes every moderator screen
  * ask again for the new team's data.
  */
-interface Team { id: number; name: string }
+export interface Team { id: number; name: string; brandName: string; accent: string; logoUrl: string | null; scope: 'own_members' | 'organization' | null }
 const teamsCache = personCache<Team[]>()
 const CHOICE_EVENT = 'fc:moderator-organization'
 const choiceKey = () => `facecloud:moderator-organization:${getSession()?.email ?? ''}`
@@ -164,18 +164,18 @@ export function chooseModeratorOrganization(id: number): void {
   window.dispatchEvent(new Event(CHOICE_EVENT))
 }
 
-export function useModeratorOrganization() {
+export function useModeratorOrganization(enabled = true) {
   const [teams, setTeams] = useState<Team[]>(teamsCache.get() ?? [])
   const [organizationId, setOrganizationId] = useState<number | null>(() => { const known = teamsCache.get(); return known ? chosenTeam(known) : null })
-  const [resolving, setResolving] = useState(USE_API && teamsCache.get() === undefined)
+  const [resolving, setResolving] = useState(USE_API && enabled && teamsCache.get() === undefined)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!USE_API || teamsCache.get() !== undefined) return
+    if (!USE_API || !enabled || teamsCache.get() !== undefined) return
     let active = true
     listModeratorTeams()
       .then(found => {
-        const list = found.map(o => ({ id: o.id, name: o.name }))
+        const list: Team[] = found.map(o => ({ id: o.id, name: o.name, brandName: o.brand_name?.trim() || o.name, accent: o.brand_accent ?? '', logoUrl: o.logo_url ?? null, scope: o.moderator_data_scope ?? null }))
         teamsCache.set(list)
         if (!active) return
         setTeams(list)
@@ -184,7 +184,7 @@ export function useModeratorOrganization() {
       .catch(caught => active && setError(messageFor(caught)))
       .finally(() => active && setResolving(false))
     return () => { active = false }
-  }, [])
+  }, [enabled])
 
   useEffect(() => {
     const onChoice = () => setOrganizationId(chosenTeam(teamsCache.get() ?? []))
@@ -192,7 +192,8 @@ export function useModeratorOrganization() {
     return () => window.removeEventListener(CHOICE_EVENT, onChoice)
   }, [])
 
-  return { organizationId, teams, resolving, error }
+  const team = teams.find(t => t.id === organizationId) ?? null
+  return { organizationId, team, teams, resolving, error }
 }
 
 /** A moderator resource: the shared loader, plus the organization it needs first. */

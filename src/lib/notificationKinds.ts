@@ -1,5 +1,5 @@
 import {
-  AlertTriangle, Camera, Download, FileText, Hourglass, Image as ImageIcon, Layers, Upload, Users, XCircle, Bell,
+  AlertTriangle, Camera, Download, ShieldAlert, ShieldCheck, FileText, Hourglass, Image as ImageIcon, Layers, Upload, Users, XCircle, Bell,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -14,6 +14,8 @@ const KINDS: Record<string, NotificationKind> = {
   photo_rejected: { label: 'Photo', icon: XCircle },
   photo_needs_review: { label: 'Photo', icon: AlertTriangle },
   photo_failed: { label: 'Photo', icon: AlertTriangle },
+  photo_review_approved: { label: 'Moderator', icon: ShieldCheck },
+  photo_review_rejected: { label: 'Moderator', icon: ShieldAlert },
   report_ready: { label: 'Report', icon: FileText },
   report_failed: { label: 'Report', icon: FileText },
   download_ready: { label: 'Download', icon: Download },

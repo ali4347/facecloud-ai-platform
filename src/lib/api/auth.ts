@@ -88,6 +88,38 @@ export async function register(input: {
 }
 
 /**
+ * Sign up straight from an organization invitation, in one step.
+ *
+ * The invitation was sent to that mailbox, so the address counts as verified: the account is created verified, the
+ * invitation is accepted and the person is signed in, all together. The email must be the invited one. A moderator
+ * invitation lands in the moderator portal (`dashboard: "moderator"`), whose tokens and session are kept apart from the
+ * user portal's, so they are stored under that portal. A wrong or used token answers the same single 404 sentence as the
+ * preview; show it as it is.
+ */
+export async function registerFromInvitation(input: {
+  fullName: string; email: string; password: string; passwordConfirm: string; invitationToken: string
+}): Promise<SignedIn> {
+  const data = await apiFetch<TokenPayload>('/api/auth/register/', {
+    body: {
+      full_name: input.fullName,
+      email: input.email,
+      password: input.password,
+      password_confirm: input.passwordConfirm,
+      invitation_token: input.invitationToken,
+    },
+    anonymous: true,
+  })
+  if (!data.access) throw new ApiError(0, 'The account was created, but you were not signed in. Please sign in.')
+  const portal = (data.dashboard ?? data.role ?? 'user') as Role
+  setAccessToken(data.access, portal)
+  if (data.refresh) setRefreshToken(data.refresh, portal)
+  const user = data.user ?? { email: input.email }
+  const name = displayNameOf(user)
+  saveSession({ role: portal, email: user.email, name, initials: initialsFrom(name), emailVerified: true })
+  return { kind: 'signed-in', role: portal, dashboard: portal, user }
+}
+
+/**
  * Finish registration with the two values from the emailed link. The account
  * exists afterwards. Opening a link that was already used answers success too
  * (without saying whose account it is), so both cases read as "go and sign in".

@@ -7,6 +7,9 @@ import {
   HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck
 } from 'lucide-react'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
+import { useModeratorOrganization } from '../../lib/moderationData'
+import { AuthedImage } from '../ui/AuthedImage'
+import { getOrgLogoBlob } from '../../lib/api/organizations'
 import { cn } from '../../lib/utils'
 import { useUserDashboard, formatBytes } from '../../lib/imageData'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
@@ -87,6 +90,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
   // A person who owns an organization also gets its management page, between Downloads and Settings.
   const { owned } = useOwnedOrganizations(role === 'user')
+  const { team } = useModeratorOrganization(role === 'moderator')
   const nav = role === 'user' && owned.length > 0
     ? [...userNav.slice(0, -1), { label: 'My Organization', icon: Building2, to: '/dashboard/organization' }, userNav[userNav.length - 1]]
     : navByRole[role]
@@ -135,8 +139,17 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
         </div>
 
         <div className="mt-3 pt-3 border-t border-line-soft">
-          <p className="text-[13px] font-semibold text-ink leading-tight">{cfg.label}</p>
-          <p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.tagline}</p>
+          {role === 'moderator' && team ? (
+            <div className="flex items-center gap-2.5" style={team.accent ? { borderLeft: `3px solid ${team.accent}`, paddingLeft: 10 } : undefined}>
+              {team.logoUrl && <AuthedImage load={signal => getOrgLogoBlob(team.logoUrl as string, signal)} cacheKey={`team-logo-${team.id}-${team.logoUrl}`} alt="" box={28} rounded="rounded-lg" className="object-contain !border-0" />}
+              <div className="min-w-0"><p className="text-[13px] font-semibold text-ink leading-tight truncate">{team.brandName}</p><p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.label}</p></div>
+            </div>
+          ) : (
+            <>
+              <p className="text-[13px] font-semibold text-ink leading-tight">{cfg.label}</p>
+              <p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.tagline}</p>
+            </>
+          )}
         </div>
       </div>
 

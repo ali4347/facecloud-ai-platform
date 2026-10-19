@@ -30,6 +30,8 @@ export interface ModeratorReview {
   sla_breached_at: string | null
   decision_reason: string
   decision_notes: string
+  /** What the moderator told the member about this decision (the only free text the member sees). */
+  message_to_member?: string
   decided_by: ReviewPerson | null
   decided_at: string | null
   created_at: string
@@ -165,7 +167,7 @@ export type DecisionAction = 'approve' | 'reject' | 'correct' | 'keep_in_review'
  */
 export function decideReview(
   organizationId: number, reviewId: number,
-  body: { action: DecisionAction; reason?: string; notes?: string; group_id?: number },
+  body: { action: DecisionAction; reason?: string; notes?: string; message_to_member?: string; group_id?: number },
 ): Promise<ModeratorReview> {
   return apiFetch<ModeratorReview>(`${base(organizationId)}/reviews/${reviewId}/decision/`, { body })
 }
@@ -201,7 +203,7 @@ export function releaseReview(organizationId: number, reviewId: number): Promise
  */
 export function bulkDecide(
   organizationId: number,
-  body: { review_ids: number[]; action: 'approve' | 'reject' | 'escalate'; reason?: string; notes?: string },
+  body: { review_ids: number[]; action: 'approve' | 'reject' | 'escalate'; reason?: string; notes?: string; message_to_member?: string },
 ): Promise<BulkResult> {
   return apiFetch<BulkResult>(`${base(organizationId)}/reviews/bulk-decision/`, { body })
 }

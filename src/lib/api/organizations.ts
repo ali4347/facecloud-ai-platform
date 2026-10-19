@@ -1,5 +1,12 @@
 import { apiFetch, apiFetchBlob } from './client'
 
+/** How many moderators and plain members a plan allows; null means unlimited. */
+export interface PlanLimits { moderators: number | null; members: number | null }
+/** Seats in use: active people plus invitations still waiting. */
+export interface PlanUsage { moderators: number; members: number }
+/** Who sees what: a moderator sees only the members they invited and those nobody invited, or the whole organization. */
+export type ModeratorDataScope = 'own_members' | 'organization'
+
 export interface Organization {
   id: number
   name: string
@@ -9,7 +16,18 @@ export interface Organization {
   is_personal: boolean
   created_at: string
   updated_at: string
+  /** Missing on a backend older than the tenancy work. */
+  moderator_data_scope?: ModeratorDataScope
+  /** What members see instead of `name` when it is set. */
+  brand_name?: string
+  /** `#rrggbb` or empty. */
+  brand_accent?: string
+  /** A path that needs the Authorization header (fetch it as a blob), or null when there is no logo. */
+  logo_url?: string | null
 }
+
+/** The name members should see for an organization. */
+export const displayName = (o: Pick<Organization, 'name' | 'brand_name'>) => o.brand_name?.trim() || o.name
 
 /** An organization as its own members see it: the caller's role there and what the caller may do (advisory; the server enforces it). */
 export interface MyOrganization extends Organization {
@@ -152,4 +170,48 @@ export function getOrgExport(organizationId: number, exportId: number, signal?: 
 
 export function downloadOrgExport(organizationId: number, exportId: number): Promise<Blob> {
   return apiFetchBlob(`/api/organizations/${organizationId}/export/${exportId}/download/`)
+}
+
+// ── One organization in full (owner and moderators), the owner's edits, and branding ─────────────────────────────
+
+export interface OrganizationDetail extends MyOrganization {
+  owner?: { id: number; username: string } | null
+  member_count?: number
+  moderator_count?: number
+  limits?: PlanLimits
+  usage?: PlanUsage
+}
+
+export function getOrganization(organizationId: number, signal?: AbortSignal): Promise<OrganizationDetail> {
+  return apiFetch<OrganizationDetail>(`/api/organizations/${organizationId}/`, { signal })
+}
+
+/** The owner's own edits. The plan and the status belong to the FaceCloud administrator (the backend answers 403). */
+export function updateOwnOrganization(
+  organizationId: number,
+  patch: { name?: string; moderator_data_scope?: ModeratorDataScope; brand_name?: string; brand_accent?: string },
+): Promise<OrganizationDetail> {
+  return apiFetch<OrganizationDetail>(`/api/organizations/${organizationId}/`, { method: 'PATCH', body: patch })
+}
+
+/** PNG or JPEG, at most 1 MB; the server re-encodes it as a PNG of at most 512 pixels. */
+export function uploadOrgLogo(organizationId: number, file: File): Promise<OrganizationDetail> {
+  const formData = new FormData()
+  formData.append('logo', file)
+  return apiFetch<OrganizationDetail>(`/api/organizations/${organizationId}/logo/`, { method: 'PUT', formData })
+}
+
+export function deleteOrgLogo(organizationId: number): Promise<unknown> {
+  return apiFetch(`/api/organizations/${organizationId}/logo/`, { method: 'DELETE' })
+}
+
+/** The logo is never public: it is fetched with the token and shown from an object URL. */
+export function getOrgLogoBlob(logoUrl: string, signal?: AbortSignal): Promise<Blob> {
+  return apiFetchBlob(logoUrl, { signal })
+}
+
+/** True when an error from the API is the "plan limit reached" refusal, whose sentence is meant to be shown as it is. */
+export function isPlanLimit(error: unknown): boolean {
+  const body = (error as { body?: { code?: string } } | null)?.body
+  return body?.code === 'plan_limit_reached'
 }

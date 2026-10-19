@@ -5,16 +5,21 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { AsyncGate } from '../../components/admin/AsyncGate'
-import { createAdminOrganization, type OrganizationPlan } from '../../lib/api/adminOrganizations'
+import { createAdminOrganization, updateAdminOrganization, type AdminOrganization, type OrganizationPlan } from '../../lib/api/adminOrganizations'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { listAdminUsersPage, type AdminUser } from '../../lib/api/adminUsers'
 import { USE_API } from '../../lib/api/config'
-import type { Organization } from '../../lib/api/organizations'
+import type { ModeratorDataScope, PlanLimits, PlanUsage } from '../../lib/api/organizations'
 import { useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { messageFor } from '../../lib/useApiResource'
 import { formatDate } from '../../lib/utils'
 
 const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
 const PLANS: OrganizationPlan[] = ['free', 'team', 'enterprise']
+
+/** "2 of 5", or just "2" when the plan has no limit. */
+const seats = (used: number | undefined, limit: number | null | undefined) => (used === undefined ? '—' : limit === null || limit === undefined ? String(used) : `${used} of ${limit}`)
+const full = (usage?: PlanUsage, limits?: PlanLimits) => Boolean(usage && limits && limits.moderators !== null && usage.moderators >= limits.moderators)
 
 /** Pick the account that will own the organization: type to search the accounts on the server, then choose one. */
 function OwnerPicker({ value, onChange }: { value: AdminUser | null; onChange: (user: AdminUser | null) => void }) {
@@ -68,7 +73,22 @@ export default function Organizations() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [created, setCreated] = useState<string | null>(null)
-  const [addedInDemo, setAddedInDemo] = useState<Organization[]>([])
+  const [addedInDemo, setAddedInDemo] = useState<AdminOrganization[]>([])
+  const [editing, setEditing] = useState<AdminOrganization | null>(null)
+  const [suspending, setSuspending] = useState<AdminOrganization | null>(null)
+  const [demoPatch, setDemoPatch] = useState<Record<number, Partial<AdminOrganization>>>({})
+  const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
+  const [working, setWorking] = useState(false)
+  const [form, setForm] = useState({ name: '', plan: 'free' as OrganizationPlan, scope: 'own_members' as ModeratorDataScope, reason: '' })
+
+  const apply = async (org: AdminOrganization, patch: Parameters<typeof updateAdminOrganization>[1], done: string) => {
+    setWorking(true); setNotice(null)
+    try {
+      if (USE_API) { await updateAdminOrganization(org.id, patch); state.reload() }
+      else setDemoPatch(p => ({ ...p, [org.id]: { ...p[org.id], ...(patch.name ? { name: patch.name } : {}), ...(patch.plan ? { plan: patch.plan } : {}), ...(patch.status ? { status: patch.status } : {}), ...(patch.moderator_data_scope ? { moderator_data_scope: patch.moderator_data_scope } : {}) } }))
+      setNotice({ text: done }); setEditing(null); setSuspending(null)
+    } catch (caught) { setNotice({ text: messageFor(caught), bad: true }) } finally { setWorking(false) }
+  }
   const [showPersonal, setShowPersonal] = useState(false)
 
   const submit = async (e: React.FormEvent) => {
@@ -93,7 +113,7 @@ export default function Organizations() {
 
       <AsyncGate state={state} what="the organizations">
         {all => {
-          const rows = [...addedInDemo, ...all].filter(o => showPersonal || !o.is_personal)
+          const rows = [...addedInDemo, ...all].map(o => ({ ...o, ...demoPatch[o.id] })).filter(o => showPersonal || !o.is_personal)
           const personal = all.filter(o => o.is_personal).length
           return (
             <div className="space-y-5">
@@ -101,6 +121,10 @@ export default function Organizations() {
                 <div role="status" className="p-3 rounded-2xl text-xs bg-[#10B981]/10 border border-[#10B981]/25 text-[#10B981] flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" /> “{created}” was created{USE_API ? '' : ' (demo — nothing is saved)'}. Add its moderators from Moderators → Create moderator.
                 </div>
+              )}
+
+              {notice && (
+                <div role={notice.bad ? 'alert' : 'status'} className={`p-3 rounded-2xl text-xs border ${notice.bad ? 'bg-[#EF4444]/10 border-[#EF4444]/25 text-[#F87171]' : 'bg-[#10B981]/10 border-[#10B981]/25 text-[#10B981]'}`}>{notice.text}</div>
               )}
 
               {formOpen && (
@@ -144,15 +168,27 @@ export default function Organizations() {
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full fc-table">
-                      <thead><tr><th>Organization</th><th>Plan</th><th>Status</th><th>Created</th></tr></thead>
+                      <thead><tr><th>Organization</th><th>Owner</th><th>People</th><th>Moderators</th><th>Plan</th><th>Status</th><th>Actions</th></tr></thead>
                       <tbody>
                         {rows.map(o => (
                           <tr key={o.id}>
                             <td><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center"><Building2 className="w-4 h-4 text-accent" /></div>
-                              <div><p className="text-sm font-semibold text-ink">{o.name}</p><p className="text-[10px] text-ink-faint">{o.is_personal ? 'Personal workspace' : o.slug}</p></div></div></td>
+                              <div><p className="text-sm font-semibold text-ink">{o.name}</p><p className="text-[10px] text-ink-faint">{o.is_personal ? 'Personal workspace' : `${o.slug} · created ${formatDate(o.created_at)}`}</p></div></div></td>
+                            <td className="text-sm text-ink-soft">{o.owner?.username ?? '—'}</td>
+                            <td className="text-sm text-ink-soft">{o.member_count ?? '—'}</td>
+                            <td className="text-sm text-ink-soft">{seats(o.usage?.moderators, o.limits?.moderators)}{full(o.usage, o.limits) && <span className="ml-1.5 text-[10px] font-semibold text-[#F59E0B]">full</span>}</td>
                             <td className="text-sm text-ink-soft capitalize">{o.plan}</td>
-                            <td><StatusBadge status={o.status === 'active' ? 'success' : 'warning'} label={o.status === 'active' ? 'Active' : o.status} /></td>
-                            <td className="text-sm text-ink-mute">{formatDate(o.created_at)}</td>
+                            <td><StatusBadge status={o.status === 'active' ? 'success' : 'warning'} label={o.status === 'active' ? 'Active' : 'Suspended'} /></td>
+                            <td>
+                              {o.is_personal ? <span className="text-[10px] text-ink-faint">—</span> : (
+                                <div className="flex gap-2">
+                                  <button type="button" onClick={() => { setForm({ name: o.name, plan: o.plan as OrganizationPlan, scope: o.moderator_data_scope ?? 'own_members', reason: '' }); setNotice(null); setEditing(o) }} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] cursor-pointer">Edit</button>
+                                  {o.status === 'active'
+                                    ? <button type="button" onClick={() => { setForm(f => ({ ...f, reason: '' })); setNotice(null); setSuspending(o) }} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] !text-[#F59E0B] cursor-pointer">Suspend</button>
+                                    : <button type="button" onClick={() => void apply(o, { status: 'active' }, `${o.name} is active again.`)} disabled={working} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] !text-[#10B981] cursor-pointer disabled:opacity-50">Reactivate</button>}
+                                </div>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -164,6 +200,34 @@ export default function Organizations() {
           )
         }}
       </AsyncGate>
+
+      {editing && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/70 backdrop-blur-[2px]" onMouseDown={e => { if (e.target === e.currentTarget && !working) setEditing(null) }}>
+          <form role="dialog" aria-modal="true" aria-label={`Edit ${editing.name}`} className="w-full max-w-md rounded-2xl bg-surface border border-line shadow-soft-lg p-6 space-y-4"
+            onSubmit={e => { e.preventDefault(); const patch: Parameters<typeof updateAdminOrganization>[1] = {}; if (form.name.trim() !== editing.name) patch.name = form.name.trim(); if (form.plan !== editing.plan) patch.plan = form.plan; if (form.scope !== (editing.moderator_data_scope ?? 'own_members')) patch.moderator_data_scope = form.scope; if (form.reason.trim()) patch.reason = form.reason.trim(); if (Object.keys(patch).filter(k => k !== 'reason').length === 0) { setEditing(null); return } void apply(editing, patch, `${editing.name} was updated.`) }}>
+            <h2 className="text-base font-bold text-ink">Edit {editing.name}</h2>
+            <div className="space-y-1.5"><label htmlFor="edit-org-name" className={labelClass}>Name</label><input id="edit-org-name" className="fc-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} maxLength={150} required /></div>
+            <div className="space-y-1.5"><label htmlFor="edit-org-plan" className={labelClass}>Plan</label>
+              <select id="edit-org-plan" className="fc-input text-ink" value={form.plan} onChange={e => setForm(f => ({ ...f, plan: e.target.value as OrganizationPlan }))}>{PLANS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}</select>
+              <p className="text-[10px] text-ink-faint">The plan sets how many moderators and members it may have. Nobody is removed if it goes down.</p></div>
+            <div className="space-y-1.5"><label htmlFor="edit-org-scope" className={labelClass}>What a moderator sees</label>
+              <select id="edit-org-scope" className="fc-input text-ink" value={form.scope} onChange={e => setForm(f => ({ ...f, scope: e.target.value as ModeratorDataScope }))}>
+                <option value="own_members">Only the members they invited, and members nobody invited</option>
+                <option value="organization">Every member of the organization</option></select></div>
+            <div className="space-y-1.5"><label htmlFor="edit-org-reason" className={labelClass}>Reason (kept in the audit trail)</label><input id="edit-org-reason" className="fc-input" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} maxLength={500} /></div>
+            <div className="flex justify-end gap-2 pt-1"><GradientButton type="button" variant="secondary" onClick={() => setEditing(null)} disabled={working}>Cancel</GradientButton><GradientButton type="submit" disabled={working}>{working ? 'Saving…' : 'Save changes'}</GradientButton></div>
+          </form>
+        </div>
+      )}
+
+      {suspending && (
+        <ConfirmDialog title={`Suspend ${suspending.name}`} confirmLabel="Suspend" busyLabel="Suspending…" danger busy={working} onCancel={() => setSuspending(null)}
+          onConfirm={() => void apply(suspending, { status: 'suspended', ...(form.reason.trim() ? { reason: form.reason.trim() } : {}) }, `${suspending.name} is suspended.`)}>
+          <p>Nothing is deleted. Until you reactivate it, its owner, moderators and members are told the organization is suspended and cannot use it or upload to it. Their own personal workspaces keep working.</p>
+          <label htmlFor="suspend-reason" className="block text-xs font-semibold text-ink pt-1">Reason (kept in the audit trail)</label>
+          <input id="suspend-reason" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} maxLength={500} className="fc-input" />
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

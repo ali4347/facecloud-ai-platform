@@ -18,6 +18,7 @@ import {
 } from '../../lib/api/moderation'
 import { useModeratorOrganization } from '../../lib/moderationData'
 import { ReviewThumbnail } from '../../components/features/ReviewThumbnail'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { formatDateTime } from '../../lib/utils'
 import { QUEUE_REFRESH_MS, getQueueAutoRefresh } from '../../lib/moderatorPrefs'
 import { AlertTriangle, Check, Clock, Eye, Loader2, Lock, RefreshCw, Unlock, X } from 'lucide-react'
@@ -102,13 +103,16 @@ export default function ReviewQueue() {
     return true
   }
 
-  const runBulk = async (action: BulkAction) => {
+  const [bulkAsk, setBulkAsk] = useState<'approve' | 'reject' | null>(null)
+  const [bulkMessage, setBulkMessage] = useState('')
+
+  const runBulk = async (action: BulkAction, messageToMember = '') => {
     if (!guard() || organizationId === null) return
     setBusy(true)
     setNotice(null)
     try {
       const result = await bulkDecide(organizationId, {
-        review_ids: [...selected], action,
+        review_ids: [...selected], action, ...(messageToMember.trim() ? { message_to_member: messageToMember.trim() } : {}),
       })
       // 200 does not mean everything went through: rows already decided or held
       // by another moderator come back under `failed`, so report both numbers.
@@ -237,13 +241,13 @@ export default function ReviewQueue() {
           </span>
           <div className="flex gap-2 ml-auto">
             <button
-              type="button" disabled={busy} onClick={() => runBulk('approve')}
+              type="button" disabled={busy} onClick={() => { if (guard()) { setBulkMessage(''); setBulkAsk('approve') } }}
               className="px-3 py-1.5 rounded-xl font-bold bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/25 hover:bg-[#10B981]/20 transition-colors cursor-pointer disabled:opacity-50"
             >
               <Check className="w-3.5 h-3.5 inline mr-1" />Approve
             </button>
             <button
-              type="button" disabled={busy} onClick={() => runBulk('reject')}
+              type="button" disabled={busy} onClick={() => { if (guard()) { setBulkMessage(''); setBulkAsk('reject') } }}
               className="px-3 py-1.5 rounded-xl font-bold bg-[#EF4444]/10 text-[#F87171] border border-[#EF4444]/25 hover:bg-[#EF4444]/20 transition-colors cursor-pointer disabled:opacity-50"
             >
               <X className="w-3.5 h-3.5 inline mr-1" />Reject
@@ -393,6 +397,17 @@ export default function ReviewQueue() {
           </div>
         )}
       </ChartCard>
+      {bulkAsk && (
+        <ConfirmDialog title={`${bulkAsk === 'approve' ? 'Approve' : 'Reject'} ${selected.size} review${selected.size === 1 ? '' : 's'}`} confirmLabel={bulkAsk === 'approve' ? 'Approve' : 'Reject'} busyLabel="Saving…"
+          danger={bulkAsk === 'reject'} busy={busy} onCancel={() => setBulkAsk(null)}
+          onConfirm={async () => { const a = bulkAsk; await runBulk(a, bulkMessage); setBulkAsk(null) }}>
+          <p>Each member whose photo is decided is notified.</p>
+          <label htmlFor="bulk-member-message" className="block text-xs font-semibold text-ink pt-1">Message to the members (optional)</label>
+          <textarea id="bulk-member-message" value={bulkMessage} onChange={e => setBulkMessage(e.target.value)} rows={3} maxLength={500}
+            className="w-full rounded-xl border border-line bg-surface-mute p-2 text-sm text-ink" />
+          <p className="text-[11px] text-ink-faint">They see this message only. If you leave it empty each gets a standard sentence for their photo's reason.</p>
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

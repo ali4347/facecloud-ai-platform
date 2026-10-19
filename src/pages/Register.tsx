@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { Mail, Lock, User } from 'lucide-react'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
-import { register, savePendingRegistration } from '../lib/api/auth'
+import { register, registerFromInvitation, savePendingRegistration } from '../lib/api/auth'
+import { previewInvitation, type InvitationPreview } from '../lib/api/organizations'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
 
@@ -14,6 +15,19 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  // Arriving from an organization invitation link: the address is the invited one, and signing up joins the organization too.
+  const invitationToken = useSearchParams()[0].get('invitation') ?? ''
+  const [invite, setInvite] = useState<InvitationPreview | null>(null)
+  const [inviteProblem, setInviteProblem] = useState('')
+  const [emailTaken, setEmailTaken] = useState(false)
+  useEffect(() => {
+    if (!USE_API || !invitationToken) return
+    const controller = new AbortController()
+    previewInvitation(invitationToken, controller.signal)
+      .then(p => { if (!controller.signal.aborted) { setInvite(p); setEmail(p.email) } })
+      .catch(err => { if (!controller.signal.aborted) setInviteProblem(err instanceof ApiError ? err.message : 'This invitation could not be checked.') })
+    return () => controller.abort()
+  }, [invitationToken])
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,6 +38,19 @@ export default function Register() {
     /* With VITE_USE_API=true the account is created for real: the backend emails
        a verification link and the account exists once it is opened. The password
        goes to the backend and nowhere else — it is never kept in the browser. */
+    if (USE_API && invitationToken && invite) {
+      try {
+        const signedIn = await registerFromInvitation({ fullName: name, email: email.trim(), password, passwordConfirm: confirmPassword, invitationToken })
+        navigate(signedIn.dashboard === 'moderator' ? '/moderator' : '/dashboard', { replace: true })
+      } catch (err) {
+        const message = err instanceof ApiError ? err.message : 'Could not create the account. Please try again.'
+        setEmailTaken(err instanceof ApiError && /already|exists|registered|taken/i.test(message))
+        setError(message)
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
     if (USE_API) {
       try {
         const { registrationId, maskedEmail } = await register({
@@ -75,10 +102,21 @@ export default function Register() {
             Create your profile to process faces with AI.
           </p>
 
+          {invite && (
+            <div className="p-3 mb-5 rounded-2xl text-xs" style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.25)', color: 'rgb(var(--a-ink-soft))' }}>
+              You were invited to <strong className="text-ink">{invite.organization_name}</strong> as a {invite.role}. Creating your account here joins it at once; there is no email to confirm.
+            </div>
+          )}
+          {inviteProblem && (
+            <div role="alert" className="p-3 mb-5 rounded-2xl text-xs" style={{ background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.25)', color: '#F87171' }}>
+              {inviteProblem} Ask whoever invited you for a new invitation.
+            </div>
+          )}
           {error && (
             <div className="p-3 mb-5 rounded-2xl text-sm"
               style={{ background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.25)', color: '#F87171' }}>
               {error}
+              {emailTaken && invitationToken && <> <Link to="/login" className="font-semibold underline">Sign in</Link>, then open the invitation link again to join.</>}
             </div>
           )}
 
@@ -102,6 +140,7 @@ export default function Register() {
                     placeholder={f.placeholder}
                     value={f.val}
                     onChange={e => f.set(e.target.value)}
+                    readOnly={f.label === 'Email Address' && invite !== null}
                     className="fc-input !pl-11"
                     required
                   />
@@ -110,7 +149,7 @@ export default function Register() {
             ))}
 
             <button type="submit" className="fc-btn-primary w-full mt-2" disabled={loading}>
-              {loading ? 'Registering…' : 'Create Account'}
+              {loading ? 'Registering…' : invite ? `Create account and join ${invite.organization_name}` : 'Create Account'}
             </button>
           </form>
         </div>

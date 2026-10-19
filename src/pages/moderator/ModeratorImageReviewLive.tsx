@@ -27,8 +27,8 @@ const DEADLINE: Record<string, { label: string; tone: 'error' | 'warning' | 'suc
 }
 
 const DIALOG: Record<Action, { title: string; confirm: string; noun: string; required: boolean }> = {
-  approve: { title: 'Approve this photo', confirm: 'Approve', noun: 'Note (optional)', required: false },
-  reject: { title: 'Reject this photo', confirm: 'Reject', noun: 'Reason (required)', required: true },
+  approve: { title: 'Approve this photo', confirm: 'Approve', noun: 'Internal note (optional, the member does not see it)', required: false },
+  reject: { title: 'Reject this photo', confirm: 'Reject', noun: 'Reason for the record (required, the member does not see it)', required: true },
   keep_in_review: { title: 'Keep in review', confirm: 'Keep in review', noun: 'Note (optional)', required: false },
   escalate: { title: 'Escalate to an administrator', confirm: 'Escalate', noun: 'What should the administrator look at? (optional)', required: false },
 }
@@ -41,6 +41,7 @@ export function LiveImageReview() {
   const [history, setHistory] = useState<OrgAuditEvent[] | null>(null)
   const [action, setAction] = useState<Action | null>(null)
   const [text, setText] = useState('')
+  const [memberMessage, setMemberMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
@@ -65,9 +66,9 @@ export function LiveImageReview() {
     setBusy(true); setFormError(null)
     try {
       if (action === 'escalate') await escalateReview(organizationId, reviewId, text.trim())
-      else await decideReview(organizationId, reviewId, { action, reason: text.trim() })
+      else await decideReview(organizationId, reviewId, { action, reason: text.trim(), ...(memberMessage.trim() ? { message_to_member: memberMessage.trim() } : {}) })
       setNotice({ text: action === 'escalate' ? 'Escalated.' : action === 'keep_in_review' ? 'Kept in review.' : `${action === 'approve' ? 'Approved' : 'Rejected'}.` })
-      setAction(null); setText(''); reload()
+      setAction(null); setText(''); setMemberMessage(''); reload()
     } catch (caught) { setFormError(messageFor(caught)) } finally { setBusy(false) }
   }
 
@@ -133,6 +134,7 @@ export function LiveImageReview() {
                     <div><dt className="text-ink-faint">Due</dt><dd className="font-semibold text-ink">{review.due_at ? formatDateTime(review.due_at) : '—'}</dd></div>
                     <div><dt className="text-ink-faint">Assigned to</dt><dd className="font-semibold text-ink">{review.assigned_moderator?.username ?? 'Nobody'}</dd></div>
                     {review.decided_at && <div className="col-span-2"><dt className="text-ink-faint">Decision</dt><dd className="font-semibold text-ink">{statusLabel(review.status)} by {review.decided_by?.username ?? 'a moderator'}, {formatDateTime(review.decided_at)}{review.decision_reason ? ` — ${review.decision_reason}` : ''}</dd></div>}
+                    {review.decided_at && review.message_to_member && <div className="col-span-2"><dt className="text-ink-faint">Message the member received</dt><dd className="text-ink">“{review.message_to_member}”</dd></div>}
                   </dl>
 
                   {open ? (
@@ -140,10 +142,10 @@ export function LiveImageReview() {
                       <div className="flex flex-wrap gap-2">
                         <button type="button" disabled={busy} onClick={() => organizationId !== null && run(() => (review.is_claimed ? releaseReview(organizationId, reviewId) : claimReview(organizationId, reviewId)), review.is_claimed ? 'Released to the queue.' : 'You took this review.')}
                           className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold disabled:opacity-50">{review.is_claimed ? <><Unlock className="w-3.5 h-3.5" /> Release</> : <><Lock className="w-3.5 h-3.5" /> Take it</>}</button>
-                        <button type="button" disabled={busy} onClick={() => { setText(''); setFormError(null); setAction('approve') }} className="fc-btn-primary !py-2 !px-3 text-[11px] font-bold"><Check className="w-3.5 h-3.5" /> Approve</button>
-                        <button type="button" disabled={busy} onClick={() => { setText(''); setFormError(null); setAction('reject') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold !text-red-400"><X className="w-3.5 h-3.5" /> Reject</button>
-                        <button type="button" disabled={busy} onClick={() => { setText(''); setFormError(null); setAction('keep_in_review') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold">Keep in review</button>
-                        <button type="button" disabled={busy} onClick={() => { setText(''); setFormError(null); setAction('escalate') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold"><ShieldAlert className="w-3.5 h-3.5" /> Escalate</button>
+                        <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('approve') }} className="fc-btn-primary !py-2 !px-3 text-[11px] font-bold"><Check className="w-3.5 h-3.5" /> Approve</button>
+                        <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('reject') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold !text-red-400"><X className="w-3.5 h-3.5" /> Reject</button>
+                        <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('keep_in_review') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold">Keep in review</button>
+                        <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('escalate') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold"><ShieldAlert className="w-3.5 h-3.5" /> Escalate</button>
                       </div>
                       <p className="text-[10px] text-ink-faint">A review someone else holds cannot be decided; the message says who.</p>
                     </div>
@@ -181,7 +183,16 @@ export function LiveImageReview() {
         <ConfirmDialog title={DIALOG[action].title} confirmLabel={DIALOG[action].confirm} busyLabel="Saving…" busy={busy} error={formError}
           danger={action === 'reject'} confirmDisabled={DIALOG[action].required && text.trim().length === 0} onCancel={() => setAction(null)} onConfirm={submit}>
           <label htmlFor="review-note" className="block text-xs font-semibold text-ink">{DIALOG[action].noun}</label>
-          <textarea id="review-note" value={text} onChange={e => setText(e.target.value)} rows={3} maxLength={500} className="w-full rounded-xl border border-line bg-surface-mute p-2 text-sm text-ink" />
+          <textarea id="review-note" value={text} onChange={e => setText(e.target.value)} rows={2} maxLength={500} className="w-full rounded-xl border border-line bg-surface-mute p-2 text-sm text-ink" />
+          {(action === 'approve' || action === 'reject') && (
+            <>
+              <label htmlFor="review-member-message" className="block text-xs font-semibold text-ink pt-2">Message to the member (optional)</label>
+              <textarea id="review-member-message" value={memberMessage} onChange={e => setMemberMessage(e.target.value)} rows={2} maxLength={500}
+                placeholder={action === 'reject' ? 'e.g. The face is too small. Please send a closer photo.' : 'e.g. Looks good, thank you.'}
+                className="w-full rounded-xl border border-line bg-surface-mute p-2 text-sm text-ink" />
+              <p className="text-[11px] text-ink-faint">The member is notified of this decision. They see this message only; if you leave it empty they get a standard sentence for the reason.</p>
+            </>
+          )}
         </ConfirmDialog>
       )}
     </div>

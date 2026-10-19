@@ -441,12 +441,12 @@ function NotificationSettings() {
     {
       key: 'photo_accepted' as const,
       label: 'Photo accepted',
-      desc: 'A photo passed the quality and face checks',
+      desc: 'A photo passed the quality and face checks, or a moderator approved it',
     },
     {
       key: 'photo_rejected' as const,
       label: 'Photo rejected, needs review or failed',
-      desc: 'A photo was rejected (with the reason, e.g. "Photo too small"), was sent to a moderator, or could not be processed',
+      desc: 'A photo was rejected (with the reason, e.g. "Photo too small"), was sent to a moderator, could not be processed, or a moderator did not accept it (with their message)',
     },
     {
       key: 'batch_upload_finished' as const,

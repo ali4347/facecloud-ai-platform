@@ -22,7 +22,8 @@ const tone = (status: string) =>
   status === 'active' ? 'bg-[#10B981]/10 text-[#10B981]' : status === 'pending' || status === 'invited' ? 'bg-[#FB923C]/10 text-[#FB923C]' : 'bg-[#EF4444]/10 text-[#EF4444]'
 
 export function LiveMemberManagement() {
-  const { organizationId, resolving, error: organizationError } = useModeratorOrganization()
+  const { organizationId, team, resolving, error: organizationError } = useModeratorOrganization()
+  const ownMembersOnly = team?.scope === 'own_members'
   const state = useApiResource<OrgData>(
     async signal => {
       const [members, invitations] = await Promise.all([
@@ -111,7 +112,7 @@ export function LiveMemberManagement() {
 
       <PageHeader
         title="Member Management"
-        subtitle="The people you invited. Switch to Whole organization to see everyone else in your organization; nobody from outside it is ever shown."
+        subtitle={ownMembersOnly ? 'The people you invited. "Everyone I can see" adds members nobody invited; members another moderator invited are not shown to you.' : 'The people you invited. Switch to Whole organization to see everyone else in your organization; nobody from outside it is ever shown.'}
         action={
           <button type="button" onClick={() => { setFormError(null); setInviteOpen(true) }} disabled={organizationId === null}
             className="fc-btn-primary !py-2.5 !px-5 text-xs font-bold flex items-center gap-2 disabled:opacity-50">
@@ -127,7 +128,7 @@ export function LiveMemberManagement() {
               <Search className="absolute left-3 top-3 w-4 h-4 text-ink-faint" />
               <input type="text" placeholder="Search member by name or email..." value={search} onChange={e => setSearch(e.target.value)} className="fc-input !pl-10 !py-2" />
             </div>
-            {([['all', 'Whole organization'], ['mine', 'Invited by me']] as const).map(([value, label]) => (
+            {([['all', ownMembersOnly ? 'Everyone I can see' : 'Whole organization'], ['mine', 'Invited by me']] as const).map(([value, label]) => (
               <button key={value} type="button" onClick={() => setScope(value)} aria-pressed={scope === value}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border cursor-pointer ${scope === value ? 'bg-accent-tint text-accent border-accent/30' : 'bg-surface-mute text-ink-mute border-line'}`}>
                 {label}

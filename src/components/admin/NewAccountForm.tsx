@@ -4,7 +4,7 @@ import { UserCog, Wand2, X } from 'lucide-react'
 import { GradientButton } from '../ui/GradientButton'
 import { PasswordInput } from '../ui/PasswordInput'
 import { ChartCard } from '../ui/ChartCard'
-import type { Organization } from '../../lib/api/organizations'
+import type { AdminOrganization } from '../../lib/api/adminOrganizations'
 
 export type NewAccountRole = 'user' | 'moderator'
 
@@ -38,7 +38,7 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], onC
   subtitle: string
   roles: NewAccountRole[]
   /** The teams a moderator can be placed in. A moderator must belong to one, so the form insists on a choice. */
-  organizations?: Organization[]
+  organizations?: AdminOrganization[]
   onCreate: (account: NewAccount) => Promise<void> | void
   onCancel: () => void
 }) {
@@ -127,7 +127,10 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], onC
               <>
                 <select id="new-organization" className="fc-input" value={organizationId} onChange={e => setOrganizationId(e.target.value ? Number(e.target.value) : '')} required>
                   <option value="">Choose an organization…</option>
-                  {organizations.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                  {organizations.map(o => {
+                    const seatsFull = Boolean(o.usage && o.limits && o.limits.moderators !== null && o.usage.moderators >= o.limits.moderators)
+                    return <option key={o.id} value={o.id} disabled={seatsFull}>{o.name}{seatsFull ? ' (moderator seats full)' : o.limits?.moderators != null && o.usage ? ` (${o.usage.moderators} of ${o.limits.moderators} moderators)` : ''}</option>
+                  })}
                 </select>
                 <p className="text-[10px] text-ink-faint">The moderator will only see this organization's members and photos.</p>
               </>

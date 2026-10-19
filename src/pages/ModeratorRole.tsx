@@ -87,7 +87,7 @@ const CAPABILITIES = [
   {
     icon: UserCog,
     title: 'Look after members',
-    body: 'Invite normal members, resend or cancel invitations, deactivate or reactivate access, and remove people from the organization.',
+    body: 'Invite normal members, resend or cancel invitations, deactivate or reactivate access, and remove people from the organization. An organization’s plan limits how many people it can have.',
     how: 'Removing someone ends their membership; it does not delete their FaceCloud account.',
   },
   {
@@ -147,6 +147,7 @@ const MATRIX: { ability: string; moderator: boolean; owner: boolean; member: boo
 
 const BOUNDARIES = [
   { icon: Ban, text: 'A moderator cannot see another organization’s data. Anything outside their organization looks like it does not exist.' },
+  { icon: Ban, text: 'By default a moderator sees only the members they invited, plus members nobody invited, so no photo is left without a reviewer. They never see another moderator’s members. An organization’s owner can widen this to everyone, and always sees everyone.' },
   { icon: Ban, text: 'A moderator cannot manage an owner, or another moderator. Only an owner can.' },
   { icon: Ban, text: 'A moderator cannot grant the owner role, and the last owner of an organization can never be demoted, suspended or removed.' },
   { icon: Ban, text: 'A moderator cannot decide a review while someone else holds it — the attempt is refused and says who has it.' },
@@ -174,11 +175,10 @@ const STATUS_COLUMNS = [
     items: [
       'Dashboard — overdue and due-soon counts, unassigned work, team performance',
       'Review queue and the single-review page — filters, deadlines, claiming, bulk decisions, the photo, its measurements and history',
-      'Rejected photos — open them large, with the reasons',
-      'Identity review — person folders and merging two folders of one member',
-      'Member management — invitations, deactivation, removal',
-      'Batches — retry, cancel and reprocess',
-      'Reports and exports, audit history, notifications and settings',
+      'Telling the member what was decided, with a message of your own or a standard sentence',
+      'Seeing only your own members, plus members nobody invited (an organization can widen this to everyone)',
+      'Rejected photos, identity review, decision log, member management, batches, reports, audit history, notifications and settings',
+      'Your organization’s name, logo and colour, set by its owner; an owner’s own page for people, roles, plan seats and data export',
     ],
   },
   {
@@ -186,9 +186,8 @@ const STATUS_COLUMNS = [
     title: 'Next, being designed',
     tone: 'text-[#FB923C] border-[#F97316]/30 bg-[#F97316]/10',
     items: [
-      'Telling a member what the moderator decided about their photo, with a reason they can read',
-      'A moderator seeing only the members they added (plus members nobody added), with owners seeing everyone',
-      'An owner’s own screen for managing their organization',
+      'Removing a whole organization and its data in one safe step (the design is written, waiting for a decision)',
+      'Billing for plans (the seat limits already work; the administrator sets the plan by hand)',
     ],
   },
   {
@@ -199,7 +198,6 @@ const STATUS_COLUMNS = [
       'Choosing the enhancement level when reprocessing a batch',
       'Original-against-enhanced comparison inside a review',
       'Side-by-side comparison of suspected duplicates',
-      'Seat limits and pricing for moderators',
     ],
   },
 ]

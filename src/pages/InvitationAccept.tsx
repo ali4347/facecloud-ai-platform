@@ -73,10 +73,10 @@ export default function InvitationAccept() {
                 <div className="space-y-3 text-xs text-ink-mute">
                   {session
                     ? <p>You are signed in as <strong className="text-ink">{session.email}</strong>, but this invitation is for <strong className="text-ink">{preview.email}</strong>. Sign in with that address to join.</p>
-                    : <p>Sign in, or create an account, with <strong className="text-ink">{preview.email}</strong>. Then open this invitation link again to join.</p>}
+                    : <p>Already have an account? Sign in with <strong className="text-ink">{preview.email}</strong>, then open this link again to join. New here? Create an account: it joins {preview.organization_name} straight away.</p>}
                   <div className="flex gap-3">
                     <Link to="/login" className="fc-btn-primary flex-1 justify-center py-2.5 text-xs font-bold">Sign in</Link>
-                    <Link to="/register" className="fc-btn-secondary flex-1 justify-center py-2.5 text-xs font-bold">Create account</Link>
+                    <Link to={`/register?invitation=${encodeURIComponent(token)}`} className="fc-btn-secondary flex-1 justify-center py-2.5 text-xs font-bold">Create account</Link>
                   </div>
                 </div>
               )}
