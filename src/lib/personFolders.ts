@@ -15,6 +15,8 @@ export interface FolderView {
   id: string
   label: string
   imageCount: number
+  /** Photos that look like this person but are not confirmed yet; undefined when the backend does not say. */
+  suggestedCount?: number
   updatedAt: string
   createdAt: string
   /** Average match confidence as a percentage; null when the backend has none (never invented). */
@@ -29,6 +31,7 @@ export const folderFromApi = (group: IdentityGroup): FolderView => ({
   id: String(group.id),
   label: group.display_name,
   imageCount: group.member_count,
+  suggestedCount: group.suggested_count,
   updatedAt: group.updated_at,
   createdAt: group.created_at,
   confidence: group.matching_confidence,

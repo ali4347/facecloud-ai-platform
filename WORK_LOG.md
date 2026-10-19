@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Backend PR #106 (person-folder grouping): frontend reads `suggested_count`
+*Status: committed (this commit).*
+
+- **Backend result (Ijaz, PR #106, not merged yet):** SFace gets its own thresholds (new folder below 0.30, automatic match from 0.45, merge suggestion 0.40, measured on public LFW photos, not on Ali's), rejected photos stay out of folders, small or unsure face detections no longer open a folder, `regroup_identities` and `cleanup_rejected_folder_members` commands (dry-run by default), folder `confirmed_count` and `suggested_count`, migration `identities/0008`.
+- **Tested here against a throwaway copy of the PR branch:** after granting the face-grouping consent (without it the server never analyses faces), four photos of one face went into **one** folder (`member_count` 4, `confirmed_count` 4, `suggested_count` 0). Not tested: many different people, review cases, the commands.
+- **Frontend:** the Person Folder page uses the folder's own `suggested_count` for "N more suggested, not confirmed yet" and falls back to counting the tiles on a backend without it. Folder cards unchanged.
+- **Files:** `src/lib/api/identities.ts`, `src/lib/personFolders.ts`, `src/pages/user/GroupDetailLive.tsx`.
+- **Verified:** `npx tsc -b`, `npm run build`, demo-safe build.
+- **Waiting on Ali:** merge #106, run `migrate`, then `regroup_identities --owner <id>` (dry-run, then `--apply`). Check the thresholds on his own labelled photos before production.
+
 ### 2026-10-19 — Person folders: say how many photos are only suggested (grouping investigation)
 *Status: committed (this commit).*
 

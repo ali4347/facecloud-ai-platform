@@ -25,6 +25,8 @@ export interface IdentityGroup {
   display_name: string
   state: 'active' | 'merged' | 'archived'
   member_count: number
+  /** Faces waiting for a decision: listed with the folder's photos, not counted in member_count. Missing on an older backend. */
+  suggested_count?: number
   preview_image: number | null
   /** Up to four distinct photos of the folder. */
   cover_images: CoverImage[]

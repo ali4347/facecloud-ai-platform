@@ -135,7 +135,8 @@ export default function GroupDetailLive() {
   const [copied, setCopied] = useState(false)
 
   const total = folder.data?.imageCount ?? 0
-  const suggested = images.filter(image => image.membership_state === 'needs_review').length
+  // The folder's own figure when the backend gives it; otherwise the suggestions among the tiles on this page.
+  const suggested = folder.data?.suggestedCount ?? images.filter(image => image.membership_state === 'needs_review').length
 
   const downloadZip = async (scope: 'all' | 'selected') => {
     if (busy) return
