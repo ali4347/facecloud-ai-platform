@@ -3,6 +3,8 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { mockModNotifications } from '../../data/mock'
 import type { ModNotification } from '../../data/mock'
+import { USE_API } from '../../lib/api/config'
+import { LiveNotificationCenter } from './NotificationCenterLive'
 import { ClipboardList, Clock, AlertTriangle, ArrowUpRight, Check, CheckCircle2, Inbox } from 'lucide-react'
 
 // Relative time helper
@@ -30,7 +32,8 @@ const TYPE_COLORS: Record<ModNotification['type'], string> = {
   Escalation: 'text-violet-400 bg-violet-500/10 border-violet-500/30/20'
 }
 
-export default function NotificationCenter() {
+/** The demo build's version: sample notifications. */
+function DemoNotificationCenter() {
   const [notifications, setNotifications] = useState<ModNotification[]>(mockModNotifications)
 
   const handleMarkAsRead = (id: string) => {
@@ -183,4 +186,9 @@ export default function NotificationCenter() {
       </div>
     </div>
   )
+}
+
+/** Live backend: the moderator's real notifications. Demo build: the sample screen above. */
+export default function NotificationCenter() {
+  return USE_API ? <LiveNotificationCenter /> : <DemoNotificationCenter />
 }

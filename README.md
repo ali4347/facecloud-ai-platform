@@ -27,7 +27,7 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
 
 * **Live on the API:** sign-in; the moderator dashboard and review queue; and the user portal's single upload, processing view, uploads list, My Images gallery and image detail.
-* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), the remaining moderator screens. The admin console and every user-portal screen read the live API when `VITE_USE_API=true`.
+* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), Moderation Logs (an unrouted duplicate of Audit Entries). The admin console and the moderator panel and every user-portal screen read the live API when `VITE_USE_API=true`.
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
@@ -136,6 +136,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/reset-password/:uid/:token` (the page the emailed reset link opens: choose a new password)
 * `/admin/login` (Admin Console Login: admin accounts only; reached by direct link)
 * `/moderator/login` (Moderator Panel Login: moderator accounts only; reached by direct link)
+* `/invitations/:token` (the page an organization invitation email opens: shows who invited you, then you sign in with the invited email and join; needs the live backend)
 * `/unauthorized` (Access Denied page)
 * `*` (Not Found / 404 page)
 
@@ -178,9 +179,17 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 ### Moderator Routes (under `/moderator`)
 * `/moderator` (Dashboard: overdue and due-soon counts against the review deadline, unassigned work, oldest waiting review, and per-moderator performance over a 7/30/90-day window)
 * `/moderator/queue` (Review queue: the photo under review shown as a thumbnail, filters by status, source, assignment and overdue-only, deadline ordering, claim or release a review so two moderators cannot work the same photo, and bulk approve, reject or escalate)
-* `/moderator/images/:id` (Human-in-the-loop audit detail view)
-* `/moderator/audit` (Historical review log matching decisions to actors)
-* `/moderator/settings` (Moderator interface threshold settings)
+* `/moderator/images/:id` (One review: the photo, its measurements, deadline, take or release, approve, reject, keep in review, escalate, and the review's history; reached from the queue)
+* `/moderator/members` (Your organization's members and pending invitations: invite, resend, cancel, deactivate, reactivate, remove; opens on the people you invited)
+* `/moderator/identity` (Person folders that hold photos submitted to your organization, with suggested merges of one member's folders)
+* `/moderator/rejected` (Rejected and needs-review photos submitted to your organization, with the reasons)
+* `/moderator/batches` (Uploads submitted to your organization: progress, outcome per photo, retry, cancel, reprocess)
+* `/moderator/notifications` (Assignments, deadlines, escalations and failed batches)
+* `/moderator/reports` (Make and download a report about your organization)
+* `/moderator/audit` (The organization's audit trail: who did what, searchable)
+* `/moderator/settings` (Notification switches, queue auto-refresh, and where you are signed in)
+
+All of these read the live API when `VITE_USE_API=true` and keep their demo data otherwise. A moderator only ever sees photos that a member **submitted to the team**: on the upload pages, a person who belongs to a team can choose "Submit to: My workspace / <team>" (the default is their own workspace).
 
 ---
 

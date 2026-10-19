@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { useReviewQueue } from '../../lib/moderationData'
@@ -18,6 +19,7 @@ import {
 import { useModeratorOrganization } from '../../lib/moderationData'
 import { ReviewThumbnail } from '../../components/features/ReviewThumbnail'
 import { formatDateTime } from '../../lib/utils'
+import { QUEUE_REFRESH_MS, getQueueAutoRefresh } from '../../lib/moderatorPrefs'
 import { AlertTriangle, Check, Clock, Eye, Loader2, Lock, RefreshCw, Unlock, X } from 'lucide-react'
 
 type BulkAction = 'approve' | 'reject' | 'escalate'
@@ -61,6 +63,13 @@ export default function ReviewQueue() {
   }), [status, source, overdueOnly, assignment, byDeadline])
 
   const { data, loading, error, isDemo, reload } = useReviewQueue(filters)
+
+  // Settings → Auto-refresh: pull in new reviews every half minute while this screen is open.
+  useEffect(() => {
+    if (isDemo || !getQueueAutoRefresh()) return
+    const timer = setInterval(reload, QUEUE_REFRESH_MS)
+    return () => clearInterval(timer)
+  }, [isDemo, reload])
   const { organizationId } = useModeratorOrganization()
   const reviews = data ?? []
 
@@ -321,7 +330,9 @@ export default function ReviewQueue() {
                     </td>
                     <td>
                       <p className="font-bold text-ink text-xs truncate max-w-[220px]" title={review.image_name}>
-                        {review.image_name || `Review #${review.id}`}
+                        {isDemo
+                          ? (review.image_name || `Review #${review.id}`)
+                          : <Link to={`/moderator/images/${review.id}`} className="hover:underline text-ink">{review.image_name || `Review #${review.id}`}</Link>}
                       </p>
                       <p className="text-[10px] text-ink-faint mt-0.5">
                         Review #{review.id} &middot; raised {formatDateTime(review.created_at)}

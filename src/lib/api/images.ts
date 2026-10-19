@@ -167,9 +167,11 @@ export const PIPELINE_STAGES = [
   'identity_grouping', 'enhancement', 'finalizing', 'completed',
 ] as const
 
-export function uploadSingle(file: File, signal?: AbortSignal): Promise<UploadBatch> {
+/** `organizationId` submits the photos to a team the person belongs to instead of their own workspace. */
+export function uploadSingle(file: File, signal?: AbortSignal, organizationId?: number): Promise<UploadBatch> {
   const formData = new FormData()
   formData.append('file', file)
+  if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
   return apiFetch<UploadBatch>('/api/images/upload/single/', { formData, signal })
 }
 
@@ -180,15 +182,17 @@ export function uploadSingle(file: File, signal?: AbortSignal): Promise<UploadBa
  * back with `rejected_files` above zero while still succeeding overall. Read
  * the per-image statuses rather than assuming everything went through.
  */
-export function uploadMultiple(files: File[], signal?: AbortSignal): Promise<UploadBatch> {
+export function uploadMultiple(files: File[], signal?: AbortSignal, organizationId?: number): Promise<UploadBatch> {
   const formData = new FormData()
   for (const file of files) formData.append('files', file)
+  if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
   return apiFetch<UploadBatch>('/api/images/upload/multiple/', { formData, signal })
 }
 
-export function uploadZip(file: File, signal?: AbortSignal): Promise<UploadBatch> {
+export function uploadZip(file: File, signal?: AbortSignal, organizationId?: number): Promise<UploadBatch> {
   const formData = new FormData()
   formData.append('file', file)
+  if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
   return apiFetch<UploadBatch>('/api/images/upload/zip/', { formData, signal })
 }
 

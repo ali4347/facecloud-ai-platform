@@ -5,8 +5,11 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { mockReviewItems, mockGroups, mockModeratorAudit, mockModNotifications } from '../../data/mock'
 import { ArrowLeft, Check, X, ShieldAlert, CheckCircle, AlertTriangle, Play, RefreshCw, AlertOctagon } from 'lucide-react'
 import { readSessionRaw } from '../../lib/session'
+import { USE_API } from '../../lib/api/config'
+import { LiveImageReview } from './ModeratorImageReviewLive'
 
-export default function ModeratorImageReview() {
+/** The demo build's version: one sample review. */
+function DemoImageReview() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const record = mockReviewItems.find(r => r.id === id) || mockReviewItems[0]
@@ -515,4 +518,9 @@ export default function ModeratorImageReview() {
 
     </div>
   )
+}
+
+/** Live backend: the real review with its measurements and history. Demo build: the sample screen above. */
+export default function ModeratorImageReview() {
+  return USE_API ? <LiveImageReview /> : <DemoImageReview />
 }

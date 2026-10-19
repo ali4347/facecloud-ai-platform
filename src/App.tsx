@@ -39,6 +39,9 @@ import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
 import AdminOverview from './pages/admin/AdminOverview'
+import InvitationAccept from './pages/InvitationAccept'
+import IdentityReview from './pages/moderator/IdentityReview'
+import RejectedImages from './pages/moderator/RejectedImages'
 import Statistics from './pages/admin/Statistics'
 import UsersPage from './pages/admin/Users'
 import AuditLogs from './pages/admin/AuditLogs'
@@ -86,6 +89,7 @@ export default function App() {
         {/* Protected Admin & Moderator Login Paths */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/moderator/login" element={<ModeratorLogin />} />
+        <Route path="/invitations/:token" element={<InvitationAccept />} />
 
         {/* User Dashboard Protected Pipeline */}
         <Route 
@@ -153,6 +157,8 @@ export default function App() {
           <Route path="members" element={<MemberManagement />} />
           <Route path="queue" element={<ReviewQueue />} />
           <Route path="images/:id" element={<ModeratorImageReview />} />
+          <Route path="identity" element={<IdentityReview />} />
+          <Route path="rejected" element={<RejectedImages />} />
           <Route path="batches" element={<BatchManagement />} />
           <Route path="notifications" element={<NotificationCenter />} />
           <Route path="reports" element={<ReportsExports />} />

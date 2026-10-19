@@ -4,8 +4,11 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { mockReviewItems } from '../../data/mock'
 import { formatDateTime } from '../../lib/utils'
 import { Eye } from 'lucide-react'
+import { USE_API } from '../../lib/api/config'
+import { LiveRejectedImages } from './RejectedImagesLive'
 
-export default function RejectedImages() {
+/** The demo build's version: sample rejected photos. */
+function DemoRejectedImages() {
   const rejected = mockReviewItems
 
   return (
@@ -42,4 +45,9 @@ export default function RejectedImages() {
       </div>
     </div>
   )
+}
+
+/** Live backend: the organization's real rejected photos. Demo build: the sample screen above. */
+export default function RejectedImages() {
+  return USE_API ? <LiveRejectedImages /> : <DemoRejectedImages />
 }

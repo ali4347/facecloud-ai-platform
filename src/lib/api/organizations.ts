@@ -88,3 +88,25 @@ export function setOrgMemberStatus(organizationId: number, membershipId: number,
 export function removeOrgMember(organizationId: number, membershipId: number): Promise<OrgMembership> {
   return apiFetch<OrgMembership>(`/api/organizations/${organizationId}/members/${membershipId}/`, { method: 'DELETE' })
 }
+
+// ── Accepting an invitation (the emailed link) ───────────────────────────────
+
+export interface InvitationPreview {
+  organization_name: string
+  email: string
+  role: 'member' | 'moderator'
+  expires_at: string
+}
+
+/**
+ * Who is inviting, shown before anyone signs in, so no Authorization header is sent. An unknown, used, cancelled or
+ * expired token all answer the same 404 sentence; show that sentence and nothing more.
+ */
+export function previewInvitation(token: string, signal?: AbortSignal): Promise<InvitationPreview> {
+  return apiFetch<InvitationPreview>(`/api/organizations/invitations/${encodeURIComponent(token)}/`, { anonymous: true, signal })
+}
+
+/** The signed-in person (who must be using the invited email) joins the organization. */
+export function acceptInvitation(token: string): Promise<OrgMembership> {
+  return apiFetch<OrgMembership>('/api/organizations/invitations/accept/', { body: { token } })
+}

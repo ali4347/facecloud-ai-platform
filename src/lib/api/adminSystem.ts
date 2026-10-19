@@ -98,8 +98,10 @@ export interface AuditPage {
   legacy?: boolean
 }
 
-export async function getAudit(page: number, pageSize: number, signal?: AbortSignal): Promise<AuditPage> {
-  const data = await apiFetch<AuditPage>(`/api/system/audit/?page=${page}&page_size=${pageSize}`, { signal })
+/** `q` searches the whole trail on the server (actor, event, category); a backend older than that ignores it. */
+export async function getAudit(page: number, pageSize: number, signal?: AbortSignal, q = ''): Promise<AuditPage> {
+  const search = q ? `&q=${encodeURIComponent(q)}` : ''
+  const data = await apiFetch<AuditPage>(`/api/system/audit/?page=${page}&page_size=${pageSize}${search}`, { signal })
   const rows = Array.isArray(data.results) ? data.results : []
   // A backend older than PR #86 sends the raw event only (no actor_name, message, status, resource).
   const legacy = rows.some(r => r.message === undefined)

@@ -3,8 +3,11 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { ShieldCheck, Mail, RefreshCw } from 'lucide-react'
 import { readSessionRaw } from '../../lib/session'
+import { USE_API } from '../../lib/api/config'
+import { LiveModeratorSettings } from './ModeratorSettingsLive'
 
-export default function ModeratorSettings() {
+/** The demo build's version: switches that save nothing. */
+function DemoModeratorSettings() {
   const [session, setSession] = useState<any>(null)
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [notifyRisk, setNotifyRisk] = useState(true)
@@ -106,4 +109,9 @@ export default function ModeratorSettings() {
       </div>
     </div>
   )
+}
+
+/** Live backend: real notification switches and sessions. Demo build: the sample screen above. */
+export default function ModeratorSettings() {
+  return USE_API ? <LiveModeratorSettings /> : <DemoModeratorSettings />
 }

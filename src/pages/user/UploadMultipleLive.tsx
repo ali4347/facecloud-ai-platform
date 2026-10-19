@@ -7,6 +7,8 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
 import { uploadMultiple, type ImageListItem } from '../../lib/api/images'
+import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { useSubmitTarget } from '../../lib/useSubmitTarget'
 import { fetchBatchZip } from '../../lib/api/downloads'
 import { formatBytes, statusLabel } from '../../lib/imageData'
 import { saveBlob } from '../../lib/saveBlob'
@@ -21,6 +23,7 @@ const MAX_FILES = 150
 interface Picked { file: File; previewUrl: string }
 
 export default function UploadMultipleLive() {
+  const target = useSubmitTarget()
   const [picked, setPicked] = useState<Picked[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState<ImageListItem[] | null>(null)
@@ -71,7 +74,7 @@ export default function UploadMultipleLive() {
     setUploading(true)
     setError(null)
     try {
-      const made = await uploadMultiple(picked.map(item => item.file))
+      const made = await uploadMultiple(picked.map(item => item.file), undefined, target.organizationId)
       setUploaded(made.images ?? [])
       setBatchId(made.id)
     } catch (caught) {
@@ -167,7 +170,9 @@ export default function UploadMultipleLive() {
                     <Loader2 className="w-4 h-4 animate-spin" />Uploading {picked.length} photo{picked.length !== 1 ? 's' : ''}…
                   </div>
                 ) : (
-                  <div className="flex gap-3 pt-2">
+                  <div className="space-y-3 pt-2">
+                  <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
+                  <div className="flex gap-3">
                     <button onClick={reset} className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center">Cancel</button>
                     <label className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center cursor-pointer">
                       Add more
@@ -177,6 +182,7 @@ export default function UploadMultipleLive() {
                       <Play className="w-3.5 h-3.5" />
                       Confirm & Upload {picked.length} photo{picked.length !== 1 ? 's' : ''}
                     </button>
+                  </div>
                   </div>
                 )}
               </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { SearchInput } from '../../components/ui/SearchInput'
@@ -27,7 +27,13 @@ function demoPage(): AuditPage {
 export default function AuditLogs() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const state = useApiResource(signal => getAudit(page, PAGE_SIZE, signal), demoPage, [page])
+  const [q, setQ] = useState('')
+  // The box asks the server once typing pauses, and a new search starts from the newest page.
+  useEffect(() => {
+    const timer = setTimeout(() => { setQ(search.trim()); setPage(1) }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
+  const state = useApiResource(signal => getAudit(page, PAGE_SIZE, signal, q), demoPage, [page, q])
 
   return (
     <div className="page-enter">
@@ -35,16 +41,18 @@ export default function AuditLogs() {
 
       <AsyncGate state={state} what="the audit log">
         {data => {
+          // The server searches the whole trail. A backend older than that cannot, so there (and in the demo build)
+          // the box narrows the rows on screen instead.
           const needle = search.trim().toLowerCase()
-          // The API pages the log but does not search it, so this narrows the page on screen only.
-          const rows = needle
+          const onScreenOnly = Boolean(data.legacy) || state.isDemo
+          const rows = needle && onScreenOnly
             ? data.results.filter(r => [r.actor_name, r.message, r.resource, r.type].some(v => v.toLowerCase().includes(needle)))
             : data.results
           return (
             <>
               {data.legacy && <OldBackendNotice what="the audit log shows each event without its actor role, status or resource" />}
               <div className="flex items-center gap-3 mb-5">
-                <SearchInput placeholder="Search this page…" value={search} onChange={e => setSearch(e.target.value)} className="w-72" />
+                <SearchInput placeholder={onScreenOnly ? 'Search this page…' : 'Search the whole audit log…'} value={search} onChange={e => setSearch(e.target.value)} className="w-72" />
               </div>
               <div className="fc-card overflow-hidden">
                 <div className="divide-y divide-line">
@@ -74,7 +82,7 @@ export default function AuditLogs() {
                     </div>
                   ))}
                   {rows.length === 0 && (
-                    <div className="py-12 text-center text-sm text-ink-faint">{needle ? 'Nothing on this page matches.' : 'No audit entries yet.'}</div>
+                    <div className="py-12 text-center text-sm text-ink-faint">{needle ? (onScreenOnly ? 'Nothing on this page matches.' : 'Nothing in the audit log matches.') : 'No audit entries yet.'}</div>
                   )}
                 </div>
               </div>

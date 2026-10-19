@@ -24,6 +24,8 @@ import {
 import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
 import { makeLocalPreview } from '../../lib/previewEnhance'
 import { EnhancementReport } from '../../components/features/EnhancementReport'
+import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { useSubmitTarget } from '../../lib/useSubmitTarget'
 import { demoImages, formatBytes } from '../../lib/imageData'
 import {
   AlertTriangle, ArrowLeft, ArrowRight, CheckCircle2, Info, Loader2,
@@ -70,6 +72,7 @@ function stageIndex(stage: string): number {
 
 export default function UploadSingle() {
   const navigate = useNavigate()
+  const target = useSubmitTarget()
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
@@ -338,7 +341,7 @@ export default function UploadSingle() {
 
     setPhase('uploading')
     try {
-      const batch = await uploadSingle(file)
+      const batch = await uploadSingle(file, undefined, target.organizationId)
       setBatchId(batch.id)
       // The file can be refused on arrival — wrong type, too large, a face the
       // validator will not accept — and that is a finished batch, not a failure
@@ -438,6 +441,7 @@ export default function UploadSingle() {
                     {file.name} · {formatBytes(file.size)} — FaceCloud will check the photo's quality,
                     find the face, enhance it and file it under the right person.
                   </p>
+                  <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
                   <button
                     type="button"
                     onClick={start}

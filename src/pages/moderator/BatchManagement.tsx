@@ -8,8 +8,11 @@ import {
   Play, Download, X, RefreshCw, ChevronDown, ChevronUp, CheckCircle, Search, HelpCircle, ShieldAlert 
 } from 'lucide-react'
 import { readSessionRaw } from '../../lib/session'
+import { USE_API } from '../../lib/api/config'
+import { LiveBatchManagement } from './BatchManagementLive'
 
-export default function BatchManagement() {
+/** The demo build's version: local sample batches. */
+function DemoBatchManagement() {
   const [batches, setBatches] = useState<BatchRecord[]>(mockBatches)
   const [expandedBatchId, setExpandedBatchId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -285,4 +288,9 @@ export default function BatchManagement() {
       </div>
     </div>
   )
+}
+
+/** Live backend: the organization's real batches. Demo build: the sample screen above. */
+export default function BatchManagement() {
+  return USE_API ? <LiveBatchManagement /> : <DemoBatchManagement />
 }

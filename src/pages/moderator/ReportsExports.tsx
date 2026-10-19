@@ -5,6 +5,8 @@ import { mockReportHistory, mockModeratorAudit } from '../../data/mock'
 import type { GeneratedReport } from '../../data/mock'
 import { Download, Calendar, CheckCircle, FileText, FileSpreadsheet, Layers, BarChart2 } from 'lucide-react'
 import { readSessionRaw } from '../../lib/session'
+import { USE_API } from '../../lib/api/config'
+import { LiveReportsExports } from './ReportsExportsLive'
 
 const REPORT_TYPES = [
   { id: 'review_activity', label: 'Review Activity', desc: 'Moderation decisions, approval/rejection counts, and overrides log.', icon: Layers },
@@ -14,7 +16,8 @@ const REPORT_TYPES = [
   { id: 'general_activity', label: 'General Activity Log', desc: 'Organization-wide ingestion telemetry audit trail.', icon: FileText }
 ]
 
-export default function ReportsExports() {
+/** The demo build's version: sample report history. */
+function DemoReportsExports() {
   const [reports, setReports] = useState<GeneratedReport[]>(mockReportHistory)
   const [selectedType, setSelectedType] = useState('review_activity')
   const [startDate, setStartDate] = useState('2026-07-01')
@@ -226,4 +229,9 @@ export default function ReportsExports() {
       </div>
     </div>
   )
+}
+
+/** Live backend: real organization reports. Demo build: the sample screen above. */
+export default function ReportsExports() {
+  return USE_API ? <LiveReportsExports /> : <DemoReportsExports />
 }

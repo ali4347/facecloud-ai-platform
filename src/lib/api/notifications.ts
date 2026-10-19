@@ -44,6 +44,8 @@ export interface NotificationPreferences {
   person_group_created: boolean
   email_notifications: boolean
   live_session_alerts: boolean
+  /** Moderators: updates about reviews assigned to them. Missing on a backend older than the moderator console work. */
+  moderator_review_updates?: boolean
 }
 
 export function getNotificationPreferences(signal?: AbortSignal): Promise<NotificationPreferences> {

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase, LineChart
+  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useUserDashboard, formatBytes } from '../../lib/imageData'
@@ -44,6 +44,8 @@ const moderatorNav = [
   { label: 'Moderator Dashboard', icon: LayoutDashboard, to: '/moderator' },
   { label: 'Member Management',    icon: Users,           to: '/moderator/members' },
   { label: 'Review & Dup. Queue',  icon: Eye,             to: '/moderator/queue' },
+  { label: 'Identity Review',      icon: UsersRound,      to: '/moderator/identity' },
+  { label: 'Rejected Images',      icon: ImageOff,        to: '/moderator/rejected' },
   { label: 'Batch Management',     icon: Briefcase,       to: '/moderator/batches' },
   { label: 'Notification Center',  icon: Bell,            to: '/moderator/notifications' },
   { label: 'Reports & Exports',    icon: BarChart3,       to: '/moderator/reports' },

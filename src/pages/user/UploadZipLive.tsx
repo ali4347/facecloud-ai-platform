@@ -6,6 +6,8 @@ import {
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { uploadZip, type UploadBatch } from '../../lib/api/images'
+import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { useSubmitTarget } from '../../lib/useSubmitTarget'
 import { fetchBatchZip } from '../../lib/api/downloads'
 import { formatBytes, statusLabel } from '../../lib/imageData'
 import { saveBlob } from '../../lib/saveBlob'
@@ -18,6 +20,7 @@ import { RejectionBreakdown } from '../../components/features/RejectionBreakdown
 const MAX_ZIP_BYTES = 2 * 1024 * 1024 * 1024
 
 export default function UploadZipLive() {
+  const target = useSubmitTarget()
   const [zipFile, setZipFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [made, setMade] = useState<UploadBatch | null>(null)
@@ -48,7 +51,7 @@ export default function UploadZipLive() {
     setUploading(true)
     setError(null)
     try {
-      setMade(await uploadZip(zipFile))
+      setMade(await uploadZip(zipFile, undefined, target.organizationId))
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'The upload failed. Please try again.')
     } finally {
@@ -136,11 +139,14 @@ export default function UploadZipLive() {
                       <Loader2 className="w-4 h-4 animate-spin" />Uploading the archive…
                     </div>
                   ) : (
+                    <div className="space-y-3">
+                    <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
                     <div className="flex gap-3">
                       <button onClick={reset} className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center">Cancel</button>
                       <button onClick={confirmAndUpload} className="fc-btn-primary !py-2.5 !px-4 text-xs flex-1 justify-center gap-2">
                         <Play className="w-3.5 h-3.5" />Confirm & Upload
                       </button>
+                    </div>
                     </div>
                   )}
                 </div>

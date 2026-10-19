@@ -170,7 +170,7 @@ export function useModeratorOrganization() {
 }
 
 /** A moderator resource: the shared loader, plus the organization it needs first. */
-function useModeratorResource<T>(
+export function useModeratorResource<T>(
   load: (organizationId: number, signal: AbortSignal) => Promise<T>,
   demo: () => T,
   dependencies: unknown[],

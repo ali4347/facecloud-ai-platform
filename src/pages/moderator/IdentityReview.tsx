@@ -3,8 +3,11 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { mockGroups } from '../../data/mock'
 import { GitMerge, MoveRight } from 'lucide-react'
+import { USE_API } from '../../lib/api/config'
+import { LiveIdentityReview } from './IdentityReviewLive'
 
-export default function IdentityReview() {
+/** The demo build's version: sample folders. */
+function DemoIdentityReview() {
   return (
     <div>
       <PageHeader title="Identity Review" subtitle="Review and correct identity groups — merge duplicates, move images." />
@@ -64,4 +67,9 @@ export default function IdentityReview() {
       </div>
     </div>
   )
+}
+
+/** Live backend: the organization's real person folders. Demo build: the sample screen above. */
+export default function IdentityReview() {
+  return USE_API ? <LiveIdentityReview /> : <DemoIdentityReview />
 }

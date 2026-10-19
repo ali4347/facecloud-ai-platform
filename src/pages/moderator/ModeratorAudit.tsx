@@ -4,6 +4,8 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { mockModeratorAudit } from '../../data/mock'
 import { formatDateTime } from '../../lib/utils'
 import { ShieldCheck } from 'lucide-react'
+import { USE_API } from '../../lib/api/config'
+import { LiveModeratorAudit } from './ModeratorAuditLive'
 
 function getCategory(action: string): 'member' | 'review' | 'batch' | 'report' | 'system' {
   const act = action.toLowerCase()
@@ -22,7 +24,8 @@ const CATEGORY_COLORS = {
   system: 'bg-surface-mute text-ink-mute border-line'
 }
 
-export default function ModeratorAudit() {
+/** The demo build's version: the sample trail. */
+function DemoModeratorAudit() {
   const [logs] = useState(mockModeratorAudit)
 
   return (
@@ -88,4 +91,9 @@ export default function ModeratorAudit() {
       </ChartCard>
     </div>
   )
+}
+
+/** Live backend: the organization's real audit trail. Demo build: the sample screen above. */
+export default function ModeratorAudit() {
+  return USE_API ? <LiveModeratorAudit /> : <DemoModeratorAudit />
 }
