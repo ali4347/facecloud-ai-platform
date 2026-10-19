@@ -27,7 +27,7 @@ FaceCloud is designed to handle high-throughput and low-light facial photography
 The frontend is being connected to the [Django backend](https://github.com/ijaz-student021/FaceCloud_backend) one screen at a time, controlled by `VITE_USE_API` in `.env.local`:
 
 * **Live on the API:** sign-in; the moderator dashboard and review queue; and the user portal's single upload, processing view, uploads list, My Images gallery and image detail.
-* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), Moderation Logs (an unrouted duplicate of Audit Entries). The admin console and the moderator panel and every user-portal screen read the live API when `VITE_USE_API=true`.
+* **Still on mock data and `localStorage`:** the live webcam preview (browser filters; captured frames are enhanced by the real pipeline), The live webcam preview's filters only. The admin console and the moderator panel and every user-portal screen read the live API when `VITE_USE_API=true`.
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
@@ -189,6 +189,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/moderator/batches` (Uploads submitted to your organization: progress, outcome per photo, retry, cancel, reprocess)
 * `/moderator/notifications` (Assignments, deadlines, escalations and failed batches)
 * `/moderator/reports` (Make and download a report about your organization)
+* `/moderator/logs` (Decision Log: the latest decisions about photos, with today's counts; the full trail is Audit)
 * `/moderator/audit` (The organization's audit trail: who did what, searchable)
 * `/moderator/settings` (Notification switches, queue auto-refresh, and where you are signed in)
 

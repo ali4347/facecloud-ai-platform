@@ -132,11 +132,13 @@ export interface OrgAuditEvent {
   target_label: string | null
   from_status: string | null
   to_status: string | null
+  /** What the event carried, e.g. for a bulk decision: { action, requested, succeeded: [ids], failed_count }. */
+  new_value?: Record<string, unknown>
   reason: string
   created_at: string
 }
 
-export interface AuditFilters { action?: string; actor?: number; q?: string; target_type?: string; target_id?: number }
+export interface AuditFilters { action?: string; actor?: number; q?: string; target_type?: string; target_id?: number; date_from?: string; date_to?: string }
 
 function auditQuery(filters: AuditFilters, extra: Record<string, string> = {}): string {
   const params = new URLSearchParams(extra)
@@ -151,8 +153,8 @@ export const listOrgAudit = (organizationId: number, filters: AuditFilters = {},
 export interface OrgAuditPage { count: number; next: string | null; results: OrgAuditEvent[] }
 
 /** One page of the trail (newest first), for the Audit screen. */
-export async function listOrgAuditPage(organizationId: number, filters: AuditFilters, page: number, signal?: AbortSignal): Promise<OrgAuditPage> {
-  return apiFetch<OrgAuditPage>(`${root(organizationId)}/audit/${auditQuery(filters, { page: String(page), page_size: '25' })}`, { signal })
+export async function listOrgAuditPage(organizationId: number, filters: AuditFilters, page: number, signal?: AbortSignal, pageSize = 25): Promise<OrgAuditPage> {
+  return apiFetch<OrgAuditPage>(`${root(organizationId)}/audit/${auditQuery(filters, { page: String(page), page_size: String(pageSize) })}`, { signal })
 }
 
 // ── Rejected Images ──────────────────────────────────────────────────────────

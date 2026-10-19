@@ -4,10 +4,13 @@ import { StatusBadge } from '../../components/ui/StatusBadge'
 import { CheckCircle, XCircle, MoveRight } from 'lucide-react'
 import { mockAuditLogs } from '../../data/mock'
 import { formatDateTime } from '../../lib/utils'
+import { USE_API } from '../../lib/api/config'
+import { LiveModerationLogs } from './ModerationLogsLive'
 
 const modLogs = mockAuditLogs.filter(l => l.role === 'moderator')
 
-export default function ModerationLogs() {
+/** The demo build's version: sample moderation history. */
+function DemoModerationLogs() {
   return (
     <div>
       <PageHeader title="Moderation Logs" subtitle="History of all moderation actions — approvals, rejections, and moves." />
@@ -54,4 +57,9 @@ export default function ModerationLogs() {
       </ChartCard>
     </div>
   )
+}
+
+/** Live backend: the organization's real review decisions. Demo build: the sample screen above. */
+export default function ModerationLogs() {
+  return USE_API ? <LiveModerationLogs /> : <DemoModerationLogs />
 }

@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Moderation Logs made real (Decision Log)
+*Status: committed (this commit).*
+
+- **Why:** `ModerationLogs.tsx` was an orphan page on demo data that duplicated Audit Entries, so it was neither routed nor wired. It now has its own job: the log of **decisions about photos**, while Audit Entries stays the full trail of everything else.
+- **Added:** route `/moderator/logs` and a sidebar item "Decision Log". Live, it lists the latest decisions (approve, reject, correct, escalate) by everyone in the organization with the sentence, who, when, the reason and "Open the review"; filter chips by outcome; and today's counts (approved, rejected, escalated, total) taken from the audit trail. The demo build keeps the sample page. `listOrgAuditPage` gained a page size and `date_from`/`date_to`.
+- **A detail worth knowing:** a bulk decision writes one event per review **and** one summary event ("Decided several reviews at once."). Counting the summary as well double-counted those photos (approved showed 5 instead of 3 in the test), so the summary is left out; each review shows in its own row.
+- **Verified:** headless Chrome against a scratch copy of backend origin/main with one approve, one reject, one escalation and one bulk approve of two reviews by a second moderator: all rows and sentences present, counts 3 / 1 / 1 / 5, the chips filter, "Open the review" opens the right review. `tsc` and both builds pass, no new lint finding.
+- **Left (frontend):** everything else waits on the backend prompt already given to the owner.
+
 ### 2026-10-19 — Owner console, moderator team switcher, live camera sessions; caches no longer outlive a sign-out
 *Status: committed (this commit).*
 
@@ -1908,7 +1917,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 **Frontend screens still on demo data (no backend call):**
 - Admin: all connected (2026-10-18); Statistics is routed (2026-10-19). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Rejections.tsx` and `SystemHealth.tsx` are deliberately not routed (duplicates).
 - Moderator Member Management is connected (2026-10-19). The invitation page `/invitations/:token` exists (2026-10-19).
-- Moderator: every screen is connected except Moderation Logs (`ModerationLogs.tsx`, demo data, no route, duplicates Audit Entries). Identity Review and Rejected Images were unrouted pages and now have routes (`/moderator/identity`, `/moderator/rejected`).
+- Moderator: every screen is connected, including the Decision Log (`/moderator/logs`). Identity Review, Rejected Images and the Decision Log were unrouted pages and now have routes.
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).
 - Public: the Contact form is connected (`POST /api/contact/`).
 - User portal: every screen is connected. Not yet in the UI although the backend has them:

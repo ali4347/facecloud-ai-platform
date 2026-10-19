@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2
+  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck
 } from 'lucide-react'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
 import { cn } from '../../lib/utils'
@@ -51,6 +51,7 @@ const moderatorNav = [
   { label: 'Batch Management',     icon: Briefcase,       to: '/moderator/batches' },
   { label: 'Notification Center',  icon: Bell,            to: '/moderator/notifications' },
   { label: 'Reports & Exports',    icon: BarChart3,       to: '/moderator/reports' },
+  { label: 'Decision Log',         icon: ClipboardCheck,  to: '/moderator/logs' },
   { label: 'Audit Entries',        icon: ScrollText,      to: '/moderator/audit' },
   { label: 'Settings',             icon: Settings,        to: '/moderator/settings' },
 ]

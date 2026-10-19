@@ -43,6 +43,7 @@ import MyOrganization from './pages/user/MyOrganization'
 import Organizations from './pages/admin/Organizations'
 import InvitationAccept from './pages/InvitationAccept'
 import IdentityReview from './pages/moderator/IdentityReview'
+import ModerationLogs from './pages/moderator/ModerationLogs'
 import RejectedImages from './pages/moderator/RejectedImages'
 import Statistics from './pages/admin/Statistics'
 import UsersPage from './pages/admin/Users'
@@ -161,6 +162,7 @@ export default function App() {
           <Route path="members" element={<MemberManagement />} />
           <Route path="queue" element={<ReviewQueue />} />
           <Route path="images/:id" element={<ModeratorImageReview />} />
+          <Route path="logs" element={<ModerationLogs />} />
           <Route path="identity" element={<IdentityReview />} />
           <Route path="rejected" element={<RejectedImages />} />
           <Route path="batches" element={<BatchManagement />} />
