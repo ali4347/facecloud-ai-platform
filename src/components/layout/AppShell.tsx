@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { ErrorBoundary } from '../ui/ErrorBoundary'
+import { NoOrganizationGuard } from '../moderator/NoOrganizationGuard'
 import { useAppearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 import { SESSION_LOST_EVENT } from '../../lib/api/client'
@@ -78,7 +79,7 @@ export function AppShell({ role }: AppShellProps) {
         />
         <main className="flex-1 px-4 sm:px-6 lg:px-7 py-6 page-enter">
           <ErrorBoundary key={location.pathname}>
-            <Outlet />
+            {role === 'moderator' ? <NoOrganizationGuard><Outlet /></NoOrganizationGuard> : <Outlet />}
           </ErrorBoundary>
         </main>
       </div>

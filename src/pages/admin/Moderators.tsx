@@ -9,6 +9,7 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
 import { createAdminUser } from '../../lib/api/adminUsers'
+import { teamsOf, useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { USE_API } from '../../lib/api/config'
 import { USERS_PAGE_SIZE, useAdminUserList, type AccountRow } from '../../lib/useAdminUserList'
 import { formatDate } from '../../lib/utils'
@@ -20,6 +21,7 @@ export default function Moderators() {
   const [addedInDemo, setAddedInDemo] = useState<AccountRow[]>([])
 
   const [page, setPage] = useState(1)
+  const orgs = useAdminOrganizations()
   const { data, loading, error, isDemo, reload } = useAdminUserList(search, page, 'moderator')
 
   const moderators = useMemo(
@@ -33,7 +35,7 @@ export default function Moderators() {
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
     if (USE_API) {
-      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: 'moderator' })
+      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: 'moderator', ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
       reload()
     } else {
       setAddedInDemo(rows => [{
@@ -71,6 +73,7 @@ export default function Moderators() {
           title="New moderator"
           subtitle="Creates a sign-in for a moderator, who reaches the moderator panel by its direct link"
           roles={['moderator']}
+          organizations={teamsOf(orgs.data)}
           onCreate={handleCreate}
           onCancel={() => setFormOpen(false)}
         />

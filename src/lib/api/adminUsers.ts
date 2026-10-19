@@ -52,6 +52,8 @@ export interface NewAccountRequest {
   email: string
   password: string
   role: 'user' | 'moderator'
+  /** The organization a moderator works for. Required for a moderator once there is more than one organization. */
+  organization_id?: number
 }
 
 /**

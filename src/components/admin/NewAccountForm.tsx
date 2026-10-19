@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { UserCog, Wand2, X } from 'lucide-react'
 import { GradientButton } from '../ui/GradientButton'
 import { PasswordInput } from '../ui/PasswordInput'
 import { ChartCard } from '../ui/ChartCard'
+import type { Organization } from '../../lib/api/organizations'
 
 export type NewAccountRole = 'user' | 'moderator'
 
@@ -11,6 +13,8 @@ export interface NewAccount {
   email: string
   password: string
   role: NewAccountRole
+  /** Set for a moderator: the organization they work for. */
+  organizationId?: number
 }
 
 const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
@@ -29,10 +33,12 @@ function generatePassword(length = 14): string {
  * the session). If `onCreate` throws, the message is shown here and what was typed is kept, so the
  * administrator can fix one field instead of retyping everything.
  */
-export function NewAccountForm({ title, subtitle, roles, onCreate, onCancel }: {
+export function NewAccountForm({ title, subtitle, roles, organizations = [], onCreate, onCancel }: {
   title: string
   subtitle: string
   roles: NewAccountRole[]
+  /** The teams a moderator can be placed in. A moderator must belong to one, so the form insists on a choice. */
+  organizations?: Organization[]
   onCreate: (account: NewAccount) => Promise<void> | void
   onCancel: () => void
 }) {
@@ -41,6 +47,7 @@ export function NewAccountForm({ title, subtitle, roles, onCreate, onCancel }: {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [role, setRole] = useState<NewAccountRole>(roles[0])
+  const [organizationId, setOrganizationId] = useState<number | ''>(organizations.length === 1 ? organizations[0].id : '')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -49,9 +56,10 @@ export function NewAccountForm({ title, subtitle, roles, onCreate, onCancel }: {
     setError('')
     if (password.length < 8) { setError('The password needs at least 8 characters.'); return }
     if (password !== confirm) { setError('The two passwords do not match.'); return }
+    if (role === 'moderator' && organizationId === '') { setError('Choose the organization this moderator works for.'); return }
     setBusy(true)
     try {
-      await onCreate({ username: username.trim(), email: email.trim(), password, role })
+      await onCreate({ username: username.trim(), email: email.trim(), password, role, ...(role === 'moderator' && organizationId !== '' ? { organizationId } : {}) })
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not create the account. Please try again.')
     } finally {
@@ -110,8 +118,25 @@ export function NewAccountForm({ title, subtitle, roles, onCreate, onCancel }: {
           </div>
         )}
 
+        {role === 'moderator' && (
+          <div className="space-y-1.5 max-w-sm">
+            <label htmlFor="new-organization" className={labelClass}>Organization</label>
+            {organizations.length === 0 ? (
+              <p className="text-xs text-ink-mute">There is no organization yet. <Link to="/admin/organizations" className="font-semibold text-[#FB923C] hover:underline">Create one first</Link>: a moderator works for an organization and only sees its data.</p>
+            ) : (
+              <>
+                <select id="new-organization" className="fc-input" value={organizationId} onChange={e => setOrganizationId(e.target.value ? Number(e.target.value) : '')} required>
+                  <option value="">Choose an organization…</option>
+                  {organizations.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                </select>
+                <p className="text-[10px] text-ink-faint">The moderator will only see this organization's members and photos.</p>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2 pt-1">
-          <GradientButton type="submit" disabled={busy} leftIcon={<UserCog className="w-4 h-4" />}>
+          <GradientButton type="submit" disabled={busy || (role === 'moderator' && organizations.length === 0)} leftIcon={<UserCog className="w-4 h-4" />}>
             {busy ? 'Creating…' : 'Create account'}
           </GradientButton>
           <GradientButton type="button" variant="secondary" onClick={onCancel} disabled={busy}>Cancel</GradientButton>

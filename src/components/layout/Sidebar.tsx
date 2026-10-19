@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff
+  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useUserDashboard, formatBytes } from '../../lib/imageData'
@@ -30,6 +30,7 @@ const userNav = [
 const adminNav = [
   { label: 'Overview',           icon: LayoutDashboard, to: '/admin' },
   { label: 'Manage Users',       icon: Users,            to: '/admin/users' },
+  { label: 'Organizations',      icon: Building2,        to: '/admin/organizations' },
   { label: 'Moderators',         icon: UserCog,          to: '/admin/moderators' },
   { label: 'Audit Logs',         icon: ClipboardList,    to: '/admin/audit-logs' },
   { label: 'Security Monitoring',icon: ShieldCheck,      to: '/admin/security' },

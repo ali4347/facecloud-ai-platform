@@ -9,6 +9,7 @@ const MIN_USER_QUERY = 2
 const PAGES = [
   { label: 'Overview', to: '/admin' },
   { label: 'Manage Users', to: '/admin/users' },
+  { label: 'Organizations', to: '/admin/organizations' },
   { label: 'Moderators', to: '/admin/moderators' },
   { label: 'Audit Logs', to: '/admin/audit-logs' },
   { label: 'Security Monitoring', to: '/admin/security' },

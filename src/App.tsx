@@ -39,6 +39,7 @@ import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
 import AdminOverview from './pages/admin/AdminOverview'
+import Organizations from './pages/admin/Organizations'
 import InvitationAccept from './pages/InvitationAccept'
 import IdentityReview from './pages/moderator/IdentityReview'
 import RejectedImages from './pages/moderator/RejectedImages'
@@ -134,6 +135,7 @@ export default function App() {
           <Route path="users" element={<UsersPage />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="security" element={<Security />} />
+          <Route path="organizations" element={<Organizations />} />
           <Route path="moderators" element={<Moderators />} />
           <Route path="api-docs" element={<Navigate to="/admin" replace />} />
           <Route path="api-test" element={<Navigate to="/admin" replace />} />

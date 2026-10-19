@@ -19,15 +19,16 @@ export function listOrganizations(): Promise<Organization[]> {
  * The organization whose moderator queue to show.
  *
  * Every moderator endpoint is scoped to one organization, so a screen needs an
- * id before it can ask for anything. A shared organization is preferred over
- * the personal one each account gets on sign-up, because the personal one has
- * no other members and therefore nothing to moderate. Returns null when the
- * account belongs to no organization at all, which the caller shows as an
- * empty state rather than an error.
+ * id before it can ask for anything. Only a team (a shared organization) counts:
+ * the personal workspace each account gets on sign-up has no other members and
+ * is not something to moderate. Returns null when the account belongs to no team,
+ * which the caller shows as "you are not part of an organization" rather than an error.
  */
 export async function resolveModeratorOrganization(): Promise<Organization | null> {
   const organizations = await listOrganizations()
-  return organizations.find(organization => !organization.is_personal) ?? organizations[0] ?? null
+  // Only a team counts. A personal workspace has no other members, the backend refuses most moderator actions on it,
+  // and a moderator who belongs to no team must see "no organization" rather than their own uploads dressed as a queue.
+  return organizations.find(organization => !organization.is_personal && organization.status === 'active') ?? null
 }
 
 // ── Members and invitations (owner or moderator) ─────────────────────────────

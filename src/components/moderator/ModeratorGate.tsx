@@ -42,7 +42,7 @@ export function ModeratorGate<T>({ state, what, children }: ModeratorGateProps<T
       {!loading && !error && data === null && (
         <div className="text-center py-16 text-ink-faint">
           <Mail className="w-8 h-8 mx-auto mb-3 opacity-30" />
-          <p className="text-xs font-semibold">You are not part of an organization yet, so there is nothing to show here.</p>
+          <p className="text-xs font-semibold">You are not part of an organization yet, so there is nothing to show here. Ask an administrator to add you to one.</p>
         </div>
       )}
       {data !== null && !error && children(data)}

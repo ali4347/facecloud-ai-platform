@@ -10,6 +10,7 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
 import { createAdminUser, setAdminUserSuspended } from '../../lib/api/adminUsers'
+import { teamsOf, useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { USE_API } from '../../lib/api/config'
 import { USERS_PAGE_SIZE, useAdminUserList, type AccountRow as UserRow } from '../../lib/useAdminUserList'
 import { formatDate } from '../../lib/utils'
@@ -27,6 +28,7 @@ export default function UsersPage() {
   const urlSearch = params.get('q') ?? ''
   const [search, setSearch] = useState(urlSearch)
   const [page, setPage] = useState(1)
+  const orgs = useAdminOrganizations()
   useEffect(() => { setSearch(urlSearch); setPage(1) }, [urlSearch])
   const [formOpen, setFormOpen] = useState(false)
   const [justCreated, setJustCreated] = useState<NewAccount | null>(null)
@@ -50,7 +52,7 @@ export default function UsersPage() {
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
     if (USE_API) {
-      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: account.role })
+      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: account.role, ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
       reload()
     } else {
       setAddedInDemo(rows => [{
@@ -114,6 +116,7 @@ export default function UsersPage() {
             title="New user"
             subtitle="Creates a sign-in for a person. Choose Moderator to give them the moderator panel."
             roles={['user', 'moderator']}
+            organizations={teamsOf(orgs.data)}
             onCreate={handleCreate}
             onCancel={() => setFormOpen(false)}
           />
