@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Failed work uses backend PR #107's richer fields
+*Status: committed (this commit).*
+
+- **Backend result (Ijaz, PR #107 `fix/console-gaps`, not merged yet):** the failed-batch list now carries `organization_*`, `failure_stage(_label)`, `failure_reason` (always a sentence), `failed_images`, `failed_at`, `can_retry`, `retry_blocked_reason`, `max_retries`, `retries_left`; failed jobs carry `kind_label`, organization, stage, reason, `failed_at`; the moderator preference `moderator_review_updates` is exposed; a new password equal to the current one is refused. The "correct" decision already notified the member on `main`.
+- **Frontend:** the Failed uploads table shows the Organization, the stage in words, the real reason, "retries x of max" and the time it failed; **Retry is switched off, with the reason underneath, when `can_retry` is false** (no failed photos, or the retry limit reached); the failed-jobs list shows the kind's name, organization and stage. Every new field is optional, so the screen still works against a backend without #107.
+- **Not needed:** the live review page never offers "correct" (only the demo page does), so the backend's caveat that "correct" changes nothing on quality and duplicate reviews does not affect it.
+- **Files:** `src/lib/api/adminOperations.ts`, `src/components/admin/FailedWork.tsx`.
+- **Verified** on a throwaway copy of the PR branch with three failed batches (retryable, none failed, at the limit) in headless Chrome: organization, stage wording, reason sentences, "3 of 3" / "0 of 3", Retry off for the two that cannot be retried with the backend's sentence shown, on for the other; no page errors. `npx tsc -b` and both builds pass. The older-backend path (fields missing) was passed on the previous commit's test and not re-run.
+
 ### 2026-10-19 — Admin: failed work with Retry, Moderation Overview, Invitations
 *Status: committed (this commit).*
 

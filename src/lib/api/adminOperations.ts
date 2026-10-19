@@ -25,6 +25,21 @@ export interface FailedBatch {
   processing_finished_at: string | null
   created_at: string
   updated_at: string
+  /* Added by the backend's "console gaps" change; missing on a backend without it, so every one is optional. */
+  organization_id?: number | null
+  organization_name?: string | null
+  /** Where most of its failed photos failed, in words ("Face validation"). */
+  failure_stage_label?: string
+  /** Why, as a sentence; never empty. */
+  failure_reason?: string
+  failed_images?: number
+  failed_at?: string
+  /** Whether Retry would be accepted now. */
+  can_retry?: boolean
+  /** Why it cannot be retried now; empty when it can. */
+  retry_blocked_reason?: string
+  max_retries?: number
+  retries_left?: number
 }
 
 export function listFailedBatches(page: number, signal?: AbortSignal): Promise<Paged<FailedBatch>> {
@@ -45,6 +60,12 @@ export interface FailedJob {
   reason: string
   created_at: string
   updated_at: string
+  /* Added by the same backend change; optional for the same reason. */
+  kind_label?: string
+  organization_name?: string | null
+  failure_stage_label?: string
+  failure_reason?: string
+  failed_at?: string
 }
 export interface FailedJobs { generated_at: string; limit_per_kind: number; kinds: Record<string, FailedJob[]> }
 

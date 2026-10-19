@@ -56,7 +56,7 @@ function FailedBatches() {
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-[10px] uppercase tracking-wider text-ink-faint border-b border-line">
-                    <th className="py-2 pr-4">Upload</th><th className="py-2 pr-4">Owner</th><th className="py-2 pr-4">Photos</th>
+                    <th className="py-2 pr-4">Upload</th><th className="py-2 pr-4">Owner</th><th className="py-2 pr-4">Organization</th><th className="py-2 pr-4">Photos</th>
                     <th className="py-2 pr-4">Stopped at</th><th className="py-2 pr-4">Error</th><th className="py-2 pr-4">Retries</th>
                     <th className="py-2 pr-4">When</th><th className="py-2"><span className="sr-only">Action</span></th>
                   </tr>
@@ -66,16 +66,20 @@ function FailedBatches() {
                     <tr key={batch.id} className="text-ink">
                       <td className="py-2 pr-4 font-semibold">{batch.display_name || `Upload #${batch.id}`}<span className="block text-[10px] font-normal text-ink-faint">{batch.upload_type}</span></td>
                       <td className="py-2 pr-4">{batch.owner_username}</td>
-                      <td className="py-2 pr-4">{batch.total_files} sent, {batch.accepted_files} accepted{batch.processing_failed_files > 0 ? <span className="text-[#EF4444]"> · {batch.processing_failed_files} failed</span> : null}</td>
-                      <td className="py-2 pr-4 capitalize">{stageLabel(batch.current_stage)}</td>
-                      <td className="py-2 pr-4 max-w-[18rem] break-words text-ink-mute">{batch.processing_error || 'No error text was recorded'}</td>
-                      <td className="py-2 pr-4">{batch.retry_count}</td>
-                      <td className="py-2 pr-4 whitespace-nowrap text-ink-mute">{formatDateTime(batch.updated_at)}</td>
+                      <td className="py-2 pr-4 text-ink-mute">{batch.organization_name ?? '—'}</td>
+                      <td className="py-2 pr-4">{batch.total_files} sent, {batch.accepted_files} accepted{(batch.failed_images ?? batch.processing_failed_files) > 0 ? <span className="text-[#EF4444]"> · {batch.failed_images ?? batch.processing_failed_files} failed</span> : null}</td>
+                      <td className="py-2 pr-4 capitalize">{batch.failure_stage_label !== undefined ? batch.failure_stage_label || '—' : stageLabel(batch.current_stage)}</td>
+                      <td className="py-2 pr-4 max-w-[18rem] break-words text-ink-mute">{batch.failure_reason || batch.processing_error || 'No error text was recorded'}</td>
+                      <td className="py-2 pr-4 whitespace-nowrap">{batch.max_retries !== undefined ? `${batch.retry_count} of ${batch.max_retries}` : batch.retry_count}</td>
+                      <td className="py-2 pr-4 whitespace-nowrap text-ink-mute">{formatDateTime(batch.failed_at ?? batch.updated_at)}</td>
                       <td className="py-2 text-right">
-                        <button type="button" disabled={busyId !== null} onClick={() => void retry(batch.id)}
+                        <button type="button" disabled={busyId !== null || batch.can_retry === false} title={batch.can_retry === false ? batch.retry_blocked_reason : undefined} onClick={() => void retry(batch.id)}
                           className="fc-btn-secondary !py-1.5 !px-3 text-[11px] font-bold inline-flex items-center gap-1.5 disabled:opacity-50">
                           {busyId === batch.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCw className="w-3.5 h-3.5" />}Retry
                         </button>
+                        {batch.can_retry === false && batch.retry_blocked_reason && !notes[batch.id] && (
+                          <p className="mt-1.5 text-[10px] max-w-[14rem] ml-auto text-ink-faint">{batch.retry_blocked_reason}</p>
+                        )}
                         {notes[batch.id] && (
                           <p role={notes[batch.id].bad ? 'alert' : 'status'} className={`mt-1.5 text-[10px] max-w-[14rem] ml-auto ${notes[batch.id].bad ? 'text-[#F87171]' : 'text-[#10B981]'}`}>{notes[batch.id].text}</p>
                         )}
@@ -114,17 +118,19 @@ function FailedJobs() {
               {kinds.map(([kind, rows]) => (
                 <div key={kind}>
                   <div className="flex items-center gap-2 mb-2">
-                    <h4 className="text-xs font-bold text-ink">{jobLabel(kind)}</h4>
+                    <h4 className="text-xs font-bold text-ink">{rows[0]?.kind_label || jobLabel(kind)}</h4>
                     <StatusBadge status="error" label={`${rows.length} shown`} dot={false} />
                   </div>
                   <ul className="divide-y divide-line border border-line rounded-2xl overflow-hidden">
                     {rows.map(row => (
                       <li key={row.id} className="p-3 text-xs flex flex-wrap gap-x-6 gap-y-1 items-start justify-between bg-surface-mute">
                         <div className="min-w-0 flex-1">
-                          <p className="text-ink break-words">{row.reason || 'No reason was recorded'}</p>
-                          <p className="text-[10px] text-ink-faint mt-0.5">#{row.id} · {row.owner_username}</p>
+                          <p className="text-ink break-words">{row.failure_reason || row.reason || 'No reason was recorded'}</p>
+                          <p className="text-[10px] text-ink-faint mt-0.5">
+                            #{row.id} · {row.owner_username}{row.organization_name ? ` · ${row.organization_name}` : ''}{row.failure_stage_label ? ` · stopped at ${row.failure_stage_label.toLowerCase()}` : ''}
+                          </p>
                         </div>
-                        <span className="text-[10px] text-ink-mute whitespace-nowrap">{formatDateTime(row.updated_at)}</span>
+                        <span className="text-[10px] text-ink-mute whitespace-nowrap">{formatDateTime(row.failed_at ?? row.updated_at)}</span>
                       </li>
                     ))}
                   </ul>
