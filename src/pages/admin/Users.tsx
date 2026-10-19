@@ -117,6 +117,8 @@ export default function UsersPage() {
             subtitle="Creates a sign-in for a person. Choose Moderator to give them the moderator panel."
             roles={['user', 'moderator']}
             organizations={teamsOf(orgs.data)}
+            organizationsError={orgs.error}
+            onRetryOrganizations={orgs.reload}
             onCreate={handleCreate}
             onCancel={() => setFormOpen(false)}
           />

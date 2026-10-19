@@ -74,6 +74,8 @@ export default function Moderators() {
           subtitle="Creates a sign-in for a moderator, who reaches the moderator panel by its direct link"
           roles={['moderator']}
           organizations={teamsOf(orgs.data)}
+            organizationsError={orgs.error}
+            onRetryOrganizations={orgs.reload}
           onCreate={handleCreate}
           onCancel={() => setFormOpen(false)}
         />

@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Plain messages when the server answers with a page; honest "organizations could not be loaded"
+*Status: committed (this commit).*
+
+- **Report (Ali, two screenshots):** Admin → Organizations showed `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`, and on Moderators the "Create account" button stayed off with "There is no organization yet".
+- **Cause (reproduced on a throwaway copy of `origin/main`):** new backend code on a database that has not been migrated. `GET /api/organizations/admin/` answers **500 with Django's HTML error page** (200 and JSON once migrated), and even sign-in fails in that state. The frontend tried to read the page as JSON, and the moderator form read the failed list as "no organizations", which was untrue and left the button off. Ali's local backend had just been updated (`git pull`) but `python manage.py migrate` had not been run.
+- **Frontend:** `src/lib/api/client.ts` turns a reply that is not JSON into a sentence (500: "internal error… run migrate and restart"; 404: older backend or wrong `VITE_API_URL`; 200 with a page: `VITE_API_URL` points at the wrong server) instead of the browser's parse error. The account form (Users, Moderators) and the Invitations form now say "The organizations could not be loaded: …" with Try again, keep the button off, and never claim there is no organization when the list simply failed.
+- **Verified** in headless Chrome against the throwaway copy: signed in, rolled the organizations migrations back to 0009, the Organizations page and the moderator form show the new sentences; after `migrate`, owner search found the account, typing without choosing was refused, the organization was created, the moderator form offered it, Create account enabled and the moderator was created (confirmed on the server). `npx tsc -b`, `npm run build`, demo-safe build pass.
+- **Files:** `src/lib/api/client.ts`, `src/components/admin/NewAccountForm.tsx`, `src/pages/admin/Moderators.tsx`, `src/pages/admin/Users.tsx`, `src/pages/admin/Invitations.tsx`.
+
 ### 2026-10-19 — Failed work uses backend PR #107's richer fields
 *Status: committed (this commit).*
 

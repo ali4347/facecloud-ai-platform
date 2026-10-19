@@ -93,7 +93,9 @@ export default function InvitationsPage() {
           {role === 'moderator' && (
             <div className="space-y-1.5 max-w-sm">
               <label htmlFor="inv-org" className={labelClass}>Organization</label>
-              {teams.length === 0 ? (
+              {orgs.error ? (
+                <p role="alert" className="text-xs text-[#F87171]">The organizations could not be loaded: {orgs.error} <button type="button" onClick={orgs.reload} className="font-semibold text-[#FB923C] hover:underline cursor-pointer">Try again</button></p>
+              ) : teams.length === 0 ? (
                 <p className="text-xs text-ink-mute">There is no organization yet. <Link to="/admin/organizations" className="font-semibold text-[#FB923C] hover:underline">Create one first</Link>.</p>
               ) : (
                 <select id="inv-org" className="fc-input" value={organizationId} onChange={e => setOrganizationId(e.target.value ? Number(e.target.value) : '')} required>
@@ -106,7 +108,7 @@ export default function InvitationsPage() {
               )}
             </div>
           )}
-          <GradientButton type="submit" disabled={sending || (role === 'moderator' && teams.length === 0)} leftIcon={<Send className="w-4 h-4" />}>
+          <GradientButton type="submit" disabled={sending || (role === 'moderator' && (teams.length === 0 || Boolean(orgs.error)))} leftIcon={<Send className="w-4 h-4" />}>
             {sending ? 'Sending…' : 'Send invitation'}
           </GradientButton>
         </form>

@@ -167,6 +167,21 @@ async function request(path: string, options: RequestOptions = {}): Promise<Resp
   return response
 }
 
+/**
+ * The body is not JSON: an error page (Django's debug page after a crash, a 404 page) or the wrong server altogether.
+ * Say what that usually means instead of the browser's "Unexpected token '<'".
+ */
+function pageInsteadOfJson(status: number): ApiError {
+  const message = status >= 500
+    ? `The server had an internal error (HTTP ${status}). The backend terminal shows why; after updating the backend, run "python manage.py migrate" and restart it.`
+    : status === 404
+      ? 'The server does not know this address (HTTP 404). The backend may be an older version, or VITE_API_URL points to the wrong place.'
+      : status >= 400
+        ? `The server answered with an error page instead of data (HTTP ${status}).`
+        : 'This address answered with a web page, not the API. Check that VITE_API_URL points to the backend.'
+  return new ApiError(status, message)
+}
+
 /** One call to the API, with a JSON body in and a parsed body out. */
 export async function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
   const response = await request(path, options)
@@ -174,7 +189,10 @@ export async function apiFetch<T = unknown>(path: string, options: RequestOption
   if (response.status === 204) return undefined as T
 
   const text = await response.text()
-  const parsed = text ? JSON.parse(text) : null
+  let parsed: unknown = null
+  if (text) {
+    try { parsed = JSON.parse(text) } catch { throw pageInsteadOfJson(response.status) }
+  }
 
   if (!response.ok) {
     throw new ApiError(response.status, messageFrom(parsed, response.status), parsed)

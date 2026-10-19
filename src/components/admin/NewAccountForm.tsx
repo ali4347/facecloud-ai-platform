@@ -33,12 +33,15 @@ function generatePassword(length = 14): string {
  * the session). If `onCreate` throws, the message is shown here and what was typed is kept, so the
  * administrator can fix one field instead of retyping everything.
  */
-export function NewAccountForm({ title, subtitle, roles, organizations = [], onCreate, onCancel }: {
+export function NewAccountForm({ title, subtitle, roles, organizations = [], organizationsError = null, onRetryOrganizations, onCreate, onCancel }: {
   title: string
   subtitle: string
   roles: NewAccountRole[]
   /** The teams a moderator can be placed in. A moderator must belong to one, so the form insists on a choice. */
   organizations?: AdminOrganization[]
+  /** Why the list of teams could not be loaded; shown instead of "there is no organization yet", which would be untrue. */
+  organizationsError?: string | null
+  onRetryOrganizations?: () => void
   onCreate: (account: NewAccount) => Promise<void> | void
   onCancel: () => void
 }) {
@@ -121,7 +124,12 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], onC
         {role === 'moderator' && (
           <div className="space-y-1.5 max-w-sm">
             <label htmlFor="new-organization" className={labelClass}>Organization</label>
-            {organizations.length === 0 ? (
+            {organizationsError ? (
+              <p role="alert" className="text-xs text-[#F87171]">
+                The organizations could not be loaded: {organizationsError}
+                {onRetryOrganizations && <> <button type="button" onClick={onRetryOrganizations} className="font-semibold text-[#FB923C] hover:underline cursor-pointer">Try again</button></>}
+              </p>
+            ) : organizations.length === 0 ? (
               <p className="text-xs text-ink-mute">There is no organization yet. <Link to="/admin/organizations" className="font-semibold text-[#FB923C] hover:underline">Create one first</Link>: a moderator works for an organization and only sees its data.</p>
             ) : (
               <>
@@ -139,7 +147,7 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], onC
         )}
 
         <div className="flex gap-2 pt-1">
-          <GradientButton type="submit" disabled={busy || (role === 'moderator' && organizations.length === 0)} leftIcon={<UserCog className="w-4 h-4" />}>
+          <GradientButton type="submit" disabled={busy || (role === 'moderator' && (organizations.length === 0 || Boolean(organizationsError)))} leftIcon={<UserCog className="w-4 h-4" />}>
             {busy ? 'Creating…' : 'Create account'}
           </GradientButton>
           <GradientButton type="button" variant="secondary" onClick={onCancel} disabled={busy}>Cancel</GradientButton>
