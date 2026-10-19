@@ -4,6 +4,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { mockReviewItems, mockGroups, mockModeratorAudit, mockModNotifications } from '../../data/mock'
 import { ArrowLeft, Check, X, ShieldAlert, CheckCircle, AlertTriangle, Play, RefreshCw, AlertOctagon } from 'lucide-react'
+import { readSessionRaw } from '../../lib/session'
 
 export default function ModeratorImageReview() {
   const { id } = useParams<{ id: string }>()
@@ -23,7 +24,7 @@ export default function ModeratorImageReview() {
   const [escalationNote, setEscalationNote] = useState('')
   const [toastMsg, setToastMsg] = useState('')
 
-  const sessionStr = localStorage.getItem('facecloud_session')
+  const sessionStr = readSessionRaw('moderator')
   const session = sessionStr ? JSON.parse(sessionStr) : { name: 'Vaneeza Sohaib' }
 
   const showToastAndRedirect = (msg: string) => {

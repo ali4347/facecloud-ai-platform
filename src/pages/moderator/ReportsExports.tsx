@@ -4,6 +4,7 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { mockReportHistory, mockModeratorAudit } from '../../data/mock'
 import type { GeneratedReport } from '../../data/mock'
 import { Download, Calendar, CheckCircle, FileText, FileSpreadsheet, Layers, BarChart2 } from 'lucide-react'
+import { readSessionRaw } from '../../lib/session'
 
 const REPORT_TYPES = [
   { id: 'review_activity', label: 'Review Activity', desc: 'Moderation decisions, approval/rejection counts, and overrides log.', icon: Layers },
@@ -21,7 +22,7 @@ export default function ReportsExports() {
   const [selectedFormat, setSelectedFormat] = useState<'CSV' | 'PDF' | 'JSON'>('PDF')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-  const sessionStr = localStorage.getItem('facecloud_session')
+  const sessionStr = readSessionRaw('moderator')
   const session = sessionStr ? JSON.parse(sessionStr) : { name: 'Vaneeza Sohaib' }
 
   const showToast = (msg: string) => {

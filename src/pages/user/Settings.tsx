@@ -5,7 +5,7 @@ import { GradientButton } from '../../components/ui/GradientButton'
 import { Avatar } from '../../components/ui/Avatar'
 import { PasswordInput } from '../../components/ui/PasswordInput'
 import { User, Lock, Bell, Camera, Save, Upload, Trash2, Check, ScanFace, Download } from 'lucide-react'
-import { useSessionUser, updateSessionName } from '../../lib/session'
+import { useSessionUser, updateSessionName, clearSession } from '../../lib/session'
 import { useProfile, saveProfile } from '../../lib/profile'
 import type { Profile } from '../../lib/profile'
 import { AVATAR_PRESETS, fileToAvatarDataUrl, useAvatar } from '../../lib/avatar'
@@ -255,7 +255,7 @@ function SecuritySettingsLive() {
     try {
       await apiFetch('/api/user/delete-account/', { method: 'DELETE', body: { password: deletePassword } })
       clearTokens()
-      localStorage.removeItem('facecloud_session')
+      clearSession('user')
       navigate('/login', { replace: true, state: { notice: 'Your account was deleted.' } })
     } catch (err) {
       setDeleteError(err instanceof ApiError ? err.message : 'Could not delete the account. Please try again.')
@@ -283,7 +283,7 @@ function SecuritySettingsLive() {
   }
 
   const leave = () => {
-    localStorage.removeItem('facecloud_session')
+    clearSession('user')
     navigate('/login', { replace: true, state: { notice: 'Your password was changed. Please sign in again.' } })
   }
 
@@ -305,7 +305,7 @@ function SecuritySettingsLive() {
   const signOutEverywhere = async () => {
     setSigningOut(true)
     try { await logoutEverywhere() } catch { /* tokens are cleared either way */ }
-    localStorage.removeItem('facecloud_session')
+    clearSession('user')
     navigate('/login', { replace: true })
   }
 

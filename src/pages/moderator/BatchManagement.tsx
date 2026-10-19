@@ -7,6 +7,7 @@ import { formatDateTime } from '../../lib/utils'
 import { 
   Play, Download, X, RefreshCw, ChevronDown, ChevronUp, CheckCircle, Search, HelpCircle, ShieldAlert 
 } from 'lucide-react'
+import { readSessionRaw } from '../../lib/session'
 
 export default function BatchManagement() {
   const [batches, setBatches] = useState<BatchRecord[]>(mockBatches)
@@ -14,7 +15,7 @@ export default function BatchManagement() {
   const [searchTerm, setSearchTerm] = useState('')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-  const sessionStr = localStorage.getItem('facecloud_session')
+  const sessionStr = readSessionRaw('moderator')
   const session = sessionStr ? JSON.parse(sessionStr) : { name: 'Vaneeza Sohaib' }
 
   const showToast = (msg: string) => {

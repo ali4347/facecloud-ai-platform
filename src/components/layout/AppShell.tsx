@@ -6,6 +6,7 @@ import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { useAppearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 import { SESSION_LOST_EVENT } from '../../lib/api/client'
+import { clearSession } from '../../lib/session'
 
 interface AppShellProps {
   role: Role
@@ -20,7 +21,7 @@ export function AppShell({ role }: AppShellProps) {
   /* The API says the session is over (revoked, expired, or the server no longer knows it): sign out and say why. */
   useEffect(() => {
     const onLost = () => {
-      localStorage.removeItem('facecloud_session')
+      clearSession(role)
       const to = role === 'admin' ? '/admin/login' : role === 'moderator' ? '/moderator/login' : '/login'
       navigate(to, { replace: true, state: { sessionExpired: true } })
     }

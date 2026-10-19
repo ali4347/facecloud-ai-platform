@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Settings, LogOut, ChevronUp, Shield } from 'lucide-react'
 import { Avatar } from './Avatar'
-import { useSessionUser } from '../../lib/session'
+import { useSessionUser, clearSession } from '../../lib/session'
 import { announcePopoverOpen, onOtherPopoverOpen } from '../../lib/popover'
 import type { Role } from '../../data/mock'
 import { logout } from '../../lib/api/auth'
@@ -98,7 +98,7 @@ export function UserMenu({ role }: UserMenuProps) {
   /* Signing out clears the session first. The old topbar menu only linked to
      /login, which left the session in place, so the guard sent you back in. */
   const handleLogout = () => {
-    localStorage.removeItem('facecloud_session')
+    clearSession(role)
     /* Against the real backend this also revokes the refresh token, so the
        session cannot be revived from another tab. It clears the local tokens
        even if the call fails, so it does not need to be awaited. */

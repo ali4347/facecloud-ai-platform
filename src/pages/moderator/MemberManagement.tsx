@@ -6,6 +6,7 @@ import type { OrgMember } from '../../data/mock'
 import { USE_API } from '../../lib/api/config'
 import { LiveMemberManagement } from './MemberManagementLive'
 import { Search, UserPlus, Mail, Trash2, RefreshCw, X, ShieldAlert, CheckCircle } from 'lucide-react'
+import { readSessionRaw } from '../../lib/session'
 
 /** The demo build's version: local sample members, kept for the site that has no backend. */
 function DemoMemberManagement() {
@@ -17,7 +18,7 @@ function DemoMemberManagement() {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   // Get active session
-  const sessionStr = localStorage.getItem('facecloud_session')
+  const sessionStr = readSessionRaw('moderator')
   const session = sessionStr ? JSON.parse(sessionStr) : { name: 'Vaneeza Sohaib', email: 'moderator@facecloud.ai', initials: 'VS' }
   // Find current moderator ID from email
   const currentModeratorId = 'u3' // Vaneeza Sohaib's user ID

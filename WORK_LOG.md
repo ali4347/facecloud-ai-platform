@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — User, admin and moderator can be signed in at the same time (session clash fixed)
+*Status: committed (this commit).*
+
+- **Reported:** signing in as an administrator while a user was signed in (and the other way round, and with the moderator) sent the other portal to "Access Denied" or asked it to sign in again.
+- **Cause:** the three portals shared two storage keys, `facecloud_session` and `facecloud_refresh`, and localStorage is shared by every tab of the site. The second sign-in overwrote the first one's session, so the first tab's next page change failed the role check (`/unauthorized`); and because the refresh token also rotates in that single slot, a tab that refreshed its token could take the other portal's token or invalidate it. Signing out in one portal also cleared them all. Reproduced first in headless Chrome with three tabs (user tab ended on `/unauthorized`).
+- **Changed:** each portal now has its own keys: `facecloud_session:<portal>`, `facecloud_refresh:<portal>`, `fc_was_logged_in:<portal>`, and its own in-memory access token. The portal is read from the page's path (`/admin…`, `/moderator…`, everything else is the user portal). New `src/lib/portal.ts`; `tokens.ts`, `session.ts` (`readSessionRaw`, `saveSession`, `clearSession`), `auth.ts`, `ProtectedRoute.tsx`, `AppShell.tsx`, `UserMenu.tsx`, `Settings.tsx`, the three login pages, `VerifyEmail.tsx` and five moderator pages use them. Anyone already signed in under the old single key is carried over once (their session and refresh token move to their portal's keys and the shared keys are removed), so nobody is signed out by this release.
+- **Behaviour now:** the three portals can be open and signed in together in one browser; signing out of one leaves the others signed in; a refresh in one portal never touches another's token.
+- **Verified:** headless Chrome, three tabs (user, admin, moderator) against a throwaway backend (origin/main): all three signed in, moving around and reloading each stayed in its own portal and showed its own account (`puser`, `padm`, `pmod`), signing the admin out left the user and moderator signed in, and the storage held separate keys per portal. A carried-over one-key admin session still worked and the shared keys were removed. Demo build: the same three-tab check passed. `tsc` and both builds pass, no new lint finding.
+- **Note:** a public page such as the landing page reads the user portal's session only, so someone signed in only as an administrator is not shown as signed in there.
+
 ### 2026-10-19 — Admin console finished: real top-bar search and bell
 *Status: committed (this commit).*
 

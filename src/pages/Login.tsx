@@ -6,6 +6,7 @@ import { signInToPortal } from '../lib/api/auth'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
+import { saveSession, type Session } from '../lib/session'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -48,7 +49,7 @@ export default function Login() {
     await new Promise(r => setTimeout(r, 800))
     setLoading(false)
     if (email === 'user@facecloud.ai' && password === 'password') {
-      const session = {
+      const session: Session = {
         token: 'mock-jwt-user-token-xyz-12345',
         role: 'user',
         email: 'user@facecloud.ai',
@@ -56,7 +57,7 @@ export default function Login() {
         initials: 'IA',
         emailVerified: localStorage.getItem('fc_email_verified') === 'true',
       }
-      localStorage.setItem('facecloud_session', JSON.stringify(session))
+      saveSession(session)
       navigate('/dashboard')
     } else {
       setError('Invalid credentials. Use user@facecloud.ai / password')

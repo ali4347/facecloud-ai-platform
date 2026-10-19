@@ -159,6 +159,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/live-enhancement` (webcam preview with face detection; a captured frame is stored in My Images and enhanced by the real pipeline with a chosen style and strength, real before/after and "what was done"; "Enhance again" re-enhances the same photo. The live preview itself uses simple browser filters. The demo build keeps the simulated version)
 * `/dashboard/jobs` (Batch job history directory)
 
+> **Sessions:** the user dashboard, the admin console and the moderator panel each keep their own session and tokens (`facecloud_session:<portal>`, `facecloud_refresh:<portal>`), so all three can be signed in side by side in one browser and each signs out on its own.
+
 ### Admin Console Routes (under `/admin`)
 * `/admin` (Admin Overview: totals, uploads, enhanced, rejected, quality pass rate, storage, with 7 / 30 / 90-day chips)
 * `/admin/users` (User directory with server search and paging, upload counts, suspend / activate, Add User)

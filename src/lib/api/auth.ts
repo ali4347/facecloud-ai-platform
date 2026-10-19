@@ -1,7 +1,7 @@
 import { apiFetch, ApiError } from './client'
 import { setAccessToken, setRefreshToken, getRefreshToken, clearTokens } from './tokens'
 import type { Role } from '../../data/mock'
-import { initialsFrom } from '../session'
+import { initialsFrom, saveSession } from '../session'
 
 export interface ApiUser {
   id?: number | string
@@ -178,13 +178,13 @@ export async function signInToPortal(
   }
 
   const name = displayNameOf(result.user)
-  localStorage.setItem('facecloud_session', JSON.stringify({
+  saveSession({
     role: result.role,
     email: result.user.email,
     name,
     initials: initialsFrom(name),
     emailVerified: true,
-  }))
+  })
   return { kind: 'ok', dashboard: result.dashboard }
 }
 

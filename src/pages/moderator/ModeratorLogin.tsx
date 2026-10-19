@@ -6,6 +6,7 @@ import { FaceCloudLogo } from '../../components/branding/FaceCloudLogo'
 import { signInToPortal } from '../../lib/api/auth'
 import { ApiError } from '../../lib/api/client'
 import { USE_API } from '../../lib/api/config'
+import { saveSession, type Session } from '../../lib/session'
 
 export default function ModeratorLogin() {
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ export default function ModeratorLogin() {
     setLoading(false)
 
     if (email === 'moderator@facecloud.ai' && password === 'password') {
-      const session = {
+      const session: Session = {
         token: 'mock-jwt-moderator-token-lmn-45678',
         role: 'moderator',
         email: 'moderator@facecloud.ai',
@@ -49,7 +50,7 @@ export default function ModeratorLogin() {
         initials: 'VS',
         emailVerified: true
       }
-      localStorage.setItem('facecloud_session', JSON.stringify(session))
+      saveSession(session)
       navigate('/moderator')
     } else {
       setError('Invalid credentials. Use moderator@facecloud.ai / password')

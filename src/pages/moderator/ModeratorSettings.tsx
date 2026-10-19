@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { ShieldCheck, Mail, RefreshCw } from 'lucide-react'
+import { readSessionRaw } from '../../lib/session'
 
 export default function ModeratorSettings() {
   const [session, setSession] = useState<any>(null)
@@ -9,7 +10,7 @@ export default function ModeratorSettings() {
   const [notifyRisk, setNotifyRisk] = useState(true)
 
   useEffect(() => {
-    const sessionStr = localStorage.getItem('facecloud_session')
+    const sessionStr = readSessionRaw('moderator')
     if (sessionStr) {
       try {
         setSession(JSON.parse(sessionStr))

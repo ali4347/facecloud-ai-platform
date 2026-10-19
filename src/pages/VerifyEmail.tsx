@@ -7,6 +7,7 @@ import {
 } from '../lib/api/auth'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
+import { readSessionRaw, saveSession } from '../lib/session'
 
 export default function VerifyEmail() {
   const navigate = useNavigate()
@@ -65,12 +66,12 @@ export default function VerifyEmail() {
     await new Promise(r => setTimeout(r, 600))
     setLoading(false)
     localStorage.setItem('fc_email_verified', 'true')
-    const sessionStr = localStorage.getItem('facecloud_session')
+    const sessionStr = readSessionRaw('user')
     if (sessionStr) {
       try {
         const session = JSON.parse(sessionStr)
         session.emailVerified = true
-        localStorage.setItem('facecloud_session', JSON.stringify(session))
+        saveSession(session)
       } catch (_) { /* ignore */ }
     }
     finish()

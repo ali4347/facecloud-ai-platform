@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import type { Role } from '../../data/mock'
+import { clearSession, readSessionRaw } from '../../lib/session'
+import { wasSignedInKey } from '../../lib/portal'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -9,12 +11,13 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, allowedRole }: ProtectedRouteProps) {
   const location = useLocation()
   
-  // Read session from localStorage
-  const sessionStr = localStorage.getItem('facecloud_session')
+  // This portal's own session: the user, admin and moderator sessions are stored apart, so signing in to one
+  // portal never signs another out or sends it to "Access Denied".
+  const sessionStr = readSessionRaw(allowedRole)
   
   if (!sessionStr) {
     // Redirect to corresponding login route with expired flag if there was a prior session
-    const hadSession = !!document.cookie || !!localStorage.getItem('fc_was_logged_in')
+    const hadSession = !!document.cookie || !!localStorage.getItem(wasSignedInKey(allowedRole))
     const state = hadSession ? { sessionExpired: true } : undefined
     if (allowedRole === 'admin') {
       return <Navigate to="/admin/login" state={state ?? { from: location }} replace />
@@ -32,9 +35,9 @@ export function ProtectedRoute({ children, allowedRole }: ProtectedRouteProps) {
       return <Navigate to="/unauthorized" replace />
     }
     // Mark that user was logged in, so we can detect expiry on next redirect
-    localStorage.setItem('fc_was_logged_in', '1')
+    localStorage.setItem(wasSignedInKey(allowedRole), '1')
   } catch (e) {
-    localStorage.removeItem('facecloud_session')
+    clearSession(allowedRole)
     return <Navigate to="/login" state={{ sessionExpired: true }} replace />
   }
 

@@ -6,6 +6,7 @@ import { FaceCloudLogo } from '../../components/branding/FaceCloudLogo'
 import { signInToPortal } from '../../lib/api/auth'
 import { ApiError } from '../../lib/api/client'
 import { USE_API } from '../../lib/api/config'
+import { saveSession, type Session } from '../../lib/session'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ export default function AdminLogin() {
     setLoading(false)
 
     if (email === 'admin@dtm.io' && password === 'password') {
-      const session = {
+      const session: Session = {
         token: 'mock-jwt-admin-token-abc-98765',
         role: 'admin',
         email: 'admin@dtm.io',
@@ -49,7 +50,7 @@ export default function AdminLogin() {
         initials: 'AH',
         emailVerified: true
       }
-      localStorage.setItem('facecloud_session', JSON.stringify(session))
+      saveSession(session)
       navigate('/admin')
     } else {
       setError('Invalid credentials. Use admin@dtm.io / password')

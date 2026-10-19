@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Role } from '../data/mock'
+import { currentPortal, sessionKey } from './portal'
 
 export interface Session {
   token?: string
@@ -17,6 +18,29 @@ const FALLBACK: Record<Role, { name: string; email: string; initials: string }> 
   moderator: { name: 'Vaneeza Sohaib', email: 'moderator@facecloud.ai', initials: 'VS' },
 }
 
+/** The stored session of one portal, as text, or null. The user, admin and moderator sessions are kept apart. */
+export function readSessionRaw(portal: Role): string | null {
+  try {
+    return localStorage.getItem(sessionKey(portal))
+  } catch {
+    return null
+  }
+}
+
+/** Remember a signed-in person under their own portal. */
+export function saveSession(session: Session): void {
+  localStorage.setItem(sessionKey(session.role), JSON.stringify(session))
+}
+
+/** Forget one portal's session (this page's portal unless told otherwise); the other portals stay signed in. */
+export function clearSession(portal: Role = currentPortal()): void {
+  try {
+    localStorage.removeItem(sessionKey(portal))
+  } catch {
+    // Blocked storage: there is nothing stored to clear.
+  }
+}
+
 /**
  * The signed-in person, or null.
  *
@@ -26,7 +50,7 @@ const FALLBACK: Record<Role, { name: string; email: string; initials: string }> 
  */
 export function getSession(): Session | null {
   try {
-    const raw = localStorage.getItem('facecloud_session')
+    const raw = readSessionRaw(currentPortal())
     if (!raw) return null
     const parsed = JSON.parse(raw)
     if (!parsed || typeof parsed !== 'object' || !parsed.role) return null
@@ -81,7 +105,7 @@ export function updateSessionName(role: Role, name: string): void {
   if (!trimmed) return
   const next: Session = { ...session, name: trimmed, initials: initialsFrom(trimmed) }
   try {
-    localStorage.setItem('facecloud_session', JSON.stringify(next))
+    saveSession(next)
   } catch {
     return
   }
