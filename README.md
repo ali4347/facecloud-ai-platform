@@ -31,6 +31,8 @@ The frontend is being connected to the [Django backend](https://github.com/ijaz-
 
 With `VITE_USE_API=false` (or no `VITE_API_URL`) every screen falls back to the built-in demo data, so the prototype stays fully browsable without a server running.
 
+**Local backend and batch progress:** the Upload Multiple / ZIP screens show each stage (checking faces, quality, grouping, enhancing) only when the backend hands the work to a Celery worker. With `DJANGO_DEBUG=True` and no `CELERY_TASK_ALWAYS_EAGER=False`, the backend does all the processing *inside the upload request*: the screen then sits on "Uploading…" and jumps straight to the finished result. For the real behaviour run Redis, set `CELERY_TASK_ALWAYS_EAGER=False` in the backend `.env`, and start `celery -A config worker -l info --pool=solo` next to the API (`--pool=solo` is needed on macOS).
+
 ---
 
 ## 3. Tech Stack

@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Why ZIP / multiple uploads show no processing (investigation + README note)
+*Status: committed (this commit).*
+
+- **Report (Ali):** after uploading a ZIP or several photos no processing is shown.
+- **Cause (reproduced on a throwaway backend copy, own Redis on port 6390, nothing of Ali's touched):** Ali's local backend has `DJANGO_DEBUG=True` and no `CELERY_TASK_ALWAYS_EAGER` setting, and no Celery worker is running. The backend's default is then eager mode (`CELERY_TASK_ALWAYS_EAGER = DEBUG`), so all processing runs *inside the upload request*: a 6-photo ZIP returned `processing_status: completed` in the upload response itself, and a large archive would hold the screen on "Uploading…" for the whole time. With eager mode off and a worker running, the same ZIP returned in 0.5 s as `queued` and progress moved through its stages (17 % → 52 % → 92 % → 100 %, finished after about 2.7 s) — exactly what the screens already poll and draw.
+- **Fix:** environment, not frontend code. In the backend `.env` set `CELERY_TASK_ALWAYS_EAGER=False`, keep Redis running, start `celery -A config worker -l info --pool=solo`. Not changed by me (Ali's backend folder is off limits). README now says so.
+- **Files:** `README.md`, `WORK_LOG.md`. No source change.
+- **Also seen:** a very small test photo (216 px wide) is rejected as too small, which is correct and unrelated.
+
 ### 2026-10-19 — Editor: say plainly where a saved edit goes
 *Status: committed (this commit).*
 
