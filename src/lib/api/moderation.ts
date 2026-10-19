@@ -187,6 +187,21 @@ export function claimReview(organizationId: number, reviewId: number): Promise<M
   })
 }
 
+/** Hand the review to one moderator of the organization. Answers 400 when that person cannot take it. */
+export function assignReview(organizationId: number, reviewId: number, moderatorId: number): Promise<ModeratorReview> {
+  return apiFetch<ModeratorReview>(`${base(organizationId)}/reviews/${reviewId}/assign/`, { body: { moderator_id: moderatorId } })
+}
+
+/**
+ * For a review raised by a duplicate match: merge the two people's person folders behind it. With no ids the
+ * backend uses the single folder on each side; with several on a side it answers 400 and says so.
+ */
+export function mergeDuplicateFolders(
+  organizationId: number, reviewId: number, reason = '',
+): Promise<{ source: { id: number; display_name: string }; target: { id: number; display_name: string } }> {
+  return apiFetch(`${base(organizationId)}/reviews/${reviewId}/merge-identity-groups/`, { body: reason ? { reason } : {} })
+}
+
 /** Give a claimed review back to the queue. */
 export function releaseReview(organizationId: number, reviewId: number): Promise<ModeratorReview> {
   return apiFetch<ModeratorReview>(`${base(organizationId)}/reviews/${reviewId}/release/`, {

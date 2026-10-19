@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Check, Loader2, ShieldAlert, Unlock, Lock, X } from 'lucide-react'
+import { ArrowLeft, Check, GitMerge, Loader2, ShieldAlert, Unlock, UserCheck, Lock, X } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { StatusBadge } from '../../components/ui/StatusBadge'
@@ -8,10 +8,11 @@ import { AuthedImage } from '../../components/ui/AuthedImage'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { ModeratorGate } from '../../components/moderator/ModeratorGate'
 import {
-  claimReview, decideReview, deadlineState, escalateReview, getReview, getReviewImage, releaseReview, sourceLabel, statusLabel,
+  assignReview, claimReview, decideReview, deadlineState, escalateReview, getReview, getReviewImage, mergeDuplicateFolders, releaseReview, sourceLabel, statusLabel,
   type ModeratorReview,
 } from '../../lib/api/moderation'
 import { listOrgAudit, type OrgAuditEvent, type ReviewImageInfo } from '../../lib/api/moderatorConsole'
+import { listOrgMembers, type OrgMembership } from '../../lib/api/organizations'
 import { formatBytes } from '../../lib/imageData'
 import { useModeratorOrganization, useModeratorResource } from '../../lib/moderationData'
 import { explainReason } from '../../lib/reasons'
@@ -45,6 +46,12 @@ export function LiveImageReview() {
   const [busy, setBusy] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
+  // Handing the review to another moderator, and merging the person folders behind a duplicate match.
+  const [assigning, setAssigning] = useState(false)
+  const [people, setPeople] = useState<OrgMembership[] | null>(null)
+  const [assignee, setAssignee] = useState('')
+  const [merging, setMerging] = useState(false)
+  const [dialogError, setDialogError] = useState<string | null>(null)
 
   const reload = state.reload
   useEffect(() => {
@@ -59,6 +66,33 @@ export function LiveImageReview() {
   const run = async (work: () => Promise<unknown>, done: string) => {
     setBusy(true); setNotice(null)
     try { await work(); setNotice({ text: done }); reload() } catch (caught) { setNotice({ text: messageFor(caught), bad: true }) } finally { setBusy(false) }
+  }
+
+  const openAssign = (current: number | null) => {
+    setAssigning(true); setDialogError(null); setAssignee(current === null ? '' : String(current))
+    if (people === null && organizationId !== null) {
+      listOrgMembers(organizationId)
+        .then(rows => setPeople(rows.filter(row => row.status === 'active' && (row.role === 'moderator' || row.role === 'owner'))))
+        .catch(caught => { setPeople([]); setDialogError(messageFor(caught)) })
+    }
+  }
+
+  const confirmAssign = async () => {
+    if (organizationId === null || !assignee) return
+    setBusy(true); setDialogError(null)
+    try {
+      await assignReview(organizationId, reviewId, Number(assignee))
+      setAssigning(false); setNotice({ text: 'Assigned.' }); reload()
+    } catch (caught) { setDialogError(messageFor(caught)) } finally { setBusy(false) }
+  }
+
+  const confirmMerge = async () => {
+    if (organizationId === null) return
+    setBusy(true); setDialogError(null)
+    try {
+      const done = await mergeDuplicateFolders(organizationId, reviewId, text.trim())
+      setMerging(false); setText(''); setNotice({ text: `Merged “${done.source.display_name}” into “${done.target.display_name}”.` }); reload()
+    } catch (caught) { setDialogError(messageFor(caught)) } finally { setBusy(false) }
   }
 
   const submit = async () => {
@@ -146,6 +180,10 @@ export function LiveImageReview() {
                         <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('reject') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold !text-red-400"><X className="w-3.5 h-3.5" /> Reject</button>
                         <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('keep_in_review') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold">Keep in review</button>
                         <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('escalate') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold"><ShieldAlert className="w-3.5 h-3.5" /> Escalate</button>
+                        <button type="button" disabled={busy} onClick={() => openAssign(review.assigned_moderator?.id ?? null)} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold"><UserCheck className="w-3.5 h-3.5" /> Assign to…</button>
+                        {review.source === 'duplicate' && (
+                          <button type="button" disabled={busy} onClick={() => { setText(''); setDialogError(null); setMerging(true) }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold"><GitMerge className="w-3.5 h-3.5" /> Merge their folders</button>
+                        )}
                       </div>
                       <p className="text-[10px] text-ink-faint">A review someone else holds cannot be decided; the message says who.</p>
                     </div>
@@ -178,6 +216,34 @@ export function LiveImageReview() {
           )
         }}
       </ModeratorGate>
+
+      {assigning && (
+        <ConfirmDialog title="Assign this review" confirmLabel="Assign" busyLabel="Assigning…" busy={busy} error={dialogError}
+          confirmDisabled={!assignee || people === null} onCancel={() => setAssigning(false)} onConfirm={confirmAssign}>
+          <label htmlFor="review-assignee" className="block text-xs font-semibold text-ink">Who should handle it?</label>
+          {people === null ? (
+            <p className="text-xs text-ink-mute flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading the team…</p>
+          ) : people.length === 0 ? (
+            <p className="text-xs text-ink-mute">No other moderator is available to take it.</p>
+          ) : (
+            <select id="review-assignee" value={assignee} onChange={e => setAssignee(e.target.value)} className="w-full rounded-xl border border-line bg-surface-mute p-2 text-sm text-ink">
+              <option value="">Choose a person</option>
+              {people.map(row => <option key={row.id} value={row.user.id}>{row.user.username} ({row.role})</option>)}
+            </select>
+          )}
+          <p className="text-[11px] text-ink-faint">They are told it was assigned to them.</p>
+        </ConfirmDialog>
+      )}
+
+      {merging && (
+        <ConfirmDialog title="Merge the two person folders" confirmLabel="Merge folders" busyLabel="Merging…" busy={busy} error={dialogError}
+          onCancel={() => setMerging(false)} onConfirm={confirmMerge}>
+          <p className="text-xs text-ink">This photo was flagged as a duplicate of one in another person folder. Merging puts both folders' photos into one folder; nothing is deleted.</p>
+          <label htmlFor="merge-reason" className="block text-xs font-semibold text-ink pt-2">Why? (optional)</label>
+          <textarea id="merge-reason" value={text} onChange={e => setText(e.target.value)} rows={2} maxLength={500} className="w-full rounded-xl border border-line bg-surface-mute p-2 text-sm text-ink" />
+          <p className="text-[11px] text-ink-faint">If a side has more than one folder, the server says so; use Identity Review to choose which folders to merge.</p>
+        </ConfirmDialog>
+      )}
 
       {action && (
         <ConfirmDialog title={DIALOG[action].title} confirmLabel={DIALOG[action].confirm} busyLabel="Saving…" busy={busy} error={formError}

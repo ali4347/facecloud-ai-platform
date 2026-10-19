@@ -16,10 +16,16 @@ export interface BellItem {
 }
 
 const POLL_MS = 60_000
+
+/** Where the moderator events lead; the backend's own link for them is not one of this app's pages. */
+const MODERATOR_LEADS: Record<string, string> = {
+  moderator_review_assigned: '/moderator/queue', moderator_review_overdue: '/moderator/queue',
+  moderator_review_escalated: '/moderator/queue', moderator_batch_failed: '/moderator/batches',
+}
 const PANEL_ITEMS = 6
 
 /**
- * The signed-in person's real notifications for the bell: the unread count kept fresh in the background,
+ * The signed-in user's or moderator's real notifications for the bell: the unread count kept fresh in the background,
  * the latest few read when the panel is opened. Does nothing at all unless `enabled`.
  */
 export function useLiveBell(enabled: boolean) {
@@ -58,7 +64,7 @@ export function useLiveBell(enabled: boolean) {
       const page = await listNotifications(1)
       setItems(page.results.slice(0, PANEL_ITEMS).map(item => ({
         id: String(item.id), text: item.title + (item.message ? ` — ${item.message}` : ''), time: item.created_at,
-        tone: item.severity, read: item.is_read, to: resolveNotificationPath(item.action_path),
+        tone: item.severity, read: item.is_read, to: resolveNotificationPath(item.action_path) ?? MODERATOR_LEADS[item.event_type] ?? null,
       })))
       await refreshCount()
     } catch (caught) {

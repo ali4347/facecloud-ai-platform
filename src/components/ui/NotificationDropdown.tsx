@@ -14,7 +14,7 @@ import type { Role } from '../../data/mock'
 interface NotificationDropdownProps {
   onOpen?: () => void
   sidebarOpen?: boolean
-  /** The user portal has real notifications and the admin console has real alerts; the moderator portal keeps its demo feed. */
+  /** The user and moderator portals show their real notifications and the admin console its real alerts; with the API off every portal keeps the demo feed. */
   role?: Role
 }
 
@@ -27,7 +27,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
   const ids = useMemo(() => notifications.map(n => String(n.id)), [notifications])
   const { isRead, unreadCount: demoUnread, markAllRead: demoMarkAllRead } = useReadNotifications(email, ids)
 
-  const userLive = role === 'user' && USE_API
+  const userLive = (role === 'user' || role === 'moderator') && USE_API
   const adminLive = role === 'admin' && USE_API
   const live = userLive || adminLive
   const userBell = useLiveBell(userLive)
@@ -227,7 +227,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
             </button>
             )}
             {live && (
-              <Link to={adminLive ? '/admin/security' : '/dashboard/notifications'} onClick={() => setOpen(false)}
+              <Link to={adminLive ? '/admin/security' : role === 'moderator' ? '/moderator/notifications' : '/dashboard/notifications'} onClick={() => setOpen(false)}
                 className="text-[12px] font-semibold text-ink-mute hover:text-ink transition-colors">
                 {adminLive ? 'Open Security' : 'View all'}
               </Link>

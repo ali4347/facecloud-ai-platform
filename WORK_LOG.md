@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Moderator: live bell, assign a review, merge the folders behind a duplicate
+*Status: committed (this commit).*
+
+- **Bell:** the moderator's top-bar bell now reads the real notifications (unread number, latest items, mark read, "View all" opens `/moderator/notifications`), like the user's. Opening an item goes to the queue (assignment, deadline, escalation) or Batch Management (failed batch), the same destinations the notification page uses. With the API off it keeps the demo feed.
+- **Assign:** an open review has **Assign to…** which lists the organization's active moderators and owner (not plain members) and sends `POST …/reviews/{id}/assign/`; the assignee is notified by the backend.
+- **Merge folders:** a review raised by a duplicate match has **Merge their folders** (`…/merge-identity-groups/`, optional reason). If a side has several folders the server says so and the dialog shows it; Identity Review is the place to pick folders then.
+- **Files:** `src/lib/useLiveBell.ts`, `src/components/ui/NotificationDropdown.tsx`, `src/lib/api/moderation.ts`, `src/pages/moderator/ModeratorImageReviewLive.tsx`, `README.md`.
+- **Verified** on a throwaway copy of `origin/main` (organization with an owner, two moderators and a member) in headless Chrome: assign dialog lists the right people, Assign is off until one is chosen, the server then shows the new assignee; the assignee's bell shows 1 and the real notification text, opening it goes to the queue and the count clears; no page errors. The merge dialog and the server's refusal message are shown correctly, **but a real merge of two folders was not tested** (the seeded duplicate review had no match behind it). `npx tsc -b`, `npm run build`, demo-safe build pass.
+- **Not done:** organization accent colour as a theme (only the sidebar edge uses it).
+
 ### 2026-10-19 — Backend PR #106 (person-folder grouping): frontend reads `suggested_count`
 *Status: committed (this commit).*
 
