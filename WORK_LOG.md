@@ -46,6 +46,13 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Moderator role guide brought up to date; customer onboarding written down
+*Status: committed (this commit).*
+
+- **Changed:** the public Moderator role guide (`/roles/moderator`, `src/pages/ModeratorRole.tsx`) said member management, batches, reports, audit and identity review were "still being connected"; they are connected. It now lists what is built, what is next (telling a member the decision, a moderator seeing only their own members, an owner console) and what is planned; it describes rejected photos, reprocessing, folder merging as they really work, and says a moderator is always added to one organization (by an administrator or an owner's invitation).
+- **Added:** README section 13b "Giving FaceCloud to an organization": the four roles, the six setup steps using the admin console, the hosted and dedicated delivery options, the consent and privacy points, and an honest list of what is not built (owner console, billing and plan limits, quotas and branding, SSO, one-step organization deletion, member notification of decisions, moderators seeing only their own members). Checked against the backend: the plan is only a label (nothing enforces it), organization export exists, deleting an organization does not.
+- **Verified:** `tsc` and both builds pass; text-only changes.
+
 ### 2026-10-19 — Rejected photos can be opened and viewed; dialogs no longer lose the cursor after one character
 *Status: committed (this commit).*
 

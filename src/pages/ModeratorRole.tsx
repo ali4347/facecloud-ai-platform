@@ -81,8 +81,8 @@ const CAPABILITIES = [
   {
     icon: GitMerge,
     title: 'Fix person folders',
-    body: 'Move a face into the right person folder, start a new one, or merge the folders behind a suspected duplicate.',
-    how: 'Group ownership stays with the person who uploaded the photo; your decision is recorded as yours.',
+    body: 'Merge two person folders that are really the same person, or settle an uncertain identity match from the review queue.',
+    how: 'Only two folders of the same member can be merged, and nothing is deleted. Your decision is recorded as yours.',
   },
   {
     icon: UserCog,
@@ -91,10 +91,16 @@ const CAPABILITIES = [
     how: 'Removing someone ends their membership; it does not delete their FaceCloud account.',
   },
   {
+    icon: Eye,
+    title: 'Go through rejected photos',
+    body: 'Open any rejected or uncertain photo from your organization at a larger size, with the reasons the checks gave, and open its review if one was raised.',
+    how: 'You see photos your members chose to submit to the team, never their private workspace.',
+  },
+  {
     icon: Layers,
-    title: 'Retry or cancel batches',
-    body: 'When an upload fails, retry the images that failed. When one should not continue, cancel it.',
-    how: 'A fully failed batch alerts every owner and moderator except the person who uploaded it.',
+    title: 'Retry, cancel or reprocess batches',
+    body: 'When an upload fails, retry the images that failed. When one should not continue, cancel it. When the result was poor, run enhancement again.',
+    how: 'Reprocessing makes a new version of each photo and keeps the original and earlier results. A fully failed batch alerts every owner and moderator except the uploader.',
   },
   {
     icon: FileText,
@@ -155,9 +161,9 @@ const SAFEGUARDS = [
 ]
 
 const ACCESS_STEPS = [
-  { title: 'An owner invites you', body: 'Only an organization owner can invite someone as a moderator. The invitation goes to your email address.' },
-  { title: 'You accept the link', body: 'Invitation links expire — after 72 hours by default — and a fresh one can be sent.' },
-  { title: 'You sign in to the Moderator Panel', body: 'Your owner shares the direct link to the panel. It is not listed on the public site.' },
+  { title: 'You are added to one organization', body: 'A FaceCloud administrator creates your moderator account for a specific organization, or the organization’s owner invites you by email. A moderator always belongs to an organization.' },
+  { title: 'You get your sign-in details', body: 'An invitation link expires — after 72 hours by default — and a fresh one can be sent. An account made by an administrator comes with its sign-in details handed over directly.' },
+  { title: 'You sign in to the Moderator Panel', body: 'Your administrator or owner shares the direct link to the panel. It is not listed on the public site. Without an organization the panel has nothing to show you.' },
 ]
 
 const STATUS_COLUMNS = [
@@ -166,20 +172,23 @@ const STATUS_COLUMNS = [
     title: 'Built and connected',
     tone: 'text-[var(--s-ok)] border-[var(--s-ok)]/30 bg-[var(--s-ok)]/10',
     items: [
-      'Moderator dashboard — overdue and due-soon counts, unassigned work, team performance',
-      'Review queue — filters, deadline ordering, claiming, bulk decisions and the photo under review',
+      'Dashboard — overdue and due-soon counts, unassigned work, team performance',
+      'Review queue and the single-review page — filters, deadlines, claiming, bulk decisions, the photo, its measurements and history',
+      'Rejected photos — open them large, with the reasons',
+      'Identity review — person folders and merging two folders of one member',
+      'Member management — invitations, deactivation, removal',
+      'Batches — retry, cancel and reprocess',
+      'Reports and exports, audit history, notifications and settings',
     ],
   },
   {
     key: 'connecting',
-    title: 'Built, screen still being connected',
+    title: 'Next, being designed',
     tone: 'text-[#FB923C] border-[#F97316]/30 bg-[#F97316]/10',
     items: [
-      'Member management — invitations, deactivation, removal',
-      'Batch controls — retry and cancel',
-      'Reports and exports',
-      'Audit history and notifications',
-      'Identity review and merging duplicate folders',
+      'Telling a member what the moderator decided about their photo, with a reason they can read',
+      'A moderator seeing only the members they added (plus members nobody added), with owners seeing everyone',
+      'An owner’s own screen for managing their organization',
     ],
   },
   {
@@ -187,7 +196,7 @@ const STATUS_COLUMNS = [
     title: 'Planned, not built',
     tone: 'text-ink-mute border-ink/15 bg-ink/[0.04]',
     items: [
-      'Reprocessing a photo at a different enhancement level',
+      'Choosing the enhancement level when reprocessing a batch',
       'Original-against-enhanced comparison inside a review',
       'Side-by-side comparison of suspected duplicates',
       'Seat limits and pricing for moderators',

@@ -308,6 +308,37 @@ To transition this project into a production-grade application, a microservices 
 
 ---
 
+## 13b. Giving FaceCloud to an organization (customer onboarding)
+
+FaceCloud is **multi-tenant**: one deployment serves many organizations, and each organization is a separate project. A person only ever sees their own organization's data; the backend answers "not found" for anything outside it.
+
+**Who does what**
+
+| Role | Belongs to | What they can do |
+|:-----|:-----------|:-----------------|
+| Platform administrator (FaceCloud staff) | The platform | Creates organizations and accounts, sees platform-wide statistics, security alerts and system health. Never part of a customer's organization. |
+| Organization owner | One organization | Invites moderators and members, sees the whole organization. (No screen of their own yet: see "Not built yet".) |
+| Moderator | One organization | Reviews uncertain photos, fixes person folders, manages batches and members, makes reports. Sees that organization only. |
+| Member | One or more organizations | Uploads photos, optionally "Submit to" the team so its moderators can review them. Always sees their own workspace. |
+
+**Setting up a new customer (all of it can be done in the admin console)**
+1. **Create the owner's account**: Admin → Manage Users → Add User (role User). Hand over the sign-in details shown once.
+2. **Create the organization**: Admin → Organizations → New organization (name, owner, plan).
+3. **Create the moderator(s)**: Admin → Moderators → Create moderator, choosing the organization. Hand over the sign-in details and the direct link `/moderator/login`.
+4. **Members join**: the moderator invites them by email (Moderator → Member Management → Invite Member). Each opens the emailed `/invitations/<token>` link, signs in or registers with that email, and joins.
+5. **Members upload** and, from the upload page, choose "Submit to: <team>" so the team's moderators can review the photos.
+6. **Check it works**: the moderator sees the photos under Batches, Rejected Images and the Review Queue; the administrator sees activity in Overview, Statistics and Audit Logs.
+
+**Two ways to deliver the product**
+- **Hosted (recommended):** you run one deployment (for example `api.facecloudai.com` plus the web app) and add each customer as an organization. Cheapest to run and update; data is separated by organization in the database and by the access rules above.
+- **Dedicated:** a customer who needs their data on their own infrastructure gets their own deployment, built from the backend's VPS runbook (`docs/deployment/VPS_RUNBOOK.md`), with one organization and their own database, storage, keys and domain. More work per customer; the strongest separation.
+
+**Before a customer's real faces go in:** face grouping needs each member's recorded consent (the consent card in My Images); photos are stored encrypted; a signed agreement should state what is stored, for how long, who in the organization can see it, and how to export or delete it.
+
+**Not built yet (say so to a customer)**: an organization owner's own console; billing and plan limits (the plan is only a label today); per-organization quotas, logo and colours; single sign-on; deleting an organization and all its data in one step (an export exists); telling a member what a moderator decided about their photo; a moderator seeing only the members they added (today every moderator sees the whole organization).
+
+---
+
 ## 14. Installation and Local Development
 
 ### Frontend Setup
