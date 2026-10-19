@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Editor: say plainly where a saved edit goes
+*Status: committed (this commit).*
+
+- **Question (Ali):** when a user edits a photo and saves the full-size version, does the enhanced photo get replaced? **No.** Read from the backend (`enhancement/models.py::ImageEditVersion`, `views.py` activate/delete, `services.py::process_image_edit`): a save makes a separate file (`edited_file`) rendered from the enhanced image; the enhanced file and the original are never touched. The newest save is marked `is_current`, and that is what the photo page shows and downloads (`EnhancedVersionCard` already did this). Deleting the current version falls back to the newest remaining edit, else the enhanced photo. There is no endpoint to un-mark a current edit.
+- **Frontend:** the success message now says the original and enhanced photo are unchanged and that this version is what the photo shows and downloads, with a "View the photo" link; the Versions card states whether the photo currently uses a saved edit or the enhanced photo; the delete dialog explains the fall-back. Logic unchanged.
+- **Files:** `src/pages/user/PhotoEditor.tsx`.
+- **Verified:** `npx tsc -b`, `npm run build`, demo-safe build. Not run in a browser (wording-only change).
+- **Also (no code):** the slow "Saving full-size version" is backend time (models re-run at full size, up to 10 guard attempts, shared queue); backend prompt given to Ali for Ijaz.
+
 ### 2026-10-19 — Batch report: no download button for an upload whose photos were deleted
 *Status: committed (this commit).*
 

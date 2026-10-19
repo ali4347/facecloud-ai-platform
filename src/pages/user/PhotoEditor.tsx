@@ -205,7 +205,7 @@ export default function PhotoEditor() {
       }
       if (edit.status !== 'completed') throw new Error(edit.failure_reason || 'The edit could not be saved.')
       setVersions(await listEdits(result.id))
-      setSavedNote('Saved as a new version and set as the current one.')
+      setSavedNote('Saved as a new version. Your original and the enhanced photo are unchanged; this version is now the one shown and downloaded for this photo.')
     } catch (caught) {
       setSaveError(caught instanceof ApiError || caught instanceof Error ? caught.message : 'Could not save the edit.')
     } finally {
@@ -316,6 +316,11 @@ export default function PhotoEditor() {
           </ChartCard>
 
           <ChartCard title="Versions" subtitle="Each save is a new version; the enhanced photo and your original are never changed">
+            <p className="text-xs text-ink-mute mb-3">
+              {versions.some(edit => edit.is_current && edit.status === 'completed')
+                ? 'This photo currently shows and downloads your edit marked "Current". Choose "Use this" on another version to switch.'
+                : 'This photo currently shows and downloads the enhanced photo. No saved edit is in use.'}
+            </p>
             {versions.length === 0 ? (
               <p className="text-xs text-ink-mute">No saved edits yet.</p>
             ) : (
@@ -403,7 +408,12 @@ export default function PhotoEditor() {
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {saving ? 'Saving full-size version…' : 'Save as new version'}
             </button>
-            {savedNote && <p role="status" className="text-xs text-emerald-500 flex items-center gap-1.5"><Check className="w-3.5 h-3.5" />{savedNote}</p>}
+            {savedNote && (
+              <div role="status" className="text-xs text-emerald-500 space-y-1.5">
+                <p className="flex items-start gap-1.5"><Check className="w-3.5 h-3.5 mt-0.5 shrink-0" />{savedNote}</p>
+                <Link to={image ? `/dashboard/images/${image.id}` : '/dashboard/images'} className="font-semibold text-accent hover:underline ml-5 inline-block">View the photo</Link>
+              </div>
+            )}
             {saveError && <p role="alert" className="text-xs text-red-500">{saveError}</p>}
             <p className="text-[11px] text-ink-faint">Double-click a slider to put it back to zero.</p>
           </div>
@@ -413,7 +423,7 @@ export default function PhotoEditor() {
       {toDelete && (
         <ConfirmDialog title="Delete this version?" confirmLabel="Delete version" busyLabel="Deleting…" danger busy={deleting} error={deleteError}
           onConfirm={() => void confirmDelete()} onCancel={() => setToDelete(null)}>
-          <p>This edit is removed. The enhanced photo and your original stay as they are.</p>
+          <p>This edit is removed. The enhanced photo and your original stay as they are. If it is the current version, the photo falls back to your newest remaining edit, or to the enhanced photo when there is none.</p>
         </ConfirmDialog>
       )}
     </div>
