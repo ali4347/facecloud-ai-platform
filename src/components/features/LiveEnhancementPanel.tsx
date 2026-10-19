@@ -6,6 +6,7 @@ import { StatusBadge } from '../ui/StatusBadge'
 import { BeforeAfterSlider } from './BeforeAfterSlider'
 import { useNavigate } from 'react-router-dom'
 import { USE_API } from '../../lib/api/config'
+import { startCameraSession, endCameraSession as endCameraSessionApi, endCameraSessionOnExit } from '../../lib/api/camera'
 import { EnhancementReport } from './EnhancementReport'
 import { levelLabel } from '../../lib/api/enhancements'
 import type { EnhancementLevel, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
@@ -482,6 +483,28 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
   }, [camState, detectorStatus])
 
   // Request browser camera
+  /* The backend counts a live session from when the camera goes on until it goes off. It records only a label and no video.
+     Failing to record it never blocks the camera: the person just is not counted. */
+  const cameraSessionRef = useRef<string | null>(null)
+  const beginCameraSession = (label: string) => {
+    if (!USE_API || cameraSessionRef.current) return
+    startCameraSession(label, { mode: 'live' }).then(session => {
+      if (streamRef.current) cameraSessionRef.current = session.id
+      else void endCameraSessionApi(session.id).catch(() => {})
+    }).catch(() => { /* not counted */ })
+  }
+  const endCameraSession = () => {
+    const id = cameraSessionRef.current
+    cameraSessionRef.current = null
+    if (id) void endCameraSessionApi(id).catch(() => { /* it expires by itself */ })
+  }
+  useEffect(() => {
+    // Closing the tab or reloading skips React's cleanup, so the session is also ended as the page goes away.
+    const onPageHide = () => { const id = cameraSessionRef.current; if (id) endCameraSessionOnExit(id) }
+    window.addEventListener('pagehide', onPageHide)
+    return () => { window.removeEventListener('pagehide', onPageHide); endCameraSession() }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const startCamera = async () => {
     setCamState('requesting')
     setErrorMessage('')
@@ -529,6 +552,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
       setCamState('active')
       setElapsed(0)
       lastDetectionTimeRef.current = performance.now()
+      beginCameraSession(mediaStream.getVideoTracks()[0]?.label || 'Camera')
 
       // Extract resolution metadata
       const videoTrack = mediaStream.getVideoTracks()[0]
@@ -554,6 +578,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
   }
 
   const stopCamera = () => {
+    endCameraSession()
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop())
       streamRef.current = null
@@ -648,7 +673,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         setPipelineStep(0)
         const file = await dataUrlToJpegFile(snapshotDataUrl, `webcam-${new Date().toISOString().replace(/[:.]/g, '-')}.jpg`)
         setPipelineStep(1)
-        const photo = await submitSnapshot(file)
+        const photo = await submitSnapshot(file, cameraSessionRef.current)
         imageId = photo.id
         setLiveImageId(photo.id)
         if (photo.display_status !== 'accepted') {

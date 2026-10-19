@@ -2,6 +2,7 @@ import {
   getBatchProgress, getImage, isBatchFinished, uploadSingle,
   type ImageListItem,
 } from './api/images'
+import { uploadCameraSnapshot } from './api/camera'
 import {
   downloadEnhanced, enhanceImage, getEnhancementResult, isEnhancementSettled,
   type EnhancementLevel, type EnhancementResult, type EnhancementStyle,
@@ -38,9 +39,12 @@ export function dataUrlToJpegFile(dataUrl: string, name: string): Promise<File> 
   })
 }
 
-/** Upload the frame and wait until the pipeline has judged it. The photo is stored in My Images from here on. */
-export async function submitSnapshot(file: File): Promise<ImageListItem> {
-  const batch = await uploadSingle(file)
+/**
+ * Upload the frame and wait until the pipeline has judged it. The photo is stored in My Images from here on.
+ * With a camera session the frame is saved into it (so the session counts its snapshots); without one it is a plain upload.
+ */
+export async function submitSnapshot(file: File, cameraSessionId?: string | null): Promise<ImageListItem> {
+  const batch = cameraSessionId ? (await uploadCameraSnapshot(cameraSessionId, file)).batch : await uploadSingle(file)
   const deadline = Date.now() + 180_000
   for (;;) {
     const progress = await getBatchProgress(batch.id)

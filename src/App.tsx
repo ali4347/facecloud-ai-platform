@@ -39,6 +39,7 @@ import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
 import AdminOverview from './pages/admin/AdminOverview'
+import MyOrganization from './pages/user/MyOrganization'
 import Organizations from './pages/admin/Organizations'
 import InvitationAccept from './pages/InvitationAccept'
 import IdentityReview from './pages/moderator/IdentityReview'
@@ -116,6 +117,7 @@ export default function App() {
           <Route path="downloads" element={<Downloads />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="activity" element={<ActivityLogs />} />
+          <Route path="organization" element={<MyOrganization />} />
           <Route path="settings" element={<Settings />} />
           <Route path="live-enhancement" element={<LiveEnhancement />} />
           <Route path="jobs" element={<ProcessingJobs />} />

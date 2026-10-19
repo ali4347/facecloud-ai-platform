@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { USE_API } from './api/config'
 import { messageFor, useApiResource, type AsyncState } from './useApiResource'
-import { resolveModeratorOrganization } from './api/organizations'
+import { listModeratorTeams } from './api/organizations'
+import { getSession } from './session'
+import { personCache } from './personCache'
 import {
   getDashboard,
   getPerformance,
@@ -141,32 +143,56 @@ function mockPerformance(days: number): ModeratorPerformance {
 /**
  * The organization every moderator request is scoped to.
  *
- * Resolved once and cached in module scope, because it does not change while
- * someone is signed in and every moderator screen needs it before it can ask
- * for anything.
+ * The teams this person can moderate are fetched once per signed-in person and remembered. A moderator of several teams
+ * works in one at a time: the choice is kept in this browser (per person) and changing it makes every moderator screen
+ * ask again for the new team's data.
  */
-let cachedOrganizationId: number | null = null
+interface Team { id: number; name: string }
+const teamsCache = personCache<Team[]>()
+const CHOICE_EVENT = 'fc:moderator-organization'
+const choiceKey = () => `facecloud:moderator-organization:${getSession()?.email ?? ''}`
+
+function chosenTeam(teams: Team[]): number | null {
+  let saved = NaN
+  try { saved = Number(localStorage.getItem(choiceKey())) } catch { /* no remembered choice */ }
+  return teams.find(team => team.id === saved)?.id ?? teams[0]?.id ?? null
+}
+
+/** Work in another of your teams. */
+export function chooseModeratorOrganization(id: number): void {
+  try { localStorage.setItem(choiceKey(), String(id)) } catch { /* the choice just will not be remembered */ }
+  window.dispatchEvent(new Event(CHOICE_EVENT))
+}
 
 export function useModeratorOrganization() {
-  const [organizationId, setOrganizationId] = useState<number | null>(cachedOrganizationId)
-  const [resolving, setResolving] = useState(USE_API && cachedOrganizationId === null)
+  const [teams, setTeams] = useState<Team[]>(teamsCache.get() ?? [])
+  const [organizationId, setOrganizationId] = useState<number | null>(() => { const known = teamsCache.get(); return known ? chosenTeam(known) : null })
+  const [resolving, setResolving] = useState(USE_API && teamsCache.get() === undefined)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!USE_API || cachedOrganizationId !== null) return
+    if (!USE_API || teamsCache.get() !== undefined) return
     let active = true
-    resolveModeratorOrganization()
-      .then(organization => {
+    listModeratorTeams()
+      .then(found => {
+        const list = found.map(o => ({ id: o.id, name: o.name }))
+        teamsCache.set(list)
         if (!active) return
-        cachedOrganizationId = organization?.id ?? null
-        setOrganizationId(cachedOrganizationId)
+        setTeams(list)
+        setOrganizationId(chosenTeam(list))
       })
       .catch(caught => active && setError(messageFor(caught)))
       .finally(() => active && setResolving(false))
     return () => { active = false }
   }, [])
 
-  return { organizationId, resolving, error }
+  useEffect(() => {
+    const onChoice = () => setOrganizationId(chosenTeam(teamsCache.get() ?? []))
+    window.addEventListener(CHOICE_EVENT, onChoice)
+    return () => window.removeEventListener(CHOICE_EVENT, onChoice)
+  }, [])
+
+  return { organizationId, teams, resolving, error }
 }
 
 /** A moderator resource: the shared loader, plus the organization it needs first. */

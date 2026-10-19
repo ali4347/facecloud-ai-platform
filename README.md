@@ -177,6 +177,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/logs` (Redirects to `/admin/audit-logs`)
 * Top bar (admin): search jumps to a screen or finds an account (opens Manage Users filtered to it); the bell lists open security alerts and services that are not operational.
 
+* `/dashboard/organization` (My Organization: for the owner of an organization only, listed in the sidebar when you own one. People, moderators, invitations, recent activity, and an export of the organization's data)
+
 ### Moderator Routes (under `/moderator`)
 * `/moderator` (Dashboard: overdue and due-soon counts against the review deadline, unassigned work, oldest waiting review, and per-moderator performance over a 7/30/90-day window)
 * `/moderator/queue` (Review queue: the photo under review shown as a thumbnail, filters by status, source, assignment and overdue-only, deadline ordering, claim or release a review so two moderators cannot work the same photo, and bulk approve, reject or escalate)
@@ -317,7 +319,7 @@ FaceCloud is **multi-tenant**: one deployment serves many organizations, and eac
 | Role | Belongs to | What they can do |
 |:-----|:-----------|:-----------------|
 | Platform administrator (FaceCloud staff) | The platform | Creates organizations and accounts, sees platform-wide statistics, security alerts and system health. Never part of a customer's organization. |
-| Organization owner | One organization | Invites moderators and members, sees the whole organization. (No screen of their own yet: see "Not built yet".) |
+| Organization owner | One organization | Invites moderators and members, changes roles, deactivates or removes people, sees the whole organization's activity and exports its data, from the My Organization page. |
 | Moderator | One organization | Reviews uncertain photos, fixes person folders, manages batches and members, makes reports. Sees that organization only. |
 | Member | One or more organizations | Uploads photos, optionally "Submit to" the team so its moderators can review them. Always sees their own workspace. |
 
@@ -335,7 +337,7 @@ FaceCloud is **multi-tenant**: one deployment serves many organizations, and eac
 
 **Before a customer's real faces go in:** face grouping needs each member's recorded consent (the consent card in My Images); photos are stored encrypted; a signed agreement should state what is stored, for how long, who in the organization can see it, and how to export or delete it.
 
-**Not built yet (say so to a customer)**: an organization owner's own console; billing and plan limits (the plan is only a label today); per-organization quotas, logo and colours; single sign-on; deleting an organization and all its data in one step (an export exists); telling a member what a moderator decided about their photo; a moderator seeing only the members they added (today every moderator sees the whole organization).
+**Not built yet (say so to a customer)**: billing and plan limits (the plan is only a label today); per-organization quotas, logo and colours; single sign-on; deleting an organization and all its data in one step (an export exists); telling a member what a moderator decided about their photo; a moderator seeing only the members they added (today every moderator sees the whole organization).
 
 ---
 

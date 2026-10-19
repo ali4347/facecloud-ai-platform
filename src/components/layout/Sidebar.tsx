@@ -6,6 +6,7 @@ import {
   ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
   HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2
 } from 'lucide-react'
+import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
 import { cn } from '../../lib/utils'
 import { useUserDashboard, formatBytes } from '../../lib/imageData'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
@@ -83,7 +84,11 @@ const roleHome = {
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
-  const nav = navByRole[role]
+  // A person who owns an organization also gets its management page, between Downloads and Settings.
+  const { owned } = useOwnedOrganizations(role === 'user')
+  const nav = role === 'user' && owned.length > 0
+    ? [...userNav.slice(0, -1), { label: 'My Organization', icon: Building2, to: '/dashboard/organization' }, userNav[userNav.length - 1]]
+    : navByRole[role]
   const cfg = roleConfig[role]
   // Only the user portal shows storage, so only it asks for the figures.
   const dashboard = useUserDashboard()

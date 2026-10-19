@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { USE_API } from './api/config'
 import { listOrganizations, type Organization } from './api/organizations'
+import { personCache } from './personCache'
 
-let cachedTeams: Organization[] | null = null
+const cache = personCache<Organization[]>()
 
 /**
  * Where an upload goes. Everyone has a personal workspace that only they can see; a person who belongs to a team
@@ -10,14 +11,14 @@ let cachedTeams: Organization[] | null = null
  * see and review them. Sharing photos of faces with moderators is always an explicit choice, so the default is personal.
  */
 export function useSubmitTarget() {
-  const [teams, setTeams] = useState<Organization[]>(cachedTeams ?? [])
+  const [teams, setTeams] = useState<Organization[]>(cache.get() ?? [])
   const [organizationId, setOrganizationId] = useState<number | undefined>(undefined)
 
   useEffect(() => {
-    if (!USE_API || cachedTeams !== null) return
+    if (!USE_API || cache.get() !== undefined) return
     let active = true
     listOrganizations()
-      .then(all => { cachedTeams = all.filter(o => !o.is_personal && o.status === 'active'); if (active) setTeams(cachedTeams) })
+      .then(all => { const teams = all.filter(o => !o.is_personal && o.status === 'active'); cache.set(teams); if (active) setTeams(teams) })
       .catch(() => { /* without the list the person simply uploads to their own workspace */ })
     return () => { active = false }
   }, [])

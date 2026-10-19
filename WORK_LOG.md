@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Owner console, moderator team switcher, live camera sessions; caches no longer outlive a sign-out
+*Status: committed (this commit).*
+
+- **Owner console ("My Organization", `/dashboard/organization`)**: an organization's owner now has a screen of their own, shown in the user dashboard's sidebar only to someone who owns a shared organization (found from `GET /api/organizations/`, whose rows carry the caller's role). It shows the people, moderators, pending invitations and plan; invites someone as a member or a moderator (only an owner may); makes a member a moderator and back; deactivates, reactivates and removes people (asks first; the owner and other owners are locked); resends or cancels pending invitations; lists recent activity (load older); switches between several owned organizations; and exports the organization's data (request, wait, download). A person who does not own an organization sees a plain explanation. Files: `src/pages/user/MyOrganization.tsx`, `src/lib/useOwnedOrganizations.ts`, additions to `src/lib/api/organizations.ts`, `Sidebar.tsx`, `App.tsx`.
+- **Moderator team switcher**: a moderator of several organizations used to get only the first one. The panel now shows "Working in <team>" when there is more than one; the choice is kept per person in this browser and every moderator screen asks again for the chosen team. (`moderationData.ts`, `NoOrganizationGuard.tsx`, `listModeratorTeams`.)
+- **Live camera sessions**: the Live Enhancement panel records a camera session (`POST /api/camera/sessions/`: a label and a plain setting, no video) when the camera goes on and ends it when it goes off, when the person leaves the page through the app, and when the page is closed or reloaded (a `keepalive` request on `pagehide`). A captured snapshot is saved through the session (`.../snapshots/`), so the session counts it. This is what the administrator's Live Sessions card and chart count. Failing to record a session never blocks the camera. A real bug was found and fixed while testing: the backend refuses a device name over 80 characters (`camera.CameraSession.device_label`), which silently stopped sessions for cameras with long names; the label is now cut to 80.
+- **Caches no longer outlive a sign-out**: the owner list, the upload team list and the moderator's team list were module-level variables, so another person signing in later in the same tab would have inherited them. They now belong to the signed-in person (`src/lib/personCache.ts`).
+- **Verified:** headless Chrome against a scratch copy of backend origin/main (an owner of two organizations, a moderator of two, members; a fake camera showing a real face for the snapshot test): owner menu present for the owner and absent for a member, the member's page explains, all owner actions saved in the backend (invite as moderator, cancel, role both ways, deactivate and reactivate, locked rows, removal asks first, activity, switching organization, export downloaded); the moderator switcher showed both teams, showed only the chosen team's data and remembered the choice; camera sessions: started, counted by the administrator's analytics and Overview card, ended on stop, on in-app navigation and on reload, and a captured snapshot raised the session's `snapshot_count`. `tsc` and both builds pass; no new lint finding. Three early failures were test mistakes (toast read after it faded, upper-case labels, a wrong button), and one real bug (the label length) was fixed.
+- **Still waiting on the backend (prompt given to the owner):** a moderator always in an organization, a moderator seeing only their own members, telling a member what was decided, admin edit/suspend, plan limits, signing up from an invitation, branding, offboarding.
+
 ### 2026-10-19 — Moderator role guide brought up to date; customer onboarding written down
 *Status: committed (this commit).*
 
@@ -1916,7 +1926,6 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 ## 7. Known Issues / Tech Debt
 
 - **Owner's local backend is behind (2026-10-19).** `~/Projects/FaceCloud_backend` is on `main` at PR #72; PR #86 and later are on origin. The admin screens work but show an "older backend" notice until it is pulled and restarted.
-- **Live Enhancement never records a camera session (2026-10-18).** The admin "Live Sessions" card and chart stay 0 until the frontend posts `/api/camera/sessions`.
 - **Two admin pages are not routed on purpose (2026-10-19).** `Rejections.tsx` duplicates Rejection Summary and `SystemHealth.tsx` duplicates System Monitoring; the files are kept.
 
 - **Backend permission gap — a moderator can promote a member to moderator.** Found 2026-10-15 by exercising
