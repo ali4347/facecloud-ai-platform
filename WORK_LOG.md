@@ -46,6 +46,17 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Person folders: say how many photos are only suggested (grouping investigation)
+*Status: committed (this commit).*
+
+- **Report (Ali, 7 screenshots):** one person spread over many folders (Person 005/006/007/014/015/016, 011/012, "ijaz"/010/013); a different person shown inside a folder; a folder (ID 3) holding a food photo with no face; "2 images in this folder" above five tiles.
+- **Read from the backend (`identities/services.py`, `providers.py`, `config/settings.py`; Ali's `.env` uses `IDENTITY_PROVIDER=sface_2021dec_v1`, no threshold overrides):** SFace has no thresholds of its own, so it uses the generic ones — new folder below cosine 0.68, automatic match only at 0.82 or more, 0.68–0.82 goes to review. SFace scores for the same person across different poses and lighting are usually well below that (OpenCV's own same-person cosine cutoff is 0.363), so most photos start a new folder, and the ones that do land in the middle show as "70% match, In review". That fits the screenshots; it has not been measured on Ali's photos.
+- **The folder photo list** includes photos whose match is only a suggestion (`needs_review`), but "N images in this folder" counts confirmed ones only: hence 2 above five tiles. **Fixed here:** the header now reads "2 images in this folder · 3 more suggested, not confirmed yet".
+- **Folder 3 (food photo, badge "Rejected"):** it is not accepted; it is rejected yet still filed. The folder list only hides rejected/removed *memberships*, not rejected *photos*, and a photo with a (false) face detection can start a folder before its quality verdict. Backend fix (prompt given to Ali for Ijaz).
+- **Not explained:** two tiles with the same file name, size and dimensions but different pictures (one with "100% match"). Needs the two image ids.
+- **Files:** `src/pages/user/GroupDetailLive.tsx`, `src/lib/api/identities.ts`.
+- **Verified:** `npx tsc -b`, `npm run build`, demo-safe build. Not run in a browser.
+
 ### 2026-10-19 — Why ZIP / multiple uploads show no processing (investigation + README note)
 *Status: committed (this commit).*
 

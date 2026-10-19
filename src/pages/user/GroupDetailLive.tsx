@@ -135,6 +135,7 @@ export default function GroupDetailLive() {
   const [copied, setCopied] = useState(false)
 
   const total = folder.data?.imageCount ?? 0
+  const suggested = images.filter(image => image.membership_state === 'needs_review').length
 
   const downloadZip = async (scope: 'all' | 'selected') => {
     if (busy) return
@@ -360,7 +361,10 @@ export default function GroupDetailLive() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-ink-mute">{total} image{total === 1 ? '' : 's'} in this folder</p>
+              <p className="text-xs text-ink-mute">
+                {total} image{total === 1 ? '' : 's'} in this folder
+                {suggested > 0 && ` · ${suggested} more suggested, not confirmed yet`}
+              </p>
             </div>
 
             {photos.loading && (

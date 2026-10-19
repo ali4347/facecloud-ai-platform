@@ -43,6 +43,8 @@ export interface IdentityGroupImage {
   height: number | null
   display_status: string
   matching_confidence: number | null
+  /** 'needs_review' while the match is only a suggestion; such a photo is shown in the folder but not counted in it. */
+  membership_state?: string | null
 }
 
 export type ExportStatus = 'queued' | 'generating' | 'ready' | 'failed' | 'expired'
