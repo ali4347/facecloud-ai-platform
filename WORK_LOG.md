@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Rejected photos can be opened and viewed; dialogs no longer lose the cursor after one character
+*Status: committed (this commit).*
+
+- **Reported:** (1) on Rejected Images, clicking a photo did nothing, so there was no way to look at it; (2) typing in the Reprocess dialog's reason box moved focus to Cancel after one character.
+- **Cause of (2):** `ConfirmDialog` ran its "focus Cancel" effect again on every render, because callers pass `onCancel` as an inline function (new each render) and each keystroke re-renders the caller. It now focuses Cancel once, when it opens, and keeps the latest `onCancel`/`busy` in a ref for the Escape key. This fixes every dialog that has a field (reprocess reason, merge reason, review note, delete-account password, etc.).
+- **Changed:** Rejected Images: clicking a photo or its name opens a viewer with the 1024-pixel preview, size, dimensions, quality score, the reasons in plain words, the uploader, and "Open the review" when one exists; a file refused at upload opens with its details and no broken picture. Escape or a click outside closes it. Batch Management: clicking a photo in a batch opens the same kind of large view (new `PhotoLightbox`). `getPreview` takes an optional size (256 or 1024, the only sizes the backend serves).
+- **Verified:** headless Chrome against a scratch copy of backend origin/main with real key events: the viewer opens with a real picture, shows the reason, closes with Escape and with an outside click; the batch lightbox opens; a 20-character sentence typed into the reprocess reason box stayed in the field (value and focus both correct). `tsc` and both builds pass, no new lint finding.
+
 ### 2026-10-19 — A moderator belongs to an organization: Organizations screen, organization choice for moderators, no-organization message
 *Status: committed (this commit).*
 

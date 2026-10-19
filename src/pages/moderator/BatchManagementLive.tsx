@@ -5,6 +5,7 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { ModeratorGate } from '../../components/moderator/ModeratorGate'
+import { PhotoLightbox } from '../../components/moderator/PhotoLightbox'
 import {
   cancelBatch, getModeratorBatch, getPreview, listModeratorBatches, reprocessBatch, retryBatch,
   type ModeratorBatch, type ModeratorBatchDetail,
@@ -45,6 +46,7 @@ export function LiveBatchManagement() {
   const [reason, setReason] = useState('')
   const [reprocessError, setReprocessError] = useState<string | null>(null)
   const [toast, setToast] = useState<{ text: string; bad?: boolean } | null>(null)
+  const [lightbox, setLightbox] = useState<{ url: string; title: string } | null>(null)
 
   const say = (text: string, bad = false) => { setToast({ text, bad }); setTimeout(() => setToast(null), 4000) }
 
@@ -157,7 +159,10 @@ export function LiveBatchManagement() {
                             {detail.images.length === 0 && <p className="text-center py-6 text-xs text-ink-faint">No files tracked under this batch.</p>}
                             {detail.images.map(img => (
                               <div key={img.id} className="p-3 rounded-2xl bg-surface border border-line flex items-center gap-3 text-xs">
-                                <AuthedImage load={img.preview_url ? signal => getPreview(img.preview_url as string, signal) : null} cacheKey={`batch-img-${img.id}`} alt="" box={36} rounded="rounded-lg" />
+                                <button type="button" disabled={!img.preview_url} onClick={() => img.preview_url && setLightbox({ url: img.preview_url, title: img.original_name })}
+                                  aria-label={`View ${img.original_name}`} title={img.preview_url ? 'Click to view the photo' : 'No picture: refused at upload'} className="flex-shrink-0 cursor-zoom-in disabled:cursor-default">
+                                  <AuthedImage load={img.preview_url ? signal => getPreview(img.preview_url as string, signal) : null} cacheKey={`batch-img-${img.id}`} alt="" box={36} rounded="rounded-lg" />
+                                </button>
                                 <div className="flex-1 min-w-0">
                                   <p className="font-bold text-ink-soft truncate">{img.original_name}</p>
                                   {(img.rejection_reason || img.failure_reason) && (
@@ -204,6 +209,7 @@ export function LiveBatchManagement() {
           <input id="reprocess-reason" value={reason} onChange={e => setReason(e.target.value)} maxLength={500} className="fc-input" />
         </ConfirmDialog>
       )}
+      {lightbox && <PhotoLightbox previewUrl={lightbox.url} title={lightbox.title} onClose={() => setLightbox(null)} />}
     </div>
   )
 }

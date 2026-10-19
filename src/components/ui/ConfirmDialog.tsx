@@ -23,12 +23,19 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   const cancelRef = useRef<HTMLButtonElement>(null)
 
+  /* The callers pass `onCancel` as an inline function, which is new on every render. Keeping the latest one in a ref means
+     typing in a field inside the dialog (which re-renders the caller on each key) does not re-run the focus effect and pull
+     the cursor out of the field onto Cancel after one character. Focus is set once, when the dialog opens. */
+  const latest = useRef({ busy, onCancel })
+  latest.current = { busy, onCancel }
+
+  useEffect(() => { cancelRef.current?.focus() }, [])
+
   useEffect(() => {
-    cancelRef.current?.focus()
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !busy) onCancel() }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !latest.current.busy) latest.current.onCancel() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [busy, onCancel])
+  }, [])
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/70 backdrop-blur-[2px]"

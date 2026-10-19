@@ -15,8 +15,10 @@ export function pathOf(url: string): string {
   }
 }
 
-export function getPreview(url: string, signal?: AbortSignal): Promise<Blob> {
-  return apiFetchBlob(pathOf(url), { signal })
+/** `size` is the longest edge in pixels; the backend serves 256 (default) or 1024. */
+export function getPreview(url: string, signal?: AbortSignal, size?: 256 | 1024): Promise<Blob> {
+  const path = pathOf(url)
+  return apiFetchBlob(size ? `${path}${path.includes('?') ? '&' : '?'}size=${size}` : path, { signal })
 }
 
 /** A plain array when no `?page=` is sent, a `{count, results}` envelope otherwise; everything here is read as an array. */
