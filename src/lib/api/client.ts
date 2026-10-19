@@ -20,18 +20,27 @@ export class ApiError extends Error {
   get isThrottled() { return this.status === 429 }
 }
 
+/**
+ * A few backend errors arrive as the text of a Python object, "[ErrorDetail(string='…', code='invalid')]" (the batch
+ * retry refusal does). Show the sentence inside, not the object.
+ */
+function plain(text: string): string {
+  const inside = text.match(/ErrorDetail\(string=(["'])(.*?)\1,\s*code=/)
+  return inside ? inside[2] : text
+}
+
 /** Pull a readable sentence out of DRF's several error shapes. */
 function messageFrom(body: unknown, status: number): string {
-  if (typeof body === 'string' && body.trim()) return body
+  if (typeof body === 'string' && body.trim()) return plain(body)
   if (body && typeof body === 'object') {
     const record = body as Record<string, unknown>
     const detail = record.detail
-    if (typeof detail === 'string') return detail
-    if (Array.isArray(detail) && typeof detail[0] === 'string') return detail[0]
+    if (typeof detail === 'string') return plain(detail)
+    if (Array.isArray(detail) && typeof detail[0] === 'string') return plain(detail[0])
     // Field errors: {"email": ["already in use"]}
     for (const value of Object.values(record)) {
-      if (typeof value === 'string') return value
-      if (Array.isArray(value) && typeof value[0] === 'string') return value[0]
+      if (typeof value === 'string') return plain(value)
+      if (Array.isArray(value) && typeof value[0] === 'string') return plain(value[0])
     }
   }
   return `Request failed (${status}).`

@@ -46,6 +46,17 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-19 — Admin: failed work with Retry, Moderation Overview, Invitations
+*Status: committed (this commit).*
+
+- **Failed work** (on System Monitoring, live only): a table of failed upload batches (name, owner, photos, where it stopped, the error, retries, when) with **Retry** for any user's batch (`POST /api/system/batches/{id}/retry/`), paged ten at a time; below it the latest failed job of each kind with its owner and reason.
+- **Moderation Overview** (`/admin/moderation`, sidebar "Moderation"): tiles for waiting, escalated, overdue, stale, nobody assigned and decided today; organizations needing attention; moderator workload. The administrator chooses when an open review counts as stale (1, 2, 3 or 7 days, sent as `stale_hours`). The demo build shows a labelled sample.
+- **Invitations** (`/admin/invitations`, sidebar "Invitations"): invite a user or a moderator by email (a moderator needs an organization; full ones are disabled), list with status filter, **Resend** (waiting or expired) and **Cancel** (waiting, asks first). The backend's refusals (address already invited, and so on) are shown as sent. Not offered: inviting an administrator (only a superuser may).
+- **A backend bug found while testing:** the batch-retry refusal arrives as the text of a Python object (`"[ErrorDetail(string='This batch has no failed images to retry.', code='invalid')]"`). `src/lib/api/client.ts` now extracts the sentence, which also fixes the owner and moderator retry messages. The backend should send a plain sentence (listed in the backend prompt).
+- **Files:** `src/lib/api/adminOperations.ts` (new), `src/components/admin/FailedWork.tsx` (new), `src/pages/admin/ModerationOverview.tsx` (new), `src/pages/admin/Invitations.tsx` (new), `src/pages/admin/SystemMonitoring.tsx`, `src/App.tsx`, `src/components/layout/Sidebar.tsx`, `src/lib/api/client.ts`, `README.md`.
+- **Verified** on a throwaway copy of `origin/main` (admin, an organization with an owner, a moderator and a member, two failed batches, reviews that are overdue/escalated/stale) in headless Chrome: both failed batches listed with owner and error; Retry on a batch with nothing to retry shows the server's sentence, Retry on a real failed batch started it (retry count 1, batch left the list); Moderation tile numbers, the organization row and the "1 day" choice match the API; invitations: user invite listed as Waiting, a repeat is refused with the server's sentence, a moderator invite is blocked by the form until an organization is chosen and then sent tied to it, Resend, Cancel (asks first, cancelled on the server), status filter. No page errors. `npx tsc -b`, `npm run build`, demo-safe build pass. Several first-run failures were test mistakes (CSS upper-cased labels; the browser's own `required` check stops the moderator form before the page's own message).
+- **Not tested:** failed jobs of kinds other than upload batches (none seeded), a batch retried that then fails again, the demo build in a browser.
+
 ### 2026-10-19 — Moderator: live bell, assign a review, merge the folders behind a duplicate
 *Status: committed (this commit).*
 
@@ -1951,7 +1962,7 @@ and run locally):
   `/unauthorized`, `/admin/login`, `/moderator/login`, `*` (404).
 - User `/dashboard` (16): index, `upload`, `upload/single`, `upload/multiple`, `upload/zip`, `processing/:id`, `images`,
   `images/:id`, `groups`, `groups/:id`, `downloads`, `notifications`, `activity`, `settings`, `live-enhancement`, `jobs`.
-- Admin `/admin` (11): index, `users`, `moderators`, `audit-logs`, `security`, `system`, `upload-statistics`,
+- Admin `/admin` (13): index, `users`, `moderators`, `moderation`, `invitations`, `audit-logs`, `security`, `system`, `upload-statistics`,
   `statistics`, `rejection-summary`, `images`, `api-docs` and `api-test` → `/admin`, `logs`→`audit-logs`. `Rejections` and `SystemHealth` pages exist without a route on purpose.
 - Moderator `/moderator` (9): index, `members`, `queue`, `images/:id`, `batches`, `notifications`, `reports`, `audit`, `settings`.
 
@@ -1995,7 +2006,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 **State:** the frontend is committed and pushed (see the 2026-10-18 entries). The live site (www.facecloudai.com) is still the demo build and is untouched.
 
 **Frontend screens still on demo data (no backend call):**
-- Admin: all connected (2026-10-18); Statistics is routed (2026-10-19). Not yet in the UI although the backend has them: `moderation`, `batches/failed`, `jobs/failed` endpoints. `Rejections.tsx` and `SystemHealth.tsx` are deliberately not routed (duplicates).
+- Admin: all connected (2026-10-18); Statistics is routed (2026-10-19). Moderation Overview, Invitations and the failed uploads / failed jobs cards on System Monitoring are connected (2026-10-19). Only the single security-alert detail endpoint is still unused. `Rejections.tsx` and `SystemHealth.tsx` are deliberately not routed (duplicates).
 - Moderator Member Management is connected (2026-10-19). The invitation page `/invitations/:token` exists (2026-10-19).
 - Moderator: every screen is connected, including the Decision Log (`/moderator/logs`). Identity Review, Rejected Images and the Decision Log were unrouted pages and now have routes.
   Backend endpoints exist under `/api/organizations/{id}/` (moderator batches, reports, members, invitations, audit, assign, merge-identity-groups, image preview).

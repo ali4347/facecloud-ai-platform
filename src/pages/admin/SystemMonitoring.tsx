@@ -3,6 +3,7 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { AsyncGate } from '../../components/admin/AsyncGate'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { OldBackendNotice } from '../../components/admin/OldBackendNotice'
+import { FailedWork } from '../../components/admin/FailedWork'
 import { formatUptime, jobLabel, serviceNote, useSystemHealth } from '../../lib/adminHealth'
 import { CheckCircle2, AlertTriangle, AlertOctagon, Clock, Users, RefreshCw, RotateCw } from 'lucide-react'
 
@@ -106,6 +107,8 @@ export default function SystemMonitoring() {
           )
         }}
       </AsyncGate>
+
+      <FailedWork />
     </div>
   )
 }

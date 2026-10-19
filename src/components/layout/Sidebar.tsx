@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck
+  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck, Mail
 } from 'lucide-react'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
 import { useModeratorOrganization } from '../../lib/moderationData'
@@ -36,6 +36,8 @@ const adminNav = [
   { label: 'Manage Users',       icon: Users,            to: '/admin/users' },
   { label: 'Organizations',      icon: Building2,        to: '/admin/organizations' },
   { label: 'Moderators',         icon: UserCog,          to: '/admin/moderators' },
+  { label: 'Moderation',         icon: Eye,              to: '/admin/moderation' },
+  { label: 'Invitations',        icon: Mail,             to: '/admin/invitations' },
   { label: 'Audit Logs',         icon: ClipboardList,    to: '/admin/audit-logs' },
   { label: 'Security Monitoring',icon: ShieldCheck,      to: '/admin/security' },
   { label: 'System Monitoring',  icon: Server,           to: '/admin/system' },
