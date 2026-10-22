@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-19
+**Last updated:** 2026-10-22
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,13 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-22 — Collages dropped from the plan; auto-enhancement becomes the top priority
+*Status: committed (this commit).*
+
+- **Decision (Ali):** collages are removed from the project. The frontend never had a collage screen, so the only trace was one label in the admin job names (`src/lib/adminHealth.ts`), now removed; an unknown job kind falls back to its backend name. The backend's `collages` app is Ijaz's to remove (prompt given to Ali).
+- **Decision (Ali):** *automatic enhancement of accepted photos* is the core of the proposal (it was the examiners' question at the proposal defence), so it moves from "pending" to the first job before the defence on 2026-11-10. Backend prompt for Ijaz given to Ali; the frontend side (upload screens, batch panel, Image Detail) follows once the backend exists.
+- **Files:** `src/lib/adminHealth.ts`, `WORK_LOG.md`. `npx tsc -b` and both builds pass.
 
 ### 2026-10-19 — Plain messages when the server answers with a page; honest "organizations could not be loaded"
 *Status: committed (this commit).*

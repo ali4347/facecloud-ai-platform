@@ -27,7 +27,7 @@ export function jobLabel(key: string): string {
   const known: Record<string, string> = {
     enhancement: 'Enhancement', enhancement_batch: 'Batch enhancement', model_comparison: 'Model comparison',
     gallery_edit: 'Gallery edit', identity_analysis: 'Face grouping', preprocessing: 'Preprocessing',
-    upload_batch: 'Upload batch', download_package: 'ZIP download', collage: 'Collage', report: 'Report', identity_export: 'Identity export',
+    upload_batch: 'Upload batch', download_package: 'ZIP download', report: 'Report', identity_export: 'Identity export',
   }
   return known[key] ?? key.replace(/_/g, ' ')
 }
