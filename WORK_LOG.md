@@ -46,6 +46,11 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — One complete backend prompt for the six QA bugs
+*Status: committed (this commit).*
+
+- `qa/PROMPT_FOR_BACKEND.md` holds the single prompt for Ijaz: BE-004 (admin organization list throttled at 30 an hour), BE-005 (the demo's dark photo is refused), BE-006 (reviews created in personal workspaces), BE-001 (login identifier length), BE-002 (JSON 404 under `/api/`), BE-003 (slow health check), each with the fix, the test and the command that shows it working. Same ids as `qa/BUGS.md`; `qa/README.md` lists the file. Documentation only.
+
 ### 2026-10-22 — Onboarding pipeline QA: a person with no team was promised a moderator
 *Status: committed (this commit).*
 

@@ -8,6 +8,7 @@ be pointed at a site that is already running; it never signs in and never create
 |---|---|
 | `TEST_PLAN.md` | What is tested, how, on which accounts, and what is **not** covered yet |
 | `BUGS.md` | Every bug found: steps, expected, actual, severity, status, who fixes it |
+| `PROMPT_FOR_BACKEND.md` | The complete prompt for the backend developer: the six backend bugs, with fixes, tests and how to see each one work |
 | `QA_REPORT.md` | The summary of the latest pass: numbers, risks for the defence, recommendations |
 | `start-test-stack.sh` / `stop-test-stack.sh` | One command up / down: backend copy from `origin/main`, test data, website, headless Chrome |
 | `seed.py` | The test accounts (see below) |
