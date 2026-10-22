@@ -133,11 +133,13 @@ export function HeroSection() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Enter your email for early access"
+                  aria-label="Your email for early access"
                   className="flex-1 bg-transparent text-white text-sm outline-none
                              placeholder:text-white/35 min-w-0"
                 />
                 <button
                   type="submit"
+                  aria-label="Request early access"
                   className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] hover:from-[#FB923C] hover:to-[#FFA43A]
                              flex items-center justify-center transition-all cursor-pointer shadow-[0_2px_12px_rgba(249,115,22,0.4)]"
                 >

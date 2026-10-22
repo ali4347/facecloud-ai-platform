@@ -46,6 +46,17 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — QA pass: the `qa/` folder, 12 bugs found, 7 fixed
+*Status: committed (this commit).*
+
+- **What was added:** `qa/` with `README.md`, `TEST_PLAN.md`, `BUGS.md`, `QA_REPORT.md`, `start-test-stack.sh` / `stop-test-stack.sh` (a throwaway backend copy from `origin/main`, test accounts, website and headless Chrome on their own ports), `seed.py`, `lib.mjs` and eight scripts (`01-crawl` … `08-limits`). Run output goes to `qa/out/` (ignored by git). The user's own servers (5173 / 8000) and database are never touched; `02-public-smoke.mjs` can be pointed at a running site and only does safe, signed-out checks.
+- **Result:** 356 checks on the QA stack, 353 passed; the 3 failures are backend items (BE-001 login identifier length, BE-002 HTML 404 under `/api/`, BE-004 the admin organization list limited to 30 reads an hour). On Ali's running 5173 / 8000: 20 of 20 safe checks passed and the backend is on the new code (242 operations).
+- **Frontend fixes in this pass:** FE-001 single upload shows the reason a file was refused (and a file card instead of a broken icon); FE-002 Live Enhancement uses an existing model address and a pinned runtime (offline use is still a decision, see `qa/BUGS.md`); FE-003 sign-in and register fields linked to their labels and an `h1` on those pages; FE-004 a tab title per page (`src/lib/useDocumentTitle.ts`, `PageHeader`); FE-005 the early-access button has a name; FE-006 file icon instead of a broken-image icon in the multiple-upload lists; **FE-008** one page load sent the same request up to 8 times (moderator pages 12 calls, now 5 to 6): identical reads in flight now share one request (`src/lib/api/client.ts`), the admin organization list is kept for a minute and dropped on any change (`adminOrganizations.ts`), and "Request was throttled…" becomes "Too many requests. You can try again in about N minutes."
+- **Open (see `qa/BUGS.md`):** BE-001, BE-002, BE-003 (health check slow when Redis is down), BE-004, FE-007. A prompt for Ijaz is in `qa/QA_REPORT.md`. Until BE-004 is fixed: `THROTTLE_RATE_ORG_INVITE=1000/hour` in the backend `.env`.
+- **Not automated yet (listed in `qa/TEST_PLAN.md`):** enhancement quality, the editor, person folders, moderator reject/assign/bulk, settings and password change, the Celery path, other browsers.
+- **Files:** `qa/**`, `.gitignore`, `README.md`, `src/lib/api/client.ts`, `src/lib/api/adminOrganizations.ts`, `src/lib/useDocumentTitle.ts`, `src/components/layout/PageHeader.tsx`, `src/components/features/LiveEnhancementPanel.tsx`, `src/components/public/HeroSection.tsx`, `src/pages/user/UploadSingle.tsx`, `src/pages/user/UploadMultipleLive.tsx`, the sign-in / register / forgot-password / about / contact / not-found pages (labels, `h1`, titles).
+- **Verified:** all eight scripts on a fresh stack (above); `npx tsc -b`, `npm run build` and the demo-safe build pass.
+
 ### 2026-10-22 — Dialogs cut off at the top and not scrollable (the `page-enter` animation)
 *Status: committed (this commit).*
 
@@ -2073,7 +2084,7 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 - **Downloaded reports read badly and can contradict themselves (2026-10-19).** The PDF/JSON/CSV are produced by the backend (`reports/renderers.py`, `reports/services.py`): ISO timestamp, raw byte counts and codes, truncated filenames, and a batch report whose photos were deleted shows Total Images 0 next to Accepted Uploads N. The frontend now hides the batch report button for an emptied upload; the wording and counts are a backend fix (prompt given to Ali for Ijaz).
 - **Two admin pages are not routed on purpose (2026-10-19).** `Rejections.tsx` duplicates Rejection Summary and `SystemHealth.tsx` duplicates System Monitoring; the files are kept.
 
-- **Backend permission gap — a moderator can promote a member to moderator.** Found 2026-10-15 by exercising
+- **(Closed, checked 2026-10-22) Backend permission gap — a moderator can promote a member to moderator.** On current `origin/main` the API answers 403 "Moderators may only set the normal member role." (`qa/scripts/04-api-security.mjs`, SEC-07). Original note: found 2026-10-15 by exercising
   `update_member()` in a rolled-back transaction. Invitations refuse it and the owner role is refused, but the
   moderator role is not guarded on the PATCH path. Not fixed: the backend is frozen at the owner's request. When
   it is unfrozen, the fix belongs next to the owner-role check in `organizations/services.py::update_member`, with a
@@ -2089,7 +2100,7 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 - `README.md` §6 lists only 5 moderator routes; the app has 9. README section numbering skips §19.
 - `docker-compose.yml` defaults the database name to `facecloud_db` while README §15 uses `facecloud` in `DATABASE_URL`;
   confirm which one the local `.env` uses.
-- No automated tests, no accessibility audit, no real email/API integration (all listed as future work in README §18).
+- No unit tests; end-to-end QA scripts exist in `qa/` (2026-10-22) and a basic accessibility pass was done. No real email/API integration (README §18). Open QA items: `qa/BUGS.md`.
 - `npm run lint` scans `reference-templates/` and `aigocy/` as well, so its output is dominated by thousands of
   warnings from a vendored jQuery copy. Add an oxlint ignore for those directories, or delete them (see §6).
 - Deployment is a manual upload, and `.htaccess` is a hidden file that most file managers do not show. If a deploy

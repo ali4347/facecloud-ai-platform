@@ -6,8 +6,10 @@ import { register, registerFromInvitation, savePendingRegistration } from '../li
 import { previewInvitation, type InvitationPreview } from '../lib/api/organizations'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function Register() {
+  useDocumentTitle('Create an account')
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -97,7 +99,7 @@ export default function Register() {
 
         {/* Card */}
         <div className="fc-panel-strong p-8">
-          <h2 className="text-xl font-bold text-ink mb-1">Get Started</h2>
+          <h1 className="text-xl font-bold text-ink mb-1">Get Started</h1>
           <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Create your profile to process faces with AI.
           </p>
@@ -128,7 +130,7 @@ export default function Register() {
               { label: 'Confirm Password', icon: Lock,  type: 'password', placeholder: '',                           val: confirmPassword, set: setConfirmPassword },
             ].map(f => (
               <div key={f.label} className="space-y-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-widest"
+                <label htmlFor={`register-${f.label.replace(/\s+/g, '-').toLowerCase()}`} className="text-[10px] font-bold uppercase tracking-widest"
                   style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                   {f.label}
                 </label>
@@ -136,6 +138,7 @@ export default function Register() {
                   <f.icon className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
                     style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                   <input
+                    id={`register-${f.label.replace(/\s+/g, '-').toLowerCase()}`}
                     type={f.type}
                     placeholder={f.placeholder}
                     value={f.val}

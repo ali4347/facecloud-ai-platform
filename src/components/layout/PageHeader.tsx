@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils'
+import { useDocumentTitle } from '../../lib/useDocumentTitle'
 
 interface PageHeaderProps {
   title: string
@@ -8,6 +9,7 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, subtitle, action, className }: PageHeaderProps) {
+  useDocumentTitle(title)
   return (
     <div className={cn('flex flex-wrap items-start justify-between gap-3 mb-6', className)}>
       <div className="min-w-0">

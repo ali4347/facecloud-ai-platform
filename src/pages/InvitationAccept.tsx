@@ -7,9 +7,11 @@ import { USE_API } from '../lib/api/config'
 import { getSession } from '../lib/session'
 import { messageFor } from '../lib/useApiResource'
 import { formatDateTime } from '../lib/utils'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 /** The page the invitation email links to: who is inviting, then join once signed in with the invited email. */
 export default function InvitationAccept() {
+  useDocumentTitle('Invitation')
   const { token = '' } = useParams<{ token: string }>()
   const [preview, setPreview] = useState<InvitationPreview | null>(null)
   const [problem, setProblem] = useState<string | null>(null)

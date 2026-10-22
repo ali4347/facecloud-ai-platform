@@ -1,5 +1,6 @@
 import { API_URL } from './config'
 import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, clearTokens } from './tokens'
+import { currentPortal } from '../portal'
 
 export class ApiError extends Error {
   readonly status: number
@@ -29,8 +30,17 @@ function plain(text: string): string {
   return inside ? inside[2] : text
 }
 
+/** "Request was throttled. Expected available in 3405 seconds." becomes a sentence a person can act on. */
+function throttledSentence(text: string): string {
+  const seconds = Number(text.match(/available in (\d+) second/i)?.[1])
+  if (!Number.isFinite(seconds)) return 'Too many requests. Please wait a little and try again.'
+  const wait = seconds < 90 ? `${seconds} seconds` : seconds < 5400 ? `about ${Math.round(seconds / 60)} minutes` : `about ${Math.round(seconds / 3600)} hours`
+  return `Too many requests. You can try again in ${wait}.`
+}
+
 /** Pull a readable sentence out of DRF's several error shapes. */
 function messageFrom(body: unknown, status: number): string {
+  if (status === 429) return throttledSentence(JSON.stringify(body ?? ''))
   if (typeof body === 'string' && body.trim()) return plain(body)
   if (body && typeof body === 'object') {
     const record = body as Record<string, unknown>
@@ -182,8 +192,49 @@ function pageInsteadOfJson(status: number): ApiError {
   return new ApiError(status, message)
 }
 
+/**
+ * Reads that are asking for the same thing at the same moment share one request.
+ *
+ * A page is built from several parts (the sidebar, the top bar, the screen itself) that each ask for the same list when
+ * they appear, so one page load used to send the same GET up to eight times and used up the server's hourly allowance
+ * (1000 requests per person) in a few dozen page views. Only requests *in flight* are shared: once one answers, the next
+ * ask goes to the server again, so nothing is ever served stale. A caller's own `signal` still cancels its own wait.
+ */
+const sharedReads = new Map<string, Promise<unknown>>()
+
+/** How many changes (anything that is not a read) this page has made so far; a cached list is stale once this number moves. */
+let changesMade = 0
+export const changesSoFar = (): number => changesMade
+
+const waitFor = <T>(shared: Promise<T>, signal?: AbortSignal): Promise<T> => {
+  if (!signal) return shared
+  if (signal.aborted) return Promise.reject(new DOMException('Aborted', 'AbortError'))
+  return new Promise<T>((resolve, reject) => {
+    const onAbort = () => reject(new DOMException('Aborted', 'AbortError'))
+    signal.addEventListener('abort', onAbort, { once: true })
+    shared.then(
+      value => { signal.removeEventListener('abort', onAbort); resolve(value) },
+      error => { signal.removeEventListener('abort', onAbort); reject(error) },
+    )
+  })
+}
+
 /** One call to the API, with a JSON body in and a parsed body out. */
-export async function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
+export function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
+  const method = options.method ?? (options.body || options.formData ? 'POST' : 'GET')
+  // Anything that changes data ends the sharing, so a read that follows a change always asks the server afresh.
+  if (method !== 'GET') { changesMade += 1; sharedReads.clear(); return load<T>(path, options) }
+  const key = `${currentPortal()}|${options.anonymous ? 'anon' : 'auth'}|${path}`
+  let shared = sharedReads.get(key) as Promise<T> | undefined
+  if (!shared) {
+    const started: Promise<T> = load<T>(path, { ...options, signal: undefined }).finally(() => { if (sharedReads.get(key) === started) sharedReads.delete(key) })
+    shared = started
+    sharedReads.set(key, started)
+  }
+  return waitFor(shared, options.signal)
+}
+
+async function load<T>(path: string, options: RequestOptions): Promise<T> {
   const response = await request(path, options)
 
   if (response.status === 204) return undefined as T

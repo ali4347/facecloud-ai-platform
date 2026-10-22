@@ -25,6 +25,8 @@ import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
 import { makeLocalPreview } from '../../lib/previewEnhance'
 import { EnhancementReport } from '../../components/features/EnhancementReport'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
+import { useReasonBreakdown } from '../../lib/uploadBatch'
 import { useSubmitTarget } from '../../lib/useSubmitTarget'
 import { demoImages, formatBytes } from '../../lib/imageData'
 import {
@@ -75,6 +77,8 @@ export default function UploadSingle() {
   const target = useSubmitTarget()
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
+  // A file that is not a picture (a text file, a PDF) cannot be drawn; say so instead of showing a broken-image icon.
+  const [brokenUrl, setBrokenUrl] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
   const [progress, setProgress] = useState<BatchProgress | null>(null)
   const [demoStage, setDemoStage] = useState(0)
@@ -362,6 +366,8 @@ export default function UploadSingle() {
   const verdict = image?.display_status ?? (phase === 'done' && !USE_API ? 'accepted' : null)
   const accepted = verdict === 'accepted'
   const rejected = verdict === 'rejected'
+  // Why a refused photo was refused: the same sentences the multiple and ZIP screens show.
+  const breakdown = useReasonBreakdown(progress, progress !== null && isBatchFinished(progress))
 
   return (
     <div className="space-y-6 page-enter">
@@ -418,11 +424,19 @@ export default function UploadSingle() {
                 <div className="relative rounded-3xl overflow-hidden border border-line bg-surface-mute flex items-center justify-center">
                   {/* Capped rather than a fixed aspect: a portrait photo in a
                       4:3 box is mostly empty box. */}
-                  <img
-                    src={previewUrl}
-                    alt={file.name}
-                    className="max-h-[420px] w-auto max-w-full object-contain"
-                  />
+                  {brokenUrl === previewUrl ? (
+                    <div className="py-14 px-6 text-center space-y-1">
+                      <p className="text-sm font-bold text-ink break-all">{file.name}</p>
+                      <p className="text-[11px] text-ink-faint">{formatBytes(file.size)} · this file cannot be shown as a picture</p>
+                    </div>
+                  ) : (
+                    <img
+                      src={previewUrl}
+                      alt={file.name}
+                      onError={() => setBrokenUrl(previewUrl)}
+                      className="max-h-[420px] w-auto max-w-full object-contain"
+                    />
+                  )}
                   {phase === 'idle' && (
                     <button
                       type="button"
@@ -544,11 +558,13 @@ export default function UploadSingle() {
                     </p>
                     <p className="text-[11px] text-ink-faint mt-0.5">
                       {accepted ? 'It passed every check and has been filed.'
-                        : rejected ? 'The reason is below — a clearer photo usually fixes it.'
+                        : rejected ? 'The reason is below.'
                         : 'The automatic checks were not confident enough to decide on their own.'}
                     </p>
                   </div>
                 </div>
+
+                {rejected && <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />}
 
                 {/* Before and after, once there is something to compare. */}
                 {accepted && (
@@ -657,7 +673,7 @@ export default function UploadSingle() {
                   </div>
                 )}
 
-                {progress && progress.status === 'partial' && (
+                {progress && progress.status === 'partial' && !rejected && (
                   <p className="text-[11px] text-[#F59E0B]">
                     The batch finished partly — check My Images for the full picture.
                   </p>

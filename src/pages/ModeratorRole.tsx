@@ -8,6 +8,7 @@ import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 /*
  * The moderator role, written from what the platform actually enforces.
@@ -229,6 +230,7 @@ function Heading({ tag, title, subtitle }: { tag: string; title: string; subtitl
 }
 
 export default function ModeratorRole() {
+  useDocumentTitle('The moderator role')
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])

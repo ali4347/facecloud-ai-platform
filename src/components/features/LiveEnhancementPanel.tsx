@@ -179,11 +179,11 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
     setDetectorFallbackMsg('')
     try {
       const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm'
       )
 
       // 1. Try full-range model (detects close + distant faces)
-      const fullRangePath = 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_full_range_sparse/float16/latest/blaze_face_full_range_sparse.tflite'
+      const fullRangePath = 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_full_range/float16/latest/blaze_face_full_range.tflite'
       let detector = await tryCreateDetector(vision, fullRangePath, 0.25)
       if (detector) {
         faceDetectorRef.current = detector

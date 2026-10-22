@@ -7,8 +7,10 @@ import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 import { saveSession, type Session } from '../lib/session'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function Login() {
+  useDocumentTitle('Sign in')
   const navigate = useNavigate()
   const location = useLocation()
   /* The demo account is pre-filled only in demo mode; a real sign-in starts empty. */
@@ -90,7 +92,7 @@ export default function Login() {
 
         {/* Card */}
         <div className="fc-panel-strong p-8">
-          <h2 className="text-xl font-bold text-ink mb-1">Welcome Back</h2>
+          <h1 className="text-xl font-bold text-ink mb-1">Welcome Back</h1>
           <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Access your AI-enhanced image workspace.
           </p>
@@ -138,7 +140,7 @@ export default function Login() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest"
+              <label htmlFor="signin-email" className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Email Address
               </label>
@@ -146,7 +148,7 @@ export default function Login() {
                 <Mail className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
                   style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input
-                  type="email"
+                  id="signin-email" autoComplete="email" type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="fc-input !pl-11"
@@ -156,11 +158,11 @@ export default function Login() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest"
+              <label htmlFor="signin-password" className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Password
               </label>
-              <PasswordInput
+              <PasswordInput id="signin-password" autoComplete="current-password"
                 leading={
                   <Lock
                     className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none z-10"

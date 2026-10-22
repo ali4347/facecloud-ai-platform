@@ -6,6 +6,7 @@ import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
 import { USE_API } from '../lib/api/config'
 import { apiFetch, ApiError } from '../lib/api/client'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 interface FormFields {
   name: string
@@ -23,6 +24,7 @@ interface FormErrors {
 }
 
 export default function Contact() {
+  useDocumentTitle('Contact')
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])

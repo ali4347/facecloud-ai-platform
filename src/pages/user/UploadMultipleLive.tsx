@@ -22,6 +22,15 @@ const MAX_FILES = 150
 
 interface Picked { file: File; previewUrl: string }
 
+/** A picture, or a file icon when the browser cannot draw the file (a text file, a PDF) so no broken-image icon shows. */
+function Thumb({ src, alt, className, fill = false }: { src: string; alt: string; className: string; fill?: boolean }) {
+  const [broken, setBroken] = useState(false)
+  if (broken) {
+    return <div className={fill ? 'w-full h-full flex items-center justify-center text-ink-mute' : 'p-2 rounded-xl bg-surface-mute border border-line text-ink-mute shrink-0'}><FileImage className={fill ? 'w-8 h-8' : 'w-4 h-4'} /></div>
+  }
+  return <img src={src} alt={alt} onError={() => setBroken(true)} className={className} />
+}
+
 export default function UploadMultipleLive() {
   const target = useSubmitTarget()
   const [picked, setPicked] = useState<Picked[]>([])
@@ -148,7 +157,7 @@ export default function UploadMultipleLive() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {picked.map((item, i) => (
                     <div key={`${item.file.name}-${i}`} className="relative group rounded-2xl overflow-hidden border border-line bg-surface-mute aspect-square">
-                      <img src={item.previewUrl} alt={item.file.name} className="w-full h-full object-cover" />
+                      <Thumb src={item.previewUrl} alt={item.file.name} fill className="w-full h-full object-cover" />
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1.5">
                         <p className="text-[9px] text-white/90 font-medium truncate">{item.file.name}</p>
                         <p className="text-[8px] text-white/60">{formatBytes(item.file.size)}</p>
@@ -212,7 +221,7 @@ export default function UploadMultipleLive() {
                     <div key={image.id} className="p-4 rounded-2xl bg-surface-mute border border-line flex items-center justify-between gap-3 text-xs">
                       <div className="flex items-center gap-3 min-w-0">
                         {preview ? (
-                          <img src={preview} alt="" className="w-9 h-9 rounded-lg object-cover border border-line shrink-0" />
+                          <Thumb src={preview} alt="" className="w-9 h-9 rounded-lg object-cover border border-line shrink-0" />
                         ) : (
                           <div className="p-2 rounded-xl bg-surface-mute border border-line text-ink-mute shrink-0"><FileImage className="w-4 h-4" /></div>
                         )}

@@ -7,8 +7,10 @@ import { signInToPortal } from '../../lib/api/auth'
 import { ApiError } from '../../lib/api/client'
 import { USE_API } from '../../lib/api/config'
 import { saveSession, type Session } from '../../lib/session'
+import { useDocumentTitle } from '../../lib/useDocumentTitle'
 
 export default function ModeratorLogin() {
+  useDocumentTitle('Moderator sign in')
   const navigate = useNavigate()
   const [email, setEmail] = useState(USE_API ? '' : 'moderator@facecloud.ai')
   const [password, setPassword] = useState(USE_API ? '' : 'password')
@@ -84,7 +86,7 @@ export default function ModeratorLogin() {
 
         {/* Card */}
         <div className="fc-panel-strong p-8">
-          <h2 className="text-xl font-bold text-ink mb-1">Moderator Access</h2>
+          <h1 className="text-xl font-bold text-ink mb-1">Moderator Access</h1>
           <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Audit low quality uploads and cluster mappings.
           </p>
@@ -104,7 +106,7 @@ export default function ModeratorLogin() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest"
+              <label htmlFor="signin-email" className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Moderator Email
               </label>
@@ -112,7 +114,7 @@ export default function ModeratorLogin() {
                 <Mail className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
                   style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input 
-                  type="email"
+                  id="signin-email" autoComplete="email" type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="fc-input !pl-11"
@@ -122,11 +124,11 @@ export default function ModeratorLogin() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold uppercase tracking-widest"
+              <label htmlFor="signin-password" className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
                 Moderator Password
               </label>
-              <PasswordInput
+              <PasswordInput id="signin-password" autoComplete="current-password"
                 leading={
                   <Lock
                     className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none z-10"

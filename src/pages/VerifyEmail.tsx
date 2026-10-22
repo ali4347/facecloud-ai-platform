@@ -8,8 +8,10 @@ import {
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
 import { readSessionRaw, saveSession } from '../lib/session'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function VerifyEmail() {
+  useDocumentTitle('Verify your email')
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [loading, setLoading] = useState(false)

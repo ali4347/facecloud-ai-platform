@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import { ShieldAlert, ArrowLeft } from 'lucide-react'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function Unauthorized() {
+  useDocumentTitle('Access denied')
   return (
     <div
       className="min-h-screen flex items-center justify-center relative p-6 overflow-hidden"

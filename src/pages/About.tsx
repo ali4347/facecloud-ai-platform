@@ -5,8 +5,10 @@ import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function About() {
+  useDocumentTitle('About')
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])

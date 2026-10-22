@@ -5,6 +5,7 @@ import { AuthShell } from '../components/auth/AuthShell'
 import { PasswordInput } from '../components/ui/PasswordInput'
 import { confirmPasswordReset } from '../lib/api/auth'
 import { ApiError } from '../lib/api/client'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 const labelStyle = { color: 'rgb(var(--a-ink) / 0.42)' }
 const lockIcon = (
@@ -14,6 +15,7 @@ const lockIcon = (
 
 /** Landing page for the link in the reset email: /reset-password/:uid/:token */
 export default function ResetPassword() {
+  useDocumentTitle('Reset your password')
   const { uid = '', token = '' } = useParams()
   const navigate = useNavigate()
   const [password, setPassword] = useState('')

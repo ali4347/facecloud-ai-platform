@@ -5,10 +5,12 @@ import { AuthShell } from '../components/auth/AuthShell'
 import { requestPasswordReset } from '../lib/api/auth'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
+import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 const labelStyle = { color: 'rgb(var(--a-ink) / 0.42)' }
 
 export default function ForgotPassword() {
+  useDocumentTitle('Forgot password')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
@@ -34,7 +36,7 @@ export default function ForgotPassword() {
       {sent ? (
         <div className="text-center space-y-4">
           <CheckCircle className="w-10 h-10 mx-auto" style={{ color: '#4ADE80' }} />
-          <h2 className="text-xl font-bold text-ink">Check your email</h2>
+          <h1 className="text-xl font-bold text-ink">Check your email</h1>
           {USE_API ? (
             <p className="text-sm" style={{ color: 'rgb(var(--a-ink) / 0.55)' }}>
               If an account exists for <span className="font-semibold text-ink">{email}</span>, we have sent a
@@ -50,7 +52,7 @@ export default function ForgotPassword() {
         </div>
       ) : (
         <>
-          <h2 className="text-xl font-bold text-ink mb-1">Forgot your password?</h2>
+          <h1 className="text-xl font-bold text-ink mb-1">Forgot your password?</h1>
           <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Enter your account email and we will send you a link to choose a new one.
           </p>
