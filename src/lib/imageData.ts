@@ -209,7 +209,9 @@ export function statusTone(status: string): 'good' | 'bad' | 'warn' | 'busy' | '
 }
 
 export function formatBytes(bytes: number): string {
-  if (!bytes) return '--'
+  // "--" is for a size nobody has told us; a file (or an account) that really holds nothing is 0 B.
+  if (bytes === undefined || bytes === null || Number.isNaN(bytes)) return '--'
+  if (bytes === 0) return '0 B'
   const units = ['B', 'KB', 'MB', 'GB']
   let value = bytes
   let unit = 0

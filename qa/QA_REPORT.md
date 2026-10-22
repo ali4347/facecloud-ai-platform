@@ -21,14 +21,14 @@ backend at `http://127.0.0.1:8000` (no sign-in, nothing created).
 
 ## What was found
 
-**12 bugs** (full detail in `BUGS.md`): 4 major, 8 minor; **7 fixed in this pass, 5 open** (four are backend).
+**12 bugs** (full detail in `BUGS.md`): 4 major, 8 minor; **8 fixed in this pass, 4 open** (all four are backend).
 
 Fixed here (frontend): **FE-001** a refused file on the single upload screen showed no reason, **FE-002** Live Enhancement used a dead
 model address and an unpinned runtime, **FE-003** sign-in/register fields not linked to labels, **FE-004** the same tab title on every
 page, **FE-005** an unnamed button, **FE-006** broken-image icons, **FE-008** the same request sent up to 8 times per page (12
 calls per moderator page, now 5 to 6).
 
-Open: **BE-004** (major), **BE-001**, **BE-002**, **BE-003** (backend), **FE-007** (a 0-byte file shows "--").
+Also fixed: **FE-007** (a 0-byte file showed "--"). Open (all backend): **BE-004** (major), **BE-001**, **BE-002**, **BE-003**.
 
 **Confirmed good by tests:**
 - The three portals are separate sessions; signing out of one does not sign out another.

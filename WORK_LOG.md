@@ -46,6 +46,13 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — FE-007: a 0-byte size reads "0 B"; backend prompt written for the four open bugs
+*Status: committed (this commit).*
+
+- `formatBytes(0)` returned "--" (the text for an unknown size); an empty file, or a new account's stored figure, now reads "0 B". "--" stays for a missing value. File: `src/lib/imageData.ts`.
+- `qa/BUGS.md` and `qa/QA_REPORT.md` updated: 12 bugs, **8 fixed, 4 open, all four backend** (BE-001 login identifier length, BE-002 JSON 404 under `/api/`, BE-003 slow health check, BE-004 admin organization list throttled at 30 an hour). The prompt for Ijaz was given to Ali; after it is merged the QA scripts are re-run (`qa/README.md`).
+- **Verified:** `npx tsc -b`, `npm run build`, demo-safe build.
+
 ### 2026-10-22 — QA pass: the `qa/` folder, 12 bugs found, 7 fixed
 *Status: committed (this commit).*
 

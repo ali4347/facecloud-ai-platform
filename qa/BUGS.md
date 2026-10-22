@@ -4,7 +4,7 @@ Newest pass first. **IDs**: `BE-` backend (Ijaz's repository: a prompt is writte
 Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call). Severity is defined in `TEST_PLAN.md`.
 "Evidence" is the check id in `qa/scripts/` (re-run it to see the failure or the fix) and, where useful, a screenshot name in `qa/out/`.
 
-## Summary of the 2026-10-22 pass (12 bugs: 4 major, 8 minor; 7 fixed, 5 open)
+## Summary of the 2026-10-22 pass (12 bugs: 4 major, 8 minor; 8 fixed, 4 open, all four backend)
 
 | ID | Severity | Status | Title |
 |---|---|---|---|
@@ -19,7 +19,7 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 | FE-004 | Minor | Fixed | Every page has the same browser-tab title |
 | FE-005 | Minor | Fixed | Landing page: the early-access submit button has no name for screen readers |
 | FE-006 | Minor | Fixed | Multiple upload: broken-image icon for files that are not pictures |
-| FE-007 | Minor | Open | A 0-byte file shows its size as "--" |
+| FE-007 | Minor | Fixed | A 0-byte file shows its size as "--" |
 
 ---
 
@@ -94,8 +94,8 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 - Multiple upload: a refused `.txt` or fake `.jpg` showed the browser's broken-image icon in the list and in the "picked files" grid.
 - **Fix:** a small `Thumb` that falls back to a file icon (`UploadMultipleLive.tsx`). **Evidence:** screenshot `upload-multiple-mixed.png` (before).
 
-### FE-007 A 0-byte file shows "--" — Minor — Open
-- `formatBytes(0)` returns "--" because it uses the same text for "unknown". An empty file should read "0 B". Left open: the sidebar "-- stored" for a new account uses the same function and would need a separate "unknown" case.
+### FE-007 A 0-byte file shows "--" — Minor — Fixed
+- `formatBytes(0)` returned "--", the text for "unknown". An empty file now reads "0 B", and so does a new account's "stored" figure in the sidebar; "--" stays for a size that is missing (`imageData.ts`).
 
 ---
 
