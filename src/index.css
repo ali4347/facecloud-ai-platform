@@ -482,7 +482,9 @@ section[id] {
   }
 
   /* ── Page animation ──────────────────────────────────────────────── */
-  .page-enter { animation: fcFadeIn 0.45s cubic-bezier(0.16,1,0.3,1) both; }
+  /* "backwards", not "both": after the animation the element must have no transform at all. A leftover transform makes it the
+     reference box of every position:fixed dialog inside it, so dialogs were cut off by the page's top bar and could not scroll. */
+  .page-enter { animation: fcFadeIn 0.45s cubic-bezier(0.16,1,0.3,1) backwards; }
 
   .gradient-text {
     @apply bg-gradient-to-r from-[#F97316] via-[#FB923C] to-[#EA580C] bg-clip-text text-transparent;

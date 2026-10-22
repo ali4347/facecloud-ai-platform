@@ -232,8 +232,8 @@ export function LiveMemberManagement() {
       )}
 
       {inviteOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div role="dialog" aria-modal="true" aria-label="Invite member" className="w-full max-w-md p-6 relative rounded-2xl bg-surface border border-line">
+        <div className="fixed inset-0 z-50 flex overflow-y-auto p-4 bg-black/70 backdrop-blur-sm">
+          <div role="dialog" aria-modal="true" aria-label="Invite member" className="m-auto w-full max-w-md p-6 relative rounded-2xl bg-surface border border-line">
             <button type="button" onClick={() => setInviteOpen(false)} aria-label="Close" className="absolute top-4 right-4 text-ink-faint hover:text-ink cursor-pointer"><X className="w-4 h-4" /></button>
             <h3 className="text-sm font-bold text-ink mb-2">Invite Organization Member</h3>
             <p className="text-xs text-ink-faint mb-6">We email them a link. A moderator can only invite standard members.</p>

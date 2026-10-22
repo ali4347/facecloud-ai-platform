@@ -38,10 +38,10 @@ export function ConfirmDialog({
   }, [])
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/70 backdrop-blur-[2px]"
+    <div className="fixed inset-0 z-[70] flex overflow-y-auto p-4 bg-black/70 backdrop-blur-[2px]"
       onMouseDown={e => { if (e.target === e.currentTarget && !busy) onCancel() }}>
       <div role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"
-        className="w-full max-w-md rounded-2xl bg-surface border border-line shadow-soft-lg p-6 space-y-4">
+        className="m-auto w-full max-w-md rounded-2xl bg-surface border border-line shadow-soft-lg p-6 space-y-4">
         <h2 id="confirm-title" className="text-base font-bold text-ink">{title}</h2>
         <div className="text-sm text-ink-mute space-y-2">{children}</div>
         {error && <p role="alert" className="text-xs text-red-500">{error}</p>}

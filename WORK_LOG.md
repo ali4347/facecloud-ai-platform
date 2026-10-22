@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — Dialogs cut off at the top and not scrollable (the `page-enter` animation)
+*Status: committed (this commit).*
+
+- **Report (Ali, screenshot):** the Organizations "Edit" dialog showed only its lower half (the Name field was hidden) and could not be scrolled.
+- **Cause (measured in headless Chrome, window 520 px high):** `.page-enter` used `animation: … both`, so after the fade-in the page container kept `transform: matrix(1,0,0,1,0,0)`. A transformed ancestor becomes the reference box of every `position: fixed` element inside it: the dialog's overlay was 507 px high and 759 px wide, starting 96 px down (under the top bar), instead of covering the window.
+- **Fix:** `src/index.css` `.page-enter` now uses `backwards` (no transform once the animation is over). The overlay then covers the whole window (0 px, 520 px high, 1095 px wide, no transformed ancestor). The dialogs also scroll when they are taller than the window: `ConfirmDialog`, the Organizations edit dialog and the moderator's invite dialog use `overflow-y-auto` on the overlay and `m-auto` on the dialog (it stays centred when there is room and starts at the top when there is not).
+- **Verified** in headless Chrome (demo build, 520 px window): the Name field is 111 px from the top and, after scrolling down, the Save button ends at 479 px of 520; the fade-in still plays. `npx tsc -b` and both builds pass. Other full-window overlays (photo viewer, lightbox) were not re-tested; they gain from the same fix.
+- **Files:** `src/index.css`, `src/components/ui/ConfirmDialog.tsx`, `src/pages/admin/Organizations.tsx`, `src/pages/moderator/MemberManagementLive.tsx`.
+
 ### 2026-10-22 — System Monitoring shows the services when one is down (HTTP 503)
 *Status: committed (this commit).*
 

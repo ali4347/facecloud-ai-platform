@@ -202,8 +202,8 @@ export default function Organizations() {
       </AsyncGate>
 
       {editing && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/70 backdrop-blur-[2px]" onMouseDown={e => { if (e.target === e.currentTarget && !working) setEditing(null) }}>
-          <form role="dialog" aria-modal="true" aria-label={`Edit ${editing.name}`} className="w-full max-w-md rounded-2xl bg-surface border border-line shadow-soft-lg p-6 space-y-4"
+        <div className="fixed inset-0 z-[70] flex overflow-y-auto p-4 bg-black/70 backdrop-blur-[2px]" onMouseDown={e => { if (e.target === e.currentTarget && !working) setEditing(null) }}>
+          <form role="dialog" aria-modal="true" aria-label={`Edit ${editing.name}`} className="m-auto w-full max-w-md rounded-2xl bg-surface border border-line shadow-soft-lg p-6 space-y-4"
             onSubmit={e => { e.preventDefault(); const patch: Parameters<typeof updateAdminOrganization>[1] = {}; if (form.name.trim() !== editing.name) patch.name = form.name.trim(); if (form.plan !== editing.plan) patch.plan = form.plan; if (form.scope !== (editing.moderator_data_scope ?? 'own_members')) patch.moderator_data_scope = form.scope; if (form.reason.trim()) patch.reason = form.reason.trim(); if (Object.keys(patch).filter(k => k !== 'reason').length === 0) { setEditing(null); return } void apply(editing, patch, `${editing.name} was updated.`) }}>
             <h2 className="text-base font-bold text-ink">Edit {editing.name}</h2>
             <div className="space-y-1.5"><label htmlFor="edit-org-name" className={labelClass}>Name</label><input id="edit-org-name" className="fc-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} maxLength={150} required /></div>
