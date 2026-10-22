@@ -18,7 +18,17 @@ export function formatUptime(seconds: number): string {
 
 /** The backend's short note on a service ("no_workers"), in words; anything else is shown as sent. */
 export function serviceNote(detail: string): string {
-  const known: Record<string, string> = { no_workers: 'No background worker is running, so jobs wait until one starts.' }
+  const known: Record<string, string> = {
+    no_workers: 'No background worker is running, so jobs wait until one starts.',
+    connection_failed: 'It did not answer. Check that it is running (on a Mac: brew services start redis).',
+    inspection_failed: 'The workers could not be asked how they are doing.',
+    write_failed: 'Files could not be written. Check the storage folder and its free space.',
+    write_verification_failed: 'A test file was written but could not be read back.',
+    not_configured: 'Not set up, so it is not used.',
+    missing: 'The model file is not there.',
+    checksum_mismatch: 'The model file is not the approved one.',
+    unreadable: 'The model file could not be read.',
+  }
   return known[detail] ?? detail
 }
 

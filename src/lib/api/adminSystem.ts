@@ -1,4 +1,4 @@
-import { apiFetch, apiFetchBlob } from './client'
+import { ApiError, apiFetch, apiFetchBlob } from './client'
 
 /* The administrator's read-only views of the whole system. Every shape below is what the backend sends
    (backend docs/FRONTEND_API_GUIDE.md section 10); a field the backend does not send is not here. */
@@ -192,12 +192,21 @@ const SERVICE_NAMES: Record<string, string> = {
   api: 'API', database: 'Database', redis: 'Cache and message broker', celery: 'Background workers',
   storage: 'File storage', email: 'Email', models: 'AI models',
 }
-const LEGACY_STATUS: Record<string, string> = { healthy: 'operational', degraded: 'degraded', unhealthy: 'down', down: 'down', disabled: 'degraded' }
+const LEGACY_STATUS: Record<string, string> = { healthy: 'operational', degraded: 'degraded', unhealthy: 'down', unavailable: 'down', down: 'down', disabled: 'degraded' }
+
+type HealthBody = SystemHealth & { checks?: Record<string, { status: string; latency_ms?: number; code?: string; workers?: number; available_bytes?: number }> }
 
 export async function getHealth(signal?: AbortSignal): Promise<SystemHealth> {
-  const data = await apiFetch<SystemHealth & { checks?: Record<string, { status: string; latency_ms?: number; code?: string; workers?: number; available_bytes?: number }> }>(
-    '/api/system/health/', { signal },
-  )
+  let data: HealthBody
+  try {
+    data = await apiFetch<HealthBody>('/api/system/health/', { signal })
+  } catch (caught) {
+    // A required service (the database, Redis, storage) being down answers 503 *with* the full list of checks. That list is exactly
+    // what the administrator needs, so show it instead of an error whose only text is the word "unavailable".
+    const body = caught instanceof ApiError && caught.status === 503 ? (caught.body as Partial<HealthBody> | null) : null
+    if (body && typeof body === 'object' && (Array.isArray(body.services) || body.checks)) data = body as HealthBody
+    else throw caught
+  }
   if (Array.isArray(data.services)) return { ...data, process: data.process ?? null }
   const checks = data.checks ?? {}
   return {

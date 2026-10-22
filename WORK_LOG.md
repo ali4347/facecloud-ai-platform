@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — System Monitoring shows the services when one is down (HTTP 503)
+*Status: committed (this commit).*
+
+- **Report (Ali, screenshot):** System Monitoring showed one word, "unavailable", where the services should be, while Failed uploads and Failed jobs loaded fine.
+- **Cause (reproduced on a throwaway copy of `origin/main` with the broker address pointing at nothing):** when a required service is down (here Redis) `GET /api/system/health/` answers **503 with the full list of checks** (`redis: down, connection_failed`, `celery: degraded`). The frontend treated every non-2xx as an error and showed the first word of the body. Aside: with Redis down the health call takes 6 to 18 seconds (several checks time out), so the page shows "Loading" that long first.
+- **Fix:** `getHealth` now uses the body of a 503 that carries the checks; the page lists every service with its colour and a sentence for the usual codes (`connection_failed` → "It did not answer. Check that it is running (on a Mac: brew services start redis)", and others). `unavailable` is treated as `down` for the older response shape.
+- **Files:** `src/lib/api/adminSystem.ts`, `src/lib/adminHealth.ts`.
+- **Verified** in headless Chrome against the throwaway copy: Redis row "down" with the hint, Background workers "degraded", the other services operational, no page errors. `npx tsc -b` and both builds pass.
+- **Ali's actual cause:** Redis was not running (see the earlier worker error); `brew services start redis` fixes it.
+
 ### 2026-10-22 — Collages dropped from the plan; auto-enhancement becomes the top priority
 *Status: committed (this commit).*
 
