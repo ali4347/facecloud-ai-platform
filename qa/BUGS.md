@@ -4,10 +4,12 @@ Newest pass first. **IDs**: `BE-` backend (Ijaz's repository: a prompt is writte
 Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call). Severity is defined in `TEST_PLAN.md`.
 "Evidence" is the check id in `qa/scripts/` (re-run it to see the failure or the fix) and, where useful, a screenshot name in `qa/out/`.
 
-## Summary of the 2026-10-22 pass (14 bugs: 6 major, 8 minor; 9 fixed, 5 open, all five backend)
+## Summary of the 2026-10-22 pass (16 bugs: 8 major, 8 minor; 10 fixed, 6 open, all six backend)
 
 | ID | Severity | Status | Title |
 |---|---|---|---|
+| BE-006 | Major | Open | Reviews are created in personal workspaces, where nobody can decide them, and pile up on the administrator's list |
+| FE-010 | Major | Fixed | A person with no team was told "a moderator will take a look" (there is none) and the photo was not enhanced |
 | BE-005 | Major | Open | The defence demo's dark photo (x0.25) is now refused as "severe underexposure", so low light cannot be shown |
 | FE-009 | Major | Fixed | Enhancement looked as if it did nothing: no reason on screen when a photo needed no fixing |
 | BE-004 | Major | Open | The administrator's organization list is limited to 30 reads an hour (it shares the invitation limit) |
@@ -24,6 +26,19 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 | FE-007 | Minor | Fixed | A 0-byte file shows its size as "--" |
 
 ---
+
+### BE-006 Reviews are created where nobody can decide them — Major — Open (Ijaz)
+- **Steps:** sign up a new person (no team) and upload a photo the quality check is unsure about (`public/hero-portrait.png` copied as `hero.jpg` does it). Then, as administrator, `GET /api/system/moderation/`.
+- **Expected:** a personal workspace has no moderator, so nothing is queued for one.
+- **Actual:** a `ModeratorReview` is created in the person's personal workspace and stays *pending* for ever. It appears under `organizations_needing_attention` (four personal workspaces after four such uploads in the test), it is counted in `totals.pending` and `unassigned`, and after a day it will count as `overdue` and `stale_open`. The administrator's picture of moderation fills with work nobody can do.
+- **Fix (backend):** (a) do not create a review (quality, duplicate or identity) when the photo's organization is a personal workspace; the owner decides, and the photo stays usable (enhancement and grouping already allow an unsure photo there); (b) leave personal workspaces out of `/api/system/moderation/` and the moderator dashboard figures; (c) a management command `close_personal_reviews` (dry run by default) that closes the pending reviews that already exist, with the reason "No moderator in a personal workspace" and no deciding moderator; (d) tests: a personal upload makes no review row, a team upload does, the overview excludes personal workspaces, the command can be run twice safely.
+- **Evidence:** `ONB-17`.
+
+### FE-010 A person with no team was promised a moderator — Major — Fixed
+- **Steps:** sign up, sign in, Single Upload of the same unsure photo.
+- **Actual:** "**A moderator will take a look**" and "The batch finished partly", although a personal workspace has no moderator; the photo was not enhanced (only accepted photos were). The multiple and ZIP screens said "Sent to a moderator: N".
+- **Fix:** for a photo in the person's own workspace the screen says "The checks were not sure about this photo. It is in your own workspace, so no moderator will look at it. You can still enhance and use it, or upload a clearer photo.", enhances it like any other, and shows the quality figures and download. For a team's photo the wording is unchanged. The multiple and ZIP screens say "Not sure about (kept, no moderator in your workspace)" for the person's own workspace (`UploadSingle.tsx`, `UploadMultipleLive.tsx`, `UploadZipLive.tsx`).
+- **Evidence:** `ONB-07`, `ONB-08`, `ONB-12`.
 
 ### BE-005 The demo's dark photo is refused, so low-light enhancement cannot be shown — Major — Open (Ijaz)
 - **Steps:** `python scripts/seed_demo.py --photo <any portrait> --dark` (this is what `scripts/defense_demo.sh` does), or upload any portrait darkened to a quarter (brightness about 18 to 25 of 255).

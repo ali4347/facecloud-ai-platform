@@ -46,6 +46,17 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — Onboarding pipeline QA: a person with no team was promised a moderator
+*Status: committed (this commit).*
+
+- **Question (Ali):** what happens to a person who signs up alone, and how does a customer's team get set up; "if there is an issue, fix the pipeline".
+- **Tested end to end in a real browser** (`qa/scripts/10-onboarding.mjs`, 17 checks, 16 pass): sign-up, verification email link, sign-in, no team (no "Submit to", My Organization says the person owns none), an owner's invitation, joining, "Submit to" then offering the personal workspace and the team, an invitation to a brand-new address (sign in or create an account, address filled in and locked, one step, signed in, already in the team).
+- **Issue found (FE-010, fixed):** an unsure photo from a person with no team was told "A moderator will take a look" and was not enhanced, although a personal workspace has no moderator. Now it says no moderator will look at it, is enhanced, and shows the quality figures and download; the multiple and ZIP screens say "Not sure about (kept, no moderator in your workspace)". Files: `UploadSingle.tsx`, `UploadMultipleLive.tsx`, `UploadZipLive.tsx`.
+- **Issue found (BE-006, backend, open):** the backend still creates a review in the personal workspace; it stays pending for ever and fills the administrator's "organizations needing attention" list and moderation totals (four personal workspaces after four uploads in the test). Prompt text is in `qa/QA_REPORT.md`.
+- **Also:** the development email's links point at `localhost:5173`, so on the QA stack the script replaces the host; nothing to fix for Ali, whose frontend is on 5173.
+- **QA:** `qa/BUGS.md` is 16 bugs (10 fixed, 6 open, all backend); 382 checks on the QA stack, 377 pass.
+- **Verified:** `npx tsc -b`, `npm run build`, demo-safe build.
+
 ### 2026-10-22 — "Enhancement does nothing": what really happens, clearer screens, an enhancement QA script
 *Status: committed (this commit).*
 

@@ -40,6 +40,7 @@ Needs: Node 20+, Google Chrome, the backend folder with its `.venv` (default `~/
 | `05-accessibility.mjs` | Image alt text, unnamed buttons, unlabelled fields, headings, page titles, language |
 | `06-upload-ui.mjs` | The three upload screens with good, bad and mixed files: what the person is told |
 | `07-flows.mjs` | The main business flow through the real screens, 19 checks: team, moderator, owner uploads a photo that needs review, moderator approves with a message, the owner's bell, an invitation, failed work, moderation overview |
+| `10-onboarding.mjs` | How a person arrives: signs up alone (verification email, personal workspace, no team), an unsure photo with no moderator, is invited into a team, signs up from an invitation, and what the administrator's list shows. Reads the development emails from the backend log |
 | `09-enhancement.mjs` | Does enhancement enhance? A clean, a dark, a very dark and a noisy portrait through the real upload and automatic enhancement (brightness and grain are measured), then what the screens say, including the editor's Auto. Needs the backend's Python to make and measure the photos |
 | `08-limits.mjs` | Rate limits that real use could hit. **Run it last**: it uses up an hourly allowance on purpose |
 

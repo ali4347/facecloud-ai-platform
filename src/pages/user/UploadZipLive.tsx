@@ -21,6 +21,8 @@ const MAX_ZIP_BYTES = 2 * 1024 * 1024 * 1024
 
 export default function UploadZipLive() {
   const target = useSubmitTarget()
+  // Where this upload was sent: undefined is the person's own workspace, which has no moderator.
+  const [sentTo, setSentTo] = useState<number | undefined>(undefined)
   const [zipFile, setZipFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [made, setMade] = useState<UploadBatch | null>(null)
@@ -51,6 +53,7 @@ export default function UploadZipLive() {
     setUploading(true)
     setError(null)
     try {
+      setSentTo(target.organizationId)
       setMade(await uploadZip(zipFile, undefined, target.organizationId))
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'The upload failed. Please try again.')
@@ -207,7 +210,7 @@ export default function UploadZipLive() {
                   </div>
                   <div className="flex justify-between"><span>Photos found in ZIP:</span><span className="font-bold text-ink">{made.total_files}</span></div>
                   <div className="flex justify-between"><span>Photos accepted:</span><span className="font-bold text-emerald-400">{results.accepted}</span></div>
-                  <div className="flex justify-between"><span>Sent to a moderator:</span><span className="font-bold text-[#FCD34D]">{results.inReview}</span></div>
+                  <div className="flex justify-between"><span>{sentTo === undefined ? 'Not sure about (kept, no moderator in your workspace):' : 'Sent to a moderator:'}</span><span className="font-bold text-[#FCD34D]">{results.inReview}</span></div>
                   <div className="flex justify-between"><span>Photos rejected:</span><span className="font-bold text-accent-soft">{results.rejected + results.failed}</span></div>
                 </div>
 

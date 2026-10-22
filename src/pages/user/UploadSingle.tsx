@@ -76,6 +76,9 @@ function stageIndex(stage: string): number {
 export default function UploadSingle() {
   const navigate = useNavigate()
   const target = useSubmitTarget()
+  // Where THIS photo was sent (undefined: the person's own workspace). A photo in a workspace nobody moderates has no reviewer.
+  const sentToRef = useRef<number | undefined>(undefined)
+  const [sentTo, setSentTo] = useState<number | undefined>(undefined)
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   // A file that is not a picture (a text file, a PDF) cannot be drawn; say so instead of showing a broken-image icon.
@@ -326,7 +329,9 @@ export default function UploadSingle() {
       setPhase(next.status === 'failed' ? 'failed' : 'done')
       // Uploading and enhancing are separate steps on the backend. A photo that
       // was not accepted is not enhanced -- there is nothing to improve into.
-      if (finished && finished.display_status === 'accepted') {
+      // The same goes for a photo the checks were unsure about in the person's own workspace: there is no moderator
+      // to wait for, so it is enhanced like any other (a team's photo waits for its moderator).
+      if (finished && (finished.display_status === 'accepted' || (finished.display_status === 'needs_review' && sentToRef.current === undefined))) {
         enhance(finished)
       }
     } catch (caught) {
@@ -346,6 +351,7 @@ export default function UploadSingle() {
 
     setPhase('uploading')
     try {
+      sentToRef.current = target.organizationId; setSentTo(target.organizationId)
       const batch = await uploadSingle(file, undefined, target.organizationId)
       setBatchId(batch.id)
       // The file can be refused on arrival — wrong type, too large, a face the
@@ -367,6 +373,8 @@ export default function UploadSingle() {
   const verdict = image?.display_status ?? (phase === 'done' && !USE_API ? 'accepted' : null)
   const accepted = verdict === 'accepted'
   const rejected = verdict === 'rejected'
+  const ownReview = verdict === 'needs_review' && sentTo === undefined
+  const usable = accepted || ownReview
   // Why a refused photo was refused: the same sentences the multiple and ZIP screens show.
   const breakdown = useReasonBreakdown(progress, progress !== null && isBatchFinished(progress))
 
@@ -555,11 +563,13 @@ export default function UploadSingle() {
                     <p className="text-sm font-bold text-ink">
                       {accepted ? 'Your photo was accepted'
                         : rejected ? 'Your photo was not accepted'
+                        : ownReview ? 'The checks were not sure about this photo'
                         : 'A moderator will take a look'}
                     </p>
                     <p className="text-[11px] text-ink-faint mt-0.5">
                       {accepted ? 'It passed every check and has been filed.'
                         : rejected ? 'The reason is below.'
+                        : ownReview ? 'It is in your own workspace, so no moderator will look at it. You can still enhance and use it, or upload a clearer photo.'
                         : 'The automatic checks were not confident enough to decide on their own.'}
                     </p>
                   </div>
@@ -568,7 +578,7 @@ export default function UploadSingle() {
                 {rejected && <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />}
 
                 {/* Before and after, once there is something to compare. */}
-                {accepted && (
+                {usable && (
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-ink-mute flex items-center gap-1.5">
@@ -613,7 +623,7 @@ export default function UploadSingle() {
                 {/* The three figures the old screen showed, now measured
                     rather than invented. Each is a real sub-score from the
                     quality decision; a dash means it was not measured. */}
-                {accepted && (
+                {usable && (
                   <div className="grid grid-cols-3 gap-3">
                     {[
                       // Only ever the server's own measurements. Without one
@@ -674,7 +684,7 @@ export default function UploadSingle() {
                   </div>
                 )}
 
-                {progress && progress.status === 'partial' && !rejected && (
+                {progress && progress.status === 'partial' && !rejected && !ownReview && (
                   <p className="text-[11px] text-[#F59E0B]">
                     The batch finished partly — check My Images for the full picture.
                   </p>
@@ -683,7 +693,7 @@ export default function UploadSingle() {
                 {/* Download and share, both real: the file comes from the
                     enhancement result, and the link is a genuine public share
                     the backend issues, watermarked and time-limited. */}
-                {accepted && (
+                {usable && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"

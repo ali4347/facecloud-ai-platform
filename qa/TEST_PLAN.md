@@ -29,6 +29,7 @@ Google Chrome (headless) at 1440 px and 390 px. Production uses PostgreSQL and C
 | Moderator review | approve with a message to the member, the owner is told | 07 | covered |
 | Moderator actions | claim, reject, assign, bulk, escalate | earlier manual runs | **not automated** |
 | Organization flow | create team, owner, moderator seats, owner's sidebar and page, another team cannot see it | 07 | covered |
+| Sign-up, verification, invitation to a team, invited sign-up, personal workspace | self sign-up, email link, no-team limits, join, "Submit to", one-step account from an invitation | 10 | covered |
 | Invitations, branding, plan limits | send/cancel covered; accept, branding, seats full | 07 (send, cancel) | partly |
 | Admin actions | create team, edit scope, create moderator, invitation, failed work and moderation pages | 07 | partly (suspend, retry, create user not scripted) |
 | Notifications and bell | the decision and the moderator's message reach the owner | 07 | partly |

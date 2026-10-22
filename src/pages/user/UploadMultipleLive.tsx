@@ -33,6 +33,8 @@ function Thumb({ src, alt, className, fill = false }: { src: string; alt: string
 
 export default function UploadMultipleLive() {
   const target = useSubmitTarget()
+  // Where this upload was sent: undefined is the person's own workspace, which has no moderator.
+  const [sentTo, setSentTo] = useState<number | undefined>(undefined)
   const [picked, setPicked] = useState<Picked[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState<ImageListItem[] | null>(null)
@@ -83,6 +85,7 @@ export default function UploadMultipleLive() {
     setUploading(true)
     setError(null)
     try {
+      setSentTo(target.organizationId)
       const made = await uploadMultiple(picked.map(item => item.file), undefined, target.organizationId)
       setUploaded(made.images ?? [])
       setBatchId(made.id)
@@ -203,7 +206,7 @@ export default function UploadMultipleLive() {
               title={rowHeading}
               subtitle={
                 stage === 'done'
-                  ? `${results.accepted} accepted · ${results.inReview} in review · ${results.rejected + results.failed} rejected or failed`
+                  ? `${results.accepted} accepted · ${results.inReview} ${sentTo === undefined ? 'not sure about' : 'in review'} · ${results.rejected + results.failed} rejected or failed`
                   : `Checking each photo${progress ? ` · ${progress.progress_percentage}% done` : ''}`
               }
             >
@@ -307,7 +310,7 @@ export default function UploadMultipleLive() {
                 {stage === 'done' && (
                   <div className="space-y-2.5 p-4 rounded-2xl bg-surface-mute border border-line text-xs text-ink-mute">
                     <div className="flex justify-between"><span>Photos accepted:</span><span className="font-bold text-emerald-400">{results.accepted}</span></div>
-                    <div className="flex justify-between"><span>Sent to a moderator:</span><span className="font-bold text-[#FCD34D]">{results.inReview}</span></div>
+                    <div className="flex justify-between"><span>{sentTo === undefined ? 'Not sure about (kept, no moderator in your workspace):' : 'Sent to a moderator:'}</span><span className="font-bold text-[#FCD34D]">{results.inReview}</span></div>
                     <div className="flex justify-between"><span>Photos rejected:</span><span className="font-bold text-accent-soft">{results.rejected + results.failed}</span></div>
                   </div>
                 )}
