@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-22 — "Enhancement does nothing": what really happens, clearer screens, an enhancement QA script
+*Status: committed (this commit).*
+
+- **Report (Ali):** after an upload the photo does not seem to be enhanced, and "Auto enhance" does nothing.
+- **Investigation** (a throwaway copy with the same settings as Ali's backend, real photos, real screens, `qa/scripts/09-enhancement.mjs`): enhancement runs after a single upload and does its work when a photo needs it. A dark portrait (brightness 28) is brightened to 56; a noisy one loses about half its grain; a blurred one is partly deblurred. A **clean, well-lit portrait is deliberately left as it is** (changed by 1.6 of 255). The screens made that look broken: "Light correction" shown on a photo that no stage changed, "strength applied Light", "No restoration stage changed this photo", and in the editor **Auto** leaving every slider at 0 with "No changes" and no explanation. Ali's server does not set `ENHANCEMENT_RENDER_POLICY` (so `lightweight_v1`); the defence demo uses `adaptive_v1`; for brightening and denoising both gave the same result.
+- **Frontend fix (FE-009):** "No correction needed" / "Nothing needed fixing, so this photo was left as it is. Enhancement changes dark, noisy or blurry photos the most."; the editor's Auto and "Auto + brighten" explain when they found nothing to change. Files: `src/components/features/EnhancementReport.tsx`, `EnhancedVersionCard.tsx`, `src/pages/user/UploadSingle.tsx`, `PhotoEditor.tsx`, `src/lib/api/enhancements.ts` (`changedNothing`).
+- **Backend finding (BE-005, for Ijaz):** the demo script `seed_demo.py --dark` darkens to x0.25, which the quality check now refuses (`severe_underexposure`), so low light cannot be shown with the demo's own photo and the script then crashes. Measured on a clean portrait: x0.60 needs nothing, x0.50 and x0.40 are brightened about twofold, x0.35 and darker are refused. Prompt text is in `qa/QA_REPORT.md`.
+- **QA:** new `qa/scripts/09-enhancement.mjs` (9 checks: 8 pass, 1 fails on BE-005); `qa/BUGS.md` is now 14 bugs (9 fixed, 5 open, all backend); test plan and README updated.
+- **Verified:** the new wording and the editor note on the real screens (upload, photo page, editor); `npx tsc -b`, `npm run build`, demo-safe build.
+
 ### 2026-10-22 — FE-007: a 0-byte size reads "0 B"; backend prompt written for the four open bugs
 *Status: committed (this commit).*
 

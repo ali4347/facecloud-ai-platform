@@ -60,6 +60,8 @@ export default function PhotoEditor() {
   const [showBefore, setShowBefore] = useState(false)
 
   const [saving, setSaving] = useState(false)
+  // What "Auto" said when it found nothing to change, so a click is never met with silence
+  const [autoNote, setAutoNote] = useState('')
   const [savedNote, setSavedNote] = useState('')
   const [saveError, setSaveError] = useState('')
   const [versions, setVersions] = useState<EditVersion[]>([])
@@ -137,6 +139,14 @@ export default function PhotoEditor() {
       if (request.mode === 'auto' && preview.applied_adjustments) {
         setSettings(current => ({ ...current, ...pickKnown(preview.applied_adjustments, config) }))
       }
+      if (request.mode === 'auto') {
+        const picked = pickKnown(preview.applied_adjustments ?? {}, config)
+        const neutral = config?.neutral_settings ?? {}
+        const changed = Object.entries(picked).some(([name, value]) => Math.abs(Number(value) - Number(neutral[name] ?? 0)) > 0.5)
+        setAutoNote(changed ? '' : request.intent === 'brighten'
+          ? 'Nothing to lift: this photo is already bright enough. Use the sliders if you want a different look.'
+          : 'Auto found nothing to fix: this photo is already well exposed and sharp. Try "Auto + brighten" for a brighter look, or use the sliders.')
+      }
     } catch (caught) {
       if (mine !== revision.current) return
       setPreviewError(caught instanceof ApiError
@@ -163,14 +173,14 @@ export default function PhotoEditor() {
   const change = (name: string, value: number) => {
     const next = { ...settings, [name]: value }
     setSettings(next)
-    setSavedNote('')
+    setSavedNote(''); setAutoNote('')
     schedule({ mode: 'manual', adjustments: next })
   }
 
   const reset = () => {
     if (!config) return
     const next = { ...config.neutral_settings }
-    setSettings(next); setSavedNote('')
+    setSettings(next); setSavedNote(''); setAutoNote('')
     if (timer.current) clearTimeout(timer.current)
     pending.current = null
     void render({ mode: 'manual', adjustments: next })
@@ -367,6 +377,7 @@ export default function PhotoEditor() {
                   <RotateCcw className="w-3.5 h-3.5" />Reset
                 </button>
               </div>
+              {autoNote && <p role="status" className="mt-3 text-xs text-ink-mute p-3 rounded-xl bg-surface-mute border border-line">{autoNote}</p>}
             </div>
 
             {GROUPS.map(group => {

@@ -17,18 +17,19 @@ backend at `http://127.0.0.1:8000` (no sign-in, nothing created).
 | 06 upload screens | 9 | 9 | 0 | first run exposed FE-001 |
 | 07 business flows (19 steps) | 19 | 19 | 0 | team, moderator, review with a message, the owner told, invitation |
 | 08 rate limits | 3 | 2 | 1 | BE-004 |
-| **Total (QA stack)** | **356** | **353** | **3** | all three failures are backend: BE-001, BE-002, BE-004 |
+| 09 enhancement (real photos, real screens) | 9 | 8 | 1 | BE-005 |
+| **Total (QA stack)** | **365** | **361** | **4** | all four failures are backend: BE-001, BE-002, BE-004, BE-005 |
 
 ## What was found
 
-**12 bugs** (full detail in `BUGS.md`): 4 major, 8 minor; **8 fixed in this pass, 4 open** (all four are backend).
+**14 bugs** (full detail in `BUGS.md`): 6 major, 8 minor; **9 fixed in this pass, 5 open** (all five are backend).
 
 Fixed here (frontend): **FE-001** a refused file on the single upload screen showed no reason, **FE-002** Live Enhancement used a dead
 model address and an unpinned runtime, **FE-003** sign-in/register fields not linked to labels, **FE-004** the same tab title on every
 page, **FE-005** an unnamed button, **FE-006** broken-image icons, **FE-008** the same request sent up to 8 times per page (12
 calls per moderator page, now 5 to 6).
 
-Also fixed: **FE-007** (a 0-byte file showed "--"). Open (all backend): **BE-004** (major), **BE-001**, **BE-002**, **BE-003**.
+Also fixed: **FE-007** (a 0-byte file showed "--"). Fixed after Ali's report that enhancement "does nothing": **FE-009** (the screens now say when a photo needed no fixing). Open (all backend): **BE-004** and **BE-005** (major), **BE-001**, **BE-002**, **BE-003**.
 
 **Confirmed good by tests:**
 - The three portals are separate sessions; signing out of one does not sign out another.
@@ -41,6 +42,7 @@ Also fixed: **FE-007** (a 0-byte file showed "--"). Open (all backend): **BE-004
 
 ## Risks for the defence (10 November), in order
 
+0. **BE-005: the defence demo's own dark photo is refused** (brightness under about 25), so low-light enhancement cannot be shown with `seed_demo.py --dark` / `defense_demo.sh`. Use a photo darkened to about x0.40 of a normal exposure, or a real dim photo (brightness 28 to 45); it is brightened about twofold. Enhancement itself works.
 1. **BE-004: the admin screens stop opening after about 15 to 30 uses in an hour** (Organizations, Moderators, Invitations, the add-account form). Until the backend is fixed, add `THROTTLE_RATE_ORG_INVITE=1000/hour` to the backend `.env` and restart it. This is the most likely thing to go wrong during rehearsals.
 2. **Live Enhancement needs the internet** (FE-002, decision open). Fix: copy the runtime and model into `public/mediapipe/` (about 22 MB), if the venue's connection is uncertain.
 3. **Do not use the repository's demo photo as the "accepted" photo** (face too small). For a photo that goes to a moderator use `public/hero-portrait.png` copied as `hero.jpg`; for an accepted photo use one with a large face.
@@ -53,10 +55,11 @@ Also fixed: **FE-007** (a 0-byte file showed "--"). Open (all backend): **BE-004
 **To Ijaz (backend), one small PR:**
 
 ```
-Task: four small API fixes found by QA. One PR, additive, with a test each.
+Task: five fixes found by QA. One PR, additive, with a test each.
 BE-004 (major): AdminOrganizationListCreateView sets throttle_scope = "org_invite" (30/hour) for both GET (list) and POST (create). The administrator's Organizations, Moderators, Invitations and Users screens read this list each time they open, so after about 15 to 30 uses an hour they get 429 for almost an hour. Apply org_invite to POST only (a throttle_scope property, like OrganizationLogoView has) and leave GET on the normal user rate. Test: 60 GETs by an administrator never answer 429; the 31st POST in an hour does.
 BE-001: POST /api/auth/login/ accepts an identifier of any length; 300,000 characters gives HTTP 500 on SQLite ("LIKE or GLOB pattern too complex"). Cap identifier at 254 characters and password at a sensible maximum in the serializer: answer 400. Test with a 300 KB identifier.
 BE-002: an unknown address under /api/ (for example GET /api/images/abc/) answers an HTML 404 page. Add a JSON handler404 and handler500 for paths starting with /api/ ({"detail": "Not found."}). Test: content type is JSON.
+BE-005: scripts/seed_demo.py --dark (used by scripts/defense_demo.sh) darkens a photo to x0.25; the quality check now refuses that ("severe_underexposure", brightness about 18), a refused photo is never enhanced, and the script then stops at queued.json()['id'] (the enhancement call answers 400). Measured on a clean portrait of brightness 71: x0.60 needs nothing, x0.50 is brightened 35 to 67, x0.40 is brightened 28 to 56, x0.35 and darker is refused. Fix: (1) seed_demo.py darkens to x0.40, prints the verdict of a refused photo instead of crashing, and docs/demo/defense-demo.md says x0.40; (2) the roadmap item "refuse only a completely dark photo": a dark photo should get a warning and go to low-light enhancement; refuse only when there is no usable signal (for example mean brightness under about 6). Test: the demo's dark photo is accepted and its brightness at least doubles.
 BE-003: GET /api/system/health/ takes 6 to 18 seconds when a service (Redis) is down because the checks wait for their timeouts one after another. Use 1 to 2 second timeouts per check, run the checks in parallel, and cache the answer for a few seconds. Test: with Redis unreachable the answer comes in under 4 seconds.
 ```
 

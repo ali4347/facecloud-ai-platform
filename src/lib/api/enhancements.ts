@@ -108,6 +108,15 @@ export function levelLabel(level: EnhancementLevel): string {
   return LEVEL_LABELS[level] ?? level
 }
 
+/**
+ * True when the backend says it ran no stage on the photo (it was already good, or the safety checks kept the original).
+ * The "strength" it records is then only what was asked for, so a screen must not call it a "light correction".
+ */
+export function changedNothing(result: { applied_stages?: unknown[]; enhancement_outcome?: string | null } | null | undefined): boolean {
+  if (!result) return false
+  return result.enhancement_outcome === 'original_preserved' || (Array.isArray(result.applied_stages) && result.applied_stages.length === 0)
+}
+
 
 export type WatermarkMode = 'none' | 'small' | 'facecloud' | 'username' | 'custom'
 

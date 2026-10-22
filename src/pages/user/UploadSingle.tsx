@@ -19,6 +19,7 @@ import {
   getEnhancementResult,
   isEnhancementSettled,
   levelLabel,
+  changedNothing,
   type EnhancementResult,
 } from '../../lib/api/enhancements'
 import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
@@ -575,7 +576,7 @@ export default function UploadSingle() {
                       </span>
                       {enhancement?.status === 'completed' && (
                         <span className="text-[10px] font-bold text-[#FB923C]">
-                          {levelLabel(enhancement.applied_level)} correction
+                          {changedNothing(enhancement) ? 'No correction needed' : `${levelLabel(enhancement.applied_level)} correction`}
                         </span>
                       )}
                     </div>

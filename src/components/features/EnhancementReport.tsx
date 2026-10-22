@@ -91,7 +91,10 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
 
       {hasStageData && applied.length === 0 && !result.hd_unavailable_reason && (
         <p className="flex items-start gap-2 text-ink-mute">
-          <MinusCircle className="w-4 h-4 flex-shrink-0 mt-px" />No restoration stage changed this photo.
+          <MinusCircle className="w-4 h-4 flex-shrink-0 mt-px" />
+          <span>
+            Nothing needed fixing, so this photo was left as it is. Enhancement changes dark, noisy or blurry photos the most.
+          </span>
         </p>
       )}
 

@@ -23,7 +23,7 @@ Google Chrome (headless) at 1440 px and 390 px. Production uses PostgreSQL and C
 | Upload screens | refused files, mixed batch, ZIP | 06 | covered |
 | Every page loads | 39 pages x 2 widths | 01 | covered |
 | Accessibility basics | alt, names, labels, h1, titles, language | 05 | covered (first screen, not a full audit) |
-| Enhancement result quality | outcomes enhanced / partial / preserved | earlier manual runs, README demo | **not automated** |
+| Enhancement result quality | clean left alone, dark brightened, noisy smoothed, very dark refused; what the screens say | 09 | covered (blur and face restoration only checked by hand) |
 | Editor (sliders, save, versions) | | earlier manual runs | **not automated** |
 | Person folders and grouping | thresholds, merge, rename | backend PR #106 tests + manual | **not automated** |
 | Moderator review | approve with a message to the member, the owner is told | 07 | covered |

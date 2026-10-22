@@ -4,10 +4,12 @@ Newest pass first. **IDs**: `BE-` backend (Ijaz's repository: a prompt is writte
 Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call). Severity is defined in `TEST_PLAN.md`.
 "Evidence" is the check id in `qa/scripts/` (re-run it to see the failure or the fix) and, where useful, a screenshot name in `qa/out/`.
 
-## Summary of the 2026-10-22 pass (12 bugs: 4 major, 8 minor; 8 fixed, 4 open, all four backend)
+## Summary of the 2026-10-22 pass (14 bugs: 6 major, 8 minor; 9 fixed, 5 open, all five backend)
 
 | ID | Severity | Status | Title |
 |---|---|---|---|
+| BE-005 | Major | Open | The defence demo's dark photo (x0.25) is now refused as "severe underexposure", so low light cannot be shown |
+| FE-009 | Major | Fixed | Enhancement looked as if it did nothing: no reason on screen when a photo needed no fixing |
 | BE-004 | Major | Open | The administrator's organization list is limited to 30 reads an hour (it shares the invitation limit) |
 | FE-008 | Major | Fixed | One page load sent the same request up to 8 times, using up the hourly allowance |
 | FE-001 | Major | Fixed | Single upload: a refused file says "the reason is below" but shows no reason |
@@ -22,6 +24,20 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 | FE-007 | Minor | Fixed | A 0-byte file shows its size as "--" |
 
 ---
+
+### BE-005 The demo's dark photo is refused, so low-light enhancement cannot be shown — Major — Open (Ijaz)
+- **Steps:** `python scripts/seed_demo.py --photo <any portrait> --dark` (this is what `scripts/defense_demo.sh` does), or upload any portrait darkened to a quarter (brightness about 18 to 25 of 255).
+- **Expected:** the dark photo is accepted and brightened (the readiness report of 2026-10-15 shows "dark portrait: enhanced").
+- **Actual:** the quality check refuses it: `rejected: severe_underexposure, contrast_too_low`. A refused photo is never enhanced, so the next call in the script (`POST /api/enhancements/images/{id}/`) answers 400 and the script stops with a KeyError. The flagship low-light feature cannot be shown with the demo's own photo.
+- **Measured (clean portrait, brightness 71, lossless PNG, adaptive and default policies alike):** brightness x0.60 is left alone (nothing needed), **x0.50 -> brightened 35 to 67, x0.40 -> 28 to 56**, x0.35 and darker -> refused. So enhancement works; the refusal limit sits above the demo's x0.25.
+- **Fix (backend):** (1) make `seed_demo.py` darken to x0.40, tell the person when a photo was refused instead of crashing, and update `docs/demo/defense-demo.md`; (2) the roadmap's "Phase 2: refuse only a completely dark photo" - a dark photo should get a warning and go to low-light enhancement; refuse only when there is no usable signal (for example brightness under about 6).
+- **Evidence:** `ENH-05`, and the sweep in `QA_REPORT.md`.
+
+### FE-009 Enhancement looked as if it did nothing — Major — Fixed
+- **Report (Ali):** "after upload it does not seem to enhance, and when I click Auto enhance nothing happens".
+- **Findings (the same settings as Ali's backend, real photos):** enhancement does run, and does its work when a photo needs it: a dark portrait goes from brightness 28 to 56, a noisy one loses about half its grain, a blurred one is partly deblurred. A clean, well-lit portrait is **deliberately left as it is** (changed by 1.6 of 255). The screens made that look like a fault: the upload screen labelled the clean photo "**Light correction**", the photo page said "strength applied Light", the report said "No restoration stage changed this photo", and in the editor **Auto** left every slider at 0 and the preview "No changes" with no word of explanation.
+- **Fix:** when no stage ran the screens now say "**No correction needed**" and "Nothing needed fixing, so this photo was left as it is. Enhancement changes dark, noisy or blurry photos the most."; the editor's Auto (and "Auto + brighten") explains when it found nothing ("Auto found nothing to fix: this photo is already well exposed and sharp. Try "Auto + brighten" ..."). Files: `EnhancementReport.tsx`, `UploadSingle.tsx`, `EnhancedVersionCard.tsx`, `PhotoEditor.tsx`, `enhancements.ts` (`changedNothing`).
+- **Evidence:** `ENH-02`, `ENH-06` to `ENH-09`.
 
 ### BE-004 The administrator's organization list is limited to 30 reads an hour — Major — Open (Ijaz)
 - **Steps:** sign in as the administrator and open Organizations, Moderators, Invitations or the Users "add account" form, about 15 to 30 times in an hour (a few rehearsals).
@@ -105,5 +121,6 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 - **N-02 An older known gap is closed.** `WORK_LOG.md` listed "a moderator can promote a member to moderator". On current `origin/main` the API answers `403 "Moderators may only set the normal member role."` (checks `SEC-07`, `SEC-08`).
 - **N-03 The repository's own demo photo is refused by the quality check** ("Face too small in the frame": under about 160 px and 6% of the photo). It is fine as a picture on the landing page but should **not** be used as the accepted photo in a live demo.
 - **N-04 "kGpuService" console message** appears only in headless Chrome (no GPU); MediaPipe then uses the CPU. Not an app fault, ignored by the crawl.
+- **N-07 What Ali's server does today, measured (copy of his settings).** `ENHANCEMENT_RENDER_POLICY` is not set, so it is `lightweight_v1`; the defence demo uses `adaptive_v1`. For brightening and denoising both give the same result; `adaptive_v1` also decides per photo (and answers "original preserved" for a clean one). Only the single-upload screen starts an enhancement by itself; the multiple and ZIP screens use the manual panel; a photo sent to review is enhanced only on request. Test with a dark, noisy or blurred photo; a clean one will (rightly) not change.
 - **N-06 `public/hero-portrait.png` is a JPEG with a `.png` name.** The uploader refuses it ("The filename extension does not match the image content"), which is a strict but clear check. Copied as `hero.jpg` it is a handy demo photo: the quality check sends it to **needs review**, so it lands in a moderator's queue (used by `07-flows.mjs`).
 - **N-05 Eager mode hides progress.** With `DJANGO_DEBUG=True` and no worker, uploads are processed inside the request, so no progress is shown. Use Redis plus a Celery worker for the demo (see `README.md`).

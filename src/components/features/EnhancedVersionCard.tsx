@@ -7,7 +7,7 @@ import { EnhancementReport } from './EnhancementReport'
 import { ApiError } from '../../lib/api/client'
 import { getImageThumbnail, type ImageListItem } from '../../lib/api/images'
 import {
-  downloadEnhanced, getEnhancementResult, isEnhancementSettled, levelLabel,
+  changedNothing, downloadEnhanced, getEnhancementResult, isEnhancementSettled, levelLabel,
   type EnhancementLevel, type EnhancementResult, type EnhancementStyle,
 } from '../../lib/api/enhancements'
 import { downloadEdit, listEdits } from '../../lib/api/editor'
@@ -132,7 +132,7 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
           <div className="text-xs text-ink-mute space-y-3">
             <EnhancementReport result={result} />
             <p>
-              Style {STYLE_LABEL[result.requested_style] ?? result.requested_style} · strength applied {levelLabel(result.applied_level)}
+              Style {STYLE_LABEL[result.requested_style] ?? result.requested_style}{changedNothing(result) ? ' · nothing needed fixing' : ` · strength applied ${levelLabel(result.applied_level)}`}
               {result.output_width && result.output_height ? ` · ${result.output_width} × ${result.output_height}` : ''}
             </p>
             {result.identity_notice && <p>{result.identity_notice}</p>}
