@@ -31,10 +31,11 @@ Google Chrome (headless) at 1440 px and 390 px. Production uses PostgreSQL and C
 | Organization flow | create team, owner, moderator seats, owner's sidebar and page, another team cannot see it | 07 | covered |
 | Sign-up, verification, invitation to a team, invited sign-up, personal workspace | self sign-up, email link, no-team limits, join, "Submit to", one-step account from an invitation | 10 | covered |
 | Invitations, branding, plan limits | send/cancel covered; accept, branding, seats full | 07 (send, cancel) | partly |
-| Admin actions | create team, edit scope, create moderator, invitation, failed work and moderation pages | 07 | partly (suspend, retry, create user not scripted) |
+| Admin actions | add user/moderator, suspend and activate, team create/rename/suspend/reactivate, invitations, failed work and moderation pages, audit trail | 07, 14 | covered (failed-work Retry needs a failed upload: manual) |
 | Notifications and bell | the decision and the moderator's message reach the owner | 07 | partly |
 | Rate limits | the admin lists, an ordinary admin read, the wording of a refusal | 08 | covered |
-| Settings and password change | | earlier manual runs | **not automated** |
+| Settings and password change | every wrong password, the right one, name, devices, sign out everywhere, notification switches, delete account | 13 | covered |
+| Resilience | server unreachable, error page, 429, slow, session ended elsewhere, double click, unknown address, wrong portal, Escape | 15 | covered |
 | Background worker path | upload with Celery and Redis (progress stages) | manual | **not automated** |
 | Other browsers and phones | Safari, Firefox, real devices | | **not covered** |
 | Load and speed | many users, large ZIP | | **not covered** |

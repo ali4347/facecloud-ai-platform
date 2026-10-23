@@ -1,10 +1,10 @@
-# Prompt for the backend developer (Ijaz): the six backend bugs found by QA
+# Prompt for the backend developer (Ijaz): the seven backend bugs found by QA (the seventh is optional)
 
-Copy everything inside the block into the backend session. The ids (BE-001 to BE-006) match `BUGS.md`.
+Copy everything inside the block into the backend session. The ids (BE-001 to BE-007) match `BUGS.md`.
 After the pull request is merged, run `bash qa/start-test-stack.sh` and the scripts again (`QA_REPORT.md`).
 
 ```
-Task: six fixes found by QA. One pull request, small and additive. Every fix needs a test, and the PR description must show how to see it work (the commands at the end). Do not change any other endpoint, field name or status value. Report the full test suite result.
+Task: seven fixes found by QA (BE-007 is optional and cosmetic). One pull request, small and additive. Every fix needs a test, and the PR description must show how to see it work (the commands at the end). Do not change any other endpoint, field name or status value. Report the full test suite result.
 
 Order: BE-004 and BE-005 first (the defence rehearsals hit them first), then BE-006, then the rest.
 
@@ -46,6 +46,11 @@ GET /api/system/health/ takes 6 to 18 seconds when Redis is down, because the ch
 Fix: give each check a short timeout (1 to 2 seconds), run the checks in parallel (a thread pool is enough), and cache the whole answer for 5 seconds. Keep the answer's shape and the 503-with-the-full-list behaviour exactly as they are.
 Test: with the Redis connection pointed at a closed port the endpoint answers 503 with all seven services listed in under 4 seconds; with everything up it answers 200.
 
+BE-007 (minor, optional) - a refresh token that was refused answers 400, a garbage one answers 401.
+POST /api/auth/refresh/ with a token that was revoked (after a password change or "sign out everywhere"), or whose account is suspended or inactive, answers 400 {"detail": ["This token has been revoked."]} (FaceCloudTokenRefreshSerializer.validate raises serializers.ValidationError). A garbage token answers 401 {"detail": "Token is invalid", "code": "token_not_valid"}. The web app treats both as "sign in again", so nothing is broken for people; it is only inconsistent for anyone using the API.
+Fix: in FaceCloudTokenRefreshSerializer.validate raise rest_framework_simplejwt.exceptions.InvalidToken (or AuthenticationFailed) with the same sentences instead of ValidationError, so every refused refresh token answers 401 with a "code" (token_revoked, account_suspended, account_inactive, session_signed_out). Keep the sentences. If the mobile or any other client already depends on 400, skip this item.
+Test: a refresh token from before a password change answers 401 with the sentence "This token has been revoked."; a suspended account's refresh answers 401 "This account is suspended."; a valid refresh still answers 200.
+
 How to see each fix (put these in the PR description; $ADMIN is an administrator's access token):
   BE-004: for i in $(seq 1 60); do curl -s -o /dev/null -w "%{http_code} " -H "Authorization: Bearer $ADMIN" http://127.0.0.1:8000/api/organizations/admin/; done        # all 200
   BE-005: python scripts/seed_demo.py --photo <a portrait> --dark                                                                                                    # accepted, brightened, no crash
@@ -53,4 +58,5 @@ How to see each fix (put these in the PR description; $ADMIN is an administrator
   BE-001: curl -s -o /dev/null -w "%{http_code}\n" -X POST -H "Content-Type: application/json" -d "{\"identifier\":\"$(head -c 300000 /dev/zero | tr '\0' a)\",\"password\":\"x\"}" http://127.0.0.1:8000/api/auth/login/      # 400
   BE-002: curl -si http://127.0.0.1:8000/api/images/abc/ | head -5                                                                                                   # 404, application/json
   BE-003: time curl -s -o /dev/null -w "%{http_code}\n" -H "Authorization: Bearer $ADMIN" http://127.0.0.1:8000/api/system/health/                                    # with Redis stopped: 503 in under 4 s
+  BE-007: curl -si -X POST -H "Content-Type: application/json" -d '{"refresh":"<a token from before a password change>"}' http://127.0.0.1:8000/api/auth/refresh/ | head -1                      # 401
 ```

@@ -4,7 +4,7 @@ Newest pass first. **IDs**: `BE-` backend (Ijaz's repository: a prompt is writte
 Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call). Severity is defined in `TEST_PLAN.md`.
 "Evidence" is the check id in `qa/scripts/` (re-run it to see the failure or the fix) and, where useful, a screenshot name in `qa/out/`.
 
-## Summary of the 2026-10-22 and 2026-10-23 passes (18 bugs: 8 major, 10 minor; 12 fixed, 6 open, all six backend)
+## Summary of the 2026-10-22, 2026-10-23 and 2026-10-24 passes (22 bugs: 9 major, 13 minor; 15 fixed, 7 open, all seven backend)
 
 | ID | Severity | Status | Title |
 |---|---|---|---|
@@ -14,11 +14,14 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 | FE-009 | Major | Fixed | Enhancement looked as if it did nothing: no reason on screen when a photo needed no fixing |
 | BE-004 | Major | Open | The administrator's organization list is limited to 30 reads an hour (it shares the invitation limit) |
 | FE-008 | Major | Fixed | One page load sent the same request up to 8 times, using up the hourly allowance |
+| FE-013 | Major | Fixed | With the server unreachable, pages showed the browser's raw "Failed to fetch" |
+| FE-014 | Major | Fixed | Clicking a button twice quickly sent the request twice (three clicks, three requests) |
 | FE-001 | Major | Fixed | Single upload: a refused file says "the reason is below" but shows no reason |
 | FE-002 | Major | Fixed + Decision | Live Enhancement: dead model address, unpinned runtime, and it needs the internet |
 | BE-001 | Minor | Open | Login accepts an identifier of any length; a 300 KB one gives HTTP 500 on SQLite |
 | BE-002 | Minor | Open | An unknown API address answers an HTML "Not Found" page instead of JSON |
 | BE-003 | Minor | Open | Health check takes 6 to 18 seconds when a service (Redis) is down |
+| BE-007 | Minor | Open (optional) | A refused refresh token answers 400, a garbage one 401 (the app copes with both) |
 | FE-003 | Minor | Fixed | Sign-in, register, forgot-password: fields not linked to their labels, no main heading |
 | FE-004 | Minor | Fixed | Every page has the same browser-tab title |
 | FE-005 | Minor | Fixed | Landing page: the early-access submit button has no name for screen readers |
@@ -26,6 +29,7 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 | FE-007 | Minor | Fixed | A 0-byte file shows its size as "--" |
 | FE-011 | Minor | Fixed | The editor let you save with every slider untouched, which made a copy of the enhanced photo and called it a new version |
 | FE-012 | Minor | Fixed | A review held by another moderator showed "Release", which the server refuses |
+| FE-015 | Minor | Fixed | Suspending a user used the browser's own pop-up, unlike every other confirmation in the console |
 
 ---
 
@@ -138,6 +142,18 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 ### FE-012 "Release" shown on a review another moderator holds — Minor — Fixed
 - Moderator A opens a review that moderator B has taken. The screen offered "Release"; pressing it gives `409 "<B> is reviewing this right now…"`. The server was right (one moderator must not silently take another's work); the button promised something it would refuse.
 - **Fix:** the queue and the review page show a disabled "Held by <name>" instead (`heldByAnother` in `moderationData.ts`, `ReviewQueue.tsx`, `ModeratorImageReviewLive.tsx`). **Evidence:** `MOD-06a`, `MOD-06b`.
+
+### FE-013 Server unreachable: the page said "Failed to fetch" — Major — Fixed
+- Found by refusing every API request in Chrome (script 15): My Images showed `Failed to fetch` (Safari says "Load failed", Firefox "NetworkError when attempting to fetch resource"). Nothing told the person it was the connection or the server, and the sign-in form said only "Could not sign in".
+- **Fix:** the one place that sends requests turns a network failure into "FaceCloud could not reach the server. Check your internet connection and try again." (`client.ts`). Every screen and the three sign-in forms get it without change. **Evidence:** `RES-01`, `RES-04`.
+
+### FE-014 Double click sent the request twice — Major — Fixed
+- Pressing "Send invitation" three times quickly sent three requests (the button is only disabled after the first has started). Against the real server the second and third come back "already exists" and the person sees an error right after a success; for other buttons it could mean two of the same action.
+- **Fix:** the same change asked for twice while the first is still on its way is sent once and both callers get its answer (`apiFetch` in `client.ts`; uploads with files are not affected). **Evidence:** `RES-12`.
+
+### FE-015 Suspending a user used the browser's pop-up — Minor — Fixed
+- Admin Users used `window.confirm`: it looks different from every other dialog, cannot say more than one line, and some browsers let people silence it.
+- **Fix:** the console's own confirmation dialog, which says what happens and shows a server refusal inside the dialog (`Users.tsx`). **Evidence:** `ADM-13`.
 ---
 
 ## Notes (not bugs)
@@ -148,4 +164,6 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 - **N-04 "kGpuService" console message** appears only in headless Chrome (no GPU); MediaPipe then uses the CPU. Not an app fault, ignored by the crawl.
 - **N-07 What Ali's server does today, measured (copy of his settings).** `ENHANCEMENT_RENDER_POLICY` is not set, so it is `lightweight_v1`; the defence demo uses `adaptive_v1`. For brightening and denoising both give the same result; `adaptive_v1` also decides per photo (and answers "original preserved" for a clean one). Only the single-upload screen starts an enhancement by itself; the multiple and ZIP screens use the manual panel; a photo sent to review is enhanced only on request. Test with a dark, noisy or blurred photo; a clean one will (rightly) not change.
 - **N-06 `public/hero-portrait.png` is a JPEG with a `.png` name.** The uploader refuses it ("The filename extension does not match the image content"), which is a strict but clear check. Copied as `hero.jpg` it is a handy demo photo: the quality check sends it to **needs review**, so it lands in a moderator's queue (used by `07-flows.mjs`).
+- **N-08 / BE-007 A revoked refresh token answers 400, other invalid ones 401.** After a password change or "sign out everywhere" the old refresh token gets `400 {"detail":["This token has been revoked."]}`, while a garbage one gets `401`. The app treats both as "sign in again", so nothing is wrong for the person; it is only an inconsistency for API users (check `SET-09`).
+- **N-09 `/api/organizations/admin/` is limited to 30 reads an hour (BE-004).** Script 14 needs more reads than that, so the stack can be started with `QA_ORG_INVITE_RATE=1000/hour bash qa/start-test-stack.sh`. Script 08 expects the real limit, so start it without that variable.
 - **N-05 Eager mode hides progress.** With `DJANGO_DEBUG=True` and no worker, uploads are processed inside the request, so no progress is shown. Use Redis plus a Celery worker for the demo (see `README.md`).

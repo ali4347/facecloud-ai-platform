@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-23
+**Last updated:** 2026-10-24
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -46,8 +46,19 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
-### 2026-10-23 — QA pass 2: editor and moderator scripts, two small fixes (FE-011, FE-012)
+### 2026-10-24 — QA pass 3: settings, administrator actions, resilience; three fixes (FE-013, FE-014, FE-015)
 *Status: uncommitted.*
+
+- **New QA scripts, all passing.** `13-settings.mjs` (22 checks: every wrong password, the right one, name, devices, sign out everywhere, notification switches, delete account), `14-admin-actions.mjs` (36: add user/moderator, suspend/activate, teams, invitations, failed-work and moderation pages, audit trail), `15-resilience.mjs` (17: server unreachable, error page, 429, slow, session ended elsewhere, double click, unknown address, wrong portal, Escape). `qa/lib.mjs` gained `tab.on(event, fn)`; `qa/start-test-stack.sh` accepts `QA_ORG_INVITE_RATE` (script 14 reads the organization list more than BE-004's 30 an hour).
+- **FE-013 (fixed).** With the server unreachable, pages showed the browser's raw "Failed to fetch". A network failure now reads "FaceCloud could not reach the server. Check your internet connection and try again." everywhere, including the three sign-in forms. File: `src/lib/api/client.ts`.
+- **FE-014 (fixed).** Three quick clicks on "Send invitation" sent three requests. The same change asked for twice while the first is on its way is now sent once and both callers get its answer (uploads with files excluded). File: `src/lib/api/client.ts` (`sharedChanges`).
+- **FE-015 (fixed).** Suspending a user used the browser's `window.confirm`; it now uses the console's own dialog, which says what happens and shows a server refusal inside it. File: `src/pages/admin/Users.tsx`.
+- **No bug in settings.** The five first-run failures of script 13 were test mistakes (the refresh address is `/api/auth/refresh/`; a wrong password answers 400 not 401). Noted N-08: a revoked refresh token answers 400 while a garbage one answers 401; the app treats both as "sign in again".
+- **Docs.** `qa/README.md`, `TEST_PLAN.md`, `BUGS.md` (22 bugs, 15 fixed, 7 open, all seven backend; BE-007 is optional and is added to `qa/PROMPT_FOR_BACKEND.md`), `QA_REPORT.md` (498 checks, 493 passed, the 5 failures are still BE-001, BE-002, BE-004, BE-005, BE-006), `README.md` Testing bullet.
+- **Verified:** scripts 13, 14, 15 pass; after the client change scripts 06 (9/9), 07 (19/19), 10 (16/17, the one failure is BE-006), 11 (18/18), 12 (23/23), 13 (22/22) and 14 (36/36) were re-run; `npx tsc -b`, both builds.
+
+### 2026-10-23 — QA pass 2: editor and moderator scripts, two small fixes (FE-011, FE-012)
+*Status: committed dae6f77.*
 
 - **New QA scripts.** `qa/scripts/11-editor.mjs` (18 checks): sliders and preview, reset, hold-to-compare, save time (2 s on a 1024 px photo), the saved version is full size and brighter, versions list and "Use this", delete asks first and the original/enhanced photo stay, another person gets 404, signed out gets 401. `qa/scripts/12-moderator.mjs` (23 checks): queue and filter, claim, a clash with a second moderator (409, shown in words on the dialog), reject with a message the member receives, a closed review, deciding twice (409), escalate (shows on the administrator's overview), keep in review, bulk approve, decision log against the dashboard, audit search, deactivating and reactivating a member. Both pass on a fresh stack: **18/18** and **23/23**.
 - **FE-011 (fixed).** The editor let you press "Save as new version" with every slider untouched, which made a copy of the enhanced photo and made it the current version. Save is now off until a slider differs from its starting position, with the reason beside it. File: `src/pages/user/PhotoEditor.tsx` (`untouched`).

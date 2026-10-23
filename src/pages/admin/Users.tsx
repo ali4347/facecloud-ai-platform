@@ -7,6 +7,7 @@ import { StatusBadge } from '../../components/ui/StatusBadge'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
 import { createAdminUser, setAdminUserSuspended } from '../../lib/api/adminUsers'
@@ -36,6 +37,8 @@ export default function UsersPage() {
   const [demoSuspended, setDemoSuspended] = useState<Record<string, boolean>>({})
   const [busyId, setBusyId] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
+  const [toSuspend, setToSuspend] = useState<UserRow | null>(null)
+  const [suspendError, setSuspendError] = useState<string | null>(null)
 
   const { data, loading, error, isDemo, reload } = useAdminUserList(search, page)
 
@@ -64,23 +67,31 @@ export default function UsersPage() {
     setFormOpen(false)
   }
 
-  const toggleSuspended = async (user: UserRow) => {
-    const suspend = !user.suspended
-    if (suspend && !window.confirm(`Suspend ${user.name}? They are signed out and cannot sign in until reactivated.`)) return
-    setNotice(null)
+  const changeSuspended = async (user: UserRow, suspend: boolean) => {
+    setNotice(null); setSuspendError(null)
     if (isDemo) {
       setDemoSuspended(map => ({ ...map, [user.id]: suspend }))
+      setToSuspend(null)
       return
     }
     setBusyId(user.id)
     try {
       await setAdminUserSuspended(Number(user.id), suspend)
+      setToSuspend(null)
       reload()
     } catch (caught) {
-      setNotice(caught instanceof Error ? caught.message : 'Could not change the account.')
+      const text = caught instanceof Error ? caught.message : 'Could not change the account.'
+      if (suspend) setSuspendError(text); else setNotice(text)
     } finally {
       setBusyId(null)
     }
+  }
+
+  /* Suspending signs the person out, so it asks first (in the same dialog as the rest of the console); reactivating does not. */
+  const toggleSuspended = (user: UserRow) => {
+    if (user.suspended) { void changeSuspended(user, false); return }
+    setSuspendError(null)
+    setToSuspend(user)
   }
 
   return (
@@ -214,6 +225,13 @@ export default function UsersPage() {
           </div>
         )}
       </div>
+
+      {toSuspend && (
+        <ConfirmDialog title={`Suspend ${toSuspend.name}?`} confirmLabel="Suspend" busyLabel="Suspending…" danger busy={busyId === toSuspend.id} error={suspendError}
+          onConfirm={() => void changeSuspended(toSuspend, true)} onCancel={() => setToSuspend(null)}>
+          <p>{toSuspend.name} is signed out on every device and cannot sign in until you activate the account again. Their photos are kept.</p>
+        </ConfirmDialog>
+      )}
     </div>
   )
 }

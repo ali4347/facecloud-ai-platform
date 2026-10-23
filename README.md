@@ -452,7 +452,7 @@ deployed backend.
 * **Client-Side Simulation**: Image filter outputs use browser canvas contexts (`ctx.filter`) rather than deep-learning GPU model logic.
 * **Webcam Performance**: The real-time face tracker depends on client CPU capabilities. Frame rates may degrade on older hardware with multiple background tasks.
 * **No Real Emails**: Email notification events are logged to the dashboard database but do not send actual SMTP emails.
-* **Testing**: the `qa/` folder holds the QA scripts, test plan, bug log and the latest report (`qa/README.md`). `bash qa/start-test-stack.sh` starts a throwaway copy of the backend with test accounts and runs nothing against your own servers. The scripts cover sign-in and roles, API security and hostile uploads, every page at desktop and phone width, accessibility basics, the upload screens, rate limits, the main business flow, enhancement quality, the photo editor and a moderator's actions. Person folders, settings and the background-worker path are still checked by hand.
+* **Testing**: the `qa/` folder holds the QA scripts, test plan, bug log and the latest report (`qa/README.md`). `bash qa/start-test-stack.sh` starts a throwaway copy of the backend with test accounts and runs nothing against your own servers. The scripts cover sign-in and roles, API security and hostile uploads, every page at desktop and phone width, accessibility basics, the upload screens, rate limits, the main business flow, enhancement quality, the photo editor, a moderator's actions, settings and password change, the administrator's actions and what happens when the server is unreachable, slow, throttled or a request is sent twice. Person folders and the background-worker path are still checked by hand.
 
 ---
 

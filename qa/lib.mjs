@@ -27,9 +27,11 @@ export async function openTab({ width = 1440, height = 900 } = {}) {
   let id = 1
   const issues = { console: [], exceptions: [], failed: [], http: [] }
   const waiting = new Map()
+  const listeners = []
   ws.addEventListener('message', e => {
     const m = JSON.parse(e.data)
     if (m.id && waiting.has(m.id)) { waiting.get(m.id)(m.result); waiting.delete(m.id); return }
+    for (const [name, fn] of listeners) if (name === m.method) fn(m.params)
     if (m.method === 'Runtime.exceptionThrown') issues.exceptions.push((m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text || '').slice(0, 200))
     if (m.method === 'Runtime.consoleAPICalled' && m.params.type === 'error') issues.console.push(m.params.args.map(a => a.value ?? a.description ?? '').join(' ').slice(0, 200))
     if (m.method === 'Network.responseReceived' && m.params.response.status >= 400) issues.http.push({ status: m.params.response.status, url: m.params.response.url.replace(/^https?:\/\/[^/]+/, '') })
@@ -41,6 +43,8 @@ export async function openTab({ width = 1440, height = 900 } = {}) {
   const ev = async e => { const r = await rpc('Runtime.evaluate', { expression: e, returnByValue: true, awaitPromise: true }); return r?.result?.value }
   const tab = {
     ev, rpc, issues,
+    /** Listen to a DevTools event, e.g. `t.on('Fetch.requestPaused', params => …)`. */
+    on: (name, fn) => { listeners.push([name, fn]) },
     resize: async (w, h) => rpc('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 600 }),
     clearIssues: () => { issues.console.length = issues.exceptions.length = issues.failed.length = issues.http.length = 0 },
     go: async (p, wait = 2500) => { await rpc('Page.navigate', { url: p.startsWith('http') ? p : WEB + p }); await sleep(wait) },

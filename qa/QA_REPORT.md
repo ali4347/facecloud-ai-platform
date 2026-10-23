@@ -21,11 +21,14 @@ backend at `http://127.0.0.1:8000` (no sign-in, nothing created).
 | 10 onboarding (sign-up, invitation, team) | 17 | 16 | 1 | BE-006 |
 | 11 photo editor | 18 | 18 | 0 | pass 2 (2026-10-23); led to FE-011 |
 | 12 moderator actions | 23 | 23 | 0 | pass 2; led to FE-012 |
-| **Total (QA stack)** | **423** | **418** | **5** | all five failures are backend: BE-001, BE-002, BE-004, BE-005, BE-006 |
+| 13 settings and password | 22 | 22 | 0 | pass 3 (2026-10-24); no bug (test mistakes only: wrong refresh address, 400 vs 401) |
+| 14 administrator actions | 36 | 36 | 0 | pass 3; led to FE-015 |
+| 15 resilience | 17 | 17 | 0 | first run 15/17: FE-013, FE-014 found and fixed |
+| **Total (QA stack)** | **498** | **493** | **5** | all five failures are backend: BE-001, BE-002, BE-004, BE-005, BE-006 |
 
 ## What was found
 
-**18 bugs** (full detail in `BUGS.md`): 8 major, 10 minor; **12 fixed, 6 open** (all six are backend). Pass 2 (2026-10-23) added the editor and moderator scripts and two small frontend fixes: **FE-011** (the editor could save a copy without any change) and **FE-012** ("Release" was offered on a review another moderator holds).
+**22 bugs** (full detail in `BUGS.md`): 9 major, 13 minor; **15 fixed, 7 open** (all seven are backend; BE-007 is optional). Pass 2 (2026-10-23) added the editor and moderator scripts and two small frontend fixes: **FE-011** (the editor could save a copy without any change) and **FE-012** ("Release" was offered on a review another moderator holds). Pass 3 (2026-10-24) added settings, administrator actions and resilience, and found **FE-013** ("Failed to fetch" shown when the server is unreachable), **FE-014** (a double click sent the request twice) and **FE-015** (suspend used the browser's pop-up).
 
 Fixed here (frontend): **FE-001** a refused file on the single upload screen showed no reason, **FE-002** Live Enhancement used a dead
 model address and an unpinned runtime, **FE-003** sign-in/register fields not linked to labels, **FE-004** the same tab title on every

@@ -150,12 +150,19 @@ async function request(path: string, options: RequestOptions = {}): Promise<Resp
     const token = getAccessToken()
     if (token && !options.anonymous) headers.Authorization = `Bearer ${token}`
 
-    return fetch(`${API_URL}${path}`, {
-      method: options.method ?? (options.body || options.formData ? 'POST' : 'GET'),
-      headers,
-      body: options.formData ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
-      signal: options.signal,
-    })
+    try {
+      return await fetch(`${API_URL}${path}`, {
+        method: options.method ?? (options.body || options.formData ? 'POST' : 'GET'),
+        headers,
+        body: options.formData ?? (options.body === undefined ? undefined : JSON.stringify(options.body)),
+        signal: options.signal,
+      })
+    } catch (caught) {
+      // A cancelled request is the caller's own doing. Anything else is the network: the browser's wording for it
+      // ("Failed to fetch", "Load failed", "NetworkError when attempting to fetch resource") says nothing useful.
+      if (caught instanceof DOMException && caught.name === 'AbortError') throw caught
+      throw new ApiError(0, 'FaceCloud could not reach the server. Check your internet connection and try again.')
+    }
   }
 
   let response = await send()
@@ -201,6 +208,8 @@ function pageInsteadOfJson(status: number): ApiError {
  * ask goes to the server again, so nothing is ever served stale. A caller's own `signal` still cancels its own wait.
  */
 const sharedReads = new Map<string, Promise<unknown>>()
+/** Changes (POST, PATCH, DELETE with a JSON body) that are on their way, by what they ask for. */
+const sharedChanges = new Map<string, Promise<unknown>>()
 
 /** How many changes (anything that is not a read) this page has made so far; a cached list is stale once this number moves. */
 let changesMade = 0
@@ -223,7 +232,20 @@ const waitFor = <T>(shared: Promise<T>, signal?: AbortSignal): Promise<T> => {
 export function apiFetch<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
   const method = options.method ?? (options.body || options.formData ? 'POST' : 'GET')
   // Anything that changes data ends the sharing, so a read that follows a change always asks the server afresh.
-  if (method !== 'GET') { changesMade += 1; sharedReads.clear(); return load<T>(path, options) }
+  if (method !== 'GET') {
+    changesMade += 1; sharedReads.clear()
+    if (options.formData) return load<T>(path, options)
+    /* The same change asked for twice while the first is still on its way (a double click, a form submitted twice) is
+       one change: the second ask waits for the first one's answer instead of sending it again. */
+    const same = `${currentPortal()}|${method}|${path}|${JSON.stringify(options.body ?? null)}`
+    let pending = sharedChanges.get(same) as Promise<T> | undefined
+    if (!pending) {
+      const started: Promise<T> = load<T>(path, { ...options, signal: undefined }).finally(() => { if (sharedChanges.get(same) === started) sharedChanges.delete(same) })
+      pending = started
+      sharedChanges.set(same, started)
+    }
+    return waitFor(pending, options.signal)
+  }
   const key = `${currentPortal()}|${options.anonymous ? 'anon' : 'auth'}|${path}`
   let shared = sharedReads.get(key) as Promise<T> | undefined
   if (!shared) {
