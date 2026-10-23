@@ -47,7 +47,7 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
 ### 2026-10-24 — QA pass 3: settings, administrator actions, resilience; three fixes (FE-013, FE-014, FE-015)
-*Status: uncommitted.*
+*Status: committed 60f9e4f.*
 
 - **New QA scripts, all passing.** `13-settings.mjs` (22 checks: every wrong password, the right one, name, devices, sign out everywhere, notification switches, delete account), `14-admin-actions.mjs` (36: add user/moderator, suspend/activate, teams, invitations, failed-work and moderation pages, audit trail), `15-resilience.mjs` (17: server unreachable, error page, 429, slow, session ended elsewhere, double click, unknown address, wrong portal, Escape). `qa/lib.mjs` gained `tab.on(event, fn)`; `qa/start-test-stack.sh` accepts `QA_ORG_INVITE_RATE` (script 14 reads the organization list more than BE-004's 30 an hour).
 - **FE-013 (fixed).** With the server unreachable, pages showed the browser's raw "Failed to fetch". A network failure now reads "FaceCloud could not reach the server. Check your internet connection and try again." everywhere, including the three sign-in forms. File: `src/lib/api/client.ts`.
