@@ -150,6 +150,13 @@ function mockPerformance(days: number): ModeratorPerformance {
 export interface Team { id: number; name: string; brandName: string; accent: string; logoUrl: string | null; scope: 'own_members' | 'organization' | null }
 const teamsCache = personCache<Team[]>()
 const CHOICE_EVENT = 'fc:moderator-organization'
+/** True when someone other than the signed-in moderator holds this review; the server refuses their Release with a 409. */
+export function heldByAnother(review: ModeratorReview): boolean {
+  if (!review.is_claimed || !review.claimed_by) return false
+  const me = (getSession()?.email ?? '').trim().toLowerCase()
+  return me !== '' && review.claimed_by.email.trim().toLowerCase() !== me
+}
+
 const choiceKey = () => `facecloud:moderator-organization:${getSession()?.email ?? ''}`
 
 function chosenTeam(teams: Team[]): number | null {

@@ -4,7 +4,7 @@ Newest pass first. **IDs**: `BE-` backend (Ijaz's repository: a prompt is writte
 Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call). Severity is defined in `TEST_PLAN.md`.
 "Evidence" is the check id in `qa/scripts/` (re-run it to see the failure or the fix) and, where useful, a screenshot name in `qa/out/`.
 
-## Summary of the 2026-10-22 pass (16 bugs: 8 major, 8 minor; 10 fixed, 6 open, all six backend)
+## Summary of the 2026-10-22 and 2026-10-23 passes (18 bugs: 8 major, 10 minor; 12 fixed, 6 open, all six backend)
 
 | ID | Severity | Status | Title |
 |---|---|---|---|
@@ -24,6 +24,8 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 | FE-005 | Minor | Fixed | Landing page: the early-access submit button has no name for screen readers |
 | FE-006 | Minor | Fixed | Multiple upload: broken-image icon for files that are not pictures |
 | FE-007 | Minor | Fixed | A 0-byte file shows its size as "--" |
+| FE-011 | Minor | Fixed | The editor let you save with every slider untouched, which made a copy of the enhanced photo and called it a new version |
+| FE-012 | Minor | Fixed | A review held by another moderator showed "Release", which the server refuses |
 
 ---
 
@@ -128,6 +130,14 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 ### FE-007 A 0-byte file shows "--" — Minor — Fixed
 - `formatBytes(0)` returned "--", the text for "unknown". An empty file now reads "0 B", and so does a new account's "stored" figure in the sidebar; "--" stays for a size that is missing (`imageData.ts`).
 
+
+### FE-011 Saving an untouched editor made a duplicate version — Minor — Fixed
+- Opening the editor and pressing "Save as new version" without moving a slider created a version identical to the enhanced photo, and it became the one shown and downloaded. Found while writing the editor checks (a second save "worked" without any change).
+- **Fix:** Save is switched off, with the reason beside it, until a slider differs from its starting position (`PhotoEditor.tsx`, `untouched`). **Evidence:** `EDIT-16`.
+
+### FE-012 "Release" shown on a review another moderator holds — Minor — Fixed
+- Moderator A opens a review that moderator B has taken. The screen offered "Release"; pressing it gives `409 "<B> is reviewing this right now…"`. The server was right (one moderator must not silently take another's work); the button promised something it would refuse.
+- **Fix:** the queue and the review page show a disabled "Held by <name>" instead (`heldByAnother` in `moderationData.ts`, `ReviewQueue.tsx`, `ModeratorImageReviewLive.tsx`). **Evidence:** `MOD-06a`, `MOD-06b`.
 ---
 
 ## Notes (not bugs)

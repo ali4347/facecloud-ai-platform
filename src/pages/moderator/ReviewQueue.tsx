@@ -16,7 +16,7 @@ import {
   type ReviewSource,
   type ReviewStatus,
 } from '../../lib/api/moderation'
-import { useModeratorOrganization } from '../../lib/moderationData'
+import { heldByAnother, useModeratorOrganization } from '../../lib/moderationData'
 import { ReviewThumbnail } from '../../components/features/ReviewThumbnail'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { formatDateTime } from '../../lib/utils'
@@ -371,12 +371,15 @@ export default function ReviewQueue() {
                         </span>
                       ) : (
                         <button
-                          type="button" disabled={busy} onClick={() => runClaim(review)}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline cursor-pointer disabled:opacity-50"
+                          type="button" disabled={busy || heldByAnother(review)} onClick={() => runClaim(review)}
+                          title={heldByAnother(review) ? `${review.claimed_by?.username ?? 'Another moderator'} is reviewing this. Their hold ends shortly if they do not finish.` : undefined}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline cursor-pointer disabled:opacity-50 disabled:no-underline disabled:cursor-not-allowed"
                         >
-                          {review.is_claimed
-                            ? <><Unlock className="w-3.5 h-3.5" />Release</>
-                            : <><Lock className="w-3.5 h-3.5" />Claim</>}
+                          {heldByAnother(review)
+                            ? <><Lock className="w-3.5 h-3.5" />Held</>
+                            : review.is_claimed
+                              ? <><Unlock className="w-3.5 h-3.5" />Release</>
+                              : <><Lock className="w-3.5 h-3.5" />Claim</>}
                         </button>
                       )}
                     </td>

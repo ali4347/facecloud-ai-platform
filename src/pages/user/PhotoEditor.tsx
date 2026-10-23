@@ -62,6 +62,8 @@ export default function PhotoEditor() {
   const [saving, setSaving] = useState(false)
   // What "Auto" said when it found nothing to change, so a click is never met with silence
   const [autoNote, setAutoNote] = useState('')
+  // Every slider still where it starts: a save would only copy the enhanced photo
+  const untouched = config !== null && Object.entries(config.neutral_settings).every(([name, value]) => settings[name] === undefined || settings[name] === value)
   const [savedNote, setSavedNote] = useState('')
   const [saveError, setSaveError] = useState('')
   const [versions, setVersions] = useState<EditVersion[]>([])
@@ -414,11 +416,13 @@ export default function PhotoEditor() {
           </div>
 
           <div className="fc-card p-5 space-y-3">
-            <button type="button" onClick={() => void save()} disabled={saving || rendering}
+            <button type="button" onClick={() => void save()} disabled={saving || rendering || untouched}
+              title={untouched ? 'Change something first: every slider is still at its starting position.' : undefined}
               className="fc-btn-primary w-full justify-center !py-2.5 text-sm font-bold flex items-center gap-2 disabled:opacity-60 cursor-pointer">
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {saving ? 'Saving full-size version…' : 'Save as new version'}
             </button>
+            {untouched && !saving && <p className="text-[11px] text-ink-faint">Move a slider or try a Quick fix first; saving without a change would only make a copy of the enhanced photo.</p>}
             {savedNote && (
               <div role="status" className="text-xs text-emerald-500 space-y-1.5">
                 <p className="flex items-start gap-1.5"><Check className="w-3.5 h-3.5 mt-0.5 shrink-0" />{savedNote}</p>

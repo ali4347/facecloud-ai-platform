@@ -14,7 +14,7 @@ import {
 import { listOrgAudit, type OrgAuditEvent, type ReviewImageInfo } from '../../lib/api/moderatorConsole'
 import { listOrgMembers, type OrgMembership } from '../../lib/api/organizations'
 import { formatBytes } from '../../lib/imageData'
-import { useModeratorOrganization, useModeratorResource } from '../../lib/moderationData'
+import { heldByAnother, useModeratorOrganization, useModeratorResource } from '../../lib/moderationData'
 import { explainReason } from '../../lib/reasons'
 import { messageFor } from '../../lib/useApiResource'
 import { formatDateTime } from '../../lib/utils'
@@ -174,8 +174,9 @@ export function LiveImageReview() {
                   {open ? (
                     <div className="mt-5 space-y-3">
                       <div className="flex flex-wrap gap-2">
-                        <button type="button" disabled={busy} onClick={() => organizationId !== null && run(() => (review.is_claimed ? releaseReview(organizationId, reviewId) : claimReview(organizationId, reviewId)), review.is_claimed ? 'Released to the queue.' : 'You took this review.')}
-                          className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold disabled:opacity-50">{review.is_claimed ? <><Unlock className="w-3.5 h-3.5" /> Release</> : <><Lock className="w-3.5 h-3.5" /> Take it</>}</button>
+                        <button type="button" disabled={busy || heldByAnother(review)} title={heldByAnother(review) ? `${review.claimed_by?.username ?? 'Another moderator'} is reviewing this. Their hold ends shortly if they do not finish.` : undefined}
+                          onClick={() => organizationId !== null && run(() => (review.is_claimed ? releaseReview(organizationId, reviewId) : claimReview(organizationId, reviewId)), review.is_claimed ? 'Released to the queue.' : 'You took this review.')}
+                          className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold disabled:opacity-50">{heldByAnother(review) ? <><Lock className="w-3.5 h-3.5" /> Held by {review.claimed_by?.username}</> : review.is_claimed ? <><Unlock className="w-3.5 h-3.5" /> Release</> : <><Lock className="w-3.5 h-3.5" /> Take it</>}</button>
                         <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('approve') }} className="fc-btn-primary !py-2 !px-3 text-[11px] font-bold"><Check className="w-3.5 h-3.5" /> Approve</button>
                         <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('reject') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold !text-red-400"><X className="w-3.5 h-3.5" /> Reject</button>
                         <button type="button" disabled={busy} onClick={() => { setText(''); setMemberMessage(''); setFormError(null); setAction('keep_in_review') }} className="fc-btn-secondary !py-2 !px-3 text-[11px] font-bold">Keep in review</button>

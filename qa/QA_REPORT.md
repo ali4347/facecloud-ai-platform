@@ -19,11 +19,13 @@ backend at `http://127.0.0.1:8000` (no sign-in, nothing created).
 | 08 rate limits | 3 | 2 | 1 | BE-004 |
 | 09 enhancement (real photos, real screens) | 9 | 8 | 1 | BE-005 |
 | 10 onboarding (sign-up, invitation, team) | 17 | 16 | 1 | BE-006 |
-| **Total (QA stack)** | **382** | **377** | **5** | all five failures are backend: BE-001, BE-002, BE-004, BE-005, BE-006 |
+| 11 photo editor | 18 | 18 | 0 | pass 2 (2026-10-23); led to FE-011 |
+| 12 moderator actions | 23 | 23 | 0 | pass 2; led to FE-012 |
+| **Total (QA stack)** | **423** | **418** | **5** | all five failures are backend: BE-001, BE-002, BE-004, BE-005, BE-006 |
 
 ## What was found
 
-**16 bugs** (full detail in `BUGS.md`): 8 major, 8 minor; **10 fixed in this pass, 6 open** (all six are backend).
+**18 bugs** (full detail in `BUGS.md`): 8 major, 10 minor; **12 fixed, 6 open** (all six are backend). Pass 2 (2026-10-23) added the editor and moderator scripts and two small frontend fixes: **FE-011** (the editor could save a copy without any change) and **FE-012** ("Release" was offered on a review another moderator holds).
 
 Fixed here (frontend): **FE-001** a refused file on the single upload screen showed no reason, **FE-002** Live Enhancement used a dead
 model address and an unpinned runtime, **FE-003** sign-in/register fields not linked to labels, **FE-004** the same tab title on every

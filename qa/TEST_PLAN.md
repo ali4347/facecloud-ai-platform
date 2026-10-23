@@ -24,10 +24,10 @@ Google Chrome (headless) at 1440 px and 390 px. Production uses PostgreSQL and C
 | Every page loads | 39 pages x 2 widths | 01 | covered |
 | Accessibility basics | alt, names, labels, h1, titles, language | 05 | covered (first screen, not a full audit) |
 | Enhancement result quality | clean left alone, dark brightened, noisy smoothed, very dark refused; what the screens say | 09 | covered (blur and face restoration only checked by hand) |
-| Editor (sliders, save, versions) | | earlier manual runs | **not automated** |
+| Editor (sliders, save, versions) | sliders, reset, compare, Save off until changed, save time, full-size version, use/delete, other person 404 | 11 | covered |
 | Person folders and grouping | thresholds, merge, rename | backend PR #106 tests + manual | **not automated** |
 | Moderator review | approve with a message to the member, the owner is told | 07 | covered |
-| Moderator actions | claim, reject, assign, bulk, escalate | earlier manual runs | **not automated** |
+| Moderator actions | queue filter, claim, clash with a second moderator, reject with message, escalate, keep in review, bulk, decision log, audit, member deactivate/reactivate | 12 | covered (assign and merge folders: manual) |
 | Organization flow | create team, owner, moderator seats, owner's sidebar and page, another team cannot see it | 07 | covered |
 | Sign-up, verification, invitation to a team, invited sign-up, personal workspace | self sign-up, email link, no-team limits, join, "Submit to", one-step account from an invitation | 10 | covered |
 | Invitations, branding, plan limits | send/cancel covered; accept, branding, seats full | 07 (send, cancel) | partly |

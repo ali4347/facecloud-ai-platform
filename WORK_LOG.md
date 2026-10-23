@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-22
+**Last updated:** 2026-10-23
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-23 — QA pass 2: editor and moderator scripts, two small fixes (FE-011, FE-012)
+*Status: uncommitted.*
+
+- **New QA scripts.** `qa/scripts/11-editor.mjs` (18 checks): sliders and preview, reset, hold-to-compare, save time (2 s on a 1024 px photo), the saved version is full size and brighter, versions list and "Use this", delete asks first and the original/enhanced photo stay, another person gets 404, signed out gets 401. `qa/scripts/12-moderator.mjs` (23 checks): queue and filter, claim, a clash with a second moderator (409, shown in words on the dialog), reject with a message the member receives, a closed review, deciding twice (409), escalate (shows on the administrator's overview), keep in review, bulk approve, decision log against the dashboard, audit search, deactivating and reactivating a member. Both pass on a fresh stack: **18/18** and **23/23**.
+- **FE-011 (fixed).** The editor let you press "Save as new version" with every slider untouched, which made a copy of the enhanced photo and made it the current version. Save is now off until a slider differs from its starting position, with the reason beside it. File: `src/pages/user/PhotoEditor.tsx` (`untouched`).
+- **FE-012 (fixed).** A review held by another moderator showed "Release", which the server refuses with 409. The queue and the review page now show a disabled "Held by <name>". Files: `src/lib/moderationData.ts` (`heldByAnother`), `src/pages/moderator/ReviewQueue.tsx`, `src/pages/moderator/ModeratorImageReviewLive.tsx`.
+- **Test-side notes (not app bugs).** Re-running script 12 on the same database failed 2 checks (approved reviews already existed; the member had already joined), so the checks need a fresh stack; both passed on a fresh `start-test-stack.sh`. Writing the script I once clicked "Reject" and hit the sidebar link "Rejected Images" (fixed by scoping to `main button`).
+- **Docs.** `qa/README.md`, `qa/TEST_PLAN.md`, `qa/BUGS.md` (FE-011, FE-012; 18 bugs, 12 fixed, 6 open, all six backend), `qa/QA_REPORT.md` (423 checks, 418 passed, the 5 failures are still BE-001, BE-002, BE-004, BE-005, BE-006), `README.md` Testing bullet.
+- **Verified:** `npx tsc -b`, `npm run build`, `VITE_USE_API=false VITE_API_URL= npm run build`; scripts 11 and 12 on a fresh stack.
 
 ### 2026-10-22 — One complete backend prompt for the six QA bugs
 *Status: committed (this commit).*
