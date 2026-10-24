@@ -47,7 +47,7 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
 ### 2026-10-24 — "Enhancement does nothing" on the owner's server: cause found, fix checked on a copy
-*Status: uncommitted.*
+*Status: committed b2e5c73.*
 
 - **Cause (verified, not guessed).** The owner's `.env` had no `ENHANCEMENT_RENDER_POLICY`, so `lightweight_v1` ran (it skips Zero-DCE even when its flag is on); and `~/Projects/FaceCloud_backend/.runtime/models/zero_dce_epoch99.onnx` was an older export (sha `b7f7d34a…`) while the code pins `e5cb6f92…`, so it failed its integrity check. The correct file exists in `/Users/Ali/FaceCloud_backend/.runtime/models/`. All four stored photos of the owner's account are well exposed, so the engine rightly left them as they were.
 - **Done by the owner's backend session (not by me):** the correct model copied in (old one kept as `.runtime/zero_dce_old_b7f7d34a.onnx`) and `ENHANCEMENT_RENDER_POLICY=adaptive_v1` added to `.env`. No code changed.
