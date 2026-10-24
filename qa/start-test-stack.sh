@@ -21,6 +21,7 @@ export DJANGO_DEBUG=True DB_ENGINE=django.db.backends.sqlite3 DB_NAME="$QA_DIR/b
 export PUBLIC_BACKEND_URL=http://127.0.0.1:$API_PORT EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 export CORS_ALLOWED_ORIGINS=http://localhost:$WEB_PORT THROTTLE_RATE_LOGIN=1000/hour
 ${QA_ORG_INVITE_RATE:+export THROTTLE_RATE_ORG_INVITE=$QA_ORG_INVITE_RATE}
+${QA_EXTRA_ENV:+export $QA_EXTRA_ENV}
 export QA_API=http://127.0.0.1:$API_PORT QA_WEB=http://localhost:$WEB_PORT QA_CDP=http://127.0.0.1:$CDP_PORT
 ENV
 source "$QA_DIR/env.sh"

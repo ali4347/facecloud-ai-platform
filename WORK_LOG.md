@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-24 — "Enhancement does nothing" on the owner's server: cause found, fix checked on a copy
+*Status: uncommitted.*
+
+- **Cause (verified, not guessed).** The owner's `.env` had no `ENHANCEMENT_RENDER_POLICY`, so `lightweight_v1` ran (it skips Zero-DCE even when its flag is on); and `~/Projects/FaceCloud_backend/.runtime/models/zero_dce_epoch99.onnx` was an older export (sha `b7f7d34a…`) while the code pins `e5cb6f92…`, so it failed its integrity check. The correct file exists in `/Users/Ali/FaceCloud_backend/.runtime/models/`. All four stored photos of the owner's account are well exposed, so the engine rightly left them as they were.
+- **Done by the owner's backend session (not by me):** the correct model copied in (old one kept as `.runtime/zero_dce_old_b7f7d34a.onnx`) and `ENHANCEMENT_RENDER_POLICY=adaptive_v1` added to `.env`. No code changed.
+- **Checked on the QA stack with the owner's real `.env`** (adaptive_v1, all five models on): script 09 passes 8 of 9: a dark portrait goes from brightness 28 to 76 through the real upload (stage `low_light`, engine `zero_dce`, blend 0.65), a noisy one is smoothed (`opencv_nlm`), a clean one is `original_preserved`; the only failure is BE-005 (x0.25 refused). The owner's own server was **not yet restarted** when checked (started 22 Oct 15:38, `.env` changed 24 Oct 12:51), so it still ran the old settings.
+- **Still advised to the owner:** switch GFPGAN, CodeFormer, HD restoration and NAFNet-deblur off to match `scripts/defense_demo.sh` (they are non-commercial or unmeasured and did not change these results), then restart and upload a darkened photo (x0.40 of photo 54 or 44).
+- **QA tooling.** `qa/start-test-stack.sh` accepts `QA_EXTRA_ENV` (extra backend settings); `qa/README.md` documents it and `QA_ORG_INVITE_RATE`.
+
 ### 2026-10-24 — QA pass 3: settings, administrator actions, resilience; three fixes (FE-013, FE-014, FE-015)
 *Status: committed 60f9e4f.*
 

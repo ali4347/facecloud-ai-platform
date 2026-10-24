@@ -28,7 +28,7 @@ bash qa/stop-test-stack.sh                        # stops it and deletes the cop
 
 Needs: Node 20+, Google Chrome, the backend folder with its `.venv` (default `~/Projects/FaceCloud_backend`, change with
 `QA_BACKEND`), `zip` (the ZIP checks). Ports default to 8840 (API), 5240 (website), 9410 (Chrome); change them with
-`QA_API_PORT`, `QA_WEB_PORT`, `QA_CDP_PORT`. `QA_REF` picks another backend branch (default `origin/main`).
+`QA_API_PORT`, `QA_WEB_PORT`, `QA_CDP_PORT`. `QA_REF` picks another backend branch (default `origin/main`). `QA_ORG_INVITE_RATE=1000/hour` raises the organization-list limit (BE-004); `QA_EXTRA_ENV="A=1 B=False"` sets extra backend settings, for trying a configuration (the stack already reads the backend's own `.env`).
 
 ## The scripts
 
