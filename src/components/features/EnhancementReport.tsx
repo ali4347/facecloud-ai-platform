@@ -6,6 +6,7 @@ import type { AppliedStage, EnhancementResult } from '../../lib/api/enhancements
 const STAGES: Record<string, { name: string; done: (s: AppliedStage) => string }> = {
   low_light: { name: 'Low light', done: () => 'Lifted the light' },
   denoise: { name: 'Noise', done: () => 'Reduced the noise' },
+  polish: { name: 'Polish', done: () => 'Balanced the contrast and sharpened lightly' },
   deblur: { name: 'Blur', done: () => 'Removed blur' },
   face_restore: { name: 'Face', done: () => 'Restored the face' },
   upscale: {
@@ -20,6 +21,7 @@ const STAGES: Record<string, { name: string; done: (s: AppliedStage) => string }
 const ENGINES: Record<string, string> = {
   nafnet_gopro: 'NAFNet', realesrgan: 'Real-ESRGAN', codeformer: 'CodeFormer', gfpgan: 'GFPGAN',
   codeformer_or_gfpgan: 'face restoration model', zero_dce: 'Zero-DCE', retinexformer: 'Retinexformer',
+  opencv_nlm: 'OpenCV noise filter', opencv_polish: 'OpenCV polish',
 }
 
 const stageName = (stage: string) => STAGES[stage]?.name ?? stage.replace(/_/g, ' ')

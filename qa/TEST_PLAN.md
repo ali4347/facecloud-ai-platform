@@ -24,6 +24,7 @@ Google Chrome (headless) at 1440 px and 390 px. Production uses PostgreSQL and C
 | Every page loads | 39 pages x 2 widths | 01 | covered |
 | Accessibility basics | alt, names, labels, h1, titles, language | 05 | covered (first screen, not a full audit) |
 | Enhancement result quality | clean left alone, dark brightened, noisy smoothed, very dark refused; what the screens say | 09 | covered (blur and face restoration only checked by hand) |
+| Enhancement polish (flag ADAPTIVE_POLISH_ENABLED) | flag off equals the unchanged backend pixel for pixel; flag on never touches dark/noisy photos; a polished photo is the same photo and measurably sharper | 16 | covered (checked on a pre-merge branch) |
 | Editor (sliders, save, versions) | sliders, reset, compare, Save off until changed, save time, full-size version, use/delete, other person 404 | 11 | covered |
 | Person folders and grouping | thresholds, merge, rename | backend PR #106 tests + manual | **not automated** |
 | Moderator review | approve with a message to the member, the owner is told | 07 | covered |

@@ -46,6 +46,19 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-24 — QA of the backend "polish" change (branch feat/adaptive-polish, commit 8845a4a); labels for it in the report
+*Status: committed (this commit).*
+
+- **What was checked.** The backend session built a gentle "polish" operation for photos with nothing to fix (`ADAPTIVE_POLISH_ENABLED`, default False; branch `feat/adaptive-polish` in `/Users/Ali/FaceCloud_backend_polish`, not merged). It was tested from a throwaway clone of the commit on the QA stack, never in the owner's folders or server. New script `qa/scripts/16-polish.mjs` (record on the unchanged backend, on the new code with the flag off, and with it on; `compare before off on`): 9 photos x 4 level/style combinations = 36 runs.
+- **Result: 6 of 6 checks pass.** Flag off: all 36 outputs identical to the unchanged backend (same decoded pixels, outcome and stages). Flag on: dark (Zero-DCE) and noisy (denoise) photos unchanged by a pixel; the only photo polished was one real portrait (4 runs): same size, colour change at most 1.4, picture shifted 0.003 px, sharpness 84 to 118-129, no new clipped highlights, the result says "Polished: balanced the contrast and sharpened lightly." The backend's own 28 new tests pass (28/28).
+- **Honest limit.** Only 1 of 7 ordinary photos was polished: two were "dark scene" (left as photographed, by design), two had both polish variants refused by the validator ("already balanced and sharp"). The change on the polished one is small. Making the effect larger means loosening gates, which raises risk: a decision for the owner and the backend developer.
+- **My QA mistake, corrected.** The first "face moved" measure used the detector's box, which jitters when a photo is sharpened; it now uses a whole-picture shift (phase correlation) and landmarks, with the landmark tolerance set after seeing the numbers (3 percent), said so in the report.
+- **Front end.** `src/components/features/EnhancementReport.tsx`: stage name "Polish" with the sentence "Balanced the contrast and sharpened lightly", and engine names "OpenCV polish" and "OpenCV noise filter" (the denoise engine `opencv_nlm` had shown its raw id). Nothing else changes; a backend without the flag never sends a polish stage.
+- **QA docs.** `qa/README.md` and `qa/TEST_PLAN.md` list script 16. The backend's whole enhancement suite (807 tests with the polish commit, 779 without) was run in the owner's environment (`adaptive_v1`, models on): **91 fail in both runs and the two lists are identical**, none is a polish test; they are old tests that assume default settings, and five of those modules (157 tests including the 28 polish ones) pass 157/157 with default settings. So the polish commit adds no failure.
+- **Screen check.** With the flag on, the real upload screen shows "Polished: balanced the contrast and sharpened lightly. Polish · Balanced the contrast and sharpened lightly · OpenCV polish (blend 1.0)" for the polished photo; no page errors.
+- **Clean-up.** Test copies of the owner's stored photos, their outputs, the throwaway clones and test logs were deleted; the owner's folders, database and servers were only read.
+- **Verified:** `npx tsc -b`, `npm run build`, `VITE_USE_API=false VITE_API_URL= npm run build`; script 16 (6/6); backend polish tests 28/28.
+
 ### 2026-10-24 — "Enhancement does nothing" on the owner's server: cause found, fix checked on a copy
 *Status: committed b2e5c73.*
 
@@ -2136,6 +2149,8 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 **Backend (separate repository) still to do, as asked of the backend owner:** Phase 1 (blur never rejects, restoration chain) is merged (#85). Not started: Phase 1B (auto = HD and situation-aware by default, defocus deblur, speed and GPU plan),
 Phase 2 (small-face floor, ignored background faces, completely-dark-only rejection, warnings list), Phase 3 (accepted photos enhanced automatically, batch-enhance must skip rejected photos), Phase 4 (groups enhanced per person),
 photo delete clean-up and bulk delete, `best_score` on new-group decisions, an activity `?type=` filter; open PR #84 (readable emailed links in development) and five dependency PRs. Deployment (VPS, HTTPS, Postgres, Redis, Celery, SMTP) is not started.
+
+**Backend change waiting (2026-10-24):** the adaptive engine's "polish" (`feat/adaptive-polish`, commit 8845a4a, flag `ADAPTIVE_POLISH_ENABLED` off by default) passed QA script 16 (flag off identical to the unchanged backend; dark/noisy untouched; a polished photo is the same photo and sharper) but polishes few ordinary photos and only slightly. It needs the owner's decision on strength and the backend developer's merge; turn it on with that one `.env` line, off by removing it.
 
 **Operations:** the development database must be migrated after every backend pull (`manage.py migrate`; the local backend clone is currently 7 commits behind `origin/main`).
 
