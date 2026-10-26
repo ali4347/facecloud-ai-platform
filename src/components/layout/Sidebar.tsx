@@ -125,7 +125,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     >
       {/* ── Desk: an icon rail. The brand mark on top, the account at the foot. ── */}
       <div className="fc-rail hidden lg:flex flex-col items-center gap-1 px-2.5 py-2.5">
-        <FaceCloudLogo variant="icon" size="sm" tone="app" showText={false} showSubtitle={false} href={roleHome[role]} priority={true} />
+        <FaceCloudLogo variant="icon" size="xs" tone="app" showText={false} showSubtitle={false} href={roleHome[role]} priority={true} />
         <div className="w-6 border-t border-line/60 my-2" />
         {nav.map(item => {
           const active = isCurrent(item.to)

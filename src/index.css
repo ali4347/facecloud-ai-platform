@@ -86,6 +86,19 @@ section[id] {
   --border-color: rgba(255,255,255,0.12);
 }
 
+/* ─── Logo treatments ─────────────────────────────────────────────────
+   The FaceCloudLogo component puts both treatments of the artwork in the
+   page; the appearance decides which one is seen. Dark is the default
+   appearance, so the light treatment starts hidden. An .on-dark block (a band
+   over footage) is dark in both appearances and always shows the dark one. */
+.fc-logo-on-light { display: none; }
+html[data-theme='light'] .fc-logo-on-light { display: block; }
+html[data-theme='light'] .fc-logo-on-dark { display: none; }
+.on-dark .fc-logo-on-light,
+html[data-theme='light'] .on-dark .fc-logo-on-light { display: none; }
+.on-dark .fc-logo-on-dark,
+html[data-theme='light'] .on-dark .fc-logo-on-dark { display: block; }
+
 /* ─── Base Layer ─────────────────────────────────────────────────────── */
 @layer base {
   * { box-sizing: border-box; }

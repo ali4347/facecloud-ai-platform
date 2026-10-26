@@ -471,25 +471,31 @@ deployed backend.
 
 ## 20. Branding
 
-FaceCloud utilizes a dark luxury, premium branding style built around the official FaceCloud logo:
+FaceCloud uses the approved glossy FaceCloud logo (the face-and-cloud mark with its network lines and floating orange
+pixels, and the black-and-orange "FaceCloud" wordmark), never redrawn:
 
-* **Official FaceCloud Logo**: Represents the single source of truth for the platform's visual identity.
-  * Location: [facecloud-logo-original.png](file:///Users/Ali/Downloads/FYP/public/branding/facecloud-logo-original.png)
-* **Logo Variants**: Available under `public/branding/` for different UI surface areas:
-  * `facecloud-logo-full.png`: Full version with electric blue cloud, metallic silver FC insignia, human face profile, neural-network nodes, wordmark, and subtitle. Used on login pages.
-  * `facecloud-logo-horizontal.png`: Horizontal layout optimized for sidebars and top navigation bars.
-  * `facecloud-logo-icon.png`: Icon-only variant for collapsed layouts and avatar elements.
-  * `facecloud-wordmark.png`: Text-only wordmark.
-  * `facecloud-logo-dark.png` / `facecloud-logo-light.png`: Dark/light background variants.
-* **Favicon Assets**: Optimized icon-only favicons in multiple resolutions (`16x16`, `32x32`, `48x48`, `192x192`, `512x512`) and `facecloud-apple-touch-icon.png`.
-* **Design Integration**: Rendered exclusively via the reusable `FaceCloudLogo` component (`src/components/branding/FaceCloudLogo.tsx`).
-* **Brand Colors**:
-  * Electric Blue: `#168BFF`
-  * Bright Blue: `#42A5FF`
-  * Deep Blue: `#0758D8`
-  * Metallic Silver: `#C9D2E3`
-  * Off-white: `#F5F8FF`
-  * Deep Black/Navy: `#030712` / `#07101F`
+* **Source of truth**: `public/branding/facecloud-logo-original.png`, the approved main logo exactly as delivered
+  (transparent PNG). The approved identity showcase supplied the dark-background treatment.
+* **Cuts of the approved artwork** under `public/branding/` (every file is cut or scaled from the approved files,
+  nothing is redrawn; each comes in a light-background and a dark-background treatment, the dark one with the
+  approved glow and dark-grey "Face"):
+  * `facecloud-logo-full.png` / `facecloud-logo-dark.png`: the stacked logo as delivered (icon above the wordmark).
+    Used on the sign-in, sign-up and recovery pages. `facecloud-logo-light.png` is the same file as `-full`.
+  * `facecloud-logo-icon.png` / `facecloud-logo-icon-dark.png`: the mark alone, for the rail and the favicons.
+  * `facecloud-wordmark.png` / `facecloud-wordmark-dark.png`: the wordmark alone.
+  * `facecloud-logo-horizontal.png` / `facecloud-logo-horizontal-dark.png`: the mark and the wordmark side by side,
+    for bars too short for the stacked logo (public navigation, footer, the phone drawer). The wordmark keeps its
+    height relative to the mark from the stacked logo; the gap between them is 12 % of the mark's height.
+* **Favicons and app icons**: `facecloud-favicon-{16,32,48,192,512}.png` (the mark on transparency) and
+  `facecloud-apple-touch-icon.png` (the mark on white, 180 px). `facecloud-social-preview.png` (1200 × 630) is the
+  dark logo on black, for link previews.
+* **Design integration**: rendered only through the reusable `FaceCloudLogo` component
+  (`src/components/branding/FaceCloudLogo.tsx`), which puts both treatments in the page and lets the stylesheet show
+  the one that matches the appearance (`.fc-logo-on-light` / `.fc-logo-on-dark` in `src/index.css`); `tone="dark"`
+  forces the dark treatment on an always-dark surface. Images are scaled by height only, so the logo is never
+  stretched.
+* **Brand colours**: orange `#F97316` (accent, "Cloud"), deep orange `#EA580C`, near-black `#1A1A1A` ("Face" on
+  light), white.
 * **DATAMART Relationship**: FaceCloud is powered by **DATAMART / DTM.IO**. Datamart is kept as secondary text to maintain FaceCloud as the primary user-facing brand.
 
 > [!IMPORTANT]

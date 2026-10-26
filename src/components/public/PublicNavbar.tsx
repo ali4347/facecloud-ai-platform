@@ -102,7 +102,7 @@ export function PublicNavbar() {
             )}
           >
             {/* Logo */}
-            <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} tone={onMedia ? "dark" : "app"} />
+            <FaceCloudLogo variant="horizontal" size="lg" href="/" priority={true} tone={onMedia ? "dark" : "app"} />
 
             {/* Desktop nav links */}
             <div className={cn(
@@ -227,7 +227,7 @@ export function PublicNavbar() {
             >
               {/* Header row: Logo + Close button */}
               <div className="flex items-center justify-between pb-4 border-b border-ink/10">
-                <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} tone="app" />
+                <FaceCloudLogo variant="horizontal" size="lg" href="/" priority={true} tone="app" />
                 <button
                   onClick={() => setMobileOpen(false)}
                   className="p-2 text-ink-mute hover:text-ink transition-colors rounded-lg bg-ink/5 border border-ink/10"

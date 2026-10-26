@@ -1,4 +1,3 @@
-import { useId } from 'react'
 import { Link } from 'react-router-dom'
 import { cn } from '../../lib/utils'
 
@@ -12,61 +11,62 @@ export interface FaceCloudLogoProps {
   href?: string
   priority?: boolean
   decorative?: boolean
-  /** Where the logo sits. 'app' is the dashboard shell, which themes its own
-   *  text colours; 'dark' is the black marketing site. */
+  /** Where the logo sits. 'app' follows the light / dark appearance; 'dark' is
+   *  a surface that is always dark (the hero video, a photo), so it always
+   *  gets the dark-background treatment. */
   tone?: 'dark' | 'app'
 }
 
-/* Two tones so the same mark works on the marketing pages and in the app
-   shell. The mark itself is brand orange in both; only the wordmark colours
-   differ, and in the shell they follow the appearance tokens. */
+/*
+ * The official FaceCloud logo, as approved artwork, never redrawn.
+ *
+ * Every file under public/branding/ is cut from the approved logo files
+ * (see WORK_LOG, 2026-10-26): the stacked logo is the approved lockup as
+ * delivered; the icon and the wordmark are the two halves of it; the
+ * horizontal lockup puts those two halves side by side for bars that are too
+ * short for the stacked logo. Each has a light-background and a
+ * dark-background treatment (the dark one carries the approved glow and the
+ * dark-grey "Face"), and the right one is chosen by CSS from the page's
+ * appearance, so no JavaScript runs on a theme change.
+ *
+ * Intrinsic sizes are written here so the browser reserves the space before
+ * the image arrives, and the image is only ever scaled by height, so it
+ * cannot be stretched.
+ */
+const ASSETS = {
+  full:       { light: { src: '/branding/facecloud-logo-full.png',            w: 1199, h: 704 }, dark: { src: '/branding/facecloud-logo-dark.png',            w: 893,  h: 576 } },
+  horizontal: { light: { src: '/branding/facecloud-logo-horizontal.png',      w: 1540, h: 360 }, dark: { src: '/branding/facecloud-logo-horizontal-dark.png', w: 1421, h: 360 } },
+  icon:       { light: { src: '/branding/facecloud-logo-icon.png',            w: 873,  h: 505 }, dark: { src: '/branding/facecloud-logo-icon-dark.png',       w: 540,  h: 374 } },
+  wordmark:   { light: { src: '/branding/facecloud-wordmark.png',             w: 1229, h: 229 }, dark: { src: '/branding/facecloud-wordmark-dark.png',        w: 893,  h: 181 } },
+} as const
+
+type Lockup = keyof typeof ASSETS
+
+/* Text colours for the words that are not part of the artwork (the "AI
+   Platform" line and a portal's role label). */
 const toneConfig = {
   dark: {
-    cloudFrom: '#F97316', cloudTo: '#EA580C',
-    faceFrom:  '#FB923C', faceTo:  '#FDBA74',
-    faceText:  'text-white',
-    cloudText: 'bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent',
-    subText:   'text-white/35',
-    roleText:  'bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent',
-    ring:      'focus-visible:ring-[#F97316] hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]',
+    subText:  'text-white/40',
+    roleText: 'bg-gradient-to-r from-[#FB923C] to-[#F97316] bg-clip-text text-transparent',
+    ring:     'focus-visible:ring-[#F97316] hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]',
   },
   app: {
-    cloudFrom: '#F97316', cloudTo: '#EA580C',
-    faceFrom:  '#FB923C', faceTo:  '#FDBA74',
-    faceText:  'text-ink',
-    cloudText: 'text-accent',
-    subText:   'text-ink-faint',
-    roleText:  'text-accent',
-    ring:      'focus-visible:ring-accent',
+    subText:  'text-ink-faint',
+    roleText: 'text-accent',
+    ring:     'focus-visible:ring-accent',
   },
 } as const
 
-// Map size to classes for outer container and SVG dimensions
-const sizeClasses = {
-  xs: 'h-5',
-  sm: 'h-7',
-  md: 'h-9',
-  lg: 'h-12',
-  xl: 'h-16',
-  hero: 'h-24 md:h-28',
+/* Heights. A row lockup (icon, horizontal, wordmark) is sized like a line of
+   chrome; the stacked logo needs about twice that to stay readable. */
+const rowHeights = {
+  xs: 'h-5', sm: 'h-7', md: 'h-9', lg: 'h-12', xl: 'h-16', hero: 'h-24 md:h-28',
 }
-
-const textSizes = {
-  xs: 'text-xs',
-  sm: 'text-sm',
-  md: 'text-base',
-  lg: 'text-lg',
-  xl: 'text-2xl',
-  hero: 'text-4xl md:text-5xl',
+const stackedHeights = {
+  xs: 'h-12', sm: 'h-16', md: 'h-20', lg: 'h-28', xl: 'h-36', hero: 'h-48 md:h-56',
 }
-
 const subTextSizes = {
-  xs: 'text-[6px]',
-  sm: 'text-[7px]',
-  md: 'text-[8px]',
-  lg: 'text-[9px]',
-  xl: 'text-[11px]',
-  hero: 'text-[13px] md:text-[14px]',
+  xs: 'text-[6px]', sm: 'text-[7px]', md: 'text-[8px]', lg: 'text-[9px]', xl: 'text-[11px]', hero: 'text-[13px] md:text-[14px]',
 }
 
 export function FaceCloudLogo({
@@ -77,153 +77,74 @@ export function FaceCloudLogo({
   roleLabel,
   className,
   href,
+  priority = false,
   decorative = false,
   tone = 'dark',
 }: FaceCloudLogoProps) {
-
   const t = toneConfig[tone]
-  /* Gradient ids must be unique per instance: two logos of different tones on
-     one page would otherwise share a single <defs> and render the same colour. */
-  const uid = useId().replace(/:/g, '')
-  const cloudGradId = `fcCloud-${uid}`
-  const faceGradId = `fcFace-${uid}`
 
-  // Active variant determination
-  let activeVariant = variant
-  if (!showText && (variant === 'full' || variant === 'horizontal' || variant === 'icon' || variant === 'wordmark')) {
-    activeVariant = 'icon'
-  } else if (!showSubtitle && variant === 'full') {
-    activeVariant = 'horizontal'
-  }
+  // Which lockup to draw. The older 'light' / 'dark' names meant the horizontal lockup.
+  let lockup: Lockup = variant === 'light' || variant === 'dark' ? 'horizontal' : variant
+  if (!showText && lockup !== 'wordmark') lockup = 'icon'
+  const stacked = lockup === 'full'
+  const heightClass = stacked ? stackedHeights[size] : rowHeights[size]
+  const alt = decorative ? '' : lockup === 'icon' ? 'FaceCloud' : 'FaceCloud AI'
 
-  // Pure SVG icon representing FaceCloud (Cloud + Biometric Scan)
-  const renderSvgIcon = () => (
-    <svg
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={cn("object-contain h-full w-auto", sizeClasses[size])}
-      aria-hidden={decorative ? "true" : undefined}
-    >
-      <defs>
-        <linearGradient id={cloudGradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={t.cloudFrom} />
-          <stop offset="100%" stopColor={t.cloudTo} />
-        </linearGradient>
-        <linearGradient id={faceGradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={t.faceFrom} />
-          <stop offset="100%" stopColor={t.faceTo} />
-        </linearGradient>
-      </defs>
-      
-      {/* Cloud Outline */}
-      <path
-        d="M28.5 28.5A5.5 5.5 0 0 0 34 23c0-2.45-1.63-4.52-3.92-5.16A7.5 7.5 0 0 0 16.5 14.5c0 .43.04.86.12 1.28A5.5 5.5 0 0 0 11 21c0 2.68 1.95 4.9 4.58 5.38"
-        stroke={`url(#${cloudGradId})`}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+  const picture = (treatment: 'light' | 'dark', extra: string) => {
+    const a = ASSETS[lockup][treatment]
+    return (
+      <img
+        key={treatment}
+        src={a.src}
+        width={a.w}
+        height={a.h}
+        alt={alt}
+        aria-hidden={decorative ? 'true' : undefined}
+        draggable={false}
+        decoding="async"
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : undefined}
+        className={cn('block w-auto max-w-none select-none', heightClass, extra)}
       />
-      
-      {/* Face Scan Brackets */}
-      <path d="M12 16h-3v-3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <path d="M28 16h3v-3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <path d="M12 28h-3v3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
-      <path d="M28 28h3v3" stroke={`url(#${faceGradId})`} strokeWidth="2" strokeLinecap="round" />
-      
-      {/* Stylized Center Face Scan Target */}
-      <circle cx="20" cy="22" r="5" stroke={`url(#${faceGradId})`} strokeWidth="1.5" strokeDasharray="3 3" />
-      <path d="M20 14v16M12 22h16" stroke={`url(#${faceGradId})`} strokeWidth="1" strokeOpacity="0.4" />
-    </svg>
-  )
-
-  // Wordmark Text Component
-  const renderWordmark = () => (
-    <div className={cn(
-      "flex flex-col justify-center",
-      activeVariant === 'full' ? "items-center text-center mt-2.5" : "items-start ml-3"
-    )}>
-      <div className="flex items-baseline">
-        <span className={cn("font-extrabold tracking-tight", t.faceText, textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
-          Face
-        </span>
-        <span className={cn("font-medium tracking-tight", t.cloudText, textSizes[size])} style={{ fontFamily: "'Space Mono', monospace" }}>
-          Cloud
-        </span>
-      </div>
-      {showSubtitle && (
-        <span className={cn("font-bold tracking-[0.25em] uppercase font-mono", t.subText, subTextSizes[size])}>
-          AI Platform
-        </span>
-      )}
-    </div>
-  )
-
-  // Layout selection based on variant
-  const renderLayout = () => {
-    switch (activeVariant) {
-      case 'icon':
-        return renderSvgIcon()
-      case 'wordmark':
-        return renderWordmark()
-      case 'full':
-        return (
-          <div className="flex flex-col items-center justify-center">
-            {renderSvgIcon()}
-            {renderWordmark()}
-          </div>
-        )
-      case 'horizontal':
-      case 'light':
-      case 'dark':
-      default:
-        return (
-          <div className="flex items-center">
-            {renderSvgIcon()}
-            {renderWordmark()}
-          </div>
-        )
-    }
+    )
   }
+
+  /* On an always-dark surface only the dark treatment is drawn. Everywhere
+     else both are in the page and the stylesheet shows the one that matches
+     the appearance (see .fc-logo-on-light / .fc-logo-on-dark in index.css). */
+  const artwork = tone === 'dark'
+    ? picture('dark', '')
+    : [picture('light', 'fc-logo-on-light'), picture('dark', 'fc-logo-on-dark')]
 
   const innerContent = (
     <>
-      {renderLayout()}
+      {artwork}
+      {stacked && showSubtitle && (
+        <span className={cn('mt-2 font-bold tracking-[0.25em] uppercase font-mono', t.subText, subTextSizes[size])}>
+          AI Platform
+        </span>
+      )}
       {roleLabel && (
-        <span className={cn(
-          "block font-bold tracking-wider uppercase leading-none font-mono",
-          t.roleText,
-          activeVariant === 'full' ? "mt-2.5 text-[10px]" : "mt-1.5 text-[10px]"
-        )}>
+        <span className={cn('block font-bold tracking-wider uppercase leading-none font-mono text-[10px]', t.roleText, stacked ? 'mt-2.5' : 'mt-1.5')}>
           {roleLabel}
         </span>
       )}
     </>
   )
 
+  const layout = cn('inline-flex flex-col', stacked ? 'items-center text-center' : 'items-start', className)
+
   if (href) {
     return (
       <Link
         to={href}
-        className={cn(
-          "inline-flex flex-col focus-visible:outline-none focus-visible:ring-2 rounded-xl transition-all duration-300 hover:opacity-90",
-          t.ring,
-          activeVariant === 'full' ? "items-center" : "items-start",
-          className
-        )}
+        aria-label={decorative ? undefined : 'FaceCloud home'}
+        className={cn(layout, 'focus-visible:outline-none focus-visible:ring-2 rounded-xl transition-all duration-300 hover:opacity-90', t.ring)}
       >
         {innerContent}
       </Link>
     )
   }
 
-  return (
-    <div className={cn(
-      "inline-flex flex-col",
-      activeVariant === 'full' ? "items-center" : "items-start",
-      className
-    )}>
-      {innerContent}
-    </div>
-  )
+  return <div className={layout}>{innerContent}</div>
 }
