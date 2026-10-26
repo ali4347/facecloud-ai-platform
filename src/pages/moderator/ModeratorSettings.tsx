@@ -5,6 +5,7 @@ import { ShieldCheck, Mail, RefreshCw } from 'lucide-react'
 import { readSessionRaw } from '../../lib/session'
 import { USE_API } from '../../lib/api/config'
 import { LiveModeratorSettings } from './ModeratorSettingsLive'
+import { AccountSettings } from '../../components/auth/AccountSettings'
 
 /** The demo build's version: switches that save nothing. */
 function DemoModeratorSettings() {
@@ -107,11 +108,13 @@ function DemoModeratorSettings() {
         </div>
 
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AccountSettings role="moderator" />
+      </div>
     </div>
   )
 }
-
-/** Live backend: real notification switches and sessions. Demo build: the sample screen above. */
 export default function ModeratorSettings() {
   return USE_API ? <LiveModeratorSettings /> : <DemoModeratorSettings />
 }

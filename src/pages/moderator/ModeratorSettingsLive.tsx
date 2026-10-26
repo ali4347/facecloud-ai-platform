@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AlertTriangle, Loader2, Mail, RefreshCw, ShieldCheck, Monitor } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
+import { AccountSettings } from '../../components/auth/AccountSettings'
 import { listSessions, revokeSession, type UserSession } from '../../lib/api/account'
 import { getNotificationPreferences, updateNotificationPreferences, type NotificationPreferences } from '../../lib/api/notifications'
 import { getQueueAutoRefresh, setQueueAutoRefresh } from '../../lib/moderatorPrefs'
@@ -35,7 +36,7 @@ export function LiveModeratorSettings() {
   const switchClass = 'flex items-start gap-3 p-4 rounded-3xl bg-surface-mute border border-line cursor-pointer'
   return (
     <div className="space-y-6">
-      <PageHeader title="Moderator Settings" subtitle="How the queue and your notifications behave, and where you are signed in." />
+      <PageHeader title="Moderator Settings" subtitle="Your account, how the queue and your notifications behave, and where you are signed in." />
       {error && <p role="alert" className="p-3 rounded-2xl text-xs bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">{error}</p>}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -94,6 +95,10 @@ export function LiveModeratorSettings() {
             {sessions.data && sessions.data.length === 0 && <p className="text-xs text-ink-faint">No other sessions.</p>}
           </ChartCard>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AccountSettings role="moderator" />
       </div>
     </div>
   )

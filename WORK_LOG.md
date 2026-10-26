@@ -24,7 +24,7 @@ identity grouping into "person folders", secure downloads, plus admin and modera
 | Frontend SPA (React 19 + Vite 8 + TypeScript + Tailwind 3 + Framer Motion) | ✅ Complete prototype | All portals work on mock data + `localStorage`; no real API calls |
 | Public marketing site (Landing, About, Contact) | ✅ Live | Landing v2 design (2026-08-05 state); a v3 redesign attempt was discarded on 2026-09-17 |
 | User portal (16 routes under `/dashboard`) | ✅ Complete | Every screen runs on the live API (live webcam enhancement: a captured frame is stored and enhanced for real; the live preview itself is browser filters) when `VITE_USE_API=true`: upload (single, multiple, ZIP), processing, My Images, Person Folders, Downloads, Activity, Notifications (+ top-bar bell), top-bar search and Settings (name, password, sign-out-everywhere, notification switches). Profile extras, picture and a device list are built against backend PR #67 (fall back gracefully until it is merged) |
-| Admin console (10 routes under `/admin`, 2 pages deliberately unrouted) | ✅ Connected to the live API (2026-10-18) | Overview, Users, Moderators, Audit Logs, Security (acknowledge), System Monitoring, Upload Statistics, Rejection Summary, Image Monitoring read the backend behind `VITE_USE_API`; demo data otherwise |
+| Admin console (11 routes under `/admin`, 2 pages deliberately unrouted) | ✅ Connected to the live API (2026-10-18) | Overview, Users, Moderators, Audit Logs, Security (acknowledge), System Monitoring, Upload Statistics, Rejection Summary, Image Monitoring read the backend behind `VITE_USE_API`; demo data otherwise |
 | Moderator panel (11 routes under `/moderator`) | ✅ Complete | Dashboard and review queue run on the live API (deadlines, claim lock, bulk decisions, team performance, and the photo under review as a thumbnail); image review, members, batches, notifications, reports, audit and settings are still on mock data |
 | Branding + design system | ✅ Done | **2026-10-26: the app shell is the "Glassy Dashboard V2" look (room ground, frosted icon rail / top bar / scrolling bottom pill / stage / cards), approved by the owner.** Orange `#F97316` is the brand accent everywhere, in both appearances. The whole site — marketing pages, auth screens and the three dashboards — switches between dark (default) and light from one setting on `<html data-theme>`. Public pages keep the monospace display face and glass panels; the dashboards use a flatter card layout (`.fc-app`, Inter headings) |
 | SEO + analytics | ✅ Done | Meta/OG/Twitter tags, JSON-LD (Organization, FAQPage), robots.txt, sitemap.xml |
@@ -45,6 +45,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-26 — Account settings (name, password) for the administrator and the moderator
+*Status: committed (this commit).*
+
+- **Asked by the owner:** the admin and moderator dashboards had no profile settings; the administrator's account menu offered only Logout.
+- **New shared component** `src/components/auth/AccountSettings.tsx`: a Profile card (full name, saved through `PATCH /api/user/profile/` and reflected in the session) and a Password card (current / new / confirm, through `POST /api/user/change-password/`; on success the portal signs out to its own sign-in page with a notice, as the backend ends every session). Same endpoints the user portal's Settings already uses; they serve any signed-in account. In the demo build the name is kept in the session and the password form says it cannot change there.
+- **Administrator:** new page `src/pages/admin/AdminSettings.tsx` at `/admin/settings`, a "Settings" entry at the end of the admin navigation (rail, drawer and bottom pill), and the account menu's Settings row now exists for the admin too (`UserMenu.tsx`).
+- **Moderator:** the two cards join the existing `/moderator/settings` page (live and demo), below the preferences and the device list.
+- **Verified:** `npx tsc -b`, both builds; on the local server: the admin page renders; a name saved there comes back from `/api/user/profile/` and appears in the top bar at once; a wrong current password is refused in words on the page; the account menu offers Settings and Logout; the moderator page shows the two cards; no console errors.
 
 ### 2026-10-26 — The approved FaceCloud logo everywhere (assets cut from the approved files; nothing redrawn)
 *Status: committed (this commit).*

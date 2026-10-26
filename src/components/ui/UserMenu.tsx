@@ -26,9 +26,9 @@ const avatarColor: Record<Role, string> = {
   moderator: '#10B981',
 }
 
-/** Admin has no settings page, so the row only appears where it leads somewhere. */
-const settingsPath: Partial<Record<Role, string>> = {
+const settingsPath: Record<Role, string> = {
   user:      '/dashboard/settings',
+  admin:     '/admin/settings',
   moderator: '/moderator/settings',
 }
 

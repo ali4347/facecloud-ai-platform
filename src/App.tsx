@@ -63,6 +63,7 @@ import ReviewQueue from './pages/moderator/ReviewQueue'
 import ModeratorImageReview from './pages/moderator/ModeratorImageReview'
 import ModeratorAudit from './pages/moderator/ModeratorAudit'
 import ModeratorSettings from './pages/moderator/ModeratorSettings'
+import AdminSettings from './pages/admin/AdminSettings'
 import MemberManagement from './pages/moderator/MemberManagement'
 import BatchManagement from './pages/moderator/BatchManagement'
 import NotificationCenter from './pages/moderator/NotificationCenter'
@@ -137,6 +138,7 @@ export default function App() {
         >
           <Route index element={<AdminOverview />} />
           <Route path="statistics" element={<Statistics />} />
+          <Route path="settings" element={<AdminSettings />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="security" element={<Security />} />

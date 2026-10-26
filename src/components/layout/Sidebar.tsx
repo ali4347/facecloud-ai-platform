@@ -45,6 +45,7 @@ const adminNav = [
   { label: 'Upload Statistics',  icon: BarChart3,        to: '/admin/upload-statistics' },
   { label: 'Rejection Summary',  icon: AlertCircle,      to: '/admin/rejection-summary' },
   { label: 'Image Monitoring',   icon: Images,           to: '/admin/images' },
+  { label: 'Settings',           icon: Settings,         to: '/admin/settings' },
 ]
 
 const moderatorNav = [

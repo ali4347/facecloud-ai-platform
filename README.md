@@ -181,6 +181,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/admin/upload-statistics` (Photos received by route, daily intake, average file size)
 * `/admin/rejection-summary` (Rejected photos, rejection rate, the reasons behind them, daily rejections)
 * `/admin/images` (Every uploaded photo with its quality result, preview and a details panel)
+* `/admin/settings` (The administrator's own account: name and password; also reached from the account menu at the foot of the rail)
 * `/admin/logs` (Redirects to `/admin/audit-logs`)
 * Top bar (admin): search jumps to a screen or finds an account (opens Manage Users filtered to it); the bell lists open security alerts and services that are not operational.
 
@@ -198,7 +199,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/moderator/reports` (Make and download a report about your organization)
 * `/moderator/logs` (Decision Log: the latest decisions about photos, with today's counts; the full trail is Audit)
 * `/moderator/audit` (The organization's audit trail: who did what, searchable)
-* `/moderator/settings` (Notification switches, queue auto-refresh, and where you are signed in)
+* `/moderator/settings` (Notification switches, queue auto-refresh, where you are signed in, and the account's name and password)
 
 All of these read the live API when `VITE_USE_API=true` and keep their demo data otherwise. A moderator only ever sees photos that a member **submitted to the team**: on the upload pages, a person who belongs to a team can choose "Submit to: My workspace / <team>" (the default is their own workspace).
 
