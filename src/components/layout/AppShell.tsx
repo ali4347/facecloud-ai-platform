@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
+import { FloatingNav } from './FloatingNav'
 import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { NoOrganizationGuard } from '../moderator/NoOrganizationGuard'
 import { useAppearance } from '../../lib/theme'
@@ -54,6 +55,17 @@ export function AppShell({ role }: AppShellProps) {
 
   return (
     <div className="fc-app min-h-screen relative">
+      {/* The ground: a warm wash and three slow blobs behind everything */}
+      <div className="fc-backdrop" aria-hidden="true">
+        <span className="fc-shape fc-shape-left" />
+        <span className="fc-shape fc-shape-right" />
+        <span className="fc-shape fc-shape-shelf" />
+        <span className="fc-shape fc-shape-floor" />
+        <span className="fc-blob fc-blob-1" />
+        <span className="fc-blob fc-blob-2" />
+        <span className="fc-blob fc-blob-3" />
+      </div>
+
       {/* Sidebar */}
       <Sidebar role={role} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -68,7 +80,7 @@ export function AppShell({ role }: AppShellProps) {
       )}
 
       {/* Main content */}
-      <div className="lg:pl-[280px] flex flex-col min-h-screen relative z-10">
+      <div className="flex flex-col min-h-screen relative z-10">
         <Topbar
           role={role}
           sidebarOpen={sidebarOpen}
@@ -77,12 +89,17 @@ export function AppShell({ role }: AppShellProps) {
           appearance={appearance}
           onToggleAppearance={toggleAppearance}
         />
-        <main className="flex-1 px-4 sm:px-6 lg:px-7 py-6 page-enter">
-          <ErrorBoundary key={location.pathname}>
-            {role === 'moderator' ? <NoOrganizationGuard><Outlet /></NoOrganizationGuard> : <Outlet />}
-          </ErrorBoundary>
+        <main className="flex-1 px-3 sm:px-5 lg:pl-[60px] lg:pr-6 pt-4 pb-28">
+          {/* One glass sheet holds the page; the floating pill below needs the extra bottom room. */}
+          <div className="fc-stage page-enter">
+            <ErrorBoundary key={location.pathname}>
+              {role === 'moderator' ? <NoOrganizationGuard><Outlet /></NoOrganizationGuard> : <Outlet />}
+            </ErrorBoundary>
+          </div>
         </main>
       </div>
+
+      <FloatingNav role={role} />
     </div>
   )
 }

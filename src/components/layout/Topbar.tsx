@@ -2,10 +2,12 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Menu, History, Sun, Moon } from 'lucide-react'
 import { NotificationDropdown } from '../ui/NotificationDropdown'
+import { Avatar } from '../ui/Avatar'
 import { GlobalSearch } from './GlobalSearch'
 import { AdminSearch } from './AdminSearch'
 import { useSessionUser } from '../../lib/session'
 import { useServerAvatar } from '../../lib/useServerAvatar'
+import { useModeratorOrganization } from '../../lib/moderationData'
 import { USE_API } from '../../lib/api/config'
 import type { Appearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
@@ -30,8 +32,10 @@ const activityPath: Record<Role, string> = {
 
 export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appearance = 'dark', onToggleAppearance }: TopbarProps) {
   /* The picture lives on the account in API mode, so another device's picture shows here too. */
-  const accountEmail = useSessionUser(role).email
-  useServerAvatar(accountEmail, USE_API && role === 'user')
+  const account = useSessionUser(role)
+  useServerAvatar(account.email, USE_API && role === 'user')
+  /* A moderator works for one team; its name stays in view beside the greeting. */
+  const { team } = useModeratorOrganization(role === 'moderator')
   const searchRef = useRef<HTMLInputElement>(null)
 
   /* ⌘K / Ctrl+K focuses search — the shortcut the chip in the field advertises. */
@@ -47,7 +51,7 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appeara
   }, [])
 
   return (
-    <header className="sticky top-0 z-30 h-[72px] flex items-center gap-3 px-4 sm:px-6 lg:px-7 bg-surface-soft/90 backdrop-blur-md">
+    <header className="sticky top-3 z-30 mx-3 sm:mx-5 lg:mx-6 h-14 flex items-center gap-2 sm:gap-3 pl-2.5 pr-2.5 sm:pl-3 sm:pr-3 rounded-full fc-glass-bar">
       {/* Mobile menu toggle */}
       <button
         onClick={onMenuClick}
@@ -58,14 +62,23 @@ export function Topbar({ role, onMenuClick, sidebarOpen, onCloseSidebar, appeara
         <Menu className="w-[18px] h-[18px]" />
       </button>
 
-      {/* Search */}
-      <div className="flex-1 max-w-[460px]">
+      {/* Who is signed in. The menu itself lives in the sidebar; this only greets. */}
+      <div className="hidden lg:flex items-center gap-2.5 pl-1 flex-shrink-0 max-w-[320px]">
+        <Avatar email={account.email} initials={account.initials} size={34} />
+        <p className="text-[14px] font-semibold text-ink leading-tight truncate">Welcome, {account.name.split(' ')[0]}</p>
+        {role === 'moderator' && team && (
+          <span className="ml-1 px-2.5 py-1 rounded-full fc-tile text-[11px] font-semibold text-ink-soft truncate" style={team.accent ? { borderColor: team.accent } : undefined}>
+            {team.brandName}
+          </span>
+        )}
+      </div>
+
+      {/* Search: takes the middle of the bar, centred between its neighbours */}
+      <div className="flex-1 min-w-0 max-w-[460px] mx-auto">
         {role === 'admin'
           ? <AdminSearch inputRef={searchRef} />
           : <GlobalSearch role={role} inputRef={searchRef} />}
       </div>
-
-      <div className="flex-1" />
 
       {/* Right actions */}
       <div className="flex items-center gap-2">

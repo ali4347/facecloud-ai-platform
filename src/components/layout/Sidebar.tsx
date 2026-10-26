@@ -61,7 +61,7 @@ const moderatorNav = [
   { label: 'Settings',             icon: Settings,        to: '/moderator/settings' },
 ]
 
-const navByRole = { user: userNav, admin: adminNav, moderator: moderatorNav }
+export const navByRole = { user: userNav, admin: adminNav, moderator: moderatorNav }
 
 const roleConfig = {
   user: {
@@ -108,123 +108,139 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     }
   }, [location.pathname])
 
+  const isCurrent = (to: string) =>
+    to === '/dashboard' || to === '/admin' || to === '/moderator' ? location.pathname === to : location.pathname.startsWith(to)
+  const isHome = (to: string) => to === '/admin' || to === '/dashboard' || to === '/moderator'
+  const closeOnPhone = () => { if (window.innerWidth < 1024 && onClose) onClose() }
+
   return (
     <aside
       className={cn(
-        'fixed top-0 bottom-0 left-0 w-[280px] z-50 flex flex-col gap-3 p-3',
-        'bg-surface-soft overflow-y-auto',
+        'fc-sidebar fixed z-50 flex flex-col',
+        'top-0 bottom-0 left-0 w-[288px] overflow-y-auto',
+        'lg:top-[84px] lg:bottom-[88px] lg:left-3 lg:w-[62px] lg:overflow-visible',
         'transform transition-transform duration-300 ease-out lg:translate-x-0',
         isOpen ? 'translate-x-0' : '-translate-x-full'
       )}
     >
-      {/* ── Brand card ─────────────────────────────────────────────── */}
-      <div className="bg-surface border border-line rounded-[18px] shadow-soft px-4 py-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <FaceCloudLogo
-            variant="horizontal"
-            size="sm"
-            tone="app"
-            showSubtitle={false}
-            href={roleHome[role]}
-            priority={true}
-          />
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="lg:hidden p-1.5 rounded-lg text-ink-faint hover:bg-surface-mute hover:text-ink transition-colors cursor-pointer"
-              type="button"
-              aria-label="Close sidebar"
+      {/* ── Desk: an icon rail. The brand mark on top, the account at the foot. ── */}
+      <div className="fc-rail hidden lg:flex flex-col items-center gap-1 px-2.5 py-2.5">
+        <FaceCloudLogo variant="icon" size="sm" tone="app" showText={false} showSubtitle={false} href={roleHome[role]} priority={true} />
+        <div className="w-6 border-t border-line/60 my-2" />
+        {nav.map(item => {
+          const active = isCurrent(item.to)
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={isHome(item.to)}
+              aria-label={item.label}
+              data-tip={item.label}
+              className={cn('fc-rail-item', active && 'fc-rail-item-active')}
             >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        <div className="mt-3 pt-3 border-t border-line-soft">
-          {role === 'moderator' && team ? (
-            <div className="flex items-center gap-2.5" style={team.accent ? { borderLeft: `3px solid ${team.accent}`, paddingLeft: 10 } : undefined}>
-              {team.logoUrl && <AuthedImage load={signal => getOrgLogoBlob(team.logoUrl as string, signal)} cacheKey={`team-logo-${team.id}-${team.logoUrl}`} alt="" box={28} rounded="rounded-lg" className="object-contain !border-0" />}
-              <div className="min-w-0"><p className="text-[13px] font-semibold text-ink leading-tight truncate">{team.brandName}</p><p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.label}</p></div>
-            </div>
-          ) : (
-            <>
-              <p className="text-[13px] font-semibold text-ink leading-tight">{cfg.label}</p>
-              <p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.tagline}</p>
-            </>
-          )}
-        </div>
+              <item.icon className="w-[19px] h-[19px]" aria-hidden="true" />
+            </NavLink>
+          )
+        })}
+        <div className="w-6 border-t border-line/60 my-2" />
+        <UserMenu role={role} compact />
       </div>
 
-      {/* ── Navigation card ────────────────────────────────────────── */}
-      <nav className="bg-surface border border-line rounded-[18px] shadow-soft p-2.5">
-        <p className="px-2.5 pt-1 pb-2.5 text-[11px] font-medium text-ink-faint tracking-wide">
-          {cfg.navLabel}
-        </p>
-        <div className="flex flex-col gap-0.5">
-          {nav.map(item => {
-            const isActive =
-              item.to === '/dashboard' || item.to === '/admin' || item.to === '/moderator'
-                ? location.pathname === item.to
-                : location.pathname.startsWith(item.to)
-
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                // The portal's home link must not count as "current" on every page below it.
-                end={item.to === '/admin' || item.to === '/dashboard' || item.to === '/moderator'}
-                onClick={() => {
-                  if (window.innerWidth < 1024 && onClose) onClose()
-                }}
-                className={cn(
-                  'group flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200 cursor-pointer',
-                  isActive
-                    ? 'bg-surface border border-line text-ink font-semibold shadow-pill'
-                    : 'text-ink-mute font-medium border border-transparent hover:bg-surface-mute hover:text-ink'
-                )}
+      {/* ── Phone: the drawer, with names ─────────────────────────────────── */}
+      <div className="lg:hidden flex flex-col flex-1">
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-center justify-between gap-2">
+            <FaceCloudLogo
+              variant="horizontal"
+              size="sm"
+              tone="app"
+              showSubtitle={false}
+              href={roleHome[role]}
+              priority={true}
+            />
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="fc-icon-btn !w-8 !h-8"
+                type="button"
+                aria-label="Close sidebar"
               >
-                <item.icon
-                  className={cn(
-                    'w-[17px] h-[17px] flex-shrink-0 transition-colors',
-                    isActive ? 'text-accent' : 'text-ink-faint group-hover:text-ink-mute'
-                  )}
-                />
-                <span className="flex-1 truncate">{item.label}</span>
-                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />}
-              </NavLink>
-            )
-          })}
-        </div>
-      </nav>
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
-      {/* ── Storage card ───────────────────────────────────────────
-           Replaces a card that named the enhancement model. Which model runs
-           is an implementation detail; how much room is taken is not.
-
-           There is no plan or quota in the system, so none is drawn: a bar
-           against a limit nothing enforces would be a made-up number, and the
-           previous "312 MB of 500 MB" was exactly that. What is shown is what
-           the backend can actually answer — how much has been stored. */}
-      {role === 'user' && summary && (
-        <div className="bg-surface border border-line rounded-[18px] shadow-soft p-3.5">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center flex-shrink-0">
-              <HardDrive className="w-4 h-4 text-accent" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-ink leading-none">
-                {formatBytes(summary.storage_bytes)} stored
-              </p>
-              <p className="text-[11px] text-ink-mute mt-1 leading-none">
-                {summary.total_images} photo{summary.total_images === 1 ? '' : 's'}
-              </p>
-            </div>
+          <div className="mt-3 pt-3 border-t border-line/60">
+            {role === 'moderator' && team ? (
+              <div className="flex items-center gap-2.5" style={team.accent ? { borderLeft: `3px solid ${team.accent}`, paddingLeft: 10 } : undefined}>
+                {team.logoUrl && <AuthedImage load={signal => getOrgLogoBlob(team.logoUrl as string, signal)} cacheKey={`team-logo-${team.id}-${team.logoUrl}`} alt="" box={28} rounded="rounded-lg" className="object-contain !border-0" />}
+                <div className="min-w-0"><p className="text-[13px] font-semibold text-ink leading-tight truncate">{team.brandName}</p><p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.label}</p></div>
+              </div>
+            ) : (
+              <>
+                <p className="text-[13px] font-semibold text-ink leading-tight">{cfg.label}</p>
+                <p className="text-[11px] text-ink-mute leading-snug mt-0.5">{cfg.tagline}</p>
+              </>
+            )}
           </div>
         </div>
-      )}
 
-      {/* ── Account menu ────────────────────────────────────────── */}
-      <UserMenu role={role} />
+        <nav className="flex-1 px-3 py-1">
+          <p className="px-3 pt-1 pb-2 text-[11px] font-medium text-ink-faint tracking-wide">
+            {cfg.navLabel}
+          </p>
+          <div className="flex flex-col gap-0.5">
+            {nav.map(item => {
+              const active = isCurrent(item.to)
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  // The portal's home link must not count as "current" on every page below it.
+                  end={isHome(item.to)}
+                  onClick={closeOnPhone}
+                  className={cn('group fc-nav-item', active && 'fc-nav-item-active')}
+                >
+                  <item.icon
+                    className={cn(
+                      'w-[17px] h-[17px] flex-shrink-0 transition-colors',
+                      active ? 'text-accent' : 'text-ink-faint group-hover:text-ink-mute'
+                    )}
+                  />
+                  <span className="flex-1 truncate">{item.label}</span>
+                  {active && <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />}
+                </NavLink>
+              )
+            })}
+          </div>
+        </nav>
+
+        {/* Storage: what the backend can actually answer — how much has been stored. There is no plan
+            or quota in the system, so no bar against a limit is drawn. */}
+        {role === 'user' && summary && (
+          <div className="px-3 pb-2">
+            <div className="fc-tile rounded-[18px] p-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center flex-shrink-0">
+                  <HardDrive className="w-4 h-4 text-accent" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-ink leading-none">
+                    {formatBytes(summary.storage_bytes)} stored
+                  </p>
+                  <p className="text-[11px] text-ink-mute mt-1 leading-none">
+                    {summary.total_images} photo{summary.total_images === 1 ? '' : 's'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="px-3 pb-3 mt-auto">
+          <UserMenu role={role} />
+        </div>
+      </div>
     </aside>
   )
 }

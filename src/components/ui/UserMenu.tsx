@@ -10,6 +10,8 @@ import { USE_API } from '../../lib/api/config'
 
 interface UserMenuProps {
   role: Role
+  /** The rail's form: only the avatar, with the menu opening to its right. */
+  compact?: boolean
 }
 
 const roleBadge: Record<Role, { bg: string; border: string; color: string }> = {
@@ -43,7 +45,7 @@ const loginPath: Record<Role, string> = {
  * carried a second copy of the same details and a second menu; one of the two
  * had to be kept in step with the other, and they had already drifted.
  */
-export function UserMenu({ role }: UserMenuProps) {
+export function UserMenu({ role, compact = false }: UserMenuProps) {
   const account = useSessionUser(role)
   const badge = roleBadge[role]
   const settingsTo = settingsPath[role]
@@ -108,14 +110,15 @@ export function UserMenu({ role }: UserMenuProps) {
   }
 
   return (
-    <div className="relative mt-auto">
+    <div className={compact ? 'relative' : 'relative mt-auto'}>
       {open && (
         <div
           ref={panelRef}
           role="menu"
           aria-labelledby="user-menu-btn"
-          className="absolute bottom-full left-0 right-0 mb-2 z-50 rounded-2xl overflow-hidden
-                     bg-surface border border-line shadow-soft-lg"
+          className={compact
+            ? 'absolute bottom-0 left-full ml-3 w-64 z-50 rounded-2xl overflow-hidden fc-popover border'
+            : 'absolute bottom-full left-0 right-0 mb-2 z-50 rounded-2xl overflow-hidden fc-popover border'}
         >
           <div className="px-4 py-4 border-b border-line-soft">
             <div className="flex items-center gap-3">
@@ -159,6 +162,21 @@ export function UserMenu({ role }: UserMenuProps) {
         </div>
       )}
 
+      {compact ? (
+        <button
+          ref={btnRef}
+          id="user-menu-btn"
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={open}
+          aria-haspopup="menu"
+          aria-label={`${account.name}: account menu`}
+          title={account.name}
+          className="fc-rail-item !w-auto !h-auto p-0.5 cursor-pointer"
+        >
+          <Avatar email={account.email} initials={account.initials} size={36} fallbackColor={avatarColor[role]} />
+        </button>
+      ) : (
       <button
         ref={btnRef}
         id="user-menu-btn"
@@ -166,8 +184,7 @@ export function UserMenu({ role }: UserMenuProps) {
         onClick={handleToggle}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="w-full bg-surface border border-line rounded-[18px] shadow-soft p-3 text-left
-                   hover:border-line-strong transition-colors cursor-pointer"
+        className="w-full fc-tile rounded-[18px] p-3 text-left hover:border-line-strong transition-colors cursor-pointer"
       >
         <div className="flex items-center gap-2.5">
           <Avatar email={account.email} initials={account.initials} size={36} fallbackColor={avatarColor[role]} />
@@ -182,6 +199,7 @@ export function UserMenu({ role }: UserMenuProps) {
           />
         </div>
       </button>
+      )}
     </div>
   )
 }

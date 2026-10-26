@@ -11,9 +11,8 @@ import type { Role } from '../../data/mock'
 interface Option { key: string; to: string }
 
 const fieldClass =
-  'w-full h-11 pl-10 pr-16 rounded-[14px] bg-surface border border-line text-[13px] text-ink ' +
-  'placeholder:text-ink-faint shadow-[0_1px_2px_rgb(var(--a-shadow-rgb) / 0.45)] outline-none ' +
-  'transition-colors focus:border-accent-soft'
+  'fc-field w-full h-10 pl-10 pr-16 !rounded-full text-[13px] text-ink ' +
+  'placeholder:text-ink-faint outline-none transition-colors'
 
 /**
  * The top-bar search.
@@ -109,7 +108,7 @@ export function GlobalSearch({ role, inputRef }: { role: Role; inputRef: React.R
 
       {live && open && text.length > 0 && (
         <div id={listId} role="listbox"
-          className="absolute left-0 right-0 top-[52px] z-50 rounded-2xl bg-surface border border-line shadow-soft-lg overflow-hidden max-h-[70vh] overflow-y-auto p-2">
+          className="absolute left-0 right-0 top-[52px] z-50 rounded-2xl fc-popover border overflow-hidden max-h-[70vh] overflow-y-auto p-2">
           {!ready && <p className="px-3 py-4 text-[12px] text-ink-faint">Type at least {SEARCH_MIN_LENGTH} characters to search.</p>}
           {ready && loading && !results && (
             <p className="px-3 py-4 text-[12px] text-ink-faint flex items-center gap-2"><Loader2 className="w-3.5 h-3.5 animate-spin" />Searching…</p>

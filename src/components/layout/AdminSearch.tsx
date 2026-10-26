@@ -23,9 +23,8 @@ const PAGES = [
 interface Option { key: string; to: string }
 
 const fieldClass =
-  'w-full h-11 pl-10 pr-16 rounded-[14px] bg-surface border border-line text-[13px] text-ink ' +
-  'placeholder:text-ink-faint shadow-[0_1px_2px_rgb(var(--a-shadow-rgb) / 0.45)] outline-none ' +
-  'transition-colors focus:border-accent-soft'
+  'fc-field w-full h-10 pl-10 pr-16 !rounded-full text-[13px] text-ink ' +
+  'placeholder:text-ink-faint outline-none transition-colors'
 
 /**
  * The administrator's top-bar search: it jumps to an admin screen by name, and (against the live API) finds an account
@@ -118,7 +117,7 @@ export function AdminSearch({ inputRef }: { inputRef: React.RefObject<HTMLInputE
 
       {open && text.length > 0 && (
         <div id={listId} role="listbox"
-          className="absolute left-0 right-0 top-[52px] z-50 rounded-2xl bg-surface border border-line shadow-soft-lg overflow-hidden max-h-[70vh] overflow-y-auto p-2">
+          className="absolute left-0 right-0 top-[52px] z-50 rounded-2xl fc-popover border overflow-hidden max-h-[70vh] overflow-y-auto p-2">
           {pages.length > 0 && (
             <div className="mb-1">
               <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-ink-faint">Screens</p>

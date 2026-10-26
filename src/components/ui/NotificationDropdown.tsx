@@ -152,7 +152,7 @@ export function NotificationDropdown({ onOpen, sidebarOpen, role }: Notification
           id="dashboard-notification-panel"
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 top-12 z-50 w-80 rounded-2xl overflow-hidden bg-surface border border-line shadow-soft-lg"
+          className="absolute right-0 top-12 z-50 w-80 rounded-2xl overflow-hidden fc-popover border"
           style={{ animation: 'dropdownFadeIn 0.18s ease-out both' }}
         >
           {/* Header */}

@@ -61,7 +61,7 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 * **Typography**: Primary display headings (`h1`, `h2`, `h3`) utilize `Space Mono` (Google Fonts). Small numbered section indicators utilize `Silkscreen` (Google Fonts). Body copy continues using `Inter`.
 * **Visual Effects**: Micro-animations on buttons and cards using Framer Motion, dynamic hover transitions, and pulse glows on status badges.
 * **Landing Page**: The FaceCloud hero uses a seamless ping-pong playback sequence. The original CloudFront video plays forward, followed by a locally generated reversed MP4, avoiding the abrupt restart produced by native video looping. Features a "live systems" data-ops aesthetic with status badges, terminal-style logs, live pipeline cards, and animated percentage indicators.
-* **Responsive Layouts**: Multi-device sidebars that automatically collapse on mobile screens with responsive top header bars.
+* **Responsive Layouts**: a "glassy" shell — a floating icon rail on the left (each icon names itself on hover; a labelled drawer on phones), a floating top bar, a floating bottom navigation pill with every section by name (scrolling sideways), and one glass stage sheet that holds each page — on a warm, softly lit "room" ground, in both the dark and the light appearance.
 
 ### Landing Page Sections (in order)
 1. **Fullscreen Video Hero** — CloudFront MP4 background video with seamless ping-pong forward/reverse loop and desktop mouse parallax, staggered headline animation with `<ScrambleText>` decodes and orange highlight blocks, inline email waitlist capture, pill badge pop-in.

@@ -584,19 +584,25 @@ section[id] {
 }
 
 
-
-
 /* ═══════════════════════════════════════════════════════════════════════
    DASHBOARD THEME  —  scope: .fc-app (the authenticated AppShell)
 
-   The portals use the same black / orange palette as the public marketing
-   pages, but keep the flat, card-based layout of the app shell rather than the
-   marketing site's heavy glass. Scoped so the shared component classes
-   (.fc-card, .fc-input, .fc-btn-*, .fc-table, .badge-*) resolve to the app's
-   own surfaces without any dashboard page restyling itself.
+   "Glassy" skin. The page is a warm, softly lit ground (a gradient wash with
+   three slow blurred blobs); everything on it is frosted glass: the floating
+   sidebar, the floating top bar, the floating bottom navigation, one large
+   stage sheet that holds the page, and the cards inside it. Orange stays the
+   only accent in both appearances.
 
-   Orange #F97316 is reserved for action, active state and focus; everything
-   else is carried by white at four opacities on a near-black card.
+   How it reaches every page without touching them: the shared component
+   classes (.fc-card, .fc-input, .fc-btn-*, .fc-table, .badge-*) and the
+   surface utilities the pages already use (bg-surface, bg-surface-mute…) are
+   re-coloured here, scoped to .fc-app. The pages keep their markup and logic.
+
+   Blur is spent carefully: only the chrome that sharp content scrolls under
+   (sidebar, top bar, bottom nav, popovers, dialogs) uses backdrop-filter. The
+   stage and the cards are translucent without blur — the ground behind them is
+   already soft, and a backdrop-filter would make each card the containing
+   block of any position:fixed dialog rendered inside it.
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -608,32 +614,30 @@ section[id] {
    (bg-accent/20, text-ink-mute/60).
 
    Orange is the accent in BOTH appearances — it is the brand colour, not a
-   dark-mode affordance. Only neutrals, shadows and status tints differ.
+   dark-mode affordance. Neutrals are warm (a touch of brown) so the glass
+   reads like frosted glass in a lit room rather than grey plastic.
    ═══════════════════════════════════════════════════════════════════════ */
 
 :root {
 
-  /* Channel triples, so Tailwind's opacity modifiers keep working.
-     Dark is the default appearance; the light block below only redefines
-     these same names, which is why no component needs a second set of rules. */
-  --a-surface:      14 15 18;      /* cards */
-  --a-surface-soft:  0  0  0;      /* page */
-  --a-surface-mute: 22 24 28;      /* inset fills, tracks */
-  --a-surface-sunk: 28 31 36;      /* pressed / deep inset */
+  --a-surface:      26 22 19;      /* opaque fallback for cards */
+  --a-surface-soft: 14 11 10;      /* page ground */
+  --a-surface-mute: 36 31 27;      /* inset fills, tracks */
+  --a-surface-sunk: 46 40 35;      /* pressed / deep inset */
 
-  --a-ink:       255 255 255;
-  --a-ink-soft:  190 194 201;
-  --a-ink-mute:  143 147 155;
-  --a-ink-faint: 106 110 118;
+  --a-ink:       250 247 243;
+  --a-ink-soft:  208 200 192;
+  --a-ink-mute:  160 150 140;
+  --a-ink-faint: 120 110 102;
 
-  --a-line:         38 40 45;
-  --a-line-soft:    26 28 32;
-  --a-line-strong:  58 61 68;
+  --a-line:         54 47 42;
+  --a-line-soft:    42 36 32;
+  --a-line-strong:  78 68 60;
 
   --a-accent:      249 115 22;
   --a-accent-soft: 251 146 60;
   --a-accent-deep: 234  88 12;
-  --a-accent-tint:  43  26 14;
+  --a-accent-tint:  58  34 18;
 
   --a-shadow-rgb: 0 0 0;
   --a-shadow:      0 1px 2px rgb(var(--a-shadow-rgb) / 0.40), 0 8px 24px rgb(var(--a-shadow-rgb) / 0.35);
@@ -644,6 +648,35 @@ section[id] {
   --a-success: #10B981;
   --a-warning: #F59E0B;
   --a-danger:  #EF4444;
+
+  /* Glass: the ground, the sheets on it, and their edges. */
+  --g-ground:
+    radial-gradient(55% 45% at 50% 24%, rgba(255,205,160,0.12), transparent 70%),
+    radial-gradient(40% 35% at 10% 8%,  rgba(249,115,22,0.16), transparent 70%),
+    linear-gradient(180deg, #19140F 0%, #15100C 55%, #0E0A08 100%);
+  --g-blob-1: rgba(255,200,150,0.10);
+  --g-blob-2: rgba(249,115,22,0.16);
+  --g-blob-3: rgba(120,85,62,0.45);
+  --g-wood:   rgba(74,50,36,0.85);
+  --g-floor:  rgba(52,35,24,0.95);
+  --g-stage:        rgba(255,255,255,0.035);
+  --g-panel:        rgba(255,255,255,0.060);
+  --g-panel-hover:  rgba(255,255,255,0.085);
+  --g-tile:         rgba(255,255,255,0.055);
+  --g-tile-hover:   rgba(255,255,255,0.095);
+  --g-tile-strong:  rgba(255,255,255,0.085);
+  --g-bar:          rgba(30,26,23,0.66);
+  --g-strong:       rgba(34,29,26,0.88);
+  --g-border:        rgba(255,255,255,0.10);
+  --g-border-strong: rgba(255,255,255,0.18);
+  --g-highlight:     rgba(255,255,255,0.07);
+  --g-line:          rgba(255,255,255,0.08);
+  --g-input:         rgba(255,255,255,0.06);
+  --g-input-border:  rgba(255,255,255,0.13);
+  --g-nav-active:    rgba(255,255,255,0.11);
+  --g-blur:          blur(24px) saturate(150%);
+  --g-shadow:        0 1px 2px rgba(0,0,0,0.30), 0 14px 40px rgba(0,0,0,0.32);
+  --g-shadow-float:  0 2px 4px rgba(0,0,0,0.35), 0 20px 60px rgba(0,0,0,0.50);
 
   /* Marketing-page surfaces. The public pages keep their glass treatment, so
      these are full colour values rather than channel triples. */
@@ -669,33 +702,61 @@ section[id] {
 html[data-theme='light'] {
 
   --a-surface:      255 255 255;
-  --a-surface-soft: 247 248 250;
-  --a-surface-mute: 241 243 247;
-  --a-surface-sunk: 233 236 242;
+  --a-surface-soft: 243 236 228;
+  --a-surface-mute: 247 242 236;
+  --a-surface-sunk: 238 231 223;
 
-  --a-ink:        15  23  42;
-  --a-ink-soft:   51  65  85;
-  --a-ink-mute:  100 116 139;
-  --a-ink-faint: 148 163 184;
+  --a-ink:        30  24  20;
+  --a-ink-soft:   70  60  54;
+  --a-ink-mute:  122 110 100;
+  --a-ink-faint: 162 150 140;
 
-  --a-line:        230 233 239;
-  --a-line-soft:   240 242 246;
-  --a-line-strong: 214 219 228;
+  --a-line:        232 224 214;
+  --a-line-soft:   240 234 226;
+  --a-line-strong: 216 206 194;
 
   --a-accent:      234  88 12;   /* deeper orange: #F97316 on white is thin */
   --a-accent-soft: 249 115 22;
   --a-accent-deep: 194  65 12;
   --a-accent-tint: 255 237 213;
 
-  --a-shadow-rgb: 15 23 42;
-  --a-shadow:      0 1px 2px rgb(var(--a-shadow-rgb) / 0.04), 0 8px 24px rgb(var(--a-shadow-rgb) / 0.05);
-  --a-shadow-md:   0 1px 2px rgb(var(--a-shadow-rgb) / 0.05), 0 12px 32px rgb(var(--a-shadow-rgb) / 0.07);
-  --a-shadow-lg:   0 2px 4px rgb(var(--a-shadow-rgb) / 0.05), 0 20px 48px rgb(var(--a-shadow-rgb) / 0.09);
-  --a-shadow-pill: 0 1px 2px rgb(var(--a-shadow-rgb) / 0.06), 0 4px 12px rgb(var(--a-shadow-rgb) / 0.06);
+  --a-shadow-rgb: 70 45 20;
+  --a-shadow:      0 1px 2px rgb(var(--a-shadow-rgb) / 0.05), 0 8px 24px rgb(var(--a-shadow-rgb) / 0.07);
+  --a-shadow-md:   0 1px 2px rgb(var(--a-shadow-rgb) / 0.06), 0 12px 32px rgb(var(--a-shadow-rgb) / 0.10);
+  --a-shadow-lg:   0 2px 4px rgb(var(--a-shadow-rgb) / 0.06), 0 20px 48px rgb(var(--a-shadow-rgb) / 0.13);
+  --a-shadow-pill: 0 1px 2px rgb(var(--a-shadow-rgb) / 0.07), 0 4px 12px rgb(var(--a-shadow-rgb) / 0.08);
 
   --a-success: #047857;
   --a-warning: #B45309;
   --a-danger:  #B91C1C;
+
+  --g-ground:
+    radial-gradient(55% 45% at 50% 24%, rgba(255,250,243,0.95), transparent 70%),
+    radial-gradient(40% 35% at 10% 8%,  rgba(255,226,196,0.60), transparent 70%),
+    linear-gradient(180deg, #EFE6DA 0%, #E6D7C5 45%, #CDAE90 78%, #96704F 100%);
+  --g-blob-1: rgba(255,248,238,0.90);
+  --g-blob-2: rgba(249,115,22,0.16);
+  --g-blob-3: rgba(190,150,118,0.60);
+  --g-wood:   rgba(112,78,52,0.70);
+  --g-floor:  rgba(120,86,60,0.85);
+  --g-stage:        rgba(255,255,255,0.36);
+  --g-panel:        rgba(255,255,255,0.58);
+  --g-panel-hover:  rgba(255,255,255,0.72);
+  --g-tile:         rgba(255,255,255,0.55);
+  --g-tile-hover:   rgba(255,255,255,0.82);
+  --g-tile-strong:  rgba(255,255,255,0.74);
+  --g-bar:          rgba(255,255,255,0.62);
+  --g-strong:       rgba(255,255,255,0.90);
+  --g-border:        rgba(255,255,255,0.78);
+  --g-border-strong: rgba(255,255,255,1);
+  --g-highlight:     rgba(255,255,255,0.95);
+  --g-line:          rgba(70,45,20,0.09);
+  --g-input:         rgba(255,255,255,0.64);
+  --g-input-border:  rgba(255,255,255,0.95);
+  --g-nav-active:    rgba(255,255,255,0.92);
+  --g-blur:          blur(24px) saturate(170%);
+  --g-shadow:        0 1px 2px rgba(70,45,20,0.05), 0 14px 40px rgba(70,45,20,0.10);
+  --g-shadow-float:  0 2px 6px rgba(70,45,20,0.08), 0 24px 60px rgba(70,45,20,0.18);
 
   --s-panel:         #FFFFFF;
   --s-panel-strong:  #FFFFFF;
@@ -730,6 +791,44 @@ html[data-theme='light'] .fc-glass-hover:hover {
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ── The ground: a warm wash and three slow blobs, fixed behind everything ── */
+.fc-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--g-ground);
+}
+.fc-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
+  animation: fcBlobDrift 28s ease-in-out infinite alternate;
+}
+.fc-blob-1 { width: 56vw; height: 56vw; left: -14vw; top: -20vw; background: var(--g-blob-1); }
+.fc-blob-2 { width: 44vw; height: 44vw; right: -12vw; top: 8vh;  background: var(--g-blob-2); animation-duration: 34s; animation-delay: -11s; }
+.fc-blob-3 { width: 62vw; height: 62vw; left: 18vw; bottom: -34vw; background: var(--g-blob-3); animation-duration: 40s; animation-delay: -19s; }
+/* The room: two wood pillars, a shelf and a floor, blurred so the sheet in
+   front reads as frosted glass with something behind it. */
+.fc-shape {
+  position: absolute;
+  filter: blur(30px);
+  pointer-events: none;
+}
+.fc-shape-left  { left: -3vw; top: 8vh; width: 11vw; height: 70vh; background: var(--g-wood); border-radius: 24px; }
+.fc-shape-right { right: -3vw; top: 4vh; width: 13vw; height: 78vh; background: var(--g-wood); border-radius: 24px; }
+.fc-shape-shelf { left: 28vw; top: 5vh; width: 44vw; height: 7vh; background: var(--g-wood); opacity: 0.55; border-radius: 16px; }
+.fc-shape-floor { left: -5vw; right: -5vw; bottom: -6vh; height: 26vh; background: var(--g-floor); filter: blur(34px); }
+
+@keyframes fcBlobDrift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(6vw, 4vh, 0) scale(1.08); }
+}
+@media (max-width: 640px) {
+  .fc-blob { filter: blur(48px); }
+}
 
 /* Headings drop the monospace display face — the app reads as a product,
    not as the marketing site. */
@@ -749,78 +848,326 @@ html[data-theme='light'] .fc-glass-hover:hover {
 .fc-app ::-webkit-scrollbar-track  { background: transparent; }
 .fc-app ::-webkit-scrollbar-thumb  {
   background: rgb(var(--a-line-strong));
+  background-clip: padding-box;
   border-radius: 9999px;
-  border: 3px solid rgb(var(--a-surface-soft));
+  border: 3px solid transparent;
 }
-.fc-app ::-webkit-scrollbar-thumb:hover { background: rgba(249,115,22,0.45); }
+.fc-app ::-webkit-scrollbar-thumb:hover { background-color: rgba(249,115,22,0.45); }
+
+/* ── Glass building blocks ────────────────────────────────────────────── */
+
+/* Chrome that content scrolls under: frosted. */
+.fc-glass-bar {
+  background: var(--g-bar);
+  backdrop-filter: var(--g-blur);
+  -webkit-backdrop-filter: var(--g-blur);
+  border: 1px solid var(--g-border);
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow);
+}
+
+/* Floating menus and dialogs: more opaque, so what they say is easy to read. */
+.fc-popover,
+.fc-app [role='menu'],
+.fc-app [role='listbox'],
+.fc-app [role='dialog'],
+.fc-app [role='alertdialog'],
+.fc-app .fixed.inset-0 > .bg-surface,
+.fc-app .fixed.inset-0 > * > .bg-surface {
+  background: var(--g-strong);
+  backdrop-filter: var(--g-blur);
+  -webkit-backdrop-filter: var(--g-blur);
+  border-color: var(--g-border-strong);
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
+}
+
+/* A small inset tile on a card (the account button, a chip, an inner box). */
+.fc-tile {
+  background: var(--g-tile-strong);
+  border: 1px solid var(--g-border);
+  box-shadow: inset 0 1px 0 var(--g-highlight);
+}
+
+/* The one sheet that holds the page. */
+.fc-stage {
+  background: var(--g-stage);
+  border: 1px solid var(--g-border);
+  border-radius: 28px;
+  padding: 18px 16px;
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow);
+}
+@media (min-width: 640px)  { .fc-stage { padding: 22px; } }
+@media (min-width: 1024px) { .fc-stage { padding: 28px; border-radius: 32px; } }
+
+/* The sidebar: a drawer on a phone (over a dimmed page, so nearly opaque); on
+   a desk a narrow icon rail floating on the stage's left edge, each icon
+   naming itself on hover. */
+.fc-sidebar {
+  background: var(--g-strong);
+  backdrop-filter: var(--g-blur);
+  -webkit-backdrop-filter: var(--g-blur);
+  border-right: 1px solid var(--g-border);
+  box-shadow: var(--g-shadow-float);
+}
+@media (min-width: 1024px) {
+  /* On a desk the aside is only the column between the top bar and the
+     bottom pill; the visible rail is the pill inside it, centred when short.
+     It never scrolls: scrolling would clip the names beside the icons, so on
+     a short screen the icons shrink instead. */
+  .fc-sidebar {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    pointer-events: none;
+    justify-content: center;
+  }
+  .fc-rail {
+    pointer-events: auto;
+    background: var(--g-bar);
+    backdrop-filter: var(--g-blur);
+    -webkit-backdrop-filter: var(--g-blur);
+    border: 1px solid var(--g-border);
+    border-radius: 9999px;
+    box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
+  }
+}
+.fc-rail-item {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: rgb(var(--a-ink-mute));
+  transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+.fc-rail-item:hover { background: var(--g-tile); color: rgb(var(--a-ink)); }
+.fc-rail-item-active,
+.fc-rail-item-active:hover {
+  background: var(--g-nav-active);
+  color: rgb(var(--a-accent));
+  box-shadow: var(--a-shadow-pill);
+}
+/* The name, to the right, on hover or keyboard focus. */
+.fc-rail-item[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(-4px);
+  padding: 6px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(var(--a-ink));
+  background: var(--g-strong);
+  border: 1px solid var(--g-border-strong);
+  box-shadow: var(--g-shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+.fc-rail-item[data-tip]:hover::after,
+.fc-rail-item[data-tip]:focus-visible::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+@media (max-height: 880px) {
+  .fc-rail-item { width: 36px; height: 36px; }
+  .fc-rail-item svg { width: 17px; height: 17px; }
+}
+@media (max-height: 790px) {
+  .fc-rail-item { width: 31px; height: 31px; }
+  .fc-rail-item svg { width: 15px; height: 15px; }
+  .fc-rail { gap: 2px; }
+}
+
+.fc-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(var(--a-ink-mute));
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  cursor: pointer;
+}
+.fc-nav-item:hover {
+  background: var(--g-tile);
+  color: rgb(var(--a-ink));
+}
+.fc-nav-item-active,
+.fc-nav-item-active:hover {
+  background: var(--g-nav-active);
+  border-color: var(--g-border);
+  color: rgb(var(--a-ink));
+  font-weight: 600;
+  box-shadow: var(--a-shadow-pill);
+}
+
+/* The floating pill at the foot of the screen. Below the mobile drawer's
+   overlay (z 40) so it is covered while the drawer is open. */
+.fc-floating-nav {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  max-width: calc(100vw - 24px);
+  border-radius: 9999px;
+  background: var(--g-bar);
+  backdrop-filter: var(--g-blur);
+  -webkit-backdrop-filter: var(--g-blur);
+  border: 1px solid var(--g-border);
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
+}
+/* The sections scroll sideways inside the pill; the "+" stays put. */
+.fc-floating-scroll {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: min(calc(100vw - 96px), 760px);
+  border-radius: 9999px;
+}
+.fc-floating-scroll::-webkit-scrollbar { display: none; }
+.fc-floating-item {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgb(var(--a-ink-mute));
+  transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+.fc-floating-item:hover {
+  background: var(--g-tile);
+  color: rgb(var(--a-ink));
+}
+.fc-floating-item-active,
+.fc-floating-item-active:hover {
+  background: var(--g-nav-active);
+  color: rgb(var(--a-ink));
+  font-weight: 600;
+  box-shadow: var(--a-shadow-pill);
+}
+.fc-floating-plus {
+  width: 40px;
+  height: 40px;
+  margin-left: 4px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(var(--a-accent));
+  background: var(--g-nav-active);
+  border: 1px solid var(--g-border);
+  box-shadow: var(--a-shadow-pill);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.fc-floating-plus:hover {
+  transform: translateY(-1px);
+  background: var(--g-tile-hover);
+  box-shadow: var(--g-shadow);
+}
+@media (max-width: 639px) {
+  .fc-floating-item { padding: 10px 12px; }
+  .fc-floating-item span { display: none; }
+}
 
 /* ── Surfaces ─────────────────────────────────────────────────────────── */
 
 .fc-app.fc-app-bg,
 .fc-app .fc-app-bg {
-  background: rgb(var(--a-surface-soft));
+  background: transparent;
 }
 
 .fc-app .fc-panel,
 .fc-app .fc-card {
-  background: rgb(var(--a-surface));
+  background: var(--g-panel);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid rgb(var(--a-line));
-  border-radius: 20px;
-  box-shadow: var(--a-shadow);
-  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  border: 1px solid var(--g-border);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow);
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease, background 200ms ease;
 }
 
 .fc-app .fc-panel:hover,
 .fc-app .fc-card:hover {
-  border-color: rgba(249,115,22,0.28);
-  box-shadow: var(--a-shadow-md);
-  transform: none;
+  background: var(--g-panel-hover);
+  border-color: var(--g-border-strong);
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
+  transform: translateY(-2px);
 }
 
 .fc-app .fc-panel-strong {
-  background: rgb(var(--a-surface));
+  background: var(--g-panel-hover);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border: 1px solid rgba(249,115,22,0.22);
-  border-radius: 22px;
-  box-shadow: var(--a-shadow-md);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow);
 }
 
 .fc-app .liquid-glass,
 .fc-app .fc-dark-glass {
-  background: rgb(var(--a-surface));
+  background: var(--g-panel);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid rgb(var(--a-line));
-  box-shadow: var(--a-shadow);
+  border: 1px solid var(--g-border);
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow);
 }
 .fc-app .liquid-glass::before { display: none; }
 
 .fc-app .glass-pill {
-  background: rgb(var(--a-surface));
+  background: var(--g-tile-strong);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  border: 1px solid rgb(var(--a-line));
+  border: 1px solid var(--g-border);
   box-shadow: var(--a-shadow-pill);
 }
 
 .fc-app .fc-glass-hover:hover {
   transform: translateY(-1px);
-  background: rgb(var(--a-surface));
-  border-color: rgba(249,115,22,0.28);
-  box-shadow: var(--a-shadow-md);
+  background: var(--g-panel-hover);
+  border-color: var(--g-border-strong);
+  box-shadow: var(--g-shadow-float);
 }
+
+/* The surface utilities the pages already use become glass tiles. Hover
+   variants are separate class names, so they are listed too. */
+.fc-app .bg-surface            { background-color: var(--g-tile-strong); }
+.fc-app .hover\:bg-surface:hover { background-color: var(--g-tile-hover); }
+.fc-app .bg-surface-mute       { background-color: var(--g-tile); }
+.fc-app .hover\:bg-surface-mute:hover { background-color: var(--g-tile-hover); }
+.fc-app .bg-surface-sunk       { background-color: var(--g-tile); }
 
 /* ── Buttons ──────────────────────────────────────────────────────────── */
 
 /* Primary is the brand orange with white text — the site's main action. */
 .fc-app .fc-btn-primary {
   background: linear-gradient(135deg, #F97316 0%, #FB923C 100%);
-  color: rgb(var(--a-ink));
+  color: #fff;
   border: none;
-  border-radius: 14px;
+  border-radius: 9999px;
   box-shadow: 0 4px 18px rgba(249,115,22,0.30);
 }
 .fc-app .fc-btn-primary:hover {
@@ -828,41 +1175,41 @@ html[data-theme='light'] .fc-glass-hover:hover {
   transform: translateY(-1px);
 }
 .fc-app .fc-btn-primary:disabled {
-  background: rgb(var(--a-surface-mute));
+  background: var(--g-tile);
   color: rgb(var(--a-ink-faint));
   box-shadow: none;
   opacity: 1;
 }
 
 .fc-app .fc-btn-secondary {
-  background: rgb(var(--a-surface-mute));
-  border: 1px solid rgb(var(--a-line));
-  border-radius: 14px;
+  background: var(--g-tile-strong);
+  border: 1px solid var(--g-border);
+  border-radius: 9999px;
   color: rgb(var(--a-ink-soft));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
-  box-shadow: none;
+  box-shadow: inset 0 1px 0 var(--g-highlight);
 }
 .fc-app .fc-btn-secondary:hover {
-  background: rgb(var(--a-surface-sunk));
+  background: var(--g-tile-hover);
   border-color: rgba(249,115,22,0.35);
   color: rgb(var(--a-ink));
-  box-shadow: none;
+  box-shadow: inset 0 1px 0 var(--g-highlight), var(--a-shadow-pill);
 }
 
 .fc-app .fc-btn-ghost {
-  border-radius: 12px;
+  border-radius: 9999px;
   color: rgb(var(--a-ink-mute));
 }
 .fc-app .fc-btn-ghost:hover {
-  background: rgb(var(--a-surface-mute));
+  background: var(--g-tile);
   color: rgb(var(--a-ink));
 }
 
 .fc-app .fc-btn-success {
   background: var(--a-success);
   color: #04160F;
-  border-radius: 14px;
+  border-radius: 9999px;
   box-shadow: none;
 }
 .fc-app .fc-btn-success:hover { background: #34D399; }
@@ -870,7 +1217,7 @@ html[data-theme='light'] .fc-glass-hover:hover {
 .fc-app .fc-btn-danger {
   background: rgba(239,68,68,0.14);
   border: 1px solid rgba(239,68,68,0.32);
-  border-radius: 14px;
+  border-radius: 9999px;
   color: #F87171;
   box-shadow: none;
 }
@@ -880,46 +1227,51 @@ html[data-theme='light'] .fc-glass-hover:hover {
 }
 
 .fc-app .fc-btn-tier-secondary {
-  background: rgb(var(--a-surface-mute));
+  background: var(--g-tile-strong);
   border: 1px solid rgba(249,115,22,0.45);
   color: rgb(var(--a-ink));
 }
 
 /* ── Inputs ───────────────────────────────────────────────────────────── */
 
-.fc-app .fc-input {
-  background: rgb(var(--a-surface-mute));
-  border: 1px solid rgb(var(--a-line));
-  border-radius: 14px;
+.fc-app .fc-input,
+.fc-app .fc-field {
+  background: var(--g-input);
+  border: 1px solid var(--g-input-border);
+  border-radius: 16px;
   color: rgb(var(--a-ink));
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  box-shadow: inset 0 1px 2px rgb(var(--a-shadow-rgb) / 0.06);
 }
-.fc-app .fc-input::placeholder { color: rgb(var(--a-ink-faint)); }
-.fc-app .fc-input:focus {
+.fc-app .fc-input::placeholder,
+.fc-app .fc-field::placeholder { color: rgb(var(--a-ink-faint)); }
+.fc-app .fc-input:focus,
+.fc-app .fc-field:focus {
   border-color: rgba(249,115,22,0.55);
   box-shadow: 0 0 0 4px rgba(249,115,22,0.12);
 }
 
-.fc-app select.fc-input,
-.fc-app .fc-input option { color: rgb(var(--a-ink)); background: rgb(var(--a-surface-mute)); }
+/* The native option list cannot be translucent, so it keeps a solid fill. */
+.fc-app select.fc-input { color: rgb(var(--a-ink)); }
+.fc-app .fc-input option { color: rgb(var(--a-ink)); background: rgb(var(--a-surface)); }
 
 .fc-app textarea { color: rgb(var(--a-ink)); }
 
 /* ── Tables ───────────────────────────────────────────────────────────── */
 
 .fc-app .fc-table th {
-  background: rgb(var(--a-surface-mute));
+  background: transparent;
   color: rgb(var(--a-ink-mute));
-  border-bottom: 1px solid rgb(var(--a-line));
+  border-bottom: 1px solid var(--g-line);
   font-weight: 600;
   letter-spacing: 0.06em;
 }
 .fc-app .fc-table td {
   color: rgb(var(--a-ink-soft));
-  border-top: 1px solid rgb(var(--a-line-soft));
+  border-top: 1px solid var(--g-line);
 }
-.fc-app .fc-table tr:hover td { background: rgb(var(--a-surface-mute)); }
+.fc-app .fc-table tr:hover td { background: var(--g-tile); }
 
 /* ── Badges ───────────────────────────────────────────────────────────── */
 
@@ -937,36 +1289,34 @@ html[data-theme='light'] .fc-glass-hover:hover {
   background: rgb(var(--a-accent-tint)); border-color: rgba(249,115,22,0.28); color: rgb(var(--a-accent-soft));
 }
 .fc-app .badge-muted {
-  background: rgb(var(--a-surface-mute)); border-color: rgb(var(--a-line)); color: rgb(var(--a-ink-mute));
+  background: var(--g-tile); border-color: var(--g-border); color: rgb(var(--a-ink-mute));
 }
 
-/* ── Sidebar navigation ───────────────────────────────────────────────── */
+/* ── Sidebar navigation (older class names, kept for any page that uses them) ── */
 
-/* Inactive rows are plain; the active row is a lifted panel with an orange
-   marker, which is what carries the selection. */
 .fc-app .sidebar-item {
   border-radius: 14px;
   color: rgb(var(--a-ink-mute));
   font-weight: 500;
 }
 .fc-app .sidebar-item:hover {
-  background: rgb(var(--a-surface-mute));
+  background: var(--g-tile);
   color: rgb(var(--a-ink));
 }
 .fc-app .sidebar-item-active {
   border-radius: 14px;
-  background: rgb(var(--a-surface-mute));
-  border: 1px solid rgba(249,115,22,0.24);
+  background: var(--g-nav-active);
+  border: 1px solid var(--g-border);
   color: rgb(var(--a-ink));
-  box-shadow: none;
+  box-shadow: var(--a-shadow-pill);
 }
 
 /* ── Upload dropzone ──────────────────────────────────────────────────── */
 
 .fc-app .upload-dropzone {
-  border-color: rgba(249,115,22,0.28);
-  background: rgba(249,115,22,0.04);
-  border-radius: 20px;
+  border-color: rgba(249,115,22,0.32);
+  background: var(--g-tile);
+  border-radius: 24px;
 }
 .fc-app .upload-dropzone:hover,
 .fc-app .upload-dropzone.drag-active {
@@ -989,18 +1339,18 @@ html[data-theme='light'] .fc-glass-hover:hover {
 .fc-app .fc-range-slider { accent-color: rgb(var(--a-accent)); }
 .fc-app .fc-range-slider::-webkit-slider-thumb {
   background: rgb(var(--a-accent));
-  border-color: rgb(var(--a-ink));
+  border-color: #fff;
   box-shadow: 0 0 10px rgba(249,115,22,0.6);
 }
 .fc-app .fc-range-slider::-moz-range-thumb {
   background: rgb(var(--a-accent));
-  border-color: rgb(var(--a-ink));
+  border-color: #fff;
   box-shadow: 0 0 10px rgba(249,115,22,0.6);
 }
 
 /* Recharts chrome */
 .fc-app .recharts-cartesian-axis-tick text { fill: rgb(var(--a-ink-faint)); }
-.fc-app .recharts-cartesian-grid line { stroke: rgb(var(--a-line-soft)); }
+.fc-app .recharts-cartesian-grid line { stroke: var(--g-line); }
 
 /* ── Building blocks used by the shell ────────────────────────────────── */
 
@@ -1009,42 +1359,46 @@ html[data-theme='light'] .fc-glass-hover:hover {
   display: inline-flex;
   padding: 4px;
   gap: 2px;
-  background: var(--a-mute, rgb(var(--a-surface-mute)));
-  border-radius: 14px;
+  background: var(--g-tile);
+  border: 1px solid var(--g-border);
+  border-radius: 9999px;
 }
 .fc-seg-item {
   padding: 6px 16px;
-  border-radius: 10px;
+  border-radius: 9999px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--a-ink-mute, rgb(var(--a-ink-mute)));
+  color: rgb(var(--a-ink-mute));
   cursor: pointer;
   transition: background 160ms ease, color 160ms ease;
 }
-.fc-seg-item:hover { color: var(--a-ink, rgb(var(--a-ink))); }
+.fc-seg-item:hover { color: rgb(var(--a-ink)); }
 .fc-seg-item[aria-pressed='true'],
 .fc-seg-item[data-active='true'] {
-  background: rgb(var(--a-accent-tint));
+  background: var(--g-nav-active);
   color: rgb(var(--a-accent-deep));
+  box-shadow: var(--a-shadow-pill);
 }
 
-/* Round chrome button in the topbar */
+/* Round chrome button in the topbar. The display is set at zero specificity
+   so a utility such as `hidden sm:inline-flex` on the button still wins. */
+:where(.fc-icon-btn) { display: inline-flex; }
 .fc-icon-btn {
-  width: 38px;
-  height: 38px;
-  display: inline-flex;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: var(--a-surface, rgb(var(--a-surface)));
-  border: 1px solid var(--a-line, rgb(var(--a-line)));
-  color: var(--a-ink-mute, rgb(var(--a-ink-mute)));
+  border-radius: 9999px;
+  background: var(--g-tile-strong);
+  border: 1px solid var(--g-border);
+  color: rgb(var(--a-ink-mute));
+  box-shadow: inset 0 1px 0 var(--g-highlight);
   transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
   cursor: pointer;
 }
 .fc-icon-btn:hover {
-  background: var(--a-mute, rgb(var(--a-surface-mute)));
-  color: var(--a-ink, rgb(var(--a-ink)));
+  background: var(--g-tile-hover);
+  color: rgb(var(--a-ink));
   border-color: rgba(249,115,22,0.35);
 }
 
@@ -1053,9 +1407,9 @@ html[data-theme='light'] .fc-glass-hover:hover {
   font-family: 'Inter', sans-serif;
   font-size: 11px;
   font-weight: 500;
-  color: var(--a-ink-faint, rgb(var(--a-ink-faint)));
-  background: var(--a-mute, rgb(var(--a-surface-mute)));
-  border: 1px solid var(--a-line, rgb(var(--a-line)));
+  color: rgb(var(--a-ink-faint));
+  background: var(--g-tile);
+  border: 1px solid var(--g-border);
   border-radius: 7px;
   padding: 2px 7px;
 }
@@ -1070,6 +1424,12 @@ html[data-theme='light'] .fc-glass-hover:hover {
   outline: 2px solid rgb(var(--a-accent));
   outline-offset: 2px;
   border-radius: 10px;
+}
+
+/* Motion is decoration here: none of it when the person asked for less. */
+@media (prefers-reduced-motion: reduce) {
+  .fc-blob { animation: none; }
+  .fc-app .fc-card:hover, .fc-app .fc-panel:hover, .fc-floating-plus:hover { transform: none; }
 }
 
 
@@ -1108,19 +1468,11 @@ html[data-theme='light'] .fc-app .fc-btn-success {
 html[data-theme='light'] .fc-app .fc-btn-success:hover { background: #065F46; }
 
 html[data-theme='light'] .fc-app .upload-dropzone {
-  background: rgb(var(--a-surface-mute));
+  background: var(--g-tile);
   border-color: rgb(var(--a-line-strong));
 }
 html[data-theme='light'] .fc-app .upload-dropzone:hover,
 html[data-theme='light'] .fc-app .upload-dropzone.drag-active {
   background: rgb(var(--a-accent-tint));
   border-color: rgb(var(--a-accent));
-}
-
-/* The sidebar's selected row reads as a raised white pill on light, and as a
-   lifted panel with an orange edge on dark. */
-html[data-theme='light'] .fc-app .sidebar-item-active {
-  background: rgb(var(--a-surface));
-  border-color: rgb(var(--a-line));
-  box-shadow: var(--a-shadow-pill);
 }

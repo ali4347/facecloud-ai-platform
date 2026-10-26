@@ -504,7 +504,7 @@ export default function GroupDetailLive() {
       </div>
 
       {/* ── Floating selection bar ─────────────────────────────────────────── */}
-      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${selected.size > 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+      <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${selected.size > 0 ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
         <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-surface border border-accent/30 shadow-2xl backdrop-blur-xl">
           <span className="text-sm font-semibold text-ink">{selected.size} image{selected.size === 1 ? '' : 's'} selected</span>
           <div className="w-px h-5 bg-line" />

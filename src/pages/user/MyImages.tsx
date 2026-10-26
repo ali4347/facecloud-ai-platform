@@ -249,7 +249,7 @@ export default function MyImages() {
           </div>
 
           {(selected.size > 0 || notice) && (
-            <div className="sticky bottom-4 z-30 mt-6 space-y-3">
+            <div className="sticky bottom-24 z-30 mt-6 space-y-3">
               {showConsentCard && (
                 <ConsentCard
                   selectedCount={selected.size}
