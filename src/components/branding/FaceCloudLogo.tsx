@@ -63,7 +63,7 @@ const rowHeights = {
   xs: 'h-5', sm: 'h-7', md: 'h-9', lg: 'h-12', xl: 'h-16', hero: 'h-24 md:h-28',
 }
 const stackedHeights = {
-  xs: 'h-12', sm: 'h-16', md: 'h-20', lg: 'h-28', xl: 'h-36', hero: 'h-48 md:h-56',
+  xs: 'h-10', sm: 'h-12', md: 'h-16', lg: 'h-[84px]', xl: 'h-28', hero: 'h-40 md:h-48',
 }
 const subTextSizes = {
   xs: 'text-[6px]', sm: 'text-[7px]', md: 'text-[8px]', lg: 'text-[9px]', xl: 'text-[11px]', hero: 'text-[13px] md:text-[14px]',
