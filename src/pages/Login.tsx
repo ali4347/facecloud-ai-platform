@@ -13,9 +13,9 @@ export default function Login() {
   useDocumentTitle('Sign in')
   const navigate = useNavigate()
   const location = useLocation()
-  /* The demo account is pre-filled only in demo mode; a real sign-in starts empty. */
-  const [email, setEmail] = useState(USE_API ? '' : 'user@facecloud.ai')
-  const [password, setPassword] = useState(USE_API ? '' : 'password')
+  /* The form starts empty in both modes: the demo must not hand its credentials to whoever opens the page. */
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -62,7 +62,7 @@ export default function Login() {
       saveSession(session)
       navigate('/dashboard')
     } else {
-      setError('Invalid credentials. Use user@facecloud.ai / password')
+      setError('Invalid email or password.')
     }
   }
 

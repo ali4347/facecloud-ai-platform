@@ -12,8 +12,8 @@ import { useDocumentTitle } from '../../lib/useDocumentTitle'
 export default function AdminLogin() {
   useDocumentTitle('Admin sign in')
   const navigate = useNavigate()
-  const [email, setEmail] = useState(USE_API ? '' : 'admin@dtm.io')
-  const [password, setPassword] = useState(USE_API ? '' : 'password')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -55,7 +55,7 @@ export default function AdminLogin() {
       saveSession(session)
       navigate('/admin')
     } else {
-      setError('Invalid credentials. Use admin@dtm.io / password')
+      setError('Invalid email or password.')
     }
   }
 

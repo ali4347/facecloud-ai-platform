@@ -115,6 +115,8 @@ The application protects routes based on user roles using a [ProtectedRoute](fil
 | **Admin** | `admin@dtm.io` | `password` | Auditing logs, managing users, testing mock APIs, system health panels. |
 | **Moderator** | `moderator@facecloud.ai` | `password` | Checking flagged images, reviewing rejection reasons, approving queues. |
 
+The sign-in pages do not pre-fill or reveal these (a wrong attempt says only "Invalid email or password."); this table is the only place they are written down.
+
 ### Auth System Architecture
 * **User Login**: Simulates credentials verification and sets the `facecloud_session` JSON item in `localStorage`.
 * **Verification Flow**: Localized mock verification redirects users to verify email screen before dashboard entry.

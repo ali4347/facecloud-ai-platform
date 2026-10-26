@@ -12,8 +12,8 @@ import { useDocumentTitle } from '../../lib/useDocumentTitle'
 export default function ModeratorLogin() {
   useDocumentTitle('Moderator sign in')
   const navigate = useNavigate()
-  const [email, setEmail] = useState(USE_API ? '' : 'moderator@facecloud.ai')
-  const [password, setPassword] = useState(USE_API ? '' : 'password')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -55,7 +55,7 @@ export default function ModeratorLogin() {
       saveSession(session)
       navigate('/moderator')
     } else {
-      setError('Invalid credentials. Use moderator@facecloud.ai / password')
+      setError('Invalid email or password.')
     }
   }
 

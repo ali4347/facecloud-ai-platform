@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-10-26 — Demo sign-in pages no longer hand out their credentials
+*Status: committed (this commit).*
+
+- **Found by the owner on the demo build** (`VITE_USE_API=false`, which is what the live site runs): the three sign-in pages came **pre-filled** with the demo email *and* password, and a wrong attempt answered "Invalid credentials. Use admin@dtm.io / password" — so anyone who opened `/admin/login` was one click from the console.
+- **Fix:** `Login.tsx`, `AdminLogin.tsx`, `ModeratorLogin.tsx` start empty in both modes and a wrong attempt says only "Invalid email or password." The demo accounts themselves are unchanged and still documented in `README.md` (§ demo accounts) for the owner.
+- **Verified** on the demo build with `vite preview` and headless Chrome: all three pages open empty, a wrong attempt shows the new sentence and names no account, and the documented demo sign-in still reaches `/admin`, `/moderator` and `/dashboard`. `npx tsc -b`, both builds.
+- **Still the owner's call:** demo mode holds no real data, but the demo password is the word "password" and sits in the README; if the repository is public, changing it (one line in each of the three files) is the only way to keep strangers out of the demo console.
+
 ### 2026-10-26 — "Glassy Dashboard V2" redesign of the app shell (visual only; running locally, not pushed)
 *Status: committed (this commit), after the owner checked it on localhost:5173 and approved it.*
 
