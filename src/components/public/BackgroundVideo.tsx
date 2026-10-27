@@ -201,7 +201,7 @@ export function BackgroundVideo() {
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[2]"
-          style={{ background: 'radial-gradient(ellipse 48% 42% at 50% 52%, rgba(243,236,228,0.55) 0%, transparent 72%)' }}
+          style={{ background: 'radial-gradient(ellipse 48% 42% at 50% 52%, rgba(243,236,228,0.34) 0%, transparent 70%)' }}
         />
       ) : (
         <>
