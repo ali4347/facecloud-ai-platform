@@ -694,6 +694,8 @@ html[data-theme='light'] .on-dark .fc-logo-on-dark { display: block; }
   --l-rim-shade:     rgba(0,0,0,0.35);           /* the edge that falls away from the light */
   --l-lens:          rgba(255,255,255,0.14);     /* the selected tab's lens */
   --l-lens-rim:      rgba(255,255,255,0.55);
+  --l-edge:          rgba(255,255,255,0.08);
+  --l-lens-shadow:   0 1px 2px rgba(0,0,0,0.20), 0 8px 20px rgba(0,0,0,0.25);
   --g-shadow:        0 1px 2px rgba(0,0,0,0.30), 0 14px 40px rgba(0,0,0,0.32);
   --g-shadow-float:  0 2px 4px rgba(0,0,0,0.35), 0 20px 60px rgba(0,0,0,0.50);
 
@@ -774,12 +776,14 @@ html[data-theme='light'] {
   --g-input-border:  rgba(255,255,255,0.95);
   --g-nav-active:    rgba(255,255,255,0.92);
   --g-blur:          blur(24px) saturate(170%);
-  --l-fill:          rgba(255,255,255,0.40);
-  --l-sheen:         rgba(255,255,255,0.55);
+  --l-fill:          rgba(228,216,202,0.58);
+  --l-sheen:         rgba(255,255,255,0.50);
   --l-rim:           rgba(255,255,255,0.95);
-  --l-rim-shade:     rgba(70,45,20,0.12);
-  --l-lens:          rgba(255,255,255,0.62);
+  --l-rim-shade:     rgba(70,45,20,0.26);
+  --l-edge:          rgba(70,45,20,0.16);
+  --l-lens:          rgba(255,255,255,0.88);
   --l-lens-rim:      rgba(255,255,255,1);
+  --l-lens-shadow:   0 2px 6px rgba(70,45,20,0.16), 0 10px 24px rgba(70,45,20,0.18);
   --g-shadow:        0 1px 2px rgba(70,45,20,0.05), 0 14px 40px rgba(70,45,20,0.10);
   --g-shadow-float:  0 2px 6px rgba(70,45,20,0.08), 0 24px 60px rgba(70,45,20,0.18);
 
@@ -891,9 +895,9 @@ html[data-theme='light'] .fc-glass-hover:hover {
   background:
     linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%),
     var(--l-fill);
-  backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
-  -webkit-backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(28px) saturate(185%);
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  border: 1px solid var(--l-edge);
   box-shadow:
     inset 0 1px 0 var(--l-rim),
     inset 1px 0 0 rgba(255,255,255,0.18),
@@ -906,15 +910,14 @@ html[data-theme='light'] .fc-glass-hover:hover {
   position: absolute;
   border-radius: 9999px;
   background: var(--l-lens);
-  backdrop-filter: blur(1px) saturate(160%) brightness(1.12);
-  -webkit-backdrop-filter: blur(1px) saturate(160%) brightness(1.12);
+  backdrop-filter: saturate(160%) brightness(1.08);
+  -webkit-backdrop-filter: saturate(160%) brightness(1.08);
   box-shadow:
     inset 0 1px 0 var(--l-lens-rim),
-    inset 0 -1px 0 rgba(0,0,0,0.10),
+    inset 0 -1px 0 var(--l-rim-shade),
     inset 1px 0 0 rgba(255,255,255,0.35),
     inset -1px 0 0 rgba(0,0,0,0.06),
-    0 1px 2px rgba(0,0,0,0.12),
-    0 8px 20px rgba(0,0,0,0.12);
+    var(--l-lens-shadow);
   will-change: transform, width, height;
   pointer-events: none;
 }
@@ -932,17 +935,18 @@ html[data-theme='light'] .fc-glass-hover:hover {
   opacity: 0.45;
   pointer-events: none;
 }
-.fc-lens-grab { pointer-events: auto; cursor: grab; touch-action: none; }
-.fc-lens-grab:active { cursor: grabbing; }
+/* the current name is the drag handle for the lens under it */
+.fc-floating-item-active { cursor: grab; touch-action: none; }
+.fc-floating-item-active:active { cursor: grabbing; }
 
 /* ── Glass building blocks ────────────────────────────────────────────── */
 
 /* Chrome that content scrolls under: frosted. */
 .fc-glass-bar {
   background: linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%), var(--l-fill);
-  backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
-  -webkit-backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(28px) saturate(185%);
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  border: 1px solid var(--l-edge);
   box-shadow: inset 0 1px 0 var(--l-rim), inset 0 -1px 0 var(--l-rim-shade), 0 2px 4px rgba(0,0,0,0.08), 0 16px 44px rgba(0,0,0,0.18);
 }
 
@@ -1007,9 +1011,9 @@ html[data-theme='light'] .fc-glass-hover:hover {
     pointer-events: auto;
     position: relative;
     background: linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%), var(--l-fill);
-    backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
-    -webkit-backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
-    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(28px) saturate(185%);
+    -webkit-backdrop-filter: blur(28px) saturate(185%);
+    border: 1px solid var(--l-edge);
     border-radius: 9999px;
     box-shadow: inset 0 1px 0 var(--l-rim), inset 1px 0 0 rgba(255,255,255,0.18), inset 0 -1px 0 var(--l-rim-shade), 0 2px 4px rgba(0,0,0,0.10), 0 18px 48px rgba(0,0,0,0.22);
   }
@@ -1152,8 +1156,8 @@ html[data-theme='light'] .fc-glass-hover:hover {
   font-weight: 600;
   box-shadow: none;
 }
-/* The lens sits over the current name (it is translucent, so the name shows through) so it can be grabbed. */
-.fc-floating-nav .fc-lens { z-index: 2; }
+.fc-floating-nav .fc-lens { z-index: 0; }
+.fc-floating-item { color: rgb(var(--a-ink-soft)); }
 .fc-floating-plus {
   width: 40px;
   height: 40px;

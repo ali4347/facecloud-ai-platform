@@ -76,17 +76,20 @@ export function FloatingNav({ role }: { role: Role }) {
     return () => window.removeEventListener('resize', onResize)
   }, [activeIndex, targetFor, x, width])
 
-  /* Dragging the lens: 1:1 with the pointer, remembering where it was grabbed;
-     the last few moves give the release velocity. */
-  const grab = useRef<{ startX: number; lensX: number; moves: { x: number; t: number }[] } | null>(null)
-  const onPointerDown = (e: React.PointerEvent<HTMLSpanElement>) => {
+  /* Dragging: the current name is the handle for the lens under it, 1:1 with
+     the pointer, remembering where it was grabbed; the last few moves give the
+     release velocity. A press that never moved stays an ordinary click. */
+  const grab = useRef<{ startX: number; lensX: number; moved: boolean; moves: { x: number; t: number }[] } | null>(null)
+  const onPointerDown = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    if (e.button !== 0) return
     e.currentTarget.setPointerCapture(e.pointerId)
-    dragging.current = true
-    grab.current = { startX: e.clientX, lensX: x.get(), moves: [{ x: e.clientX, t: performance.now() }] }
+    grab.current = { startX: e.clientX, lensX: x.get(), moved: false, moves: [{ x: e.clientX, t: performance.now() }] }
   }
-  const onPointerMove = (e: React.PointerEvent<HTMLSpanElement>) => {
+  const onPointerMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
     const g = grab.current; const strip = scrollRef.current
     if (!g || !strip) return
+    if (!g.moved && Math.abs(e.clientX - g.startX) < 6) return   // hysteresis before it becomes a drag
+    g.moved = true; dragging.current = true
     const min = 0, max = strip.scrollWidth - width.get()
     let next = g.lensX + (e.clientX - g.startX)
     if (next < min) next = min + rubberband(next - min, strip.clientWidth)
@@ -96,7 +99,7 @@ export function FloatingNav({ role }: { role: Role }) {
   }
   const onPointerUp = () => {
     const g = grab.current; grab.current = null; dragging.current = false
-    if (!g) return
+    if (!g || !g.moved) return
     const first = g.moves[0], last = g.moves[g.moves.length - 1]
     const dt = Math.max(1, last.t - first.t)
     const velocity = ((last.x - first.x) / dt) * 1000
@@ -105,21 +108,17 @@ export function FloatingNav({ role }: { role: Role }) {
     items.forEach((_, i) => { const t = targetFor(i); if (!t) return; const d = Math.abs(t.x + t.width / 2 - landing); if (d < best) { best = d; nearest = i } })
     moveLensTo(nearest, velocity)
     if (nearest !== activeIndex) navigate(items[nearest].to)
+    justDragged.current = true
   }
+  /* The click that ends a drag must not navigate to the handle's own page. */
+  const justDragged = useRef(false)
+  const onClickCapture = (e: React.MouseEvent) => { if (justDragged.current) { e.preventDefault(); e.stopPropagation(); justDragged.current = false } }
 
   return (
     <nav className="fc-floating-nav fc-liquid" aria-label="Quick navigation">
       <div ref={scrollRef} className="fc-floating-scroll">
         {visible && (
-          <motion.span
-            className="fc-lens fc-lens-grab"
-            style={{ x, width, top: 0, bottom: 0, left: 0 }}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
-            aria-hidden="true"
-          />
+          <motion.span className="fc-lens" style={{ x, width, top: 0, bottom: 0, left: 0 }} aria-hidden="true" />
         )}
         {items.map((item, i) => (
           <NavLink
@@ -130,6 +129,11 @@ export function FloatingNav({ role }: { role: Role }) {
             aria-label={item.label}
             title={item.label}
             className={({ isActive }) => cn('fc-floating-item', isActive && 'fc-floating-item-active')}
+            onPointerDown={i === activeIndex ? onPointerDown : undefined}
+            onPointerMove={i === activeIndex ? onPointerMove : undefined}
+            onPointerUp={i === activeIndex ? onPointerUp : undefined}
+            onPointerCancel={i === activeIndex ? onPointerUp : undefined}
+            onClickCapture={i === activeIndex ? onClickCapture : undefined}
           >
             <item.icon className="w-[18px] h-[18px] flex-shrink-0 lg:hidden" aria-hidden="true" />
             <span>{item.label}</span>
