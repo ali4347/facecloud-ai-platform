@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import { motion, useReducedMotion } from 'framer-motion'
 import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
@@ -113,6 +114,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
     to === '/dashboard' || to === '/admin' || to === '/moderator' ? location.pathname === to : location.pathname.startsWith(to)
   const isHome = (to: string) => to === '/admin' || to === '/dashboard' || to === '/moderator'
   const closeOnPhone = () => { if (window.innerWidth < 1024 && onClose) onClose() }
+  const reduced = useReducedMotion()
 
   return (
     <aside
@@ -139,6 +141,15 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
               data-tip={item.label}
               className={cn('fc-rail-item', active && 'fc-rail-item-active')}
             >
+              {active && (
+                <motion.span
+                  layoutId="fc-rail-lens"
+                  className="fc-lens"
+                  style={{ inset: 0 }}
+                  transition={reduced ? { duration: 0.15 } : { type: 'spring', bounce: 0.25, duration: 0.5 }}
+                  aria-hidden="true"
+                />
+              )}
               <item.icon className="w-[19px] h-[19px]" aria-hidden="true" />
             </NavLink>
           )

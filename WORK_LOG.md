@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-26
+**Last updated:** 2026-10-27
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-27 — Liquid-glass chrome: the bars are thick glass and the current tab is a lens that springs and can be dragged
+*Status: committed (this commit).*
+
+- **Asked by the owner** with iOS 26 / WhatsApp "Liquid Glass" screenshots as the reference: the dashboard chrome should feel like that glass, with the selected tab a lens that slides.
+- **Material** (`src/index.css`, `.fc-liquid`, and the same recipe on `.fc-glass-bar`, `.fc-rail`, `.fc-popover`): a strong blur with saturation and a touch of contrast, a sheen across the top where the light catches the glass, a bright rim on the lit edge and a shaded rim on the far one, a deeper drop shadow. New tokens `--l-*` per appearance. `prefers-reduced-transparency` makes it solid; `prefers-reduced-motion` removes the bounce and the press scale.
+- **Lens** (`.fc-lens`): brighter glass with its own rim, a slight magnification/saturation of what is under it (`backdrop-filter` of 1 px blur, brightness 1.12) and a faint colour fringe on the edge (a 1 px conic gradient through a mask). In the bottom pill it is one element positioned by motion values (`FloatingNav.tsx`): on a route change it springs to the new section from wherever it is (interruptible: a second change mid-flight re-targets without a jump; `bounce 0.22`, `duration 0.5`); it can be **dragged** along the pill 1:1 (pointer capture, the grab offset respected, rubber-banding past the ends) and on release flies with the finger's momentum (UIKit's projection, deceleration 0.998) to the nearest section and opens it; the release velocity is handed to the spring so there is no seam. In the rail the lens is a shared-layout element (`layoutId`) that morphs between icons. Tabs scale to 0.95 on pointer-down (feedback on the press, not the release).
+- **Nothing functional changed:** the links are the same `NavLink`s; a plain click navigates as before; the drag is additive. Cards and the stage keep the earlier frosted look.
+- **Verified:** `npx tsc -b`, both builds; on the local server as admin: a click moves the lens to the new section (337 → 550 px, route changed); a drag of the lens followed the pointer (338 → 602 px) and a flick landed it on "Security" and opened `/admin/security`; a plain click on "Overview" still opens `/admin`; screenshots of the pill and the rail in both appearances; no console errors.
 
 ### 2026-10-26 — Account settings (name, password) for the administrator and the moderator
 *Status: committed (this commit).*

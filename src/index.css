@@ -688,6 +688,12 @@ html[data-theme='light'] .on-dark .fc-logo-on-dark { display: block; }
   --g-input-border:  rgba(255,255,255,0.13);
   --g-nav-active:    rgba(255,255,255,0.11);
   --g-blur:          blur(24px) saturate(150%);
+  --l-fill:          rgba(44,38,33,0.52);        /* liquid glass: the bar itself */
+  --l-sheen:         rgba(255,255,255,0.10);     /* light catching the top of the material */
+  --l-rim:           rgba(255,255,255,0.42);     /* the bright edge */
+  --l-rim-shade:     rgba(0,0,0,0.35);           /* the edge that falls away from the light */
+  --l-lens:          rgba(255,255,255,0.14);     /* the selected tab's lens */
+  --l-lens-rim:      rgba(255,255,255,0.55);
   --g-shadow:        0 1px 2px rgba(0,0,0,0.30), 0 14px 40px rgba(0,0,0,0.32);
   --g-shadow-float:  0 2px 4px rgba(0,0,0,0.35), 0 20px 60px rgba(0,0,0,0.50);
 
@@ -768,6 +774,12 @@ html[data-theme='light'] {
   --g-input-border:  rgba(255,255,255,0.95);
   --g-nav-active:    rgba(255,255,255,0.92);
   --g-blur:          blur(24px) saturate(170%);
+  --l-fill:          rgba(255,255,255,0.40);
+  --l-sheen:         rgba(255,255,255,0.55);
+  --l-rim:           rgba(255,255,255,0.95);
+  --l-rim-shade:     rgba(70,45,20,0.12);
+  --l-lens:          rgba(255,255,255,0.62);
+  --l-lens-rim:      rgba(255,255,255,1);
   --g-shadow:        0 1px 2px rgba(70,45,20,0.05), 0 14px 40px rgba(70,45,20,0.10);
   --g-shadow-float:  0 2px 6px rgba(70,45,20,0.08), 0 24px 60px rgba(70,45,20,0.18);
 
@@ -867,15 +879,71 @@ html[data-theme='light'] .fc-glass-hover:hover {
 }
 .fc-app ::-webkit-scrollbar-thumb:hover { background-color: rgba(249,115,22,0.45); }
 
+/* ── Liquid glass ────────────────────────────────────────────────────────
+   The chrome is a thick piece of glass, not a tinted sheet: a strong blur
+   with saturation and a touch of contrast, a sheen across the top where the
+   light catches it, a bright rim on the lit edge and a shaded rim on the far
+   one. The selected tab is a lens: brighter glass with its own rim and a
+   slight magnification of what is under it, which slides between the tabs
+   on a spring and can be dragged. */
+.fc-liquid {
+  position: relative;
+  background:
+    linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%),
+    var(--l-fill);
+  backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
+  -webkit-backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    inset 0 1px 0 var(--l-rim),
+    inset 1px 0 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 var(--l-rim-shade),
+    inset -1px 0 0 rgba(0,0,0,0.06),
+    0 2px 4px rgba(0,0,0,0.10),
+    0 18px 48px rgba(0,0,0,0.22);
+}
+.fc-lens {
+  position: absolute;
+  border-radius: 9999px;
+  background: var(--l-lens);
+  backdrop-filter: blur(1px) saturate(160%) brightness(1.12);
+  -webkit-backdrop-filter: blur(1px) saturate(160%) brightness(1.12);
+  box-shadow:
+    inset 0 1px 0 var(--l-lens-rim),
+    inset 0 -1px 0 rgba(0,0,0,0.10),
+    inset 1px 0 0 rgba(255,255,255,0.35),
+    inset -1px 0 0 rgba(0,0,0,0.06),
+    0 1px 2px rgba(0,0,0,0.12),
+    0 8px 20px rgba(0,0,0,0.12);
+  will-change: transform, width, height;
+  pointer-events: none;
+}
+/* the faint colour fringe a thick lens leaves on its edge */
+.fc-lens::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from 200deg, rgba(255,120,80,0.35), rgba(120,200,255,0.35), rgba(255,220,120,0.35), rgba(255,120,80,0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.fc-lens-grab { pointer-events: auto; cursor: grab; touch-action: none; }
+.fc-lens-grab:active { cursor: grabbing; }
+
 /* ── Glass building blocks ────────────────────────────────────────────── */
 
 /* Chrome that content scrolls under: frosted. */
 .fc-glass-bar {
-  background: var(--g-bar);
-  backdrop-filter: var(--g-blur);
-  -webkit-backdrop-filter: var(--g-blur);
-  border: 1px solid var(--g-border);
-  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow);
+  background: linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%), var(--l-fill);
+  backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
+  -webkit-backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 var(--l-rim), inset 0 -1px 0 var(--l-rim-shade), 0 2px 4px rgba(0,0,0,0.08), 0 16px 44px rgba(0,0,0,0.18);
 }
 
 /* Floating menus and dialogs: more opaque, so what they say is easy to read. */
@@ -886,11 +954,11 @@ html[data-theme='light'] .fc-glass-hover:hover {
 .fc-app [role='alertdialog'],
 .fc-app .fixed.inset-0 > .bg-surface,
 .fc-app .fixed.inset-0 > * > .bg-surface {
-  background: var(--g-strong);
-  backdrop-filter: var(--g-blur);
-  -webkit-backdrop-filter: var(--g-blur);
+  background: linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 40%), var(--g-strong);
+  backdrop-filter: blur(28px) saturate(185%);
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
   border-color: var(--g-border-strong);
-  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
+  box-shadow: inset 0 1px 0 var(--l-rim), inset 0 -1px 0 var(--l-rim-shade), var(--g-shadow-float);
 }
 
 /* A small inset tile on a card (the account button, a chip, an inner box). */
@@ -937,12 +1005,13 @@ html[data-theme='light'] .fc-glass-hover:hover {
   }
   .fc-rail {
     pointer-events: auto;
-    background: var(--g-bar);
-    backdrop-filter: var(--g-blur);
-    -webkit-backdrop-filter: var(--g-blur);
-    border: 1px solid var(--g-border);
+    position: relative;
+    background: linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%), var(--l-fill);
+    backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
+    -webkit-backdrop-filter: blur(28px) saturate(185%) contrast(1.04);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 9999px;
-    box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
+    box-shadow: inset 0 1px 0 var(--l-rim), inset 1px 0 0 rgba(255,255,255,0.18), inset 0 -1px 0 var(--l-rim-shade), 0 2px 4px rgba(0,0,0,0.10), 0 18px 48px rgba(0,0,0,0.22);
   }
 }
 .fc-rail-item {
@@ -957,12 +1026,15 @@ html[data-theme='light'] .fc-glass-hover:hover {
   transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 .fc-rail-item:hover { background: var(--g-tile); color: rgb(var(--a-ink)); }
+.fc-rail-item:active { transform: scale(0.94); transition: transform 90ms ease-out; }
+/* the lens behind the active icon carries the selection; the icon only colours */
 .fc-rail-item-active,
 .fc-rail-item-active:hover {
-  background: var(--g-nav-active);
+  background: transparent;
   color: rgb(var(--a-accent));
-  box-shadow: var(--a-shadow-pill);
+  box-shadow: none;
 }
+.fc-rail-item > svg { position: relative; z-index: 1; }
 /* The name, to the right, on hover or keyboard focus. */
 .fc-rail-item[data-tip]::after {
   content: attr(data-tip);
@@ -1038,12 +1110,8 @@ html[data-theme='light'] .fc-glass-hover:hover {
   padding: 6px;
   max-width: calc(100vw - 24px);
   border-radius: 9999px;
-  background: var(--g-bar);
-  backdrop-filter: var(--g-blur);
-  -webkit-backdrop-filter: var(--g-blur);
-  border: 1px solid var(--g-border);
-  box-shadow: inset 0 1px 0 var(--g-highlight), var(--g-shadow-float);
 }
+.fc-floating-scroll { position: relative; }
 /* The sections scroll sideways inside the pill; the "+" stays put. */
 .fc-floating-scroll {
   display: flex;
@@ -1070,17 +1138,22 @@ html[data-theme='light'] .fc-glass-hover:hover {
   color: rgb(var(--a-ink-mute));
   transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
+.fc-floating-item { position: relative; z-index: 1; }
 .fc-floating-item:hover {
   background: var(--g-tile);
   color: rgb(var(--a-ink));
 }
+.fc-floating-item:active { transform: scale(0.95); transition: transform 90ms ease-out; }
+/* the lens behind the current section carries the selection */
 .fc-floating-item-active,
 .fc-floating-item-active:hover {
-  background: var(--g-nav-active);
+  background: transparent;
   color: rgb(var(--a-ink));
   font-weight: 600;
-  box-shadow: var(--a-shadow-pill);
+  box-shadow: none;
 }
+/* The lens sits over the current name (it is translucent, so the name shows through) so it can be grabbed. */
+.fc-floating-nav .fc-lens { z-index: 2; }
 .fc-floating-plus {
   width: 40px;
   height: 40px;
@@ -1440,8 +1513,17 @@ html[data-theme='light'] .fc-glass-hover:hover {
 }
 
 /* Motion is decoration here: none of it when the person asked for less. */
+@media (prefers-reduced-transparency: reduce) {
+  .fc-liquid, .fc-glass-bar, .fc-rail, .fc-floating-nav .fc-liquid, .fc-popover {
+    background: rgb(var(--a-surface));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .fc-lens { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--g-nav-active); }
+}
 @media (prefers-reduced-motion: reduce) {
   .fc-blob { animation: none; }
+  .fc-rail-item:active, .fc-floating-item:active { transform: none; }
   .fc-app .fc-card:hover, .fc-app .fc-panel:hover, .fc-floating-plus:hover { transform: none; }
 }
 
