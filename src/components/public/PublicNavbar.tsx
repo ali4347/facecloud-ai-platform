@@ -13,10 +13,10 @@ export function PublicNavbar() {
   const isHomePage = location.pathname === '/'
   const [appearance, toggleAppearance] = useAppearance()
 
-  /* At the top of the home page the bar floats over the hero video, which is
-     dark in either appearance — so the text there stays white. Once it docks,
-     or on any other page, it sits on the page itself and follows the tokens. */
-  const onMedia = isHomePage && !scrolled
+  /* At the top of the home page, in the dark appearance, the bar floats over the hero video, so the text there stays
+     white. In the light appearance the hero is light too, and once the bar docks, or on any other page, it sits on the
+     page itself and follows the tokens. */
+  const onMedia = isHomePage && !scrolled && appearance === 'dark'
 
   useEffect(() => {
     const handleScroll = () => {

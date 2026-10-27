@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import Hls from 'hls.js';
 import { ScrambleText } from '../animation/ScrambleText';
+import { useAppearance } from '../../lib/theme';
 
 const HLS_SRC =
   'https://stream.mux.com/bnYL6x5cAX6WiJv2pOKpITehZd3NVdXpj3ylJFpX5Lk.m3u8';
@@ -87,28 +88,74 @@ function HlsVideo() {
 }
 
 export default function FreedomSection() {
+  /* Dark appearance: the original black band. Light appearance: the same layout on the page's own cream, with glass
+     cards, ink text and the same orange accents. Every colour below that differs between the two is in `c`. */
+  const [appearance] = useAppearance();
+  const light = appearance === 'light';
+  const c = light
+    ? {
+        ground: 'rgb(var(--a-surface-soft))',
+        glow1: 'rgba(249, 115, 22, 0.14)',
+        glow2: 'rgba(234, 88, 12, 0.08)',
+        line: 'rgba(249, 115, 22, 0.20)',
+        badgeBg: 'rgba(255, 255, 255, 0.72)',
+        badgeText: 'rgb(var(--a-ink))',
+        badgeEdge: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 24px rgba(70, 45, 20, 0.12)',
+        para: 'rgb(var(--a-ink-mute))',
+        paraStrong: 'rgb(var(--a-ink))',
+        negBg: 'linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.52))',
+        negBorder: '1px solid rgba(239, 68, 68, 0.26)',
+        negShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 28px rgba(70, 45, 20, 0.10)',
+        negText: 'rgb(var(--a-ink-mute))',
+        posBg: 'linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62))',
+        posBorder: '1px solid rgba(16, 185, 129, 0.34)',
+        posShadow: 'inset 0 1px 0 rgba(255,255,255,0.95), 0 10px 28px rgba(70, 45, 20, 0.10)',
+        posText: 'rgb(var(--a-ink))',
+        orb: '0 0 0 8px rgba(249, 115, 22, 0.08), 0 24px 70px rgba(249, 115, 22, 0.28), 0 10px 30px rgba(70, 45, 20, 0.18)',
+      }
+    : {
+        ground: '#000000',
+        glow1: 'rgba(249, 115, 22, 0.08)',
+        glow2: 'rgba(234, 88, 12, 0.05)',
+        line: 'rgba(249, 115, 22, 0.08)',
+        badgeBg: 'rgb(var(--a-shadow-rgb) / 0.72)',
+        badgeText: '#FFFFFF',
+        badgeEdge: 'inset 0 1px 0 rgb(var(--a-ink) / 0.06), 0 10px 30px rgba(249, 115, 22, 0.10)',
+        para: '#9CA3AF',
+        paraStrong: '#FFFFFF',
+        negBg: 'linear-gradient(145deg, rgba(10, 10, 10, 0.90), rgba(5, 5, 5, 0.82))',
+        negBorder: '1px solid rgba(239, 68, 68, 0.14)',
+        negShadow: 'inset 0 1px 0 rgb(var(--a-ink) / 0.035), 0 14px 38px rgb(var(--a-shadow-rgb) / 0.26)',
+        negText: '#9CA3AF',
+        posBg: 'linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(10, 10, 10, 0.86))',
+        posBorder: '1px solid rgba(16, 185, 129, 0.16)',
+        posShadow: 'inset 0 1px 0 rgb(var(--a-ink) / 0.04), 0 14px 40px rgb(var(--a-shadow-rgb) / 0.13)',
+        posText: '#FFFFFF',
+        orb: '0 0 0 8px rgba(249, 115, 22, 0.035), 0 24px 80px rgba(249, 115, 22, 0.20), 0 0 70px rgba(249, 115, 22, 0.08)',
+      };
+
   return (
     <section
       id="methodology"
-      className="on-dark freedom-section w-full flex flex-col items-center select-none"
+      className={`${light ? '' : 'on-dark '}freedom-section w-full flex flex-col items-center select-none`}
       style={{
         background: `
           radial-gradient(
             circle at 50% 45%,
-            rgba(249, 115, 22, 0.08),
+            ${c.glow1},
             transparent 34%
           ),
           radial-gradient(
             circle at 80% 30%,
-            rgba(234, 88, 12, 0.05),
+            ${c.glow2},
             transparent 26%
           ),
-          #000000
+          ${c.ground}
         `,
         padding: 'clamp(48px, 6vw, 80px) clamp(16px, 3vw, 40px)',
         gap: '36px',
-        borderTop: '1px solid rgba(249, 115, 22, 0.08)',
-        borderBottom: '1px solid rgba(249, 115, 22, 0.08)',
+        borderTop: `1px solid ${c.line}`,
+        borderBottom: `1px solid ${c.line}`,
       }}
     >
       {/* Header */}
@@ -117,15 +164,12 @@ export default function FreedomSection() {
         <div
           className="flex items-center gap-2 text-lg font-medium rounded-full"
           style={{
-            backgroundColor: 'rgb(var(--a-shadow-rgb) / 0.72)',
+            backgroundColor: c.badgeBg,
             border: '1px solid rgba(249, 115, 22, 0.22)',
-            color: '#FFFFFF',
+            color: c.badgeText,
             backdropFilter: 'blur(16px) saturate(150%)',
             padding: 'clamp(10px, 0.9vw, 14px) clamp(14px, 1.25vw, 20px)',
-            boxShadow: `
-              inset 0 1px 0 rgb(var(--a-ink) / 0.06),
-              0 10px 30px rgba(249, 115, 22, 0.10)
-            `,
+            boxShadow: c.badgeEdge,
           }}
         >
           {/* Inline SVG for Badge */}
@@ -171,11 +215,11 @@ export default function FreedomSection() {
         <p
           className="text-xs sm:text-sm md:text-base leading-relaxed max-w-[760px] mx-auto font-medium"
           style={{
-            color: '#9CA3AF',
+            color: c.para,
             lineHeight: 1.6,
           }}
         >
-          FaceCloud transforms unstructured facial images into <span style={{ color: '#FFFFFF' }}>enhanced</span>, <span style={{ color: '#FFFFFF' }}>validated</span>, <span style={{ color: '#FFFFFF' }}>identity-grouped</span>, and <span style={{ color: '#FFFFFF' }}>securely downloadable</span> results.
+          FaceCloud transforms unstructured facial images into <span style={{ color: c.paraStrong }}>enhanced</span>, <span style={{ color: c.paraStrong }}>validated</span>, <span style={{ color: c.paraStrong }}>identity-grouped</span>, and <span style={{ color: c.paraStrong }}>securely downloadable</span> results.
         </p>
       </div>
 
@@ -207,9 +251,9 @@ export default function FreedomSection() {
                 gap: '12px',
                 padding: 'clamp(12px, 0.97vw, 16px) clamp(14px, 1.25vw, 20px)',
                 borderRadius: '18px',
-                background: 'linear-gradient(145deg, rgba(10, 10, 10, 0.90), rgba(5, 5, 5, 0.82))',
-                border: '1px solid rgba(239, 68, 68, 0.14)',
-                boxShadow: 'inset 0 1px 0 rgb(var(--a-ink) / 0.035), 0 14px 38px rgb(var(--a-shadow-rgb) / 0.26)',
+                background: c.negBg,
+                border: c.negBorder,
+                boxShadow: c.negShadow,
                 backdropFilter: 'blur(18px) saturate(130%)',
               }}
             >
@@ -225,7 +269,7 @@ export default function FreedomSection() {
               <span
                 style={{
                   fontSize: 'clamp(13px, 1.15vw, 17px)',
-                  color: '#9CA3AF',
+                  color: c.negText,
                   lineHeight: 1.4,
                   fontWeight: 400,
                 }}
@@ -249,11 +293,7 @@ export default function FreedomSection() {
               borderRadius: '50%',
               padding: '3px',
               background: 'conic-gradient(from 180deg, #EA580C, #F97316, #FB923C, #FDBA74, #EA580C)',
-              boxShadow: `
-                0 0 0 8px rgba(249, 115, 22, 0.035),
-                0 24px 80px rgba(249, 115, 22, 0.20),
-                0 0 70px rgba(249, 115, 22, 0.08)
-              `,
+              boxShadow: c.orb,
             }}
           >
             <div
@@ -288,9 +328,9 @@ export default function FreedomSection() {
                 gap: '12px',
                 padding: 'clamp(12px, 0.97vw, 16px) clamp(14px, 1.25vw, 20px)',
                 borderRadius: '18px',
-                background: 'linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(10, 10, 10, 0.86))',
-                border: '1px solid rgba(16, 185, 129, 0.16)',
-                boxShadow: 'inset 0 1px 0 rgb(var(--a-ink) / 0.04), 0 14px 40px rgb(var(--a-shadow-rgb) / 0.13)',
+                background: c.posBg,
+                border: c.posBorder,
+                boxShadow: c.posShadow,
               }}
             >
               <img
@@ -305,7 +345,7 @@ export default function FreedomSection() {
               <span
                 style={{
                   fontSize: 'clamp(13px, 1.15vw, 17px)',
-                  color: '#FFFFFF',
+                  color: c.posText,
                   lineHeight: 1.4,
                   fontWeight: 500,
                 }}

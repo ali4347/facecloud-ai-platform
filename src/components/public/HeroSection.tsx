@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Check, Zap, Shield, Users, Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ScrambleText } from '../animation/ScrambleText'
+import { useAppearance } from '../../lib/theme'
 
 const SUBMITTED_TEXT = "You're on the list — we'll be in touch."
 
@@ -17,6 +18,8 @@ export function HeroSection() {
   const [email, setEmail]           = useState('')
   const [submitted, setSubmitted]   = useState(false)
   const prefersReduced              = useReducedMotion()
+  const [appearance]                = useAppearance()
+  const light                       = appearance === 'light'
   const resetTimeoutRef             = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -67,7 +70,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15, duration: 0.7 }}
-          className="text-white/75 text-[10px] md:text-[11px] font-mono font-bold tracking-[0.22em] uppercase"
+          className="text-ink/75 text-[10px] md:text-[11px] font-mono font-bold tracking-[0.22em] uppercase"
         >
           AI Face Enhancement&nbsp;•&nbsp;Validation&nbsp;•&nbsp;Identity Grouping
         </motion.p>
@@ -81,7 +84,7 @@ export function HeroSection() {
         >
           <motion.span
             variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } } }}
-            className="block text-white"
+            className="block text-ink"
           >
             <ScrambleText text="A new way to enhance" />
           </motion.span>
@@ -89,7 +92,7 @@ export function HeroSection() {
             variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 1, ease: [0.16, 1, 0.3, 1] } } }}
             className="block"
           >
-            <span className="text-white">and organize </span>
+            <span className="text-ink">and organize </span>
             <span className="bg-[#F97316] text-white px-2 py-1 inline-block font-bold">
               <ScrambleText text="facial images" />
             </span>
@@ -101,7 +104,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25, duration: 0.8 }}
-          className="max-w-2xl text-white/60 text-sm md:text-[15px] leading-7"
+          className="max-w-2xl text-ink/60 text-sm md:text-[15px] leading-7"
         >
           Upload single images, multiple photos, or ZIP files. FaceCloud improves
           low-light images with Zero-DCE, validates face quality, groups identities
@@ -124,8 +127,8 @@ export function HeroSection() {
                 exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ duration: 0.2 }}
                 onSubmit={handleSubmit}
-                className="flex items-center gap-2 pl-5 pr-1.5 py-1.5 border border-white/15 rounded-full
-                           bg-white/[0.03] backdrop-blur-sm w-full max-w-[420px]
+                className="flex items-center gap-2 pl-5 pr-1.5 py-1.5 border border-ink/15 rounded-full
+                           bg-ink/[0.03] backdrop-blur-sm w-full max-w-[420px]
                            focus-within:border-[#F97316]/50 transition-colors duration-300"
               >
                 <input
@@ -134,8 +137,8 @@ export function HeroSection() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Enter your email for early access"
                   aria-label="Your email for early access"
-                  className="flex-1 bg-transparent text-white text-sm outline-none
-                             placeholder:text-white/35 min-w-0"
+                  className="flex-1 bg-transparent text-ink text-sm outline-none
+                             placeholder:text-ink/35 min-w-0"
                 />
                 <button
                   type="submit"
@@ -165,7 +168,7 @@ export function HeroSection() {
           {/* Demo link */}
           <Link
             to="/dashboard"
-            className="text-white/55 hover:text-[#F97316] transition-colors duration-300
+            className="text-ink/55 hover:text-[#F97316] transition-colors duration-300
                        text-[13px] font-medium tracking-wide"
           >
             Watch FaceCloud processing demo →
@@ -191,8 +194,9 @@ export function HeroSection() {
                 stiffness: 300,
                 damping: 20,
               }}
-              className="on-dark glass-media rounded-full flex items-center gap-2 px-4 py-2 text-[11px] font-medium
-                         text-white/55 border border-white/[0.07]"
+              className={light
+                ? 'glass-pill rounded-full flex items-center gap-2 px-4 py-2 text-[11px] font-medium text-ink-mute border border-line'
+                : 'on-dark glass-media rounded-full flex items-center gap-2 px-4 py-2 text-[11px] font-medium text-white/55 border border-white/[0.07]'}
             >
               <s.icon className="w-3.5 h-3.5 text-[#F97316] flex-shrink-0" />
               {s.label}

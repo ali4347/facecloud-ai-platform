@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-10-27
+**Last updated:** 2026-10-28
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-10-28 — Landing hero and Control section in the light appearance; the appearance toggle fixed
+*Status: committed (this commit).*
+
+- **Asked by the owner:** in the light appearance the home page's hero and the "Control" section were still black.
+- **Hero.** Both videos are shot on black, so the light appearance has its own cut of the same footage: `public/videos/facecloud-hero-{forward,reverse}-light.mp4` and `facecloud-hero-poster-light.jpg`, baked with ffmpeg by a luminance matte (the black ground becomes the page's own cream #F3ECE4, the portrait keeps its colours; 241 frames each, 24 fps, same length as the dark files, which are untouched). `BackgroundVideo.tsx` picks the cut by appearance (remounting the videos on a change), fades the frame's edges with a mask in light so no rectangle can show, and swaps the black readability overlay for a soft cream veil behind the headline. `HeroSection.tsx`: the white text, the email pill and the placeholder use the ink tokens (white in dark, dark brown in light; the orange highlight keeps white on orange), and the four feature pills are glass pills in light and the old dark media glass in dark. `Landing.tsx`/`index.css`: the hero's ground is `.fc-hero-main` (black / cream). `PublicNavbar.tsx`: the bar is "over media" only in the dark appearance, so in light it is the normal glass bar with the light logo.
+- **Control section** (`FreedomSection.tsx`): one set of colours per appearance. Dark is the original black band, unchanged; light is the same layout on cream with glass cards (red-edged for the problems, green-edged for the answers), ink text, a white badge, and the same orange accents and orb. The `on-dark` class is only applied in the dark appearance.
+- **A bug found on the way and fixed (`src/lib/theme.ts`).** The appearance toggle did nothing on the landing page and in the dashboards: one click toggled twice (stored "light" then "dark" in the same tick), in the dev server and in the production build. The side effects (store, paint, tell the other consumers) ran inside a state updater; the event they sent made the same hook set its state again and run the updater a second time from the new value. The toggle now reads `<html data-theme>`, runs its side effects outside any updater and sets the state once. Checked by three clicks on the landing page (light, dark, light, footage and ground swapping each time) in dev and in the production build, and by three clicks in the dashboard.
+- **Verified:** `npx tsc -b`, `npm run build`, `VITE_USE_API=false VITE_API_URL= npm run build`; screenshots of the hero and the Control section in both appearances at 1440 px and the hero at 390 px (no page wider than the screen); the dark hero and Control section look as before; no console errors.
+- **Known, not changed:** the dark treatment of the logo has a dark-grey "Face" that is faint on pure black (the approved artwork); the lower sections of the home page that were already light-aware were not touched, and the two terminal-style panels stay dark by design.
 
 ### 2026-10-27 — Liquid-glass chrome: the bars are thick glass and the current tab is a lens that springs and can be dragged
 *Status: committed (this commit).*

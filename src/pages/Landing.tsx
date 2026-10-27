@@ -295,7 +295,7 @@ export default function Landing() {
       {/* ══════════════════════════════════════════════════════════
           SECTION 1 — Fullscreen video hero (100vh)
           ══════════════════════════════════════════════════════════ */}
-      <main className="relative bg-black min-h-[100svh] h-screen w-full flex flex-col overflow-hidden selection:bg-white selection:text-black shrink-0 z-10">
+      <main className="fc-hero-main relative min-h-[100svh] h-screen w-full flex flex-col overflow-hidden shrink-0 z-10">
         <BackgroundVideo />
         <HeroSection />
       </main>

@@ -86,6 +86,16 @@ section[id] {
   --border-color: rgba(255,255,255,0.12);
 }
 
+/* ─── Landing hero ground ─────────────────────────────────────────────
+   Black in the dark appearance (the footage is shot on black); the page's own
+   cream in the light one, where the footage is the cut baked onto that cream. */
+.fc-hero-main { background: #000; }
+.fc-hero-main ::selection { background: #fff; color: #000; }
+.fc-hero-ground { background: #000; }
+html[data-theme='light'] .fc-hero-main,
+html[data-theme='light'] .fc-hero-ground { background: rgb(var(--a-surface-soft)); }
+html[data-theme='light'] .fc-hero-main ::selection { background: #F97316; color: #fff; }
+
 /* ─── Logo treatments ─────────────────────────────────────────────────
    The FaceCloudLogo component puts both treatments of the artwork in the
    page; the appearance decides which one is seen. Dark is the default

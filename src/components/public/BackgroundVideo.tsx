@@ -1,21 +1,32 @@
 import { useState, useEffect, useRef } from 'react'
+import { useAppearance } from '../../lib/theme'
 
 const FORWARD_VIDEO_SRC = '/videos/facecloud-hero-forward.mp4'
 const REVERSE_VIDEO_SRC = '/videos/facecloud-hero-reverse.mp4'
 const POSTER_SRC = '/videos/facecloud-hero-poster.jpg'
 
+/* The light appearance has its own cut of the same footage: the black ground is replaced by the page's own cream
+   (#F3ECE4, the light --a-surface-soft) through a luminance matte, so the portrait stands on the page instead of in a
+   black box. Baked with ffmpeg; the dark files are untouched. */
+const FORWARD_LIGHT_SRC = '/videos/facecloud-hero-forward-light.mp4'
+const REVERSE_LIGHT_SRC = '/videos/facecloud-hero-reverse-light.mp4'
+const POSTER_LIGHT_SRC = '/videos/facecloud-hero-poster-light.jpg'
+
 type PlaybackDirection = 'forward' | 'reverse'
 
 export function BackgroundVideo() {
+  const [appearance] = useAppearance()
+  const light = appearance === 'light'
   const [playbackDirection, setPlaybackDirection] = useState<PlaybackDirection>('forward')
   const forwardVideoRef = useRef<HTMLVideoElement>(null)
   const reverseVideoRef = useRef<HTMLVideoElement>(null)
   const motionWrapperRef = useRef<HTMLDivElement>(null)
 
-  // Preload reverse video on mount
+  // Preload reverse video on mount, and again when the appearance swaps the footage (the videos are remounted).
   useEffect(() => {
+    setPlaybackDirection('forward')
     reverseVideoRef.current?.load()
-  }, [])
+  }, [appearance])
 
   // Auto-play forward video on mount or when playable
   const handleForwardCanPlay = () => {
@@ -123,7 +134,7 @@ export function BackgroundVideo() {
       window.removeEventListener('mousemove', handleMove)
       if (wrapper) wrapper.style.transform = ''
     }
-  }, [])
+  }, [appearance])
 
   const getVideoClass = (direction: PlaybackDirection) => {
     const active = playbackDirection === direction
@@ -139,9 +150,18 @@ export function BackgroundVideo() {
   }
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 bg-black">
-      {/* Shared Parallax Motion Wrapper */}
-      <div ref={motionWrapperRef} className="absolute inset-0 w-full h-full pointer-events-none">
+    <div className="fc-hero-ground absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Shared Parallax Motion Wrapper. Keyed by the appearance so the other cut of the footage loads cleanly; in the
+          light appearance its edges fade out, so no rectangle of the video's frame can show against the page. */}
+      <div
+        key={appearance}
+        ref={motionWrapperRef}
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={light ? {
+          WebkitMaskImage: 'radial-gradient(ellipse 62% 72% at 50% 56%, #000 52%, transparent 100%)',
+          maskImage: 'radial-gradient(ellipse 62% 72% at 50% 56%, #000 52%, transparent 100%)',
+        } : undefined}
+      >
         {/* Forward Video */}
         <video
           ref={forwardVideoRef}
@@ -149,14 +169,14 @@ export function BackgroundVideo() {
           muted
           playsInline
           preload="auto"
-          poster={POSTER_SRC}
+          poster={light ? POSTER_LIGHT_SRC : POSTER_SRC}
           aria-hidden="true"
           tabIndex={-1}
           onCanPlay={handleForwardCanPlay}
           onEnded={handleForwardEnded}
           className={getVideoClass('forward')}
         >
-          <source src={FORWARD_VIDEO_SRC} type="video/mp4" />
+          <source src={light ? FORWARD_LIGHT_SRC : FORWARD_VIDEO_SRC} type="video/mp4" />
         </video>
 
         {/* Reverse Video */}
@@ -165,32 +185,43 @@ export function BackgroundVideo() {
           muted
           playsInline
           preload="metadata"
-          poster={POSTER_SRC}
+          poster={light ? POSTER_LIGHT_SRC : POSTER_SRC}
           aria-hidden="true"
           tabIndex={-1}
           onEnded={handleReverseEnded}
           onError={handleReverseError}
           className={getVideoClass('reverse')}
         >
-          <source src={REVERSE_VIDEO_SRC} type="video/mp4" />
+          <source src={light ? REVERSE_LIGHT_SRC : REVERSE_VIDEO_SRC} type="video/mp4" />
         </video>
       </div>
 
-      {/* Restrained readability overlay */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(180deg,rgba(0,0,0,0.14)_0%,rgba(0,0,0,0.04)_45%,rgba(0,0,0,0.34)_100%)]"
-      />
+      {light ? (
+        /* A soft cream veil behind the headline, so dark text stays readable over the portrait */
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[2]"
+          style={{ background: 'radial-gradient(ellipse 48% 42% at 50% 52%, rgba(243,236,228,0.55) 0%, transparent 72%)' }}
+        />
+      ) : (
+        <>
+          {/* Restrained readability overlay */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(180deg,rgba(0,0,0,0.14)_0%,rgba(0,0,0,0.04)_45%,rgba(0,0,0,0.34)_100%)]"
+          />
 
-      {/* Subtle orange atmospheric glow — bottom center */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[3]"
-        style={{
-          background:
-            'radial-gradient(ellipse 55% 30% at 50% 80%, rgba(249,115,22,0.08) 0%, transparent 70%)',
-        }}
-      />
+          {/* Subtle orange atmospheric glow — bottom center */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-[3]"
+            style={{
+              background:
+                'radial-gradient(ellipse 55% 30% at 50% 80%, rgba(249,115,22,0.08) 0%, transparent 70%)',
+            }}
+          />
+        </>
+      )}
     </div>
   )
 }

@@ -58,14 +58,18 @@ export function useAppearance(): [Appearance, () => void] {
     return () => window.removeEventListener(CHANGE_EVENT, onChange)
   }, [])
 
+  /* The current appearance is read from <html data-theme>, the one thing every consumer and stylesheet agrees on, and the
+     side effects (store, paint, tell the other consumers) run here, not inside a state updater. They used to run inside
+     `setAppearance(current => …)`: an updater may be run more than once, and the event it sent made this very hook set
+     its state again and run the updater a second time from the new value, so one click toggled twice and the
+     appearance never changed. */
   const toggle = useCallback(() => {
-    setAppearance(current => {
-      const next: Appearance = current === 'dark' ? 'light' : 'dark'
-      storeAppearance(next)
-      applyAppearance(next)
-      window.dispatchEvent(new CustomEvent<Appearance>(CHANGE_EVENT, { detail: next }))
-      return next
-    })
+    const current: Appearance = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
+    const next: Appearance = current === 'dark' ? 'light' : 'dark'
+    storeAppearance(next)
+    applyAppearance(next)
+    setAppearance(next)
+    window.dispatchEvent(new CustomEvent<Appearance>(CHANGE_EVENT, { detail: next }))
   }, [])
 
   return [appearance, toggle]
