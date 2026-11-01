@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { animate, motion, useMotionValue, useReducedMotion } from 'framer-motion'
 import { navByRole } from './Sidebar'
@@ -18,8 +18,10 @@ const rubberband = (over: number, size: number, c = 0.55) => (over * size * c) /
 /**
  * The floating pill at the foot of the screen: every section of the portal by
  * name, scrolling sideways inside the pill when there are more than fit, plus
- * the upload shortcut for a member. It only points at routes the sidebar
- * already has; on a phone it shows icons alone, on a desk names alone.
+ * the upload shortcut for a member: a "+" that asks the shell to open the
+ * upload popup, so the person stays on the page they are reading. The names
+ * only point at routes the sidebar already has; on a phone the pill shows
+ * icons alone, on a desk names alone.
  *
  * The current section sits under a lens of brighter glass. On a route change
  * the lens springs to the new section from wherever it is (interruptible: a
@@ -27,7 +29,7 @@ const rubberband = (over: number, size: number, c = 0.55) => (over * size * c) /
  * dragged along the pill; on release it flies with the finger's momentum to
  * the nearest section and opens it.
  */
-export function FloatingNav({ role }: { role: Role }) {
+export function FloatingNav({ role, onUpload }: { role: Role; onUpload?: () => void }) {
   const items = navByRole[role]
   const location = useLocation()
   const navigate = useNavigate()
@@ -140,10 +142,10 @@ export function FloatingNav({ role }: { role: Role }) {
           </NavLink>
         ))}
       </div>
-      {role === 'user' && (
-        <Link to="/dashboard/upload" className="fc-floating-plus" aria-label="Upload photos" title="Upload photos">
+      {role === 'user' && onUpload && (
+        <button type="button" onClick={onUpload} className="fc-floating-plus" aria-label="Upload photos" aria-haspopup="dialog" title="Upload photos">
           <Plus className="w-5 h-5" aria-hidden="true" />
-        </Link>
+        </button>
       )}
     </nav>
   )

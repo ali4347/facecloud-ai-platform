@@ -31,7 +31,7 @@ function Thumb({ src, alt, className, fill = false }: { src: string; alt: string
   return <img src={src} alt={alt} onError={() => setBroken(true)} className={className} />
 }
 
-export default function UploadMultipleLive() {
+export default function UploadMultipleLive({ embedded = false }: { embedded?: boolean }) {
   const target = useSubmitTarget()
   // Where this upload was sent: undefined is the person's own workspace, which has no moderator.
   const [sentTo, setSentTo] = useState<number | undefined>(undefined)
@@ -117,15 +117,17 @@ export default function UploadMultipleLive() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/dashboard/upload" aria-label="Back to Upload Center" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <PageHeader
-          title="Multiple Batch Upload"
-          subtitle="Select your photos, review them, then confirm to start processing."
-        />
-      </div>
+      {!embedded && (
+        <div className="flex items-center gap-3">
+          <Link to="/dashboard/upload" aria-label="Back to Upload Center" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <PageHeader
+            title="Multiple Batch Upload"
+            subtitle="Select your photos, review them, then confirm to start processing."
+          />
+        </div>
+      )}
 
       {error && (
         <div role="alert" className="p-3 rounded-2xl text-xs flex items-start gap-2 bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">

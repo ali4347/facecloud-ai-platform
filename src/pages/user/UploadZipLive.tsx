@@ -19,7 +19,7 @@ import { RejectionBreakdown } from '../../components/features/RejectionBreakdown
 /** What the backend takes: a ZIP up to 2 GB. */
 const MAX_ZIP_BYTES = 2 * 1024 * 1024 * 1024
 
-export default function UploadZipLive() {
+export default function UploadZipLive({ embedded = false }: { embedded?: boolean }) {
   const target = useSubmitTarget()
   // Where this upload was sent: undefined is the person's own workspace, which has no moderator.
   const [sentTo, setSentTo] = useState<number | undefined>(undefined)
@@ -78,15 +78,17 @@ export default function UploadZipLive() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/dashboard/upload" aria-label="Back to Upload Center" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <PageHeader
-          title="ZIP Archive Upload"
-          subtitle="Upload a ZIP of portrait photos for automated batch processing and grouping."
-        />
-      </div>
+      {!embedded && (
+        <div className="flex items-center gap-3">
+          <Link to="/dashboard/upload" aria-label="Back to Upload Center" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <PageHeader
+            title="ZIP Archive Upload"
+            subtitle="Upload a ZIP of portrait photos for automated batch processing and grouping."
+          />
+        </div>
+      )}
 
       {error && (
         <div role="alert" className="p-3 rounded-2xl text-xs flex items-start gap-2 bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">

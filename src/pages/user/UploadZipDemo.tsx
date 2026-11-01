@@ -6,7 +6,7 @@ import { ArrowLeft, FileArchive, CheckCircle, Download, Link2, HelpCircle, Play,
 
 type Stage = 'select' | 'preview' | 'processing' | 'done'
 
-export default function UploadZipDemo() {
+export default function UploadZipDemo({ embedded = false }: { embedded?: boolean }) {
   const [zipFile, setZipFile] = useState<File | null>(null)
   const [stage, setStage] = useState<Stage>('select')
   const [progress, setProgress] = useState(0)
@@ -39,15 +39,17 @@ export default function UploadZipDemo() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <PageHeader
-          title="ZIP Archive Upload"
-          subtitle="Upload a ZIP of portrait photos for automated batch processing and grouping."
-        />
-      </div>
+      {!embedded && (
+        <div className="flex items-center gap-3">
+          <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <PageHeader
+            title="ZIP Archive Upload"
+            subtitle="Upload a ZIP of portrait photos for automated batch processing and grouping."
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 

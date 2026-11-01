@@ -17,7 +17,7 @@ interface UploadFileItem {
 
 type Stage = 'select' | 'preview' | 'processing' | 'done'
 
-export default function UploadMultipleDemo() {
+export default function UploadMultipleDemo({ embedded = false }: { embedded?: boolean }) {
   const [stage, setStage] = useState<Stage>('select')
   const [filesList, setFilesList] = useState<UploadFileItem[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
@@ -80,15 +80,17 @@ export default function UploadMultipleDemo() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <PageHeader
-          title="Multiple Batch Upload"
-          subtitle="Select your photos, review them, then confirm to start processing."
-        />
-      </div>
+      {!embedded && (
+        <div className="flex items-center gap-3">
+          <Link to="/dashboard/upload" className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <PageHeader
+            title="Multiple Batch Upload"
+            subtitle="Select your photos, review them, then confirm to start processing."
+          />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 

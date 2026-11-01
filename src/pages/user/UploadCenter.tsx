@@ -1,36 +1,10 @@
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
-import { FileImage, Files, FolderArchive, ArrowRight, CheckCircle } from 'lucide-react'
+import { UPLOAD_KINDS, UPLOAD_LIMITS, UploadArt } from '../../components/features/uploadKinds'
+import { ArrowRight, CheckCircle } from 'lucide-react'
 
 export default function UploadCenter() {
-  const options = [
-    {
-      title: 'Single Image Upload',
-      desc: 'Upload a single face portrait to restore lighting and validate compliance.',
-      path: '/dashboard/upload/single',
-      icon: FileImage,
-      badge: 'Interactive Restores',
-      color: 'border-accent/20 text-accent hover:border-accent'
-    },
-    {
-      title: 'Multiple Batch Upload',
-      desc: 'Upload up to 50 files. Estimates illumination levels and outputs status reports.',
-      path: '/dashboard/upload/multiple',
-      icon: Files,
-      badge: 'Batch Queue',
-      color: 'border-emerald-500/30/20 text-emerald-400 hover:border-emerald-500/30'
-    },
-    {
-      title: 'ZIP Archive Upload',
-      desc: 'Upload a ZIP folder of face portraits for fully automated cluster grouping.',
-      path: '/dashboard/upload/zip',
-      icon: FolderArchive,
-      badge: 'Automated Folders',
-      color: 'border-violet-500/30/20 text-violet-400 hover:border-violet-500/30'
-    }
-  ]
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -39,24 +13,22 @@ export default function UploadCenter() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {options.map(opt => (
-          <div key={opt.title} className="fc-card p-6 flex flex-col justify-between aspect-square hover:-translate-y-1">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className={`p-3 rounded-2xl bg-surface-mute border border-line`}>
-                  <opt.icon className="w-6 h-6 text-accent" />
-                </div>
-                <span className="text-[10px] font-bold text-ink-mute uppercase tracking-wider bg-surface-mute px-2 py-0.5 rounded-full border border-line">{opt.badge}</span>
-              </div>
-              <div className="space-y-2">
-                <h3 className="text-base font-bold text-ink">{opt.title}</h3>
-                <p className="text-xs text-ink-mute leading-relaxed">{opt.desc}</p>
-              </div>
+        {UPLOAD_KINDS.map(opt => (
+          <article key={opt.kind} className="fc-card group p-4 flex flex-col gap-5">
+            <UploadArt kind={opt.kind} className="h-40" />
+            <div className="px-2 space-y-2">
+              <h3 className="text-[17px] font-semibold text-ink tracking-tight leading-snug">{opt.title}</h3>
+              <p className="text-[13px] text-ink-mute leading-relaxed">{opt.blurb}</p>
             </div>
-            <Link to={opt.path} className="fc-btn-primary w-full text-xs font-bold py-3 mt-4">
-              Access Pipeline <ArrowRight className="w-3.5 h-3.5" />
+            <ul className="px-2 flex flex-wrap gap-1.5" aria-label={`${opt.title}: what to expect`}>
+              {opt.facts.map(fact => (
+                <li key={fact} className="text-[11px] font-medium text-ink-soft px-2.5 py-1 rounded-full bg-surface-mute border border-line">{fact}</li>
+              ))}
+            </ul>
+            <Link to={opt.path} className="fc-btn-primary w-full text-[13px] font-semibold py-3 mt-auto">
+              {opt.cta} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
+          </article>
         ))}
       </div>
 
@@ -66,7 +38,7 @@ export default function UploadCenter() {
             {[
               { text: 'File Formats: JPG, JPEG, PNG', ok: true },
               { text: 'ZIP files must contain only valid images (uncompressed folder hierarchies)', ok: true },
-              { text: 'Single Image file size limit: 50MB; ZIP limit: 200MB', ok: true },
+              { text: `Single image file size limit: ${UPLOAD_LIMITS.image}; ZIP limit: ${UPLOAD_LIMITS.zip}`, ok: true },
               { text: 'Target face must be centered and face forward directly', ok: false },
               { text: 'Image resolution must not display excessive motion blur or noise indicators', ok: false }
             ].map((g, i) => (

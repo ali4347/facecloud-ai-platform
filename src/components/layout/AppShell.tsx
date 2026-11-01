@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import { Sidebar } from './Sidebar'
 import { Topbar } from './Topbar'
 import { FloatingNav } from './FloatingNav'
+import { UploadDialog } from '../features/UploadDialog'
 import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { NoOrganizationGuard } from '../moderator/NoOrganizationGuard'
 import { useAppearance } from '../../lib/theme'
@@ -16,6 +18,9 @@ interface AppShellProps {
 
 export function AppShell({ role }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  // The "+" in the bottom bar opens the upload popup over the current page (a member's shell only).
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const closeUpload = useCallback(() => setUploadOpen(false), [])
   const [appearance, toggleAppearance] = useAppearance()
   const navigate = useNavigate()
   const location = useLocation()
@@ -99,7 +104,14 @@ export function AppShell({ role }: AppShellProps) {
         </main>
       </div>
 
-      <FloatingNav role={role} />
+      <FloatingNav role={role} onUpload={() => setUploadOpen(true)} />
+
+      {/* Inside .fc-app, not a portal to <body>: the glass styling is scoped to it. */}
+      {role === 'user' && (
+        <AnimatePresence>
+          {uploadOpen && <UploadDialog key="upload-dialog" onClose={closeUpload} />}
+        </AnimatePresence>
+      )}
     </div>
   )
 }

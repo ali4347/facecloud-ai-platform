@@ -73,7 +73,8 @@ function stageIndex(stage: string): number {
   return found === -1 ? 0 : found
 }
 
-export default function UploadSingle() {
+/** `embedded`: shown inside the upload popup, which supplies its own heading and way back. */
+export default function UploadSingle({ embedded = false }: { embedded?: boolean }) {
   const navigate = useNavigate()
   const target = useSubmitTarget()
   // Where THIS photo was sent (undefined: the person's own workspace). A photo in a workspace nobody moderates has no reviewer.
@@ -380,19 +381,21 @@ export default function UploadSingle() {
 
   return (
     <div className="space-y-6 page-enter">
-      <div className="flex items-center gap-3">
-        <Link
-          to="/dashboard/upload"
-          className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink"
-          aria-label="Back to upload options"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-        <PageHeader
-          title="Upload a Photo"
-          subtitle="Review your photo below, then confirm to start processing."
-        />
-      </div>
+      {!embedded && (
+        <div className="flex items-center gap-3">
+          <Link
+            to="/dashboard/upload"
+            className="p-2 rounded-xl hover:bg-surface-mute border border-line text-ink-mute hover:text-ink"
+            aria-label="Back to upload options"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <PageHeader
+            title="Upload a Photo"
+            subtitle="Review your photo below, then confirm to start processing."
+          />
+        </div>
+      )}
 
       {!USE_API && (
         <div className="p-3 rounded-2xl text-xs flex items-center gap-2 bg-surface-mute border border-line text-ink-soft">
