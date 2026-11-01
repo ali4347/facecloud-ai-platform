@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-01 — My Images: the success message goes by itself after 3 seconds
+*Status: committed (this commit).*
+
+- **Asked by the owner** (Roman Urdu, two screenshots of My Images showing the green bar at the bottom, "Grouping started for 3 photos. Person Folders update when it finishes." and "1 photo deleted."): the notification never closed by itself and sat there until the x was pressed; it should go after 2–3 seconds. Frontend only; the backend is not to be touched.
+- **Change** (`src/pages/user/MyImages.tsx`, one effect and one constant): a *success* notice is cleared 3 seconds after it appears (`NOTICE_MS = 3000`); a second notice restarts the clock and leaving the page cancels it. A *failure* notice is **not** timed: it says what went wrong ("2 deleted, 1 could not be deleted: …"), so it stays until it is dismissed with the x.
+- **Left alone on purpose:** the "Secure link ready" panels on Person Folder detail and Downloads (the backend returns that link once and never again, so the panel must not vanish) and the other pages' own messages.
+- **Verified** on a throwaway QA stack (8840 / 5240 / 9410, stopped and deleted afterwards; the owner's backend folder and model files untouched), real screens in headless Chrome: after a delete the notice appeared at 0.1 s and was gone at 3.05 s (shown for 2.95 s); with the delete forced to fail in the test tab only (a rewritten response, nothing on a server) the failure notice was still there after 9 s and the x removed it; no uncaught exceptions. `npx tsc -b`, `npm run build`, `VITE_USE_API=false VITE_API_URL= npm run build` pass. The "Grouping started" message uses the same code path; it was not triggered (it needs the face-grouping consent and an accepted photo, and the QA backend reports `completed`, see §7).
+
 ### 2026-11-01 — Upload Center cards redesigned, buttons renamed, and the "+" in the bottom bar opens an upload popup
 *Status: committed (this commit). The home-page gallery (photos of real people) is deliberately not part of it.*
 

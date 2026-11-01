@@ -22,6 +22,9 @@ const STATUS_FILTERS = [
   { value: 'processing', label: 'Processing' },
 ] as const
 
+/** How long a success message stays before it goes by itself. A failure is not timed: it explains what went wrong, so it stays until dismissed. */
+const NOTICE_MS = 3000
+
 export default function MyImages() {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')
@@ -37,6 +40,13 @@ export default function MyImages() {
   const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  // A new success message restarts the clock; leaving the page cancels it.
+  useEffect(() => {
+    if (notice?.kind !== 'ok') return
+    const timer = setTimeout(() => setNotice(null), NOTICE_MS)
+    return () => clearTimeout(timer)
+  }, [notice])
 
   const { data, loading, error, isDemo, reload } = useMyImages(page, status || undefined)
   const images = useMemo(() => data?.results ?? [], [data])

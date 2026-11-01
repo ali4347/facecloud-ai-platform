@@ -214,7 +214,7 @@ All of these read the live API when `VITE_USE_API=true` and keep their demo data
 * **Multiple Image Upload**: Processes collections of images concurrently in a progress queue, simulating details verification and face clusters.
 * **ZIP Archive Upload**: Handles bulk assets in standard ZIP archives, reporting extraction speeds, valid image counts, and extraction progress logs.
 * **Processing Jobs**: Detailed visual tracker containing duration metrics, stage completion ticks, and failure reasons for active tasks.
-* **My Images Grid**: Comprehensive gallery with search/filters based on face count, blur scores, or dates.
+* **My Images Grid**: Comprehensive gallery with search/filters based on face count, blur scores, or dates. The message after a delete or a grouping request goes by itself after 3 seconds when it succeeded; a failure message stays until it is dismissed.
 * **Person Folders (Identity Groups)**: Groups matched face embeddings into specific cards displaying matched confidence rates and historical counts.
 * **Secure Downloads**: Allows packaging enhanced copies, raw copies, or PDF audit reports to local browser filesystem downloads.
 * **Activity Logs**: Auditing stream representing user actions such as login, enhancement, and downloads.
