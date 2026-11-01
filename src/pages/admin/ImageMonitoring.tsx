@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 import { Check, ChevronLeft, ChevronRight, Clock, Eye, X, XCircle, Loader2 } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
@@ -110,6 +111,7 @@ function DetailPanel({ id, onClose, onChanged }: { id: number; onClose: () => vo
   const [busy, setBusy] = useState(false)
   const [decideError, setDecideError] = useState<string | null>(null)
   const [done, setDone] = useState<string | null>(null)
+  const reduced = useReducedMotion()
 
   useEffect(() => {
     if (!USE_API) return
@@ -157,86 +159,95 @@ function DetailPanel({ id, onClose, onChanged }: { id: number; onClose: () => vo
 
   const reasons = detail?.rejection_reason ? [detail.rejection_reason] : []
   return (
-    <div className="fixed inset-0 z-[70] flex justify-end bg-black/60" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
-      <aside role="dialog" aria-modal="true" aria-label="Photo details" className="w-full max-w-md h-full overflow-y-auto bg-surface border-l border-line p-6 space-y-5">
-        <div className="flex items-start justify-between gap-3">
+    <div className="fixed inset-0 z-[70] bg-black/50" onMouseDown={e => { if (e.target === e.currentTarget) onClose() }}>
+      {/* A floating card like the rail, set between the top bar (56 px, 12 px from the top) and the bottom pill (about 52 px, 14 px
+          from the foot) with a gap each side, so it never runs under either. The header stays; the photo's details scroll. */}
+      <motion.aside
+        role="dialog" aria-modal="true" aria-label="Photo details"
+        initial={reduced ? { opacity: 0 } : { opacity: 0, x: 28 }} animate={{ opacity: 1, x: 0 }}
+        transition={reduced ? { duration: 0.12 } : { type: 'spring', bounce: 0.12, duration: 0.45 }}
+        className="fc-popover fixed right-3 left-3 sm:left-auto sm:right-5 sm:w-[28rem] top-[5.25rem] bottom-[5.5rem] flex flex-col overflow-hidden rounded-[28px] border"
+      >
+        <div className="flex items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-line">
           <h2 className="text-base font-bold text-ink break-all">{detail?.original_name ?? `Photo ${id}`}</h2>
           <button type="button" onClick={onClose} aria-label="Close" className="p-1.5 rounded-lg hover:bg-surface-mute cursor-pointer"><X className="w-4 h-4 text-ink-mute" /></button>
         </div>
-        {error && <p role="alert" className="text-xs text-red-500">{error}</p>}
-        {!detail && !error && USE_API && <div className="py-10 text-center"><Loader2 className="w-5 h-5 mx-auto animate-spin text-ink-faint" /></div>}
-        {detail && (
-          <>
-            <AuthedImage load={signal => getSystemImagePreview(detail.id, signal)} cacheKey={`sys-${detail.id}`} alt={detail.original_name}
-              className="w-full h-64 object-contain bg-surface-mute" rounded="rounded-2xl" />
-            <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
-              <div><dt className="text-ink-faint">Owner</dt><dd className="font-semibold text-ink">{detail.owner.username}</dd><dd className="text-ink-mute break-all">{detail.owner.email}</dd></div>
-              <div><dt className="text-ink-faint">Uploaded</dt><dd className="font-semibold text-ink">{formatDateTime(detail.created_at)}</dd></div>
-              <div><dt className="text-ink-faint">Size</dt><dd className="font-semibold text-ink">{formatBytes(detail.file_size)}</dd></div>
-              <div><dt className="text-ink-faint">Dimensions</dt><dd className="font-semibold text-ink">{detail.width && detail.height ? `${detail.width} × ${detail.height}` : '—'}</dd></div>
-              <div><dt className="text-ink-faint">Quality verdict</dt><dd className="font-semibold text-ink">{verdict(detail).label}</dd></div>
-              <div><dt className="text-ink-faint">Faces found</dt><dd className="font-semibold text-ink">{detail.face_validation?.face_count ?? '—'}</dd></div>
-              <div><dt className="text-ink-faint">Sharpness</dt><dd className="font-semibold text-ink">{score(detail.quality?.sharpness_score)}</dd></div>
-              <div><dt className="text-ink-faint">Brightness</dt><dd className="font-semibold text-ink">{score(detail.quality?.brightness_score)}</dd></div>
-              <div><dt className="text-ink-faint">Duplicate matches</dt><dd className="font-semibold text-ink">{detail.duplicate_matches}</dd></div>
-            </dl>
-            {!detail.rejection_reason && (
-              <section aria-label="Decide on this photo" className="space-y-2">
-                <h3 className="text-xs font-bold text-ink">Decide on this photo</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {ACTIONS.map(a => {
-                    const current = detail.quality?.decision === DECISION_OF_ACTION[a.action]
-                    const settled = Boolean(detail.quality?.decision)
-                    return (
-                      <button
-                        key={a.action}
-                        type="button"
-                        data-current={current}
-                        aria-pressed={current}
-                        disabled={!canDecide || !settled || current || busy}
-                        title={current ? `Already ${a.past}` : undefined}
-                        onClick={() => { setPending(a.action); setDecideError(null); setReason('') }}
-                        className={`inline-flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl border text-xs font-bold whitespace-nowrap bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-transparent ${current ? '' : 'disabled:opacity-40'} ${a.tone}`}
-                      >
-                        <a.icon className="w-3.5 h-3.5" aria-hidden="true" />{a.label}
-                      </button>
-                    )
-                  })}
-                </div>
-                {canDecide === false && (
-                  <p className="text-[11px] text-ink-faint">
-                    The backend cannot record an administrator's decision yet, so these stay off. They switch on by themselves once it can.
-                  </p>
-                )}
-                {canDecide && !detail.quality?.decision && (
-                  <p className="text-[11px] text-ink-faint">You can decide once the quality check has finished.</p>
-                )}
-                {done && <p role="status" className="text-[11px] font-semibold text-[#10B981]">{done}</p>}
-              </section>
-            )}
-            {reasons.length > 0 && (
-              <div className="p-3 rounded-2xl bg-surface-mute border border-line text-xs">
-                <p className="font-semibold text-ink">{explainReason(reasons[0]).title}</p>
-                {explainReason(reasons[0]).hint && <p className="text-ink-mute mt-1">{explainReason(reasons[0]).hint}</p>}
-              </div>
-            )}
-            {detail.face_validation?.message && <p className="text-xs text-ink-mute">{detail.face_validation.message}</p>}
-            <div>
-              <h3 className="text-xs font-bold text-ink mb-2">Enhancements ({detail.enhancements.length})</h3>
-              {detail.enhancements.length === 0 ? <p className="text-xs text-ink-faint">None yet.</p> : (
-                <ul className="space-y-1.5 text-xs">
-                  {detail.enhancements.map(e => (
-                    <li key={e.id} className="flex justify-between gap-3 p-2 rounded-xl bg-surface-mute border border-line">
-                      <span className="text-ink">{e.applied_level || '—'}{e.algorithm ? ` · ${e.algorithm}` : ''}</span>
-                      <span className="text-ink-mute">{e.status} · {formatDateTime(e.created_at)}</span>
-                    </li>
-                  ))}
-                </ul>
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-5">
+          {error && <p role="alert" className="text-xs text-red-500">{error}</p>}
+          {!detail && !error && USE_API && <div className="py-10 text-center"><Loader2 className="w-5 h-5 mx-auto animate-spin text-ink-faint" /></div>}
+          {detail && (
+            <>
+              <AuthedImage load={signal => getSystemImagePreview(detail.id, signal)} cacheKey={`sys-${detail.id}`} alt={detail.original_name}
+                className="w-full h-64 object-contain bg-surface-mute" rounded="rounded-2xl" />
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+                <div><dt className="text-ink-faint">Owner</dt><dd className="font-semibold text-ink">{detail.owner.username}</dd><dd className="text-ink-mute break-all">{detail.owner.email}</dd></div>
+                <div><dt className="text-ink-faint">Uploaded</dt><dd className="font-semibold text-ink">{formatDateTime(detail.created_at)}</dd></div>
+                <div><dt className="text-ink-faint">Size</dt><dd className="font-semibold text-ink">{formatBytes(detail.file_size)}</dd></div>
+                <div><dt className="text-ink-faint">Dimensions</dt><dd className="font-semibold text-ink">{detail.width && detail.height ? `${detail.width} × ${detail.height}` : '—'}</dd></div>
+                <div><dt className="text-ink-faint">Quality verdict</dt><dd className="font-semibold text-ink">{verdict(detail).label}</dd></div>
+                <div><dt className="text-ink-faint">Faces found</dt><dd className="font-semibold text-ink">{detail.face_validation?.face_count ?? '—'}</dd></div>
+                <div><dt className="text-ink-faint">Sharpness</dt><dd className="font-semibold text-ink">{score(detail.quality?.sharpness_score)}</dd></div>
+                <div><dt className="text-ink-faint">Brightness</dt><dd className="font-semibold text-ink">{score(detail.quality?.brightness_score)}</dd></div>
+                <div><dt className="text-ink-faint">Duplicate matches</dt><dd className="font-semibold text-ink">{detail.duplicate_matches}</dd></div>
+              </dl>
+              {!detail.rejection_reason && (
+                <section aria-label="Decide on this photo" className="space-y-2">
+                  <h3 className="text-xs font-bold text-ink">Decide on this photo</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    {ACTIONS.map(a => {
+                      const current = detail.quality?.decision === DECISION_OF_ACTION[a.action]
+                      const settled = Boolean(detail.quality?.decision)
+                      return (
+                        <button
+                          key={a.action}
+                          type="button"
+                          data-current={current}
+                          aria-pressed={current}
+                          disabled={!canDecide || !settled || current || busy}
+                          title={current ? `Already ${a.past}` : undefined}
+                          onClick={() => { setPending(a.action); setDecideError(null); setReason('') }}
+                          className={`inline-flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl border text-xs font-bold whitespace-nowrap bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-transparent ${current ? '' : 'disabled:opacity-40'} ${a.tone}`}
+                        >
+                          <a.icon className="w-3.5 h-3.5" aria-hidden="true" />{a.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {canDecide === false && (
+                    <p className="text-[11px] text-ink-faint">
+                      The backend cannot record an administrator's decision yet, so these stay off. They switch on by themselves once it can.
+                    </p>
+                  )}
+                  {canDecide && !detail.quality?.decision && (
+                    <p className="text-[11px] text-ink-faint">You can decide once the quality check has finished.</p>
+                  )}
+                  {done && <p role="status" className="text-[11px] font-semibold text-[#10B981]">{done}</p>}
+                </section>
               )}
-            </div>
-          </>
-        )}
-      </aside>
+              {reasons.length > 0 && (
+                <div className="p-3 rounded-2xl bg-surface-mute border border-line text-xs">
+                  <p className="font-semibold text-ink">{explainReason(reasons[0]).title}</p>
+                  {explainReason(reasons[0]).hint && <p className="text-ink-mute mt-1">{explainReason(reasons[0]).hint}</p>}
+                </div>
+              )}
+              {detail.face_validation?.message && <p className="text-xs text-ink-mute">{detail.face_validation.message}</p>}
+              <div>
+                <h3 className="text-xs font-bold text-ink mb-2">Enhancements ({detail.enhancements.length})</h3>
+                {detail.enhancements.length === 0 ? <p className="text-xs text-ink-faint">None yet.</p> : (
+                  <ul className="space-y-1.5 text-xs">
+                    {detail.enhancements.map(e => (
+                      <li key={e.id} className="flex justify-between gap-3 p-2 rounded-xl bg-surface-mute border border-line">
+                        <span className="text-ink">{e.applied_level || '—'}{e.algorithm ? ` · ${e.algorithm}` : ''}</span>
+                        <span className="text-ink-mute">{e.status} · {formatDateTime(e.created_at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </motion.aside>
 
       {pending && detail && (
         <ConfirmDialog

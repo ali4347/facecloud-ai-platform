@@ -46,6 +46,16 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-01 — Admin Image Monitoring: the photo details open as a rounded floating card between the top bar and the bottom bar
+*Status: committed (this commit).*
+
+- **Asked by the owner** (Roman Urdu, a screenshot of the open details panel): change the design of the page that opens for a photo's details, rounded like the left sidebar, and make it less tall so it does not mix with the top bar and the bottom bar.
+- **What was wrong:** the panel was a full-height slab on the right edge. It ran from the top of the screen to the bottom, so its top edge sat across the top bar (56 px high, 12 px from the top) and the bottom pill (about 52 px, 14 px from the foot) overlapped its lower corner.
+- **Change** (`src/pages/admin/ImageMonitoring.tsx`, `DetailPanel`, look only): a floating card with 28 px rounded corners and the same glass and rim as the rail and the other floating menus (`fc-popover`), 28 rem wide on a desk and the screen width less 12 px a side on a phone. It is set between the bars: its top is 84 px from the top of the screen (16 px under the top bar) and its bottom 88 px from the foot (about 23 px above the pill). The title and the close button are now a header that stays put with a hairline under it; the photo, facts and the Accept / Under review / Reject row scroll underneath. It slides in from the right with a short spring (a plain fade under reduced motion). Behind it the page is dimmed a little less (50 % instead of 60 %). Nothing about what it shows or does changed.
+- **Verified** on a throwaway QA stack (stopped and deleted afterwards; the owner's backend folder and model files untouched), real screens in headless Chrome, by measuring the card against the top bar and the bottom pill at 1440 × 900, 1024 × 640, 820 × 1100 and 390 × 844: it is 16 px under the top bar and 23 px above the pill at every size; on the short screen the details scroll inside the card while the header stays at the same place; the close button, Escape and a click on the dimmed page close it, a click inside the card does not; the decision confirmation still opens over the card; dark, light and phone screenshots looked at; no uncaught exceptions. `npx tsc -b`, `npm run build`, `VITE_USE_API=false VITE_API_URL= npm run build` pass.
+- **Mistake of mine while testing (not a product bug):** two close checks first failed because I clicked at the wrong places (one point fell on the sidebar rail, which sits above the dimmed page, the other outside the card at 1024 px, which is a click on the dimmed page and so closed it, as it should); re-run at the right places they pass.
+- **Left alone:** the bottom pill and the rail stay above the dimmed page (they always did), so they look un-dimmed next to the topbar; that is the shell's layering, not this card's.
+
 ### 2026-11-01 — Admin Image Monitoring: a sort menu, and Accept / Under review / Reject in the details panel (the buttons wait for one backend call)
 *Status: committed (this commit).*
 
