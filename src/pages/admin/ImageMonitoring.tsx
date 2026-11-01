@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight, Eye, X, Loader2 } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Clock, Eye, X, XCircle, Loader2 } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { AsyncGate } from '../../components/admin/AsyncGate'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { mockImages } from '../../data/mock'
 import {
-  getSystemImage, getSystemImagePreview, listSystemImages,
-  type Paged, type SystemImageDetail, type SystemImageRow,
+  DECISION_OF_ACTION, decideSystemImage, getSystemImage, getSystemImagePreview, listSystemImages, systemDecisionsAvailable,
+  type Paged, type SystemImageAction, type SystemImageDetail, type SystemImageRow,
 } from '../../lib/api/adminSystem'
 import { USE_API } from '../../lib/api/config'
 import { formatBytes } from '../../lib/imageData'
@@ -17,6 +18,22 @@ import { messageFor, useApiResource } from '../../lib/useApiResource'
 import { formatDateTime } from '../../lib/utils'
 
 const PAGE_SIZE = 20
+/** The most photos one request can return. Any order other than "newest first" is worked out here, over this many. */
+const SORT_WINDOW = 200
+
+type SortKey = 'newest' | 'oldest' | 'name_asc' | 'name_desc' | 'size_desc' | 'size_asc' | 'owner' | 'attention' | 'sharp_desc' | 'sharp_asc'
+const SORTS: { key: SortKey; label: string }[] = [
+  { key: 'newest', label: 'Newest first' },
+  { key: 'oldest', label: 'Oldest first' },
+  { key: 'attention', label: 'Needs review first' },
+  { key: 'name_asc', label: 'Name A to Z' },
+  { key: 'name_desc', label: 'Name Z to A' },
+  { key: 'owner', label: 'Owner A to Z' },
+  { key: 'size_desc', label: 'Largest file first' },
+  { key: 'size_asc', label: 'Smallest file first' },
+  { key: 'sharp_desc', label: 'Sharpest first' },
+  { key: 'sharp_asc', label: 'Blurriest first' },
+]
 
 function demoPage(): Paged<SystemImageRow> {
   const results = mockImages.map((m, i): SystemImageRow => ({
@@ -42,9 +59,57 @@ function verdict(img: SystemImageRow): { tone: 'success' | 'warning' | 'error' |
 
 const score = (n: number | null | undefined) => (n === null || n === undefined ? '—' : String(Math.round(n)))
 
-function DetailPanel({ id, onClose }: { id: number; onClose: () => void }) {
+/** What needs a person's eye first: unsure photos, then refused ones, then the ones still being checked, then the good ones. */
+function attentionRank(img: SystemImageRow): number {
+  if (img.rejection_reason) return 2
+  switch (img.quality?.decision) {
+    case 'needs_review': return 0
+    case 'rejected': return 1
+    case 'accepted': return 4
+    default: return 3
+  }
+}
+const time = (img: SystemImageRow) => Date.parse(img.created_at) || 0
+/** A missing number sorts last in either direction, so "—" never ends up on top. */
+const numbers = (a: number | null | undefined, b: number | null | undefined, direction: 1 | -1) =>
+  a == null && b == null ? 0 : a == null ? 1 : b == null ? -1 : (a - b) * direction
+const text = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+
+function sortRows(rows: SystemImageRow[], key: SortKey): SystemImageRow[] {
+  const newest = (a: SystemImageRow, b: SystemImageRow) => time(b) - time(a) || b.id - a.id
+  const compare: Record<SortKey, (a: SystemImageRow, b: SystemImageRow) => number> = {
+    newest,
+    oldest: (a, b) => -newest(a, b),
+    name_asc: (a, b) => text(a.original_name, b.original_name),
+    name_desc: (a, b) => text(b.original_name, a.original_name),
+    owner: (a, b) => text(a.owner.username, b.owner.username),
+    size_desc: (a, b) => numbers(a.file_size || null, b.file_size || null, -1),
+    size_asc: (a, b) => numbers(a.file_size || null, b.file_size || null, 1),
+    sharp_desc: (a, b) => numbers(a.quality?.sharpness_score, b.quality?.sharpness_score, -1),
+    sharp_asc: (a, b) => numbers(a.quality?.sharpness_score, b.quality?.sharpness_score, 1),
+    attention: (a, b) => attentionRank(a) - attentionRank(b),
+  }
+  // Ties keep the newest photo on top, so the same sort always gives the same order.
+  return [...rows].sort((a, b) => compare[key](a, b) || newest(a, b))
+}
+
+/** The three things an administrator can do with a photo, in the order they are shown. */
+const ACTIONS: { action: SystemImageAction; label: string; past: string; icon: typeof Check; tone: string }[] = [
+  { action: 'approve', label: 'Accept', past: 'accepted', icon: Check, tone: 'border-[#10B981]/35 text-[#10B981] [html[data-theme=light]_&]:text-[#047857] hover:bg-[#10B981]/10 data-[current=true]:bg-[#10B981]/15' },
+  { action: 'keep_in_review', label: 'Under review', past: 'under review', icon: Clock, tone: 'border-[#F59E0B]/35 text-[#D97706] [html[data-theme=light]_&]:text-[#B45309] hover:bg-[#F59E0B]/10 data-[current=true]:bg-[#F59E0B]/15' },
+  { action: 'reject', label: 'Reject', past: 'rejected', icon: XCircle, tone: 'border-[#EF4444]/35 text-[#F87171] [html[data-theme=light]_&]:text-[#B91C1C] hover:bg-[#EF4444]/10 data-[current=true]:bg-[#EF4444]/15' },
+]
+
+function DetailPanel({ id, onClose, onChanged }: { id: number; onClose: () => void; onChanged: () => void }) {
   const [detail, setDetail] = useState<SystemImageDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // Deciding: is the backend able to record it, which action is being confirmed, and how it went.
+  const [canDecide, setCanDecide] = useState<boolean | null>(null)
+  const [pending, setPending] = useState<SystemImageAction | null>(null)
+  const [reason, setReason] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [decideError, setDecideError] = useState<string | null>(null)
+  const [done, setDone] = useState<string | null>(null)
 
   useEffect(() => {
     if (!USE_API) return
@@ -58,10 +123,37 @@ function DetailPanel({ id, onClose }: { id: number; onClose: () => void }) {
   }, [id])
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    if (!USE_API) return
+    let current = true
+    setCanDecide(null)
+    systemDecisionsAvailable(id).then(ok => { if (current) setCanDecide(ok) })
+    return () => { current = false }
+  }, [id])
+
+  // While a decision is being confirmed, Escape belongs to that dialog, not to this panel.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !pending) onClose() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
+  }, [onClose, pending])
+
+  const submit = async () => {
+    const chosen = ACTIONS.find(a => a.action === pending)
+    if (!chosen || !detail) return
+    setBusy(true)
+    setDecideError(null)
+    try {
+      setDetail(await decideSystemImage(detail.id, chosen.action, reason.trim()))
+      setDone(`Marked as ${chosen.past}.`)
+      setPending(null)
+      setReason('')
+      onChanged()
+    } catch (caught) {
+      setDecideError(messageFor(caught))
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const reasons = detail?.rejection_reason ? [detail.rejection_reason] : []
   return (
@@ -88,6 +180,40 @@ function DetailPanel({ id, onClose }: { id: number; onClose: () => void }) {
               <div><dt className="text-ink-faint">Brightness</dt><dd className="font-semibold text-ink">{score(detail.quality?.brightness_score)}</dd></div>
               <div><dt className="text-ink-faint">Duplicate matches</dt><dd className="font-semibold text-ink">{detail.duplicate_matches}</dd></div>
             </dl>
+            {!detail.rejection_reason && (
+              <section aria-label="Decide on this photo" className="space-y-2">
+                <h3 className="text-xs font-bold text-ink">Decide on this photo</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {ACTIONS.map(a => {
+                    const current = detail.quality?.decision === DECISION_OF_ACTION[a.action]
+                    const settled = Boolean(detail.quality?.decision)
+                    return (
+                      <button
+                        key={a.action}
+                        type="button"
+                        data-current={current}
+                        aria-pressed={current}
+                        disabled={!canDecide || !settled || current || busy}
+                        title={current ? `Already ${a.past}` : undefined}
+                        onClick={() => { setPending(a.action); setDecideError(null); setReason('') }}
+                        className={`inline-flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl border text-xs font-bold whitespace-nowrap bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-transparent ${current ? '' : 'disabled:opacity-40'} ${a.tone}`}
+                      >
+                        <a.icon className="w-3.5 h-3.5" aria-hidden="true" />{a.label}
+                      </button>
+                    )
+                  })}
+                </div>
+                {canDecide === false && (
+                  <p className="text-[11px] text-ink-faint">
+                    The backend cannot record an administrator's decision yet, so these stay off. They switch on by themselves once it can.
+                  </p>
+                )}
+                {canDecide && !detail.quality?.decision && (
+                  <p className="text-[11px] text-ink-faint">You can decide once the quality check has finished.</p>
+                )}
+                {done && <p role="status" className="text-[11px] font-semibold text-[#10B981]">{done}</p>}
+              </section>
+            )}
             {reasons.length > 0 && (
               <div className="p-3 rounded-2xl bg-surface-mute border border-line text-xs">
                 <p className="font-semibold text-ink">{explainReason(reasons[0]).title}</p>
@@ -111,25 +237,79 @@ function DetailPanel({ id, onClose }: { id: number; onClose: () => void }) {
           </>
         )}
       </aside>
+
+      {pending && detail && (
+        <ConfirmDialog
+          title={pending === 'approve' ? 'Accept this photo?' : pending === 'reject' ? 'Reject this photo?' : 'Put this photo under review?'}
+          confirmLabel={pending === 'approve' ? 'Accept' : pending === 'reject' ? 'Reject' : 'Put under review'}
+          busyLabel="Saving…"
+          danger={pending === 'reject'}
+          busy={busy}
+          error={decideError}
+          confirmDisabled={pending === 'reject' && !reason.trim()}
+          onConfirm={() => void submit()}
+          onCancel={() => setPending(null)}
+        >
+          <p>
+            {pending === 'approve' && <>This sets <span className="font-semibold text-ink">{detail.original_name}</span> to accepted. {detail.owner.username} is told.</>}
+            {pending === 'keep_in_review' && <>This puts <span className="font-semibold text-ink">{detail.original_name}</span> back under review. {detail.owner.username} is not told.</>}
+            {pending === 'reject' && <>This rejects <span className="font-semibold text-ink">{detail.original_name}</span>. {detail.owner.username} is told, with your reason.</>}
+          </p>
+          {pending === 'reject' && (
+            <label className="block">
+              <span className="text-xs font-semibold text-ink">Reason, shown to the owner</span>
+              <textarea className="fc-input mt-1 w-full text-xs" rows={3} maxLength={500} value={reason} onChange={e => setReason(e.target.value)} />
+            </label>
+          )}
+        </ConfirmDialog>
+      )}
     </div>
   )
 }
 
 export default function ImageMonitoring() {
   const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<SortKey>('newest')
   const [selected, setSelected] = useState<number | null>(null)
-  const state = useApiResource(signal => listSystemImages(page, PAGE_SIZE, signal), demoPage, [page])
+  /* "Newest first" is the server's own order, so it pages on the server and is right for any number of photos. Any other
+     order needs the photos together: one request for up to 200 of the newest, sorted and paged here. The result says which
+     way it was loaded, so a list loaded the other way is never drawn under the wrong order for a moment. */
+  const local = sort !== 'newest'
+  const state = useApiResource(
+    async signal => ({ paged: await listSystemImages(local ? 1 : page, local ? SORT_WINDOW : PAGE_SIZE, signal), local }),
+    () => ({ paged: demoPage(), local }),
+    [local, local ? 0 : page],
+  )
+  const changeSort = (next: SortKey) => { setSort(next); setPage(1) }
 
   return (
     <div className="space-y-6 page-enter">
-      <PageHeader title="Image Monitoring" subtitle="Every photo uploaded to the platform, newest first, with its quality result." />
+      <PageHeader title="Image Monitoring" subtitle="Every photo uploaded to the platform, with its quality result. Sort it, and open a photo to accept, reject or put it under review." />
 
       <AsyncGate state={state} what="the images">
-        {data => {
-          const lastPage = Math.max(1, Math.ceil(data.count / PAGE_SIZE))
+        {({ paged: data, local: loadedLocal }) => {
+          const ready = loadedLocal === local
+          const sorted = local && ready ? sortRows(data.results, sort) : data.results
+          const rows = local && ready ? sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : data.results
+          const lastPage = Math.max(1, Math.ceil((local && ready ? data.results.length : data.count) / PAGE_SIZE))
+          const hasNext = local && ready ? page < lastPage : Boolean(data.next)
+          const clipped = local && ready && data.count > data.results.length
           return (
-            <ChartCard title="Uploaded photos" subtitle={`${data.count.toLocaleString()} in total`}>
-              {data.results.length === 0 ? (
+            <ChartCard
+              title="Uploaded photos"
+              subtitle={`${data.count.toLocaleString()} in total${clipped ? ` · ordered within the newest ${data.results.length.toLocaleString()}` : ''}`}
+              action={
+                <label className="flex items-center gap-2 text-xs text-ink-mute">
+                  <span>Sort by</span>
+                  <select className="fc-input !w-auto !py-1.5 text-xs" value={sort} onChange={e => changeSort(e.target.value as SortKey)}>
+                    {SORTS.map(option => <option key={option.key} value={option.key}>{option.label}</option>)}
+                  </select>
+                </label>
+              }
+            >
+              {!ready ? (
+                <div className="text-center py-16 text-ink-faint"><Loader2 className="w-5 h-5 mx-auto mb-2 animate-spin" /><p className="text-xs font-semibold">Ordering the photos…</p></div>
+              ) : data.results.length === 0 ? (
                 <p className="text-xs text-ink-mute py-8 text-center">No photos have been uploaded yet.</p>
               ) : (
                 <div className="overflow-x-auto">
@@ -138,7 +318,7 @@ export default function ImageMonitoring() {
                       <tr><th>Photo</th><th>Owner</th><th>File</th><th>Quality result</th><th>Scores</th><th>Enhancement</th><th /></tr>
                     </thead>
                     <tbody>
-                      {data.results.map(img => {
+                      {rows.map(img => {
                         const v = verdict(img)
                         return (
                           <tr key={img.id}>
@@ -184,7 +364,7 @@ export default function ImageMonitoring() {
                 <div className="flex items-center gap-2">
                   <button type="button" disabled={page <= 1} onClick={() => setPage(p => p - 1)}
                     className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1"><ChevronLeft className="w-3.5 h-3.5" />Previous</button>
-                  <button type="button" disabled={!data.next} onClick={() => setPage(p => p + 1)}
+                  <button type="button" disabled={!hasNext} onClick={() => setPage(p => p + 1)}
                     className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1">Next<ChevronRight className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
@@ -193,7 +373,7 @@ export default function ImageMonitoring() {
         }}
       </AsyncGate>
 
-      {selected !== null && <DetailPanel id={selected} onClose={() => setSelected(null)} />}
+      {selected !== null && <DetailPanel id={selected} onClose={() => setSelected(null)} onChanged={state.reload} />}
     </div>
   )
 }

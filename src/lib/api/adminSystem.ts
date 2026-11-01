@@ -275,6 +275,35 @@ export function listSystemImages(page: number, pageSize: number, signal?: AbortS
 export function getSystemImage(id: number, signal?: AbortSignal): Promise<SystemImageDetail> {
   return apiFetch<SystemImageDetail>(`/api/system/images/${id}/`, { signal })
 }
+/**
+ * What the administrator can decide on a photo: the moderator's own words (`approve`, `reject`, `keep_in_review`).
+ * Deciding is a call the backend does not have yet (see PROMPT_FOR_BACKEND_ADMIN_IMAGES.md); the screen asks first
+ * whether it is there and keeps the buttons off until it is.
+ */
+export type SystemImageAction = 'approve' | 'reject' | 'keep_in_review'
+
+/** The server's verdict word for each action, to show which one is already in force. */
+export const DECISION_OF_ACTION: Record<SystemImageAction, string> = { approve: 'accepted', reject: 'rejected', keep_in_review: 'needs_review' }
+
+export function decideSystemImage(id: number, action: SystemImageAction, reason: string): Promise<SystemImageDetail> {
+  return apiFetch<SystemImageDetail>(`/api/system/images/${id}/decision/`, { body: reason ? { action, reason } : { action } })
+}
+
+/* Asked once per page load, and only the answer "no, that address does not exist" is remembered: a server that was
+   merely slow or unreachable is asked again next time. */
+let decisionsAvailable: boolean | null = null
+/** True when this backend can record an administrator's decision. A question (OPTIONS), not an action: nothing changes. */
+export async function systemDecisionsAvailable(id: number): Promise<boolean> {
+  if (decisionsAvailable !== null) return decisionsAvailable
+  try {
+    await apiFetch(`/api/system/images/${id}/decision/`, { method: 'OPTIONS' })
+    return (decisionsAvailable = true)
+  } catch (caught) {
+    if (caught instanceof ApiError && (caught.status === 404 || caught.status === 405)) return (decisionsAvailable = false)
+    return false
+  }
+}
+
 /** The photo's preview, behind the token like every other file. */
 export function getSystemImagePreview(id: number, signal?: AbortSignal): Promise<Blob> {
   return apiFetchBlob(`/api/system/images/${id}/preview/`, { signal })
