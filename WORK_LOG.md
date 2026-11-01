@@ -46,6 +46,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-01 — Settings: the left menu's hover is a soft light tile, not black
+*Status: committed (this commit).*
+
+- **Asked by the owner** (Roman Urdu, a screenshot of Settings with the pointer on "Notifications"): the hover on the menu at the left of Settings is much too black; fix it.
+- **Cause:** the tabs used `hover:bg-background`, and `background` is the page's own colour (`--bg-page`, `#000000` in the dark appearance), so a hovered tab painted a solid black patch on a glass card. In the light appearance it was the cream page colour, which is why it was never noticed there.
+- **Fix** (`src/pages/user/Settings.tsx`, one class list): a hovered tab now uses `hover:bg-surface-mute hover:text-ink`, which the glass shell already maps to its tile-hover colour (`--g-tile-hover`: a translucent white veil in dark, a near-white tile in light), and the text goes from muted to full ink. The active tab keeps its orange tint. The same wrong class was on the rows of the **demo build's** Moderation Logs (`src/pages/moderator/ModerationLogs.tsx`, `DemoModerationLogs`; the live Decision Log is a separate file and was never affected); fixed the same way. No other use of `hover:bg-background` is left in `src/`.
+- **Verified** on a throwaway QA stack (stopped and deleted afterwards; the owner's backend folder and model files untouched): with the pointer on Notifications and on Camera & Privacy the computed background is `rgba(255,255,255,0.094)` in the dark appearance and `rgba(255,255,255,0.82)` in the light one (it was the page colour `#000000`), the text turns to full ink, and the screenshot shows a soft light tile with the active tab still orange. The demo Moderation Logs row was checked in the offline demo build on its own port: transparent at rest, `rgba(255,255,255,0.094)` on hover, screenshot looked at. `npx tsc -b`, `npm run build`, `VITE_USE_API=false VITE_API_URL= npm run build` pass.
+- **Mistakes of mine while testing (not product bugs):** my script labelled a hover on the non-active "Security" tab as "the active tab" (the page had reloaded to Profile); and in the demo build the real mouse hover did not register in my test tab at all (not even on a stat card), so that row was checked with DevTools' "force :hover" instead, which runs the same CSS rule.
+
 ### 2026-11-01 — Admin Image Monitoring: the photo details open as a rounded floating card between the top bar and the bottom bar
 *Status: committed (this commit).*
 

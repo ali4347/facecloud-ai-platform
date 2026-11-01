@@ -35,7 +35,7 @@ function DemoModerationLogs() {
       <ChartCard title="Review History" subtitle="All moderation actions" delay={0.1}>
         <div className="divide-y divide-border">
           {modLogs.map(log => (
-            <div key={log.id} className="flex items-center gap-4 py-3 hover:bg-background -mx-6 px-6 transition-colors">
+            <div key={log.id} className="flex items-center gap-4 py-3 hover:bg-surface-mute -mx-6 px-6 transition-colors">
               <div className="w-8 h-8 rounded-xl bg-[#F59E0B]/15 flex items-center justify-center text-warning text-xs font-bold flex-shrink-0">
                 {log.actor.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
               </div>

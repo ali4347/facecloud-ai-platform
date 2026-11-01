@@ -49,7 +49,7 @@ export default function Settings() {
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-left transition-all ${
-                tab === t.id ? 'bg-soft-blue text-accent font-semibold' : 'text-ink-mute hover:bg-background'
+                tab === t.id ? 'bg-soft-blue text-accent font-semibold' : 'text-ink-mute hover:bg-surface-mute hover:text-ink'
               }`}>
               <t.icon className="w-4 h-4" />
               {t.label}
