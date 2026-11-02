@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { cn } from '../../lib/utils'
 
 interface BeforeAfterSliderProps {
@@ -27,29 +27,25 @@ export function BeforeAfterSlider({
   afterStyle,
   initialPosition,
 }: BeforeAfterSliderProps) {
-  const [position, setPosition] = useState(initialPosition ?? 50)
+  // The handle follows the auto-demo value until the person moves it; from then on their own position wins. It is worked
+  // out while rendering (not copied into state by an effect), so the 60-per-second demo costs one render a frame, not two.
+  const [moved, setMoved] = useState<number | null>(null)
+  const position = moved ?? initialPosition ?? 50
+  const setPosition = (next: number | ((pos: number) => number)) =>
+    setMoved(prev => (typeof next === 'function' ? next(prev ?? initialPosition ?? 50) : next))
   const [dragging, setDragging] = useState(false)
-  const userInteracted = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  // Sync external auto-demo position until user drags
-  useEffect(() => {
-    if (initialPosition !== undefined && !userInteracted.current) {
-      setPosition(initialPosition)
-    }
-  }, [initialPosition])
 
   const updatePosition = useCallback((clientX: number) => {
     if (!containerRef.current) return
     const rect = containerRef.current.getBoundingClientRect()
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width))
-    setPosition(Math.round((x / rect.width) * 100))
+    setMoved(Math.round((x / rect.width) * 100))
   }, [])
 
   // Dragging event listeners (pointer capture/document listeners)
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault()
-    userInteracted.current = true
     setDragging(true)
     if (containerRef.current) {
       containerRef.current.setPointerCapture(e.pointerId)

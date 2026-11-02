@@ -74,15 +74,16 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 8. **05 / Ingestion Suite** — 12-card feature grid with staggered reveal and hover glow.
 9. **06 / Methodology (Freedom Section)** — Responsive three-column layout with an HLS-hosted processing video, pain points list, and benefits list.
 10. **07 / Interactive Demo** — Before/after slider with auto-demo scroll trigger (0→50%).
-11. **08 / Processing Options** — Single, Multiple, ZIP upload cards.
-12. **09 / Pricing** — Monthly/Yearly toggle, 3 tier cards (Free/Basic/Pro), each marked "Coming soon" with a disabled button — plans and pricing are deferred to V2.
-13. **10 / User Interface** — 3 dashboard preview mockup cards.
-14. **11 / Administrative Control** — Admin Console and Moderator Review cards with orange-colored hover glows.
-15. **12 / Enterprise Security** — Security points grid + animated terminal log feed with typewriter effect.
-16. **13 / FAQ** — Accordion with Framer Motion layout height animation.
-17. **14 / API / Integrations Teaser** — Terminal-style code block showing example REST request.
-18. **Final CTA** — Call to action with orange gradient orb background.
-19. **Footer** — Logo, Product links (Features, Methodology, Pricing, Security, FAQ), Portals, Compliance.
+11. **Gallery** (`src/components/landing/GallerySection.tsx`, photos in `public/gallery/`) — 26 portraits in very different light (evening, studio, window, neon, coloured gels, black & white, hard sun, silhouette, motion blur…) share one pool, and **six are on show in justified rows**: two rows of three on a desktop, three of two on a tablet, three stacked on a phone. A row is always the same height and its photos share the width in proportion to their shape (a narrow portrait next to wide close-ups), so nothing on the page moves; a photo is cropped a little around its face when its row is not exactly its shape and is shown whole in the viewer. **Every 4 seconds two of the six are swapped for two that were not on show**, chosen at random and never one that has just left, and the neighbours in the row glide to their new widths. A thin progress bar under the grid is the timer itself (it loops every 4 s and the update happens each time it is full), with a pause/play button beside it. Updates also pause while the pointer or keyboard focus is on the grid and while the full-screen viewer is open; with *reduce motion* set there is no automatic change and a "Show other photos" button instead. Photos are fetched once, just before the gallery scrolls into view, and only photos already fetched are brought in. Hover or keyboard focus shows a caption; a click opens the viewer (arrow buttons or keys, drag/flick to turn the page, Escape to close, focus returned to the photo, background scroll locked). The captions describe the photographs; they do not claim FaceCloud processed them. To add a photo: put `gallery-NN.webp` (1800 px) and `gallery-NN-sm.webp` (1000 px), without metadata, in `public/gallery/` and add one line to `PHOTOS`.
+12. **08 / Processing Options** — Single, Multiple, ZIP upload cards.
+13. **09 / Pricing** — Monthly/Yearly toggle, 3 tier cards (Free/Basic/Pro), each marked "Coming soon" with a disabled button — plans and pricing are deferred to V2.
+14. **10 / User Interface** — 3 dashboard preview mockup cards.
+15. **11 / Administrative Control** — Admin Console and Moderator Review cards with orange-colored hover glows.
+16. **12 / Enterprise Security** — Security points grid + animated terminal log feed with typewriter effect.
+17. **13 / FAQ** — Accordion with Framer Motion layout height animation.
+18. **14 / API / Integrations Teaser** — Terminal-style code block showing example REST request.
+19. **Final CTA** — Call to action with orange gradient orb background.
+20. **Footer** — Logo, Product links (Features, Methodology, Pricing, Security, FAQ), Portals, Compliance.
 
 ### Public Marketing Pages
 * **About Page (`/about`)**: Full-width marketing overview highlighting the product genesis and core mission:

@@ -16,6 +16,7 @@ import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChildren'
 import { CountUp } from '../components/animation/CountUp'
 import FreedomSection from '../components/landing/FreedomSection'
+import GallerySection from '../components/landing/GallerySection'
 import MacBookDemoFrame from '../components/landing/MacBookDemoFrame'
 import { ScrambleText } from '../components/animation/ScrambleText'
 
@@ -682,6 +683,9 @@ export default function Landing() {
             </div>
           </div>
         </section>
+
+        {/* ── 7b. Gallery ───────────────────────────────────────── */}
+        <GallerySection />
 
         {/* ── 8. Upload Modes Section ───────────────────────────── */}
         <section className="py-24 bg-ink/[0.03] border-y border-ink/[0.05]">

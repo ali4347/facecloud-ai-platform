@@ -96,6 +96,9 @@ html[data-theme='light'] .fc-hero-main,
 html[data-theme='light'] .fc-hero-ground { background: rgb(var(--a-surface-soft)); }
 html[data-theme='light'] .fc-hero-main ::selection { background: #F97316; color: #fff; }
 
+/* The gallery's update timer: the bar fills over the interval, and the update happens when it is full. */
+@keyframes fcGalleryTick { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+
 /* ─── Logo treatments ─────────────────────────────────────────────────
    The FaceCloudLogo component puts both treatments of the artwork in the
    page; the appearance decides which one is seen. Dark is the default
