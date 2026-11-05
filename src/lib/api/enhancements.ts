@@ -38,6 +38,8 @@ export interface EnhancementResult {
   skipped_stages?: SkippedStage[]
   /** One sentence when restoration was needed and could not be done; null otherwise. */
   hd_unavailable_reason?: string | null
+  /** Which engine produced each stage and whether a classical filter stood in for an AI model. `null` for a failed job; absent on older backends. */
+  processing_summary?: ProcessingSummary | null
   /** What the analyzer measured, and the operations it chose with reasons. Shapes may grow; shown generically. */
   diagnosis?: unknown
   plan?: unknown
@@ -55,6 +57,25 @@ export interface AppliedStage {
 export interface SkippedStage {
   stage: string
   reason: string
+}
+
+/** One stage that changed the photograph: `kind` is what the engine is (a learned model, or OpenCV only), `fallback` that an engine ahead of it did not produce the result. */
+export interface ProcessingStage {
+  stage: string | null
+  engine: string | null
+  kind: 'ai' | 'classical' | 'unknown'
+  fallback: boolean
+  /** The engines that stood ahead of this one. Empty when `fallback` is false. */
+  replaced?: string[]
+}
+
+export interface ProcessingSummary {
+  /** A learned model produced at least one stage. */
+  ai_applied: boolean
+  /** A classical engine produced a stage because the AI model for it was unavailable or its result was refused. */
+  classical_fallback: boolean
+  /** In order; empty when the original was kept. */
+  stages: ProcessingStage[]
 }
 
 const SETTLED = new Set<EnhancementStatus>(['completed', 'failed', 'cancelled', 'partial'])

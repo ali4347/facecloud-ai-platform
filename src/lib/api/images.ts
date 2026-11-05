@@ -167,11 +167,26 @@ export const PIPELINE_STAGES = [
   'identity_grouping', 'enhancement', 'finalizing', 'completed',
 ] as const
 
+/**
+ * Once a photo has passed the checks and been handed to enhancement, the backend reports the enhancement's own status as the photo's
+ * `display_status` instead of `accepted`. Any of these means the photo was accepted, never that it waits for a moderator.
+ */
+export const ENHANCEMENT_STATUSES: readonly string[] = ['pending', 'queued', 'processing', 'completed', 'partial', 'failed']
+
+/** A photo that passed the checks: `accepted`, or already carrying an enhancement status. */
+export const passedChecks = (status: string | null | undefined): boolean => status === 'accepted' || ENHANCEMENT_STATUSES.includes(status ?? '')
+
+/** `autoEnhance: false` keeps the backend from enhancing the photos itself (it does by default), for a screen that enhances them afterwards with the person's own choices. */
+function withAutoEnhance(formData: FormData, autoEnhance?: boolean) {
+  if (autoEnhance === false) formData.append('auto_enhance', 'false')
+}
+
 /** `organizationId` submits the photos to a team the person belongs to instead of their own workspace. */
-export function uploadSingle(file: File, signal?: AbortSignal, organizationId?: number): Promise<UploadBatch> {
+export function uploadSingle(file: File, signal?: AbortSignal, organizationId?: number, autoEnhance?: boolean): Promise<UploadBatch> {
   const formData = new FormData()
   formData.append('file', file)
   if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
+  withAutoEnhance(formData, autoEnhance)
   return apiFetch<UploadBatch>('/api/images/upload/single/', { formData, signal })
 }
 
@@ -189,10 +204,11 @@ export function uploadMultiple(files: File[], signal?: AbortSignal, organization
   return apiFetch<UploadBatch>('/api/images/upload/multiple/', { formData, signal })
 }
 
-export function uploadZip(file: File, signal?: AbortSignal, organizationId?: number): Promise<UploadBatch> {
+export function uploadZip(file: File, signal?: AbortSignal, organizationId?: number, autoEnhance?: boolean): Promise<UploadBatch> {
   const formData = new FormData()
   formData.append('file', file)
   if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
+  withAutoEnhance(formData, autoEnhance)
   return apiFetch<UploadBatch>('/api/images/upload/zip/', { formData, signal })
 }
 

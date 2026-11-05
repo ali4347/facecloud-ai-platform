@@ -4,8 +4,8 @@ import { cn } from '../../lib/utils'
 
 export type UploadKind = 'single' | 'multiple' | 'zip'
 
-/** What one upload screen takes. The live screens follow the backend's limits; the offline demo screens keep their own, smaller ones. */
-export const UPLOAD_LIMITS = USE_API ? { photos: 150, zip: '2 GB', image: '400 MB' } : { photos: 50, zip: '200 MB', image: '50 MB' }
+/** What one upload screen takes. The live screens follow the backend's limits; the offline demo screens keep their own, smaller ones. `zipPhotos` is how many photos one ZIP may hold (counted in the browser before it is sent): 20, because the enhancement models are heavy for the GPU the project runs on. */
+export const UPLOAD_LIMITS = USE_API ? { photos: 150, zipPhotos: 20, zip: '2 GB', image: '400 MB' } : { photos: 50, zipPhotos: 50, zip: '200 MB', image: '50 MB' }
 const LIMITS = UPLOAD_LIMITS
 
 export interface UploadKindInfo {

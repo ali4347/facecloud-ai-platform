@@ -163,6 +163,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/notifications` (real notifications: mark read / mark all read, open, dismiss, paging; the top-bar bell shows the same unread count)
 * `/dashboard/activity` (your real activity history, paged; picking a type chip or searching looks through your newest 500 events (the backend's window) and shows how many of each type there are, or says there are none)
 * `/dashboard/settings` (name, organization, job title, phone, country and the picture saved to the account; Delete my account (password and a typed word); password change; the list of signed-in devices with Revoke, and sign out of all devices; notification switches saved to the account. Against a backend that predates profile details/sessions (before backend PR #67) the extras and picture stay on this device and the device list is hidden)
+* `/dashboard/enhance` (Enhancement Uploader: choose Auto, Standard or Pro, add one photo or a ZIP of up to 20, see the progress and each enhanced photo with its Processing summary; see section "Enhancement Uploader")
 * `/dashboard/live-enhancement` (webcam preview with face detection; a captured frame is stored in My Images and enhanced by the real pipeline with a chosen style and strength, real before/after and "what was done"; "Enhance again" re-enhances the same photo. The live preview itself uses simple browser filters. The demo build keeps the simulated version)
 * `/dashboard/jobs` (Batch job history directory)
 
@@ -233,6 +234,10 @@ Located at `/dashboard/live-enhancement`, this feature leverages browser capabil
 * **Reversion Note**: *Age/gender estimation was tested but removed/reverted because the model was not reliable enough for the current demo.*
 
 ---
+
+### Enhancement Uploader (`/dashboard/enhance`)
+
+`src/components/features/EnhancementUploader.tsx` (+ `EnhancementUploader.module.css`) is one self-contained card for the live backend: three preset buttons (**Auto** = level `auto` + style `natural`, **Standard** = `high` + `natural`, **Pro** = `high` + `ai_max`, the pairs the backend's presets resolve to), a drop zone for one photo or one ZIP (a ZIP is counted in the browser first and refused above `UPLOAD_LIMITS.zipPhotos`), a progress bar, and for each photo the enhanced picture, a Download button and a **Processing summary** (the backend's `processing_summary`: a green "AI enhancement applied" badge, a yellow "Classical fallback used" badge, and the stages with the engine that did each). It uploads with `auto_enhance=false`, polls the batch and then each enhancement every 2 seconds, three photos at a time, shows the time spent while photos are being enhanced, and can be cancelled (Cancel only stops the waiting: the server has no way to withdraw a photo it already has, and the card says so). A photo may wait up to 15 minutes for a free worker, and takes up to 4 minutes once a worker has it. It is the page `/dashboard/enhance` (route in `src/App.tsx`, inside the signed-in user dashboard; it needs `VITE_USE_API=true`; there is no menu link yet, open the address), and can also be rendered as `<EnhancementUploader />` anywhere. It is styled from the app's own theme variables, so it follows the dark and light appearance.
 
 ## 9. Upload Pipeline
 
