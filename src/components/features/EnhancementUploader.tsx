@@ -68,6 +68,7 @@ async function enhanceAndWait(photoId: number, preset: (typeof PRESETS)[number],
   const queueDeadline = Date.now() + QUEUE_TIMEOUT_MS
   let workingSince = 0
   while (!isEnhancementSettled(result)) {
+    // The work clock starts when a worker takes the photo, not when it was sent: until then the photo waits in the queue, which has its own limit (QUEUE_TIMEOUT_MS).
     if (result.status === 'processing' && workingSince === 0) workingSince = Date.now()
     const overdue = workingSince > 0 ? Date.now() - workingSince > ENHANCE_TIMEOUT_MS : Date.now() > queueDeadline
     if (overdue) throw new Error('This photo is taking longer than expected.')

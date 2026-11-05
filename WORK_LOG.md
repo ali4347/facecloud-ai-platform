@@ -46,6 +46,12 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-05 — EnhancementUploader: one comment in `enhanceAndWait` (no change in behaviour)
+*Status: committed (this commit); the owner asked for it to be committed and pushed.*
+
+- **Changed:** `src/components/features/EnhancementUploader.tsx`: a one-line comment above the work clock in `enhanceAndWait` saying why it starts when the status turns `processing` and not when the photo was sent (the explanation was only in the comment above `ENHANCE_TIMEOUT_MS`). Same code, same behaviour.
+- **Checked:** `npx tsc -b` and oxlint on the file are clean. The same checklist asked for the `enhance` route in `App.tsx`: it was already added and pushed in `d39f52f` (import and route above `live-enhancement`), so nothing was added there.
+
 ### 2026-11-05 — EnhancementUploader gets its route, `/dashboard/enhance`, and is committed and pushed
 *Status: committed (this commit).*
 
