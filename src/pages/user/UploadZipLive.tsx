@@ -7,10 +7,16 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { uploadZip, type UploadBatch } from '../../lib/api/images'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { LightingPicker } from '../../components/features/LightingPicker'
+import { PresetPicker } from '../../components/features/PresetPicker'
+import { presetPair, type PresetKey } from '../../lib/enhancementPresets'
+import type { EnhancementLighting } from '../../lib/api/enhancements'
 import { useSubmitTarget } from '../../lib/useSubmitTarget'
 import { fetchBatchZip } from '../../lib/api/downloads'
 import { formatBytes, statusLabel } from '../../lib/imageData'
 import { saveBlob } from '../../lib/saveBlob'
+import { readZipContents } from '../../lib/zipContents'
+import { UPLOAD_LIMITS } from '../../components/features/uploadKinds'
 import { tally, useFinishedBatch, useReasonBreakdown } from '../../lib/uploadBatch'
 import { BatchStageList } from '../../components/features/BatchStageList'
 import { BatchEnhancementPanel } from '../../components/features/BatchEnhancementPanel'
@@ -18,12 +24,22 @@ import { RejectionBreakdown } from '../../components/features/RejectionBreakdown
 
 /** What the backend takes: a ZIP up to 2 GB. */
 const MAX_ZIP_BYTES = 2 * 1024 * 1024 * 1024
+/** How many photos one ZIP may hold on this screen (the same figure as the Upload Center card shows). */
+const MAX_PHOTOS = UPLOAD_LIMITS.zipPhotos
 
 export default function UploadZipLive({ embedded = false }: { embedded?: boolean }) {
   const target = useSubmitTarget()
   // Where this upload was sent: undefined is the person's own workspace, which has no moderator.
   const [sentTo, setSentTo] = useState<number | undefined>(undefined)
+  // How the person wants these photos enhanced: a preset and a lighting, sent WITH the upload (the server's pipeline does the work). `sent` is what the
+  // upload went with (the server's own echo is on `made`, see BatchEnhancementPanel).
+  const [preset, setPreset] = useState<PresetKey>('auto')
+  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const [sent, setSent] = useState<{ preset: PresetKey; lighting: EnhancementLighting } | null>(null)
   const [zipFile, setZipFile] = useState<File | null>(null)
+  // Photos found inside the chosen archive, and whether that is still being read.
+  const [photosInside, setPhotosInside] = useState<number | null>(null)
+  const [checking, setChecking] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [made, setMade] = useState<UploadBatch | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -37,16 +53,33 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
   const stage: 'select' | 'preview' | 'uploading' | 'processing' | 'done' =
     made ? (done ? 'done' : 'processing') : uploading ? 'uploading' : zipFile ? 'preview' : 'select'
 
-  const pick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const pick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target
+    const file = input.files?.[0]
+    input.value = ''
     if (!file) return
     setError(null)
     if (file.size > MAX_ZIP_BYTES) { setError('That archive is larger than 2 GB, the most one upload can hold.'); return }
-    setZipFile(file)
-    e.target.value = ''
+    // Count the photos from the archive's table of contents before anything is sent: enhancing is heavy for the GPU, so a big ZIP is refused here.
+    setChecking(true)
+    try {
+      const contents = await readZipContents(file)
+      if (contents === null) { setError('Could not read that file as a ZIP archive. Check that it opens on your computer, then try again.'); return }
+      if (contents.photos === null || contents.photos > MAX_PHOTOS) {
+        const found = contents.photos === null ? 'far more photos than that' : `${contents.photos} photos`
+        setError(`That archive holds ${found}. One ZIP takes up to ${MAX_PHOTOS} photos, because enhancing photos is heavy for the GPU. Make a smaller ZIP and try again.`)
+        return
+      }
+      setPhotosInside(contents.photos)
+      setZipFile(file)
+    } catch {
+      setError('Could not read that archive. Please try again.')
+    } finally {
+      setChecking(false)
+    }
   }
 
-  const reset = () => { setZipFile(null); setMade(null); setError(null); setUploading(false) }
+  const reset = () => { setZipFile(null); setPhotosInside(null); setMade(null); setError(null); setUploading(false) }
 
   const confirmAndUpload = async () => {
     if (!zipFile) return
@@ -54,7 +87,8 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
     setError(null)
     try {
       setSentTo(target.organizationId)
-      setMade(await uploadZip(zipFile, undefined, target.organizationId))
+      setSent({ preset, lighting })
+      setMade(await uploadZip(zipFile, { organizationId: target.organizationId, enhancement: { ...presetPair(preset), lighting } }))
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'The upload failed. Please try again.')
     } finally {
@@ -101,14 +135,14 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
           <ChartCard title="Select Archive" subtitle="ZIP file dropzone">
             <div className="space-y-6">
               {stage === 'select' && (
-                <label className="upload-dropzone block cursor-pointer">
-                  <input type="file" onChange={pick} className="hidden" accept=".zip,application/zip" />
+                <label className={`upload-dropzone block ${checking ? 'pointer-events-none opacity-70' : 'cursor-pointer'}`}>
+                  <input type="file" onChange={e => void pick(e)} disabled={checking} className="hidden" accept=".zip,application/zip" />
                   <div className="flex flex-col items-center gap-3">
                     <div className="p-4 rounded-full bg-accent/10 border border-accent/20 text-accent">
-                      <FileArchive className="w-6 h-6" />
+                      {checking ? <Loader2 className="w-6 h-6 animate-spin" /> : <FileArchive className="w-6 h-6" />}
                     </div>
-                    <span className="text-xs font-bold text-ink">Click to browse or drop a ZIP file here</span>
-                    <span className="text-[10px] text-ink-mute">ZIP archives up to 2 GB</span>
+                    <span className="text-xs font-bold text-ink">{checking ? 'Checking the archive…' : 'Click to browse or drop a ZIP file here'}</span>
+                    <span className="text-[10px] text-ink-mute">A ZIP of up to {MAX_PHOTOS} photos (JPG, PNG or WebP)</span>
                   </div>
                 </label>
               )}
@@ -119,7 +153,9 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
                     <div className="p-3 rounded-2xl bg-accent/10 border border-accent/20 text-accent shrink-0"><FileArchive className="w-6 h-6" /></div>
                     <div className="flex-1 min-w-0">
                       <p className="font-bold text-ink truncate">{zipFile.name}</p>
-                      <p className="text-[10px] text-ink-mute mt-0.5">{formatBytes(zipFile.size)}</p>
+                      <p className="text-[10px] text-ink-mute mt-0.5">
+                        {formatBytes(zipFile.size)}{photosInside !== null ? ` · ${photosInside} photo${photosInside === 1 ? '' : 's'} inside` : ''}
+                      </p>
                     </div>
                     {stage === 'preview' && (
                       <button onClick={reset} aria-label="Remove the archive"
@@ -146,6 +182,8 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
                   ) : (
                     <div className="space-y-3">
                     <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
+                    <PresetPicker id="upload-preset" value={preset} onChange={setPreset} />
+                    <LightingPicker id="upload-lighting" value={lighting} onChange={setLighting} />
                     <div className="flex gap-3">
                       <button onClick={reset} className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center">Cancel</button>
                       <button onClick={confirmAndUpload} className="fc-btn-primary !py-2.5 !px-4 text-xs flex-1 justify-center gap-2">
@@ -217,7 +255,7 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
                 </div>
 
                 <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />
-                {made && <BatchEnhancementPanel batchId={made.id} />}
+                {made && <BatchEnhancementPanel batchId={made.id} choice={sent ?? undefined} echoed={made.auto_enhance_options} />}
 
                 <div className="space-y-3">
                   {results.accepted > 0 && (

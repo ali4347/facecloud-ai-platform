@@ -1,30 +1,10 @@
 import { useState } from 'react'
 import { AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, MinusCircle } from 'lucide-react'
-import type { AppliedStage, EnhancementResult } from '../../lib/api/enhancements'
-
-/** What each stage does, in plain words, as a past-tense phrase and a short name. */
-const STAGES: Record<string, { name: string; done: (s: AppliedStage) => string }> = {
-  low_light: { name: 'Low light', done: () => 'Lifted the light' },
-  denoise: { name: 'Noise', done: () => 'Reduced the noise' },
-  polish: { name: 'Polish', done: () => 'Balanced the contrast and sharpened lightly' },
-  deblur: { name: 'Blur', done: () => 'Removed blur' },
-  face_restore: { name: 'Face', done: () => 'Restored the face' },
-  upscale: {
-    name: 'HD',
-    done: s => {
-      const size = s.output_size ? ` to ${s.output_size[0]} × ${s.output_size[1]}` : ''
-      return `Enlarged${s.scale ? ` ×${s.scale}` : ''}${size}`
-    },
-  },
-}
-
-const ENGINES: Record<string, string> = {
-  nafnet_gopro: 'NAFNet', realesrgan: 'Real-ESRGAN', codeformer: 'CodeFormer', gfpgan: 'GFPGAN',
-  codeformer_or_gfpgan: 'face restoration model', zero_dce: 'Zero-DCE', retinexformer: 'Retinexformer',
-  opencv_nlm: 'OpenCV noise filter', opencv_polish: 'OpenCV polish',
-}
-
-const stageName = (stage: string) => STAGES[stage]?.name ?? stage.replace(/_/g, ' ')
+import type { EnhancementResult } from '../../lib/api/enhancements'
+import { ENGINES, STAGES, stageName } from '../../lib/stageNames'
+import { LightingBadge } from './LightingPicker'
+import { ProcessingSummaryBox } from './ProcessingSummaryBox'
+import { presetOf } from '../../lib/enhancementPresets'
 
 /** The first sentence of a long technical reason, so a file path does not fill the screen. */
 const shortReason = (reason: string) => reason.split(/[;:(]/)[0].trim() || reason
@@ -66,13 +46,21 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
 
   // The backend's own sentence wins; otherwise build one from the stages that ran.
   const sentence = result.enhancement_summary
-    || (applied.length > 0 ? `${applied.map(s => STAGES[s.stage]?.done(s) ?? stageName(s.stage)).join(', ')}.` : '')
+    || (applied.length > 0 ? `${applied.map(s => (s.stage ? STAGES[s.stage]?.done(s) : undefined) ?? stageName(s.stage)).join(', ')}.` : '')
 
-  if (!hasStageData && !sentence && !hasDetails) return null
+  const preset = presetOf(result.requested_level, result.requested_style)
+
+  if (!hasStageData && !sentence && !hasDetails && !result.processing_summary) return null
 
   return (
     <div className="p-4 rounded-2xl bg-surface-mute border border-line space-y-3 text-xs">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">What was done</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">What was done</p>
+        <span className="inline-flex flex-wrap items-center gap-1.5">
+          {preset && <span className="px-2 py-0.5 rounded-full border border-line bg-surface text-ink-soft text-[10px] font-bold" title="The enhancement preset this result was made with">{preset} preset</span>}
+          <LightingBadge lighting={result.lighting} />
+        </span>
+      </div>
 
       {sentence && <p className="text-ink">{sentence}</p>}
 
@@ -83,7 +71,7 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
               <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-px" />
               <span className="text-ink-soft">
                 <span className="font-semibold text-ink">{stageName(stage.stage)}</span>
-                {' · '}{STAGES[stage.stage]?.done(stage) ?? 'Applied'}
+                {' · '}{(stage.stage ? STAGES[stage.stage]?.done(stage) : undefined) ?? 'Applied'}
                 {stage.engine ? <span className="text-ink-faint"> · {ENGINES[stage.engine] ?? stage.engine}{stage.variant ? ` (${stage.variant})` : ''}</span> : null}
               </span>
             </li>
@@ -109,6 +97,8 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
           </span>
         </p>
       )}
+
+      <ProcessingSummaryBox summary={result.processing_summary} />
 
       {hasDetails && (
         <div>

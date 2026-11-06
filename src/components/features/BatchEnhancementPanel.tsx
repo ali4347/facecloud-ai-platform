@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CheckCircle2, Loader2, Sparkles } from 'lucide-react'
 import { enhanceAcceptedPhotos, listBatchPhotos } from '../../lib/batchEnhance'
-import type { ImageListItem } from '../../lib/api/images'
+import type { ImageListItem, UploadBatch } from '../../lib/api/images'
+import type { EnhancementLighting } from '../../lib/api/enhancements'
+import { PRESETS, ignoredBatchChoice, lightingWords, presetPair, type PresetKey } from '../../lib/enhancementPresets'
 
 const RUNNING = new Set(['pending', 'queued', 'processing'])
 
@@ -24,14 +26,18 @@ interface BatchEnhancementPanelProps {
   batchId: number
   /** Called when enhancement finished so a page can refresh whatever depends on it. */
   onChanged?: () => void
+  /** What the person chose when uploading (the preset and the lighting). It went WITH the upload and the server's pipeline did the enhancement; the button below uses the same choice for photos the pipeline did not enhance. */
+  choice?: { preset: PresetKey; lighting: EnhancementLighting }
+  /** What the server says it took from that choice (`auto_enhance_options` in the upload's answer). */
+  echoed?: UploadBatch['auto_enhance_options']
 }
 
 /**
- * Whether the accepted photos of an upload have been enhanced, and the way to do it.
- * Enhancement is a separate step from checking: it only happens when asked for, so this says plainly what has
- * and has not happened instead of leaving the person to wonder.
+ * Whether the accepted photos of an upload have been enhanced, and the way to do it for any that were not.
+ * The server's own pipeline enhances the photos of an upload; this says plainly what has and has not happened instead of leaving the
+ * person to wonder, and keeps a manual button for photos the pipeline did not enhance (for instance when the account's automatic enhancement is off).
  */
-export function BatchEnhancementPanel({ batchId, onChanged }: BatchEnhancementPanelProps) {
+export function BatchEnhancementPanel({ batchId, onChanged, choice, echoed }: BatchEnhancementPanelProps) {
   const [counts, setCounts] = useState<Awaited<ReturnType<typeof countBatch>> | null>(null)
   const [run, setRun] = useState<{ done: number; total: number } | null>(null)
   const [busy, setBusy] = useState(false)
@@ -62,7 +68,7 @@ export function BatchEnhancementPanel({ batchId, onChanged }: BatchEnhancementPa
       const outcome = await enhanceAcceptedPhotos(batchId, (done, total) => {
         if (alive.current) setRun({ done, total })
         if (done > 0) void refresh()
-      })
+      }, undefined, choice ? { ...presetPair(choice.preset), lighting: choice.lighting } : undefined)
       await refresh()
       onChanged?.()
       if (outcome.failed > 0) {
@@ -79,9 +85,15 @@ export function BatchEnhancementPanel({ batchId, onChanged }: BatchEnhancementPa
   if (counts.eligible === 0) return null
 
   const allDone = counts.enhanced === counts.eligible
+  const ignored = choice ? ignoredBatchChoice(choice, echoed) : null
   return (
     <div className="p-4 rounded-2xl bg-surface-mute border border-line space-y-3">
       <p className="text-[10px] font-bold uppercase tracking-wider text-ink-faint">Enhancement</p>
+      {choice && (choice.preset !== 'auto' || choice.lighting !== 'auto') && (
+        <p className="text-[11px] text-ink-mute">
+          Chosen: {PRESETS.find(item => item.key === choice.preset)?.label}{choice.lighting !== 'auto' ? ` · ${lightingWords(choice.lighting)}` : ''}. {ignored ?? ''}
+        </p>
+      )}
       {allDone ? (
         <p className="text-xs text-emerald-400 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" />All {counts.eligible} accepted photo{counts.eligible === 1 ? ' is' : 's are'} enhanced.</p>
       ) : (

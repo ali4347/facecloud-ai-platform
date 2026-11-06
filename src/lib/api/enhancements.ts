@@ -2,6 +2,25 @@ import { apiFetch, apiFetchBlob } from './client'
 
 export type EnhancementLevel = 'auto' | 'low' | 'medium' | 'high'
 export type EnhancementStyle = 'natural' | 'dynamic' | 'ai_max'
+/** What to treat the photo as: `auto` lets the backend decide (and is never sent). */
+export type EnhancementLighting = 'auto' | 'dark' | 'light'
+
+/**
+ * How an enhancement saw the lighting. The backend that exists today sends `detected` with what it measured (`exposure`, `scene_median`) and
+ * whether a brightening step really changed the photo (`brightened`); it decides on its own. `used` and `forced` are for the day a person can
+ * choose the method (the request's `lighting`): what was used, and whether it was forced.
+ */
+export interface LightingInfo {
+  detected: 'dark' | 'light'
+  /** The engine's own status: low_light, low_light_subject, dark_scene, backlit_subject, normal or overexposed. */
+  exposure?: string
+  /** Median grey level of the frame, 0 (black) to 255. */
+  scene_median?: number | null
+  /** A photo can be seen as dark and still not be brightened, when that was not safe to apply. */
+  brightened?: boolean
+  used?: 'dark' | 'light'
+  forced?: boolean
+}
 
 export type EnhancementStatus =
   | 'pending' | 'queued' | 'processing' | 'completed' | 'partial' | 'failed' | 'cancelled'
@@ -13,6 +32,10 @@ export interface EnhancementResult {
   /** May differ from what was asked for: the backend adapts to the photo. */
   applied_level: EnhancementLevel
   requested_style: EnhancementStyle
+  /** What the person asked for (`auto` when they did not say). Absent on a backend that predates the lighting choice. */
+  requested_lighting?: EnhancementLighting
+  /** Newer backends only: older results have none. */
+  lighting?: LightingInfo | null
   status: EnhancementStatus
   output_name: string
   output_format: string
@@ -93,10 +116,14 @@ export function isEnhancementSettled(result: EnhancementResult | null): boolean 
  */
 export function enhanceImage(
   imageId: number,
-  options: { level?: EnhancementLevel; style?: EnhancementStyle } = {},
+  options: { level?: EnhancementLevel; style?: EnhancementStyle; lighting?: EnhancementLighting } = {},
 ): Promise<EnhancementResult> {
   return apiFetch<EnhancementResult>(`/api/enhancements/images/${imageId}/`, {
-    body: { level: options.level ?? 'auto', style: options.style ?? 'natural' },
+    body: {
+      level: options.level ?? 'auto', style: options.style ?? 'natural',
+      // Only a choice is sent: "auto" is the backend's default.
+      ...(options.lighting && options.lighting !== 'auto' ? { lighting: options.lighting } : {}),
+    },
   })
 }
 

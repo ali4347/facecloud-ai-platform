@@ -4,10 +4,12 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { USE_API } from '../../lib/api/config'
 import {
+  ENHANCEMENT_STATUSES,
   getBatchProgress,
   getImage,
   getImageThumbnail,
   isBatchFinished,
+  stageOrder,
   uploadSingle,
   type BatchProgress,
   type ImageListItem,
@@ -20,12 +22,16 @@ import {
   isEnhancementSettled,
   levelLabel,
   changedNothing,
+  type EnhancementLighting,
   type EnhancementResult,
 } from '../../lib/api/enhancements'
 import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
 import { makeLocalPreview } from '../../lib/previewEnhance'
 import { EnhancementReport } from '../../components/features/EnhancementReport'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { LightingPicker } from '../../components/features/LightingPicker'
+import { PresetPicker } from '../../components/features/PresetPicker'
+import { ignoredChoice, presetPair, type PresetKey } from '../../lib/enhancementPresets'
 import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
 import { useReasonBreakdown } from '../../lib/uploadBatch'
 import { useSubmitTarget } from '../../lib/useSubmitTarget'
@@ -68,9 +74,9 @@ function scoreTone(score: number | null | undefined): string {
   return 'text-[#F87171]'
 }
 
-function stageIndex(stage: string): number {
-  const found = STAGES.findIndex(entry => entry.key === stage)
-  return found === -1 ? 0 : found
+/** The stages in the order the server runs them (its own `stage_order` when it sends one). */
+function orderedStages(order: readonly string[]) {
+  return [...STAGES].sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key))
 }
 
 /** `embedded`: shown inside the upload popup, which supplies its own heading and way back. */
@@ -80,6 +86,12 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
   // Where THIS photo was sent (undefined: the person's own workspace). A photo in a workspace nobody moderates has no reviewer.
   const sentToRef = useRef<number | undefined>(undefined)
   const [sentTo, setSentTo] = useState<number | undefined>(undefined)
+  // How the person wants this photo enhanced: a preset and a lighting. Both go WITH the upload and the server's own pipeline does the work; enhance()
+  // below uses the same choice for a photo the pipeline did not enhance. The refs hold what was chosen when the upload started.
+  const [preset, setPreset] = useState<PresetKey>('auto')
+  const presetRef = useRef<PresetKey>('auto')
+  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const lightingRef = useRef<EnhancementLighting>('auto')
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   // A file that is not a picture (a text file, a PDF) cannot be drawn; say so instead of showing a broken-image icon.
@@ -239,13 +251,14 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
    * as many enhancement jobs running as it is allowed; the message says so and
    * the right answer is to wait, not to retry.
    */
-  const enhance = async (accepted: ImageListItem) => {
+  const settle = async (accepted: ImageListItem, start: () => Promise<EnhancementResult>, failedMessage: string) => {
     setEnhancing(true)
     setEnhanceError('')
     try {
-      let result = await enhanceImage(accepted.id)
+      let result = await start()
       // The job can come back already finished, or still running.
-      for (let attempt = 0; attempt < 20 && !isEnhancementSettled(result); attempt += 1) {
+      // Up to four minutes, as on the photo's own page: a worker or a heavy model can take well over the half minute this used to allow.
+      for (let attempt = 0; attempt < 160 && !isEnhancementSettled(result); attempt += 1) {
         await new Promise(resolve => setTimeout(resolve, 1500))
         result = await getEnhancementResult(result.id)
       }
@@ -263,11 +276,15 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
         after: URL.createObjectURL(after),
       })
     } catch (caught) {
-      setEnhanceError(caught instanceof Error ? caught.message : 'Could not enhance this photo.')
+      setEnhanceError(caught instanceof Error ? caught.message : failedMessage)
     } finally {
       setEnhancing(false)
     }
   }
+  /** Start an enhancement for an accepted photo. */
+  const enhance = (accepted: ImageListItem) => settle(accepted, () => enhanceImage(accepted.id, { ...presetPair(presetRef.current), lighting: lightingRef.current }), 'Could not enhance this photo.')
+  /** The photo was enhanced automatically before this screen read it: show that enhancement instead of starting another. */
+  const showExisting = (photo: ImageListItem, existingId: number) => settle(photo, () => getEnhancementResult(existingId), 'Could not load the enhanced photo.')
 
   /** Walk the same stages on a timer when there is no server to talk to. */
   const runDemo = () => {
@@ -334,6 +351,8 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
       // to wait for, so it is enhanced like any other (a team's photo waits for its moderator).
       if (finished && (finished.display_status === 'accepted' || (finished.display_status === 'needs_review' && sentToRef.current === undefined))) {
         enhance(finished)
+      } else if (finished && ENHANCEMENT_STATUSES.includes(finished.display_status) && finished.latest_enhancement) {
+        showExisting(finished, finished.latest_enhancement.id)
       }
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Lost contact while processing.')
@@ -353,7 +372,8 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
     setPhase('uploading')
     try {
       sentToRef.current = target.organizationId; setSentTo(target.organizationId)
-      const batch = await uploadSingle(file, undefined, target.organizationId)
+      lightingRef.current = lighting; presetRef.current = preset
+      const batch = await uploadSingle(file, { organizationId: target.organizationId, enhancement: { ...presetPair(preset), lighting } })
       setBatchId(batch.id)
       // The file can be refused on arrival — wrong type, too large, a face the
       // validator will not accept — and that is a finished batch, not a failure
@@ -366,16 +386,24 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
     }
   }
 
-  const activeStage = USE_API ? stageIndex(progress?.stage ?? 'uploaded') : demoStage
+  const stages = orderedStages(stageOrder(progress))
+  const activeStage = USE_API ? Math.max(0, stages.findIndex(entry => entry.key === (progress?.stage ?? 'uploaded'))) : demoStage
   const percent = USE_API
     ? Math.round(progress?.progress_percentage ?? 0)
     : Math.round((demoStage / (STAGES.length - 1)) * 100)
 
   const verdict = image?.display_status ?? (phase === 'done' && !USE_API ? 'accepted' : null)
-  const accepted = verdict === 'accepted'
+  const hasEnhancement = ENHANCEMENT_STATUSES.includes(verdict ?? '')
+  const accepted = verdict === 'accepted' || hasEnhancement
   const rejected = verdict === 'rejected'
   const ownReview = verdict === 'needs_review' && sentTo === undefined
+  // Only a photo sent to a team can wait for that team's moderator; no other status may say so.
+  const withModerator = verdict === 'needs_review' && sentTo !== undefined
   const usable = accepted || ownReview
+  // A photo that was still `accepted` (or unsure, in the person's own workspace) gets an enhancement started here. One that already carries an
+  // enhancement status was enhanced before this screen read it: that enhancement is shown (showExisting). Until it is loaded, or when it could not
+  // be (still running, failed), there is nothing to download here, so the card points to the photo's own page instead.
+  const alreadyEnhanced = hasEnhancement && image !== null && enhancement === null
   // Why a refused photo was refused: the same sentences the multiple and ZIP screens show.
   const breakdown = useReasonBreakdown(progress, progress !== null && isBatchFinished(progress))
 
@@ -468,6 +496,8 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                     find the face, enhance it and file it under the right person.
                   </p>
                   <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
+                  {USE_API && <PresetPicker id="upload-preset" value={preset} onChange={setPreset} />}
+                  {USE_API && <LightingPicker id="upload-lighting" value={lighting} onChange={setLighting} />}
                   <button
                     type="button"
                     onClick={start}
@@ -493,7 +523,7 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                     />
                   </div>
                   <div className="space-y-3.5 max-h-72 overflow-y-auto pr-1">
-                    {STAGES.map((stage, index) => (
+                    {stages.map((stage, index) => (
                       <div
                         key={stage.key}
                         className="flex gap-3 items-start text-xs"
@@ -535,7 +565,7 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                 <p className="text-xs font-semibold">
                   {phase === 'uploading' ? 'Sending your photo…' : 'Working on it…'}
                 </p>
-                <p className="text-[10px] mt-1">This usually takes a few seconds.</p>
+                <p className="text-[10px] mt-1">{presetRef.current === 'pro' ? 'Pro uses the strongest models, so this can take a minute or two.' : 'This usually takes a few seconds.'}</p>
               </div>
             )}
 
@@ -567,13 +597,15 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                       {accepted ? 'Your photo was accepted'
                         : rejected ? 'Your photo was not accepted'
                         : ownReview ? 'The checks were not sure about this photo'
-                        : 'A moderator will take a look'}
+                        : withModerator ? 'A moderator will take a look'
+                        : 'Your photo was received'}
                     </p>
                     <p className="text-[11px] text-ink-faint mt-0.5">
-                      {accepted ? 'It passed every check and has been filed.'
+                      {accepted ? (person || !USE_API ? 'It passed every check and has been filed.' : 'It passed every check.')
                         : rejected ? 'The reason is below.'
                         : ownReview ? 'It is in your own workspace, so no moderator will look at it. You can still enhance and use it, or upload a clearer photo.'
-                        : 'The automatic checks were not confident enough to decide on their own.'}
+                        : withModerator ? 'The automatic checks were not confident enough to decide on their own.'
+                        : 'Its result could not be read just now. My Images shows where it stands.'}
                     </p>
                   </div>
                 </div>
@@ -604,6 +636,10 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                           />
                         </div>
                         {USE_API && enhancement && <EnhancementReport result={enhancement} />}
+                        {USE_API && enhancement?.status === 'completed' && (() => {
+                          const ignored = ignoredChoice({ preset: presetRef.current, lighting: lightingRef.current }, enhancement)
+                          return ignored ? <p className="text-[11px] text-ink-faint">{ignored}</p> : null
+                        })()}
                         <p className="text-[10px] text-ink-faint">
                           {USE_API
                             ? 'Drag the handle to compare. The original is never overwritten.'
@@ -617,6 +653,12 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                       </div>
                     ) : enhanceError ? (
                       <p className="text-[11px] text-[#F87171]">{enhanceError}</p>
+                    ) : alreadyEnhanced ? (
+                      <p className="text-[11px] text-ink-faint">
+                        This photo already has an enhancement.{' '}
+                        <Link to={`/dashboard/images/${image.id}`} className="font-bold text-[#FB923C] hover:underline">Open the photo</Link>
+                        {' '}to see how it turned out and to download it.
+                      </p>
                     ) : (
                       <p className="text-[11px] text-ink-faint">Not enhanced yet.</p>
                     )}
@@ -658,8 +700,9 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
 
                 {/* Which person folder the photo was filed under. Shown only
                     when the pipeline actually assigned one -- an unassigned
-                    photo is usually waiting on a moderator, which the row says
-                    rather than leaving a blank. */}
+                    photo in a team is usually waiting on a moderator, which the
+                    row says; in the person's own workspace there is none, so it
+                    only says no folder yet. */}
                 {accepted && USE_API && (
                   <div className="p-4 rounded-3xl bg-surface-mute border border-line flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -682,7 +725,7 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                         ? 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/25'
                         : 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/25'
                     }`}>
-                      {person ? 'Matched' : 'With a moderator'}
+                      {person ? 'Matched' : sentTo !== undefined ? 'With a moderator' : 'No folder yet'}
                     </span>
                   </div>
                 )}
@@ -696,7 +739,7 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                 {/* Download and share, both real: the file comes from the
                     enhancement result, and the link is a genuine public share
                     the backend issues, watermarked and time-limited. */}
-                {usable && (
+                {usable && !alreadyEnhanced && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"

@@ -1,5 +1,5 @@
-import { listMyImages, type ImageListItem } from './api/images'
-import { enhanceImage, getEnhancementResult, isEnhancementSettled } from './api/enhancements'
+import { ENHANCEMENT_STATUSES, listMyImages, type ImageListItem } from './api/images'
+import { enhanceImage, getEnhancementResult, isEnhancementSettled, type EnhancementLevel, type EnhancementLighting, type EnhancementStyle } from './api/enhancements'
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -16,9 +16,10 @@ export async function listBatchPhotos(batchId: number, signal?: AbortSignal): Pr
 
 /** Accepted photos that have no finished enhancement and none in progress. */
 export function needsEnhancing(photo: ImageListItem): boolean {
-  if (photo.display_status !== 'accepted') return false
   const status = photo.latest_enhancement?.status
-  return !status || status === 'failed' || status === 'cancelled'
+  if (photo.display_status === 'accepted') return !status || status === 'failed' || status === 'cancelled'
+  // Once an enhancement exists the backend reports its status instead: only one that failed or was cancelled can be tried again.
+  return ENHANCEMENT_STATUSES.includes(photo.display_status) && (status === 'failed' || status === 'cancelled')
 }
 
 /**
@@ -33,6 +34,8 @@ export async function enhanceAcceptedPhotos(
   batchId: number,
   onProgress?: (done: number, total: number, failed: number) => void,
   signal?: AbortSignal,
+  /** The person's own choice (the preset's level and style, and the lighting), the same one the upload was sent with. */
+  choice?: { level?: EnhancementLevel; style?: EnhancementStyle; lighting?: EnhancementLighting },
 ): Promise<{ total: number; failed: number; firstError: string }> {
   const todo = (await listBatchPhotos(batchId, signal)).filter(needsEnhancing)
   let next = 0
@@ -45,7 +48,7 @@ export async function enhanceAcceptedPhotos(
     while (next < todo.length && !signal?.aborted) {
       const photo = todo[next]; next += 1
       try {
-        let result = await enhanceImage(photo.id)
+        let result = await enhanceImage(photo.id, choice)
         const deadline = Date.now() + 240_000
         while (!isEnhancementSettled(result)) {
           if (Date.now() > deadline) throw new Error('This photo is taking longer than expected.')

@@ -6,8 +6,13 @@ import {
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
-import { uploadMultiple, type ImageListItem } from '../../lib/api/images'
+import { uploadMultiple, type ImageListItem, type UploadBatch } from '../../lib/api/images'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
+import { LightingPicker } from '../../components/features/LightingPicker'
+import { PresetPicker } from '../../components/features/PresetPicker'
+import { presetPair, type PresetKey } from '../../lib/enhancementPresets'
+import { UPLOAD_LIMITS } from '../../components/features/uploadKinds'
+import type { EnhancementLighting } from '../../lib/api/enhancements'
 import { useSubmitTarget } from '../../lib/useSubmitTarget'
 import { fetchBatchZip } from '../../lib/api/downloads'
 import { formatBytes, statusLabel } from '../../lib/imageData'
@@ -17,8 +22,8 @@ import { BatchStageList } from '../../components/features/BatchStageList'
 import { BatchEnhancementPanel } from '../../components/features/BatchEnhancementPanel'
 import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
 
-/** What the backend accepts in one batch. */
-const MAX_FILES = 150
+/** How many photos one batch holds on this screen (the same figure the Upload Center card shows). */
+const MAX_FILES = UPLOAD_LIMITS.photos
 
 interface Picked { file: File; previewUrl: string }
 
@@ -35,6 +40,11 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
   const target = useSubmitTarget()
   // Where this upload was sent: undefined is the person's own workspace, which has no moderator.
   const [sentTo, setSentTo] = useState<number | undefined>(undefined)
+  // How the person wants these photos enhanced: a preset and a lighting, sent WITH the upload (the server's pipeline does the work). `sent` is what the
+  // upload went with and what the server said it took (see BatchEnhancementPanel).
+  const [preset, setPreset] = useState<PresetKey>('auto')
+  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const [sent, setSent] = useState<{ preset: PresetKey; lighting: EnhancementLighting; echoed: UploadBatch['auto_enhance_options'] } | null>(null)
   const [picked, setPicked] = useState<Picked[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploaded, setUploaded] = useState<ImageListItem[] | null>(null)
@@ -62,7 +72,8 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
     if (chosen.length === 0) return
     setError(null)
     const room = MAX_FILES - picked.length
-    if (chosen.length > room) setError(`A batch holds up to ${MAX_FILES} photos, so only the first ${room} were added.`)
+    if (room <= 0) setError(`A batch holds up to ${MAX_FILES} photos and this one is full. Remove a photo to add another.`)
+    else if (chosen.length > room) setError(`A batch holds up to ${MAX_FILES} photos, so only the first ${room} were added.`)
     setPicked(current => [
       ...current,
       ...chosen.slice(0, Math.max(room, 0)).map(file => ({ file, previewUrl: URL.createObjectURL(file) })),
@@ -86,7 +97,8 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
     setError(null)
     try {
       setSentTo(target.organizationId)
-      const made = await uploadMultiple(picked.map(item => item.file), undefined, target.organizationId)
+      const made = await uploadMultiple(picked.map(item => item.file), { organizationId: target.organizationId, enhancement: { ...presetPair(preset), lighting } })
+      setSent({ preset, lighting, echoed: made.auto_enhance_options })
       setUploaded(made.images ?? [])
       setBatchId(made.id)
     } catch (caught) {
@@ -186,6 +198,8 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
                 ) : (
                   <div className="space-y-3 pt-2">
                   <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
+                  <PresetPicker id="upload-preset" value={preset} onChange={setPreset} />
+                  <LightingPicker id="upload-lighting" value={lighting} onChange={setLighting} />
                   <div className="flex gap-3">
                     <button onClick={reset} className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center">Cancel</button>
                     <label className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center cursor-pointer">
@@ -318,7 +332,7 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
                 )}
 
                 {stage === 'done' && <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />}
-                {stage === 'done' && batchId !== null && <BatchEnhancementPanel batchId={batchId} />}
+                {stage === 'done' && batchId !== null && <BatchEnhancementPanel batchId={batchId} choice={sent ? { preset: sent.preset, lighting: sent.lighting } : undefined} echoed={sent?.echoed} />}
 
                 {(stage === 'preview') && (
                   <div className="p-4 rounded-2xl bg-[#F97316]/[0.06] border border-[#F97316]/20 text-xs text-[#FB923C] font-medium">

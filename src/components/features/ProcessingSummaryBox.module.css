@@ -1,0 +1,57 @@
+/*
+ * The processing summary: which engine did what, and whether an AI model or a plain filter did it. Colours come from the app's own theme variables
+ * (so it follows the dark and light appearance); the value after each comma is what it falls back to outside the app.
+ */
+.summary {
+  --u-bg: var(--a-surface, 30 30 30);
+  --u-mute: var(--a-surface-mute, 40 40 40);
+  --u-ink: var(--a-ink, 245 245 245);
+  --u-soft: var(--a-ink-soft, 200 200 200);
+  --u-faint: var(--a-ink-mute, 150 150 150);
+  --u-line: var(--a-line, 64 64 64);
+  --u-good: 16 185 129;
+  --u-warn: 245 158 11;
+  color: rgb(var(--u-ink));
+  font-size: 0.8125rem;
+  line-height: 1.5;
+
+  display: flex; flex-direction: column; gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(var(--u-line));
+  border-radius: 0.75rem;
+  background: rgb(var(--u-bg));
+}
+.summaryTitle { margin: 0; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgb(var(--u-faint)); }
+.badges { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.badge {
+  display: inline-flex; align-items: center; gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid;
+  border-radius: 9999px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.badge svg { width: 0.875rem; height: 0.875rem; }
+.good { border-color: rgb(var(--u-good) / 0.45); background: rgb(var(--u-good) / 0.14); color: rgb(var(--u-good)); }
+.warn { border-color: rgb(var(--u-warn) / 0.45); background: rgb(var(--u-warn) / 0.14); color: rgb(var(--u-warn)); }
+.neutral { border-color: rgb(var(--u-line)); background: rgb(var(--u-mute)); color: rgb(var(--u-soft)); }
+
+.stages { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.stage {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.5rem;
+  padding: 0.5rem 0;
+  border-top: 1px solid rgb(var(--u-line));
+}
+.stage:first-child { border-top: none; }
+.stageName { font-weight: 600; }
+.stageEngine { flex: 1 1 8rem; min-width: 0; font-size: 0.8125rem; color: rgb(var(--u-soft)); }
+.kind {
+  padding: 0.0625rem 0.5rem;
+  border: 1px solid rgb(var(--u-line));
+  border-radius: 9999px;
+  font-size: 0.6875rem; font-weight: 600;
+  color: rgb(var(--u-faint));
+}
+.kindAi { border-color: rgb(var(--u-good) / 0.45); color: rgb(var(--u-good)); }
+.kindWarn { border-color: rgb(var(--u-warn) / 0.45); color: rgb(var(--u-warn)); }
+
+.note { margin: 0; font-size: 0.8125rem; color: rgb(var(--u-faint)); }

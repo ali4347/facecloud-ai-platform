@@ -35,7 +35,6 @@ import Notifications from './pages/user/Notifications'
 import ActivityLogs from './pages/user/ActivityLogs'
 import Settings from './pages/user/Settings'
 import LiveEnhancement from './pages/user/LiveEnhancement'
-import EnhancementUploader from './components/features/EnhancementUploader'
 import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
@@ -124,7 +123,8 @@ export default function App() {
           <Route path="activity" element={<ActivityLogs />} />
           <Route path="organization" element={<MyOrganization />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="enhance" element={<EnhancementUploader />} />
+          {/* The separate uploader page was folded into the Upload screens (preset and lighting are chosen there); keep old bookmarks working. */}
+          <Route path="enhance" element={<Navigate to="/dashboard/upload" replace />} />
           <Route path="live-enhancement" element={<LiveEnhancement />} />
           <Route path="jobs" element={<ProcessingJobs />} />
         </Route>

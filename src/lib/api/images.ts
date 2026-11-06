@@ -1,4 +1,5 @@
 import { apiFetch, apiFetchBlob } from './client'
+import type { EnhancementLevel, EnhancementLighting, EnhancementStyle } from './enhancements'
 
 /** DRF's paginated envelope. `/api/images/my/` uses it; batch lists do not. */
 export interface Page<T> {
@@ -68,6 +69,15 @@ export interface EnhancementSummary {
   download_url?: string | null
 }
 
+/** Where a photo was taken, by name. The coordinates are never in a photo row; the photo's own `/location/` call has them. */
+export interface PlaceBrief {
+  id: number
+  name: string
+  region: string
+  country: string
+  country_code: string
+}
+
 export interface ImageListItem {
   id: number
   batch: number
@@ -89,6 +99,12 @@ export interface ImageListItem {
   face_validation: FaceValidationSummary | null
   latest_enhancement: EnhancementSummary | null
   identity_groups: IdentityGroupRef[] | null
+  /** Newer backends only. */
+  is_favorite?: boolean
+  /** The capture time from the file's EXIF data; null when it has none. */
+  taken_at?: string | null
+  place?: PlaceBrief | null
+  has_location?: boolean
   created_at: string
   updated_at: string
 }
@@ -123,6 +139,8 @@ export interface UploadBatch {
   created_at: string
   updated_at: string
   images?: ImageListItem[]
+  /** What the server took from the upload's `level` / `style` / `lighting` for the batch's automatic enhancement; `{}` when nothing was sent. Absent on a backend that predates the fields. */
+  auto_enhance_options?: { level?: EnhancementLevel; style?: EnhancementStyle; lighting?: EnhancementLighting }
 }
 
 export interface BatchImageProgress {
@@ -148,6 +166,8 @@ export interface BatchProgress {
   counts: Record<string, number>
   estimated_completion_at: string | null
   images: BatchImageProgress[]
+  /** The stages in the order this server runs them. Newer backends send it, so a change of order there needs no change here; see `stageOrder`. */
+  stage_order?: string[]
   updated_at: string
 }
 
@@ -168,6 +188,16 @@ export const PIPELINE_STAGES = [
 ] as const
 
 /**
+ * The order to show the stages in: the server's own when it sends one (and it names every stage this app knows), otherwise the order above.
+ * Keeping the order on the server means moving a stage (say, enhancing before grouping by person) is one change there.
+ */
+export function stageOrder(progress?: { stage_order?: string[] } | null): readonly string[] {
+  const sent = progress?.stage_order
+  const complete = Array.isArray(sent) && sent.length === PIPELINE_STAGES.length && PIPELINE_STAGES.every(stage => sent.includes(stage))
+  return complete ? sent : PIPELINE_STAGES
+}
+
+/**
  * Once a photo has passed the checks and been handed to enhancement, the backend reports the enhancement's own status as the photo's
  * `display_status` instead of `accepted`. Any of these means the photo was accepted, never that it waits for a moderator.
  */
@@ -176,18 +206,37 @@ export const ENHANCEMENT_STATUSES: readonly string[] = ['pending', 'queued', 'pr
 /** A photo that passed the checks: `accepted`, or already carrying an enhancement status. */
 export const passedChecks = (status: string | null | undefined): boolean => status === 'accepted' || ENHANCEMENT_STATUSES.includes(status ?? '')
 
-/** `autoEnhance: false` keeps the backend from enhancing the photos itself (it does by default), for a screen that enhances them afterwards with the person's own choices. */
-function withAutoEnhance(formData: FormData, autoEnhance?: boolean) {
-  if (autoEnhance === false) formData.append('auto_enhance', 'false')
+/** How the person wants the automatic enhancement of an upload done: the (level, style) pair of the preset they picked, and the lighting. */
+export interface UploadEnhancement { level?: EnhancementLevel; style?: EnhancementStyle; lighting?: EnhancementLighting }
+
+export interface UploadOptions {
+  signal?: AbortSignal
+  /** Submits the photos to a team the person belongs to instead of their own workspace. */
+  organizationId?: number
+  /** `false` keeps the backend from enhancing the photos itself (it does by default). The upload screens no longer use it: the pipeline does the enhancement. */
+  autoEnhance?: boolean
+  /** Drives the batch's automatic enhancement (and only while `autoEnhance` is not false). The server answers 400 for a value it does not allow and makes no batch. */
+  enhancement?: UploadEnhancement
 }
 
-/** `organizationId` submits the photos to a team the person belongs to instead of their own workspace. */
-export function uploadSingle(file: File, signal?: AbortSignal, organizationId?: number, autoEnhance?: boolean): Promise<UploadBatch> {
+/**
+ * The optional fields every upload takes. A field is sent only when it says something: `level` "auto", `style` "natural" and `lighting` "auto" are
+ * the server's own defaults and are left out, as is `auto_enhance` unless it is false. A person who changed nothing sends nothing extra.
+ */
+function appendOptions(formData: FormData, options: UploadOptions) {
+  if (options.organizationId !== undefined) formData.append('organization_id', String(options.organizationId))
+  if (options.autoEnhance === false) formData.append('auto_enhance', 'false')
+  const { level, style, lighting } = options.enhancement ?? {}
+  if (level && level !== 'auto') formData.append('level', level)
+  if (style && style !== 'natural') formData.append('style', style)
+  if (lighting && lighting !== 'auto') formData.append('lighting', lighting)
+}
+
+export function uploadSingle(file: File, options: UploadOptions = {}): Promise<UploadBatch> {
   const formData = new FormData()
   formData.append('file', file)
-  if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
-  withAutoEnhance(formData, autoEnhance)
-  return apiFetch<UploadBatch>('/api/images/upload/single/', { formData, signal })
+  appendOptions(formData, options)
+  return apiFetch<UploadBatch>('/api/images/upload/single/', { formData, signal: options.signal })
 }
 
 /**
@@ -197,29 +246,49 @@ export function uploadSingle(file: File, signal?: AbortSignal, organizationId?: 
  * back with `rejected_files` above zero while still succeeding overall. Read
  * the per-image statuses rather than assuming everything went through.
  */
-export function uploadMultiple(files: File[], signal?: AbortSignal, organizationId?: number): Promise<UploadBatch> {
+export function uploadMultiple(files: File[], options: UploadOptions = {}): Promise<UploadBatch> {
   const formData = new FormData()
   for (const file of files) formData.append('files', file)
-  if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
-  return apiFetch<UploadBatch>('/api/images/upload/multiple/', { formData, signal })
+  appendOptions(formData, options)
+  return apiFetch<UploadBatch>('/api/images/upload/multiple/', { formData, signal: options.signal })
 }
 
-export function uploadZip(file: File, signal?: AbortSignal, organizationId?: number, autoEnhance?: boolean): Promise<UploadBatch> {
+export function uploadZip(file: File, options: UploadOptions = {}): Promise<UploadBatch> {
   const formData = new FormData()
   formData.append('file', file)
-  if (organizationId !== undefined) formData.append('organization_id', String(organizationId))
-  withAutoEnhance(formData, autoEnhance)
-  return apiFetch<UploadBatch>('/api/images/upload/zip/', { formData, signal })
+  appendOptions(formData, options)
+  return apiFetch<UploadBatch>('/api/images/upload/zip/', { formData, signal: options.signal })
+}
+
+/** What the photo list can be narrowed to, beside its status: one set of keys shared by the page's address and the API call. */
+export interface PhotoFilter {
+  favorite?: boolean
+  album?: number
+  /** Several ids: photos that contain all of those people. */
+  person?: number[]
+  place?: number
+  /** Two letters, e.g. "PK". */
+  country?: string
+  /** YYYY-MM-DD, inclusive, on the capture date (the upload date when the file has none). */
+  takenFrom?: string
+  takenTo?: string
 }
 
 export function listMyImages(
-  params: { page?: number; status?: string; batch?: number; pageSize?: number } = {}, signal?: AbortSignal,
+  params: { page?: number; status?: string; batch?: number; pageSize?: number } & PhotoFilter = {}, signal?: AbortSignal,
 ): Promise<Page<ImageListItem>> {
   const query = new URLSearchParams()
   if (params.page) query.set('page', String(params.page))
   if (params.status) query.set('status', params.status)
   if (params.batch) query.set('batch', String(params.batch))
   if (params.pageSize) query.set('page_size', String(params.pageSize))
+  if (params.favorite) query.set('favorite', 'true')
+  if (params.album) query.set('album', String(params.album))
+  for (const person of params.person ?? []) query.append('person', String(person))
+  if (params.place) query.set('place', String(params.place))
+  if (params.country) query.set('country', params.country)
+  if (params.takenFrom) query.set('taken_from', params.takenFrom)
+  if (params.takenTo) query.set('taken_to', params.takenTo)
   const suffix = query.toString() ? `?${query}` : ''
   return apiFetch<Page<ImageListItem>>(`/api/images/my/${suffix}`, { signal })
 }
@@ -234,6 +303,16 @@ export function listBatches(signal?: AbortSignal): Promise<UploadBatch[]> {
 
 export function getBatchProgress(batchId: number, signal?: AbortSignal): Promise<BatchProgress> {
   return apiFetch<BatchProgress>(`/api/images/batches/${batchId}/progress/`, { signal })
+}
+
+/** Give an upload a name of the person's own. */
+export function renameBatch(batchId: number, displayName: string): Promise<UploadBatch> {
+  return apiFetch<UploadBatch>(`/api/images/batches/${batchId}/`, { method: 'PATCH', body: { display_name: displayName } })
+}
+
+/** Delete an upload AND every photo in it, for good (like deleting each photo from My Images, not the trash). */
+export function deleteBatch(batchId: number): Promise<void> {
+  return apiFetch<void>(`/api/images/batches/${batchId}/`, { method: 'DELETE' })
 }
 
 export function cancelBatch(batchId: number): Promise<unknown> {
