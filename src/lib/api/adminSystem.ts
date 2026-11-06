@@ -84,6 +84,8 @@ export interface AuditRow {
   ip_address: string | null
   created_at: string
   actor: { id: number; username: string; role: string } | null
+  /** What the event recorded (for a photo decision: `action`, `previous_decision`, `decision`, `reason`). The server's `message` does not always say it. */
+  details?: Record<string, unknown>
   /** The username, or the typed identifier for a failed sign-in by someone unknown. */
   actor_name: string
   actor_role: string | null
@@ -269,16 +271,22 @@ export interface SystemImageDetail extends SystemImageRow {
 }
 export interface Paged<T> { count: number; next: string | null; previous: string | null; results: T[] }
 
-export function listSystemImages(page: number, pageSize: number, signal?: AbortSignal): Promise<Paged<SystemImageRow>> {
-  return apiFetch<Paged<SystemImageRow>>(`/api/system/images/?page=${page}&page_size=${pageSize}`, { signal })
+/**
+ * One page of every uploaded photo. `ordering` is the server's: `created_at`, `original_name`, `file_size`, `owner__username` or
+ * `quality_decision__sharpness_score`, each optionally with a leading "-"; anything else is a 400. Without it the newest come first. Names sort
+ * without regard to case, and photos with no score come last, in either direction.
+ */
+export function listSystemImages(page: number, pageSize: number, signal?: AbortSignal, ordering?: string): Promise<Paged<SystemImageRow>> {
+  return apiFetch<Paged<SystemImageRow>>(`/api/system/images/?page=${page}&page_size=${pageSize}${ordering ? `&ordering=${encodeURIComponent(ordering)}` : ''}`, { signal })
 }
 export function getSystemImage(id: number, signal?: AbortSignal): Promise<SystemImageDetail> {
   return apiFetch<SystemImageDetail>(`/api/system/images/${id}/`, { signal })
 }
 /**
- * What the administrator can decide on a photo: the moderator's own words (`approve`, `reject`, `keep_in_review`).
- * Deciding is a call the backend does not have yet (see PROMPT_FOR_BACKEND_ADMIN_IMAGES.md); the screen asks first
- * whether it is there and keeps the buttons off until it is.
+ * What the administrator can decide on a photo: the moderator's own words (`approve`, `reject`, `keep_in_review`). `reject` needs a reason (400 without
+ * one, at most 500 characters); a photo that cannot be decided (refused at upload, in the trash, its quality check failed or not finished) answers 409
+ * with a sentence. The answer is the photo's detail, as `GET` gives it. The screen still asks first (an OPTIONS call) whether the server has this, and
+ * keeps the buttons off on one that does not.
  */
 export type SystemImageAction = 'approve' | 'reject' | 'keep_in_review'
 
@@ -308,3 +316,53 @@ export async function systemDecisionsAvailable(id: number): Promise<boolean> {
 export function getSystemImagePreview(id: number, signal?: AbortSignal): Promise<Blob> {
   return apiFetchBlob(`/api/system/images/${id}/preview/`, { signal })
 }
+
+// ── Privacy audit ────────────────────────────────────────────────────────────
+
+/** One row of the audit's key/value sections. The server may add keys later, so the shapes stay open. */
+export type PrivacyFacts = Record<string, unknown>
+
+/**
+ * The platform's privacy posture, as `GET /api/privacy/audit/` sends it (administrators only; anyone else gets 403 "Administrator
+ * access is required."). Totals only: it carries no personal data. Typed from a real response.
+ */
+export interface PrivacyAudit {
+  generated_at: string
+  consent: {
+    /** Whether the server insists on the person's consent before it creates face data. */
+    required: boolean
+    current_policy_version: string
+    users_with_active_consent: number
+    users_with_withdrawn_consent: number
+    /** Agreed to an older policy version than the current one. */
+    users_needing_reconsent: number
+  }
+  /** Privacy requests of the last 30 days: how many of each kind, by outcome (`completed`, `failed`, and any other the server adds). Empty when there were none. */
+  requests_last_30_days: Record<string, Record<string, number>>
+  /** Facial-data erasures and retention purges that were not verified as complete, all time. */
+  unverified_erasures_total: number
+  temporary_files: {
+    stale_temp_archives: number
+    max_age_hours: number
+    orphan_media_deletion_enabled: boolean
+  }
+  retention: {
+    /** 0 means no limit. */
+    days: number
+    enabled: boolean
+    /** The latest retention purge (`created_at`, `verified`, `summary` with counts), or null when none has run. Its keys can grow. */
+    last_purge: PrivacyFacts | null
+  }
+  encryption: {
+    /** How identity data is protected, in a sentence, as the server words it. */
+    identity_embeddings: string
+    current_key_id: string | number
+    previous_keys_configured: number
+    dedicated_embedding_key_configured: boolean
+    /** How the stored identity records are protected (`current_key`, `older_key`, `legacy_v1`, `unrecognized`, `rotation_needed`, and any other the server adds). */
+    stored_records: PrivacyFacts
+    uploaded_images_encrypted_at_rest: boolean
+  }
+}
+
+export const getPrivacyAudit = (signal?: AbortSignal) => apiFetch<PrivacyAudit>('/api/privacy/audit/', { signal })

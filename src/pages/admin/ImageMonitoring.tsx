@@ -19,21 +19,22 @@ import { messageFor, useApiResource } from '../../lib/useApiResource'
 import { formatDateTime } from '../../lib/utils'
 
 const PAGE_SIZE = 20
-/** The most photos one request can return. Any order other than "newest first" is worked out here, over this many. */
-const SORT_WINDOW = 200
-
 type SortKey = 'newest' | 'oldest' | 'name_asc' | 'name_desc' | 'size_desc' | 'size_asc' | 'owner' | 'attention' | 'sharp_desc' | 'sharp_asc'
-const SORTS: { key: SortKey; label: string }[] = [
+/**
+ * The server sorts every sort here (`ordering` on `GET /api/system/images/`), across all photos, and pages the result. "Needs review first" has no
+ * server field: it only puts the unsure photos at the top of the page that is loaded, and says so. The demo build has no server, so it sorts its sample here.
+ */
+const SORTS: { key: SortKey; label: string; ordering?: string }[] = [
   { key: 'newest', label: 'Newest first' },
-  { key: 'oldest', label: 'Oldest first' },
-  { key: 'attention', label: 'Needs review first' },
-  { key: 'name_asc', label: 'Name A to Z' },
-  { key: 'name_desc', label: 'Name Z to A' },
-  { key: 'owner', label: 'Owner A to Z' },
-  { key: 'size_desc', label: 'Largest file first' },
-  { key: 'size_asc', label: 'Smallest file first' },
-  { key: 'sharp_desc', label: 'Sharpest first' },
-  { key: 'sharp_asc', label: 'Blurriest first' },
+  { key: 'oldest', label: 'Oldest first', ordering: 'created_at' },
+  { key: 'attention', label: 'Needs review first (this page)' },
+  { key: 'name_asc', label: 'Name A to Z', ordering: 'original_name' },
+  { key: 'name_desc', label: 'Name Z to A', ordering: '-original_name' },
+  { key: 'owner', label: 'Owner A to Z', ordering: 'owner__username' },
+  { key: 'size_desc', label: 'Largest file first', ordering: '-file_size' },
+  { key: 'size_asc', label: 'Smallest file first', ordering: 'file_size' },
+  { key: 'sharp_desc', label: 'Sharpest first', ordering: '-quality_decision__sharpness_score' },
+  { key: 'sharp_asc', label: 'Blurriest first', ordering: 'quality_decision__sharpness_score' },
 ]
 
 function demoPage(): Paged<SystemImageRow> {
@@ -101,7 +102,7 @@ const ACTIONS: { action: SystemImageAction; label: string; past: string; icon: t
   { action: 'reject', label: 'Reject', past: 'rejected', icon: XCircle, tone: 'border-[#EF4444]/35 text-[#F87171] [html[data-theme=light]_&]:text-[#B91C1C] hover:bg-[#EF4444]/10 data-[current=true]:bg-[#EF4444]/15' },
 ]
 
-function DetailPanel({ id, onClose, onChanged }: { id: number; onClose: () => void; onChanged: () => void }) {
+function DetailPanel({ id, onClose, onDecided }: { id: number; onClose: () => void; onDecided: (photo: SystemImageDetail) => void }) {
   const [detail, setDetail] = useState<SystemImageDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   // Deciding: is the backend able to record it, which action is being confirmed, and how it went.
@@ -145,11 +146,13 @@ function DetailPanel({ id, onClose, onChanged }: { id: number; onClose: () => vo
     setBusy(true)
     setDecideError(null)
     try {
-      setDetail(await decideSystemImage(detail.id, chosen.action, reason.trim()))
+      // The answer is the photo's detail as it is now: the panel and the row in the list both take it from here.
+      const decided = await decideSystemImage(detail.id, chosen.action, reason.trim())
+      setDetail(decided)
       setDone(`Marked as ${chosen.past}.`)
       setPending(null)
       setReason('')
-      onChanged()
+      onDecided(decided)
     } catch (caught) {
       setDecideError(messageFor(caught))
     } finally {
@@ -282,33 +285,33 @@ export default function ImageMonitoring() {
   const [page, setPage] = useState(1)
   const [sort, setSort] = useState<SortKey>('newest')
   const [selected, setSelected] = useState<number | null>(null)
-  /* "Newest first" is the server's own order, so it pages on the server and is right for any number of photos. Any other
-     order needs the photos together: one request for up to 200 of the newest, sorted and paged here. The result says which
-     way it was loaded, so a list loaded the other way is never drawn under the wrong order for a moment. */
-  const local = sort !== 'newest'
-  const state = useApiResource(
-    async signal => ({ paged: await listSystemImages(local ? 1 : page, local ? SORT_WINDOW : PAGE_SIZE, signal), local }),
-    () => ({ paged: demoPage(), local }),
-    [local, local ? 0 : page],
-  )
+  const ordering = SORTS.find(option => option.key === sort)?.ordering
+  const state = useApiResource(signal => listSystemImages(page, PAGE_SIZE, signal, ordering), demoPage, [page, ordering])
   const changeSort = (next: SortKey) => { setSort(next); setPage(1) }
+  /* A decision answers with the photo as it is now. It is kept here and drawn over its row, so the list does not jump or reload; a fresh
+     answer from the server (another page, another order, a reload) replaces it. */
+  const [decided, setDecided] = useState<Record<number, SystemImageDetail>>({})
+  useEffect(() => { setDecided({}) }, [state.data])
+  const showing = (row: SystemImageRow): SystemImageRow => {
+    const now = decided[row.id]
+    return now ? { ...row, quality: now.quality, status: now.status, rejection_reason: now.rejection_reason, latest_enhancement: now.latest_enhancement } : row
+  }
 
   return (
     <div className="space-y-6 page-enter">
       <PageHeader title="Image Monitoring" subtitle="Every photo uploaded to the platform, with its quality result. Sort it, and open a photo to accept, reject or put it under review." />
 
       <AsyncGate state={state} what="the images">
-        {({ paged: data, local: loadedLocal }) => {
-          const ready = loadedLocal === local
-          const sorted = local && ready ? sortRows(data.results, sort) : data.results
-          const rows = local && ready ? sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE) : data.results
-          const lastPage = Math.max(1, Math.ceil((local && ready ? data.results.length : data.count) / PAGE_SIZE))
-          const hasNext = local && ready ? page < lastPage : Boolean(data.next)
-          const clipped = local && ready && data.count > data.results.length
+        {data => {
+          // The server has already ordered and paged the list. Only the demo build's sample, and "needs review first" (no server field), are ordered here.
+          const clientOrder = state.isDemo || sort === 'attention'
+          const rows = (clientOrder ? sortRows(data.results, state.isDemo ? sort : 'attention') : data.results).slice(0, PAGE_SIZE).map(showing)
+          const lastPage = Math.max(1, Math.ceil(data.count / PAGE_SIZE))
+          const hasNext = Boolean(data.next)
           return (
             <ChartCard
               title="Uploaded photos"
-              subtitle={`${data.count.toLocaleString()} in total${clipped ? ` · ordered within the newest ${data.results.length.toLocaleString()}` : ''}`}
+              subtitle={`${data.count.toLocaleString()} in total`}
               action={
                 <label className="flex items-center gap-2 text-xs text-ink-mute">
                   <span>Sort by</span>
@@ -318,9 +321,7 @@ export default function ImageMonitoring() {
                 </label>
               }
             >
-              {!ready ? (
-                <div className="text-center py-16 text-ink-faint"><Loader2 className="w-5 h-5 mx-auto mb-2 animate-spin" /><p className="text-xs font-semibold">Ordering the photos…</p></div>
-              ) : data.results.length === 0 ? (
+              {data.results.length === 0 ? (
                 <p className="text-xs text-ink-mute py-8 text-center">No photos have been uploaded yet.</p>
               ) : (
                 <div className="overflow-x-auto">
@@ -384,7 +385,7 @@ export default function ImageMonitoring() {
         }}
       </AsyncGate>
 
-      {selected !== null && <DetailPanel id={selected} onClose={() => setSelected(null)} onChanged={state.reload} />}
+      {selected !== null && <DetailPanel id={selected} onClose={() => setSelected(null)} onDecided={photo => setDecided(current => ({ ...current, [photo.id]: photo }))} />}
     </div>
   )
 }

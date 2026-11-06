@@ -12,6 +12,21 @@ import { formatDateTime } from '../../lib/utils'
 
 const PAGE_SIZE = 25
 
+const DECISION_WORDS: Record<string, string> = { accepted: 'accepted', rejected: 'rejected', needs_review: 'under review' }
+
+/**
+ * The server words an event it has no sentence for from the event's name, so an administrator's decision on a photo reads "Admin image decided."
+ * and not which decision. Its details say what was decided, so that is said here; any other row (and this one, once the server words it itself) keeps the server's sentence.
+ */
+function sentenceOf(row: AuditRow): string {
+  if (row.event !== 'admin_image_decided' || row.message !== 'Admin image decided.') return row.message
+  const details = row.details ?? {}
+  const what = details.action === 'approve' ? 'Accepted a photo' : details.action === 'reject' ? 'Rejected a photo' : details.action === 'keep_in_review' ? 'Put a photo under review' : 'Decided on a photo'
+  const before = DECISION_WORDS[String(details.previous_decision)]
+  const reason = typeof details.reason === 'string' && details.reason.trim() ? ` Reason: “${details.reason.trim().slice(0, 120)}”.` : ''
+  return `${what}${before ? ` (it was ${before})` : ''}.${reason}`
+}
+
 const roleBadge = (role: string) => (role === 'admin' ? 'purple' : role === 'moderator' ? 'warning' : 'info')
 
 function demoPage(): AuditPage {
@@ -46,7 +61,7 @@ export default function AuditLogs() {
           const needle = search.trim().toLowerCase()
           const onScreenOnly = Boolean(data.legacy) || state.isDemo
           const rows = needle && onScreenOnly
-            ? data.results.filter(r => [r.actor_name, r.message, r.resource, r.type].some(v => v.toLowerCase().includes(needle)))
+            ? data.results.filter(r => [r.actor_name, sentenceOf(r), r.resource, r.type].some(v => v.toLowerCase().includes(needle)))
             : data.results
           return (
             <>
@@ -72,7 +87,7 @@ export default function AuditLogs() {
                             : <StatusBadge status="muted" label="Not signed in" dot={false} />}
                           <StatusBadge status={log.status} label={log.status === 'error' ? 'Failed' : log.status === 'warning' ? 'Warning' : log.status === 'success' ? 'OK' : 'Info'} />
                         </div>
-                        <p className="text-sm text-ink-soft mt-0.5">{log.message}</p>
+                        <p className="text-sm text-ink-soft mt-0.5">{sentenceOf(log)}</p>
                         <p className="text-xs text-ink-faint mt-1 font-mono">
                           {formatDateTime(log.created_at)}
                           {log.resource && <> · {log.resource}</>}
