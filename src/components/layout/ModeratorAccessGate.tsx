@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
-import { Lock, AlertTriangle, ArrowLeft, LogIn } from 'lucide-react'
-import { mockUsers } from '../../data/mock'
+import { Lock, ArrowLeft, LogIn } from 'lucide-react'
 import { getSession } from '../../lib/session'
 
 interface ModeratorAccessGateProps {
@@ -11,13 +10,13 @@ interface ModeratorAccessGateProps {
 /**
  * Guards the moderator portal.
  *
- * Three outcomes, deliberately different:
+ * Two outcomes, deliberately different:
  *  - no session at all → send them to the moderator login, the way the admin
  *    portal does. Showing "Access Denied" here left a moderator who typed
  *    /moderator with no way in but to guess the login URL.
  *  - signed in as someone else → refuse, and offer the moderator login so they
  *    can switch accounts on purpose rather than by wandering.
- *  - a suspended moderator → refuse; signing in again would not help.
+ * A suspended moderator is not handled here: the server refuses a suspended account at sign-in and on every request.
  */
 export function ModeratorAccessGate({ children }: ModeratorAccessGateProps) {
   const location = useLocation()
@@ -27,11 +26,7 @@ export function ModeratorAccessGate({ children }: ModeratorAccessGateProps) {
     return <Navigate to="/moderator/login" state={{ from: location }} replace />
   }
 
-  const isModerator = session.role === 'moderator'
-  const isSuspended =
-    isModerator && mockUsers.find(u => u.email === session.email)?.status === 'suspended'
-
-  if (isModerator && !isSuspended) {
+  if (session.role === 'moderator') {
     return <>{children}</>
   }
 
@@ -46,26 +41,22 @@ export function ModeratorAccessGate({ children }: ModeratorAccessGateProps) {
       <div className="w-full max-w-md relative z-10 text-center">
         <div className="fc-panel-strong p-8">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-red-500/10 border border-red-500/25 flex items-center justify-center text-red-500 mb-6">
-            {isSuspended ? <AlertTriangle className="w-8 h-8" /> : <Lock className="w-8 h-8" />}
+            <Lock className="w-8 h-8" />
           </div>
 
           <h2 className="text-xl font-bold tracking-tight text-ink mb-2">Access Denied</h2>
 
           <p className="text-[13px] text-ink-mute leading-relaxed mb-8">
-            {isSuspended
-              ? 'Your account has been deactivated. Please contact your organization administrator.'
-              : 'You are signed in with an account that does not have moderator access.'}
+            You are signed in with an account that does not have moderator access.
           </p>
 
           <div className="flex flex-col gap-2.5">
-            {!isSuspended && (
-              <Link
-                to="/moderator/login"
-                className="fc-btn-primary w-full justify-center text-[13px] py-3 gap-2"
-              >
-                <LogIn className="w-3.5 h-3.5" /> Sign in as moderator
-              </Link>
-            )}
+            <Link
+              to="/moderator/login"
+              className="fc-btn-primary w-full justify-center text-[13px] py-3 gap-2"
+            >
+              <LogIn className="w-3.5 h-3.5" /> Sign in as moderator
+            </Link>
             <Link
               to="/"
               className="fc-btn-secondary w-full justify-center text-[13px] py-3 gap-2"

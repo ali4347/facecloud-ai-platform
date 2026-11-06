@@ -1,7 +1,7 @@
 // Sign-in, sign-out, wrong passwords, wrong portal, session survival, tampered session. Uses the QA stack's test accounts.
 import { check, openTab, sleep, summary, WEB } from '../lib.mjs'
 const t = await openTab()
-const submit = async (portal, email, pw) => { await t.wipe(); const p = { user: '/login', admin: '/admin/login', moderator: '/moderator/login' }[portal]; await t.go(p, 1500); await t.type('input[type=email]', email); await t.type('input[type=password]', pw); t.clearIssues(); await t.ev(`document.querySelector('form button[type=submit]').click()`); await sleep(3500); return { at: await t.path(), text: await t.text() } }
+const submit = async (portal, email, pw) => { await t.wipe(); const p = { user: '/login', admin: '/admin/login', moderator: '/moderator/login' }[portal]; await t.go(p, 1500); await t.type('#signin-email', email); await t.type('input[type=password]', pw); t.clearIssues(); await t.ev(`document.querySelector('form button[type=submit]').click()`); await sleep(3500); return { at: await t.path(), text: await t.text() } }
 
 // 1. wrong password and unknown account: refused, with the same wording (no hint which accounts exist)
 const wrong = await submit('user', 'owner@qa.test', 'not-the-password')

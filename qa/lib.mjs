@@ -59,7 +59,7 @@ export async function openTab({ width = 1440, height = 900 } = {}) {
     /** Signs in through the real form. Returns the path the app ended on. */
     login: async (portal, email, pw = PASSWORD) => {
       const loginPath = { user: '/login', admin: '/admin/login', moderator: '/moderator/login' }[portal]
-      await tab.go(loginPath, 1500); await tab.type('input[type=email]', email); await tab.type('input[type=password]', pw)
+      await tab.go(loginPath, 1500); await tab.type('#signin-email', email); await tab.type('input[type=password]', pw)
       await tab.ev(`document.querySelector('form button[type=submit]').click()`); await sleep(4500)
       return tab.path()
     },

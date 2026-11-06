@@ -108,13 +108,13 @@ export default function ModeratorLogin() {
             <div className="space-y-1.5">
               <label htmlFor="signin-email" className="text-[10px] font-bold uppercase tracking-widest"
                 style={{ color: 'rgb(var(--a-ink) / 0.42)' }}>
-                Moderator Email
+                Email or username
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-3.5 w-4 h-4 pointer-events-none"
                   style={{ color: 'rgb(var(--a-ink) / 0.35)' }} />
                 <input 
-                  id="signin-email" autoComplete="email" type="email"
+                  id="signin-email" autoComplete="username" type="text" autoCapitalize="none" autoCorrect="off" spellCheck={false}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="fc-input !pl-11"

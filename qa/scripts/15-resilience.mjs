@@ -46,7 +46,7 @@ await check('RES-03', 'once the server is back, "Try again" shows the page', !/r
 // the sign-in form while the server is down
 await t.wipe(); await t.go('/login', 1500)
 when({ when: p => p.startsWith('/api/'), fail: true })
-await t.type('input[type=email]', 'member2@qa.test'); await t.type('input[type=password]', PASSWORD)
+await t.type('#signin-email', 'member2@qa.test'); await t.type('input[type=password]', PASSWORD)
 await t.ev(`document.querySelector('form button[type=submit]').click()`); await sleep(3000)
 txt = await body()
 await check('RES-04', 'signing in while the server is down gives a sentence, and the typed email stays', !raw.test(txt.replace(/Welcome Back.*?PORTAL/i, '')) && /could not reach the server/i.test(txt) && (await t.ev(`document.querySelector('input[type=email]')?.value`)) === 'member2@qa.test', txt.slice(0, 260))
