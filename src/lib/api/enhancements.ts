@@ -108,6 +108,13 @@ export function isEnhancementSettled(result: EnhancementResult | null): boolean 
 }
 
 /**
+ * How long a screen waits for an enhancement it started before it stops waiting (the job itself goes on).
+ * The engine stops itself at 180 s (ADAPTIVE_TIME_BUDGET_SECONDS) and a queued job waits for the ones ahead of it, so four minutes fell short now and then:
+ * the longest of the 171 results measured on the owner's machine took 284 s.
+ */
+export const ENHANCE_WAIT_MS = 600_000
+
+/**
  * Start enhancing one photo.
  *
  * Answers **429** when the account already has the most enhancement jobs it is

@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-11-02
+**Last updated:** 2026-11-07
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,15 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-11-07 — Waiting for an enhancement: one shared ten-minute wait, an honest "still being enhanced" message, a group-photo hint on Pro and a note on photos with more than 5 faces
+*Status: committed (this commit); the owner asked for it to be applied, committed and pushed.*
+
+- **Why (measured in the backend repository, `docs/evaluation/2026-11-07-group-photographs.md`, PR #149):** the "240 s" in a brief about wedding photographs is not a backend setting: it is the three waits in this app (`UploadSingle.tsx` 160 polls of 1.5 s, `batchEnhance.ts`, `liveSnapshot.ts`), counted from the request, so the time in the queue counts (the development worker enhances one photograph at a time). The engine stops itself at 180 s, but of the 171 timed results on the owner's machine one took 284 s and four took over 180 s; after the wait the screen said "The enhancement did not finish." while the job went on. The server restores the 5 largest faces of a photograph with AI (`CODEFORMER_MAX_FACES`); the other faces get only the whole-photograph corrections.
+- **Changed:** `src/lib/api/enhancements.ts` (`ENHANCE_WAIT_MS = 600_000`, one shared wait); `src/lib/batchEnhance.ts` and `src/lib/liveSnapshot.ts` (use it instead of `240_000`); `src/pages/user/UploadSingle.tsx` (polls for that long; when the time is up and the job is still queued or processing, the screen says "This photo is still being enhanced…" and that the photograph can be opened from the library, instead of "did not finish"); `src/components/features/PresetPicker.tsx` (the Pro hint says a group photograph with many faces can take a few minutes); `src/lib/enhancementPresets.ts` (`FACE_RESTORATION_LIMIT = 5`, the server's cap); `src/pages/user/ImageDetail.tsx` (a note under "Faces found" when a photograph has more than 5 faces).
+- **Checked:** on a clean export of this commit, `npm run build` (`tsc -b` and `vite build`, 2962 modules) and oxlint on the seven files are clean; the type check also fails when the new import is removed, so it does look at these lines.
+- **Not verified:** in a browser; the note on a real photograph with more than 5 faces (the library has none with more than 3); a wait of more than four minutes against the real worker.
+- **Partial commit:** `src/lib/liveSnapshot.ts`, `src/pages/user/ImageDetail.tsx` and this file also hold the other session's uncommitted edits; this commit holds only the lines above and this entry.
 
 ### 2026-11-05 — EnhancementUploader: one comment in `enhanceAndWait` (no change in behaviour)
 *Status: committed (this commit); the owner asked for it to be committed and pushed.*

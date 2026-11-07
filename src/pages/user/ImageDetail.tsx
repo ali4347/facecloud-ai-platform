@@ -12,6 +12,7 @@ import { USE_API } from '../../lib/api/config'
 import { useImage, formatBytes, statusLabel } from '../../lib/imageData'
 import { deleteImage, downloadImage, getImageThumbnail } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
+import { FACE_RESTORATION_LIMIT } from '../../lib/enhancementPresets'
 import { explainReason, REJECTING_CODES } from '../../lib/reasons'
 import {
   AlertTriangle, ArrowLeft, CheckCircle2, Download, Loader2, RefreshCw, Trash2, XCircle,
@@ -222,6 +223,12 @@ export default function ImageDetail() {
                       <span>Faces found:</span>
                       <span className="font-bold text-ink">{image.face_validation.face_count}</span>
                     </div>
+                  )}
+                  {USE_API && (image.face_validation?.face_count ?? 0) > FACE_RESTORATION_LIMIT && (
+                    <p className="text-[11px] leading-snug text-ink-faint">
+                      This photo has more faces than FaceCloud restores one by one. The {FACE_RESTORATION_LIMIT} largest are restored with AI, each kept only if it still matches the person in your photo; the others get only the
+                      whole-photo corrections (light, noise, sharpness). A group photo can take a few minutes.
+                    </p>
                   )}
                   <div className="flex justify-between">
                     <span>From upload:</span>

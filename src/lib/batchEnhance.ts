@@ -1,5 +1,5 @@
 import { ENHANCEMENT_STATUSES, listMyImages, type ImageListItem } from './api/images'
-import { enhanceImage, getEnhancementResult, isEnhancementSettled, type EnhancementLevel, type EnhancementLighting, type EnhancementStyle } from './api/enhancements'
+import { ENHANCE_WAIT_MS, enhanceImage, getEnhancementResult, isEnhancementSettled, type EnhancementLevel, type EnhancementLighting, type EnhancementStyle } from './api/enhancements'
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -49,7 +49,7 @@ export async function enhanceAcceptedPhotos(
       const photo = todo[next]; next += 1
       try {
         let result = await enhanceImage(photo.id, choice)
-        const deadline = Date.now() + 240_000
+        const deadline = Date.now() + ENHANCE_WAIT_MS
         while (!isEnhancementSettled(result)) {
           if (Date.now() > deadline) throw new Error('This photo is taking longer than expected.')
           await sleep(1500)

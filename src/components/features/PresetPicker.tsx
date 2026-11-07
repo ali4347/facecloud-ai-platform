@@ -3,7 +3,7 @@ import { PRESETS, type PresetKey } from '../../lib/enhancementPresets'
 const HINTS: Record<PresetKey, string> = {
   auto: 'FaceCloud chooses how strongly to correct each photo.',
   standard: 'A strong correction that keeps the photo looking natural.',
-  pro: 'Pro uses the strongest models, so one photo can take a minute or two. A restored face is kept only if it still matches the person in your photo, and any step that fails a safety check is skipped.',
+  pro: 'Pro uses the strongest models, so one photo can take a minute or two, and a group photo with many faces a few minutes. A restored face is kept only if it still matches the person in your photo, and any step that fails a safety check is skipped.',
 }
 
 /** "Enhancement: Auto · Standard · Pro": how strongly the upload's enhancement should work. Sent with the upload; the server does the work in its own pipeline. */

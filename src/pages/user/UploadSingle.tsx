@@ -16,6 +16,7 @@ import {
 } from '../../lib/api/images'
 import {
   createShareLink,
+  ENHANCE_WAIT_MS,
   downloadEnhanced,
   enhanceImage,
   getEnhancementResult,
@@ -59,6 +60,8 @@ const STAGES: { key: string; label: string; detail: string }[] = [
 ]
 
 const POLL_MS = 2500
+/** Polls of 1.5 s until the screen stops waiting for an enhancement (ENHANCE_WAIT_MS). */
+const ENHANCE_WAIT_POLLS = Math.ceil(ENHANCE_WAIT_MS / 1500)
 /** The demo walks the same stages so the prototype still shows the flow. */
 const DEMO_STEP_MS = 650
 
@@ -257,12 +260,17 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
     try {
       let result = await start()
       // The job can come back already finished, or still running.
-      // Up to four minutes, as on the photo's own page: a worker or a heavy model can take well over the half minute this used to allow.
-      for (let attempt = 0; attempt < 160 && !isEnhancementSettled(result); attempt += 1) {
+      // Up to ten minutes: a heavy model, a group photo or a job queued behind others can take well over the half minute this used to allow.
+      for (let attempt = 0; attempt < ENHANCE_WAIT_POLLS && !isEnhancementSettled(result); attempt += 1) {
         await new Promise(resolve => setTimeout(resolve, 1500))
         result = await getEnhancementResult(result.id)
       }
       setEnhancement(result)
+      if (!isEnhancementSettled(result)) {
+        // Still queued or processing: the server has not failed, this screen stopped waiting.
+        setEnhanceError('This photo is still being enhanced. A group photo or a busy server can take several minutes; you can leave this page and open the photo from your library when it is done.')
+        return
+      }
       if (result.status !== 'completed') {
         setEnhanceError(result.failure_reason || 'The enhancement did not finish.')
         return

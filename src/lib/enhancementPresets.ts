@@ -2,6 +2,9 @@ import type { EnhancementLevel, EnhancementLighting, EnhancementResult, Enhancem
 
 export type PresetKey = 'auto' | 'standard' | 'pro'
 
+/** Faces per photo the server restores with AI, the largest first (CODEFORMER_MAX_FACES; the face analysis and the identity check use the same five). */
+export const FACE_RESTORATION_LIMIT = 5
+
 export interface Preset { key: PresetKey; label: string; hint: string; level: EnhancementLevel; style: EnhancementStyle }
 
 /**

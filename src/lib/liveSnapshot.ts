@@ -4,7 +4,7 @@ import {
 } from './api/images'
 import { uploadCameraSnapshot } from './api/camera'
 import {
-  downloadEnhanced, enhanceImage, getEnhancementResult, isEnhancementSettled,
+  ENHANCE_WAIT_MS, downloadEnhanced, enhanceImage, getEnhancementResult, isEnhancementSettled,
   type EnhancementLevel, type EnhancementResult, type EnhancementStyle,
 } from './api/enhancements'
 
@@ -69,7 +69,7 @@ export async function enhanceStoredPhoto(
   imageId: number, style: EnhancementStyle, level: EnhancementLevel,
 ): Promise<SnapshotEnhancement> {
   let result = await enhanceImage(imageId, { style, level })
-  const deadline = Date.now() + 240_000
+  const deadline = Date.now() + ENHANCE_WAIT_MS
   while (!isEnhancementSettled(result)) {
     if (Date.now() > deadline) throw new Error('The enhancement is taking longer than expected.')
     await sleep(1500)
