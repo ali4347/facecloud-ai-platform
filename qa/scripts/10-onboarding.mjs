@@ -30,7 +30,7 @@ await t.go('/dashboard/organization', 3000); await check('ONB-05', 'with no team
 await t.go('/dashboard/upload/single', 2500); await t.setFile('input[type=file]', [hero]); await sleep(1800)
 await check('ONB-06', 'with no team there is no "Submit to" choice', !(await t.exists('#submit-to')))
 await t.click('Confirm'); await sleep(26000); const own = await main()
-await check('ONB-07', 'an unsure photo in one\'s own workspace is not promised a moderator', !/A moderator will take a look/.test(own) && /no moderator will look at it/i.test(own), own.replace(/^.*What the pipeline concluded/, '').slice(0, 160))
+await check('ONB-07', 'an unsure photo in one\'s own workspace is not promised a moderator (the backend treats it as accepted and enhances it, so the card says accepted or, before that, "not sure")', !/A moderator will take a look/.test(own) && /(no moderator will look at it|Your photo was accepted)/i.test(own), own.replace(/^.*What the pipeline concluded/, '').slice(0, 160))
 await check('ONB-08', 'and it is enhanced like any other (the before/after is shown)', /ENHANCEMENT/.test(own) && /ORIGINAL ENHANCED|WHAT WAS DONE/.test(own), own.slice(own.indexOf('ENHANCEMENT'), own.indexOf('ENHANCEMENT') + 120))
 
 // 3. a team owner invites the person

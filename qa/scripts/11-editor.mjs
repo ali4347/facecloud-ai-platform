@@ -26,7 +26,7 @@ const image = (await api(`/api/images/batches/${up.id}/progress/`, tok)).json.im
 let enh = (await api(`/api/enhancements/images/${imageId}/`, tok, { method: 'POST', body: JSON.stringify({ level: 'auto', style: 'natural' }) })).json
 for (let i = 0; i < 60 && !['completed', 'failed'].includes(enh.status); i++) { await sleep(2000); enh = (await api(`/api/enhancements/results/${enh.id}/`, tok)).json }
 const info = (await api(`/api/images/${imageId}/`, tok)).json
-await check('EDIT-00', 'test photo: accepted and enhanced', image.status === 'accepted' && enh.status === 'completed', `${image.status} ${enh.status}`)
+await check('EDIT-00', 'test photo: accepted and enhanced', ['accepted', 'completed'].includes(image.status) && enh.status === 'completed', `${image.status} ${enh.status}`)
 
 await t.go(`/dashboard/images/${imageId}/edit`, 6000)
 const start = await sliders()

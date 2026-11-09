@@ -4,23 +4,23 @@ Newest pass first. **IDs**: `BE-` backend (Ijaz's repository: a prompt is writte
 Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call). Severity is defined in `TEST_PLAN.md`.
 "Evidence" is the check id in `qa/scripts/` (re-run it to see the failure or the fix) and, where useful, a screenshot name in `qa/out/`.
 
-## Summary of the 2026-10-22, 2026-10-23 and 2026-10-24 passes (22 bugs: 9 major, 13 minor; 15 fixed, 7 open, all seven backend)
+## Summary of the 2026-10-22, 2026-10-23 and 2026-10-24 passes (22 bugs: 9 major, 13 minor; 21 fixed, 1 open (optional), re-probed on 2026-11-04: BE-001 to BE-006 are fixed on the backend, see `BACKEND_GAPS.md` section 2)
 
 | ID | Severity | Status | Title |
 |---|---|---|---|
-| BE-006 | Major | Open | Reviews are created in personal workspaces, where nobody can decide them, and pile up on the administrator's list |
+| BE-006 | Major | Fixed (re-probed 2026-11-04) | Reviews are created in personal workspaces, where nobody can decide them, and pile up on the administrator's list |
 | FE-010 | Major | Fixed | A person with no team was told "a moderator will take a look" (there is none) and the photo was not enhanced |
-| BE-005 | Major | Open | The defence demo's dark photo (x0.25) is now refused as "severe underexposure", so low light cannot be shown |
+| BE-005 | Major | Fixed (re-probed 2026-11-04) | The defence demo's dark photo (x0.25) is now refused as "severe underexposure", so low light cannot be shown |
 | FE-009 | Major | Fixed | Enhancement looked as if it did nothing: no reason on screen when a photo needed no fixing |
-| BE-004 | Major | Open | The administrator's organization list is limited to 30 reads an hour (it shares the invitation limit) |
+| BE-004 | Major | Fixed (re-probed 2026-11-04) | The administrator's organization list is limited to 30 reads an hour (it shares the invitation limit) |
 | FE-008 | Major | Fixed | One page load sent the same request up to 8 times, using up the hourly allowance |
 | FE-013 | Major | Fixed | With the server unreachable, pages showed the browser's raw "Failed to fetch" |
 | FE-014 | Major | Fixed | Clicking a button twice quickly sent the request twice (three clicks, three requests) |
 | FE-001 | Major | Fixed | Single upload: a refused file says "the reason is below" but shows no reason |
 | FE-002 | Major | Fixed + Decision | Live Enhancement: dead model address, unpinned runtime, and it needs the internet |
-| BE-001 | Minor | Open | Login accepts an identifier of any length; a 300 KB one gives HTTP 500 on SQLite |
-| BE-002 | Minor | Open | An unknown API address answers an HTML "Not Found" page instead of JSON |
-| BE-003 | Minor | Open | Health check takes 6 to 18 seconds when a service (Redis) is down |
+| BE-001 | Minor | Fixed (re-probed 2026-11-04) | Login accepts an identifier of any length; a 300 KB one gives HTTP 500 on SQLite |
+| BE-002 | Minor | Fixed (re-probed 2026-11-04) | An unknown API address answers an HTML "Not Found" page instead of JSON |
+| BE-003 | Minor | Fixed (re-probed 2026-11-04) | Health check takes 6 to 18 seconds when a service (Redis) is down |
 | BE-007 | Minor | Open (optional) | A refused refresh token answers 400, a garbage one 401 (the app copes with both) |
 | FE-003 | Minor | Fixed | Sign-in, register, forgot-password: fields not linked to their labels, no main heading |
 | FE-004 | Minor | Fixed | Every page has the same browser-tab title |
@@ -33,7 +33,7 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 
 ---
 
-### BE-006 Reviews are created where nobody can decide them — Major — Open (Ijaz)
+### BE-006 Reviews are created where nobody can decide them — Major — Fixed by the backend (re-probed 2026-11-04)
 - **Steps:** sign up a new person (no team) and upload a photo the quality check is unsure about (`public/hero-portrait.png` copied as `hero.jpg` does it). Then, as administrator, `GET /api/system/moderation/`.
 - **Expected:** a personal workspace has no moderator, so nothing is queued for one.
 - **Actual:** a `ModeratorReview` is created in the person's personal workspace and stays *pending* for ever. It appears under `organizations_needing_attention` (four personal workspaces after four such uploads in the test), it is counted in `totals.pending` and `unassigned`, and after a day it will count as `overdue` and `stale_open`. The administrator's picture of moderation fills with work nobody can do.
@@ -46,7 +46,7 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 - **Fix:** for a photo in the person's own workspace the screen says "The checks were not sure about this photo. It is in your own workspace, so no moderator will look at it. You can still enhance and use it, or upload a clearer photo.", enhances it like any other, and shows the quality figures and download. For a team's photo the wording is unchanged. The multiple and ZIP screens say "Not sure about (kept, no moderator in your workspace)" for the person's own workspace (`UploadSingle.tsx`, `UploadMultipleLive.tsx`, `UploadZipLive.tsx`).
 - **Evidence:** `ONB-07`, `ONB-08`, `ONB-12`.
 
-### BE-005 The demo's dark photo is refused, so low-light enhancement cannot be shown — Major — Open (Ijaz)
+### BE-005 The demo's dark photo is refused, so low-light enhancement cannot be shown — Major — Fixed by the backend (re-probed 2026-11-04)
 - **Steps:** `python scripts/seed_demo.py --photo <any portrait> --dark` (this is what `scripts/defense_demo.sh` does), or upload any portrait darkened to a quarter (brightness about 18 to 25 of 255).
 - **Expected:** the dark photo is accepted and brightened (the readiness report of 2026-10-15 shows "dark portrait: enhanced").
 - **Actual:** the quality check refuses it: `rejected: severe_underexposure, contrast_too_low`. A refused photo is never enhanced, so the next call in the script (`POST /api/enhancements/images/{id}/`) answers 400 and the script stops with a KeyError. The flagship low-light feature cannot be shown with the demo's own photo.
@@ -60,7 +60,7 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 - **Fix:** when no stage ran the screens now say "**No correction needed**" and "Nothing needed fixing, so this photo was left as it is. Enhancement changes dark, noisy or blurry photos the most."; the editor's Auto (and "Auto + brighten") explains when it found nothing ("Auto found nothing to fix: this photo is already well exposed and sharp. Try "Auto + brighten" ..."). Files: `EnhancementReport.tsx`, `UploadSingle.tsx`, `EnhancedVersionCard.tsx`, `PhotoEditor.tsx`, `enhancements.ts` (`changedNothing`).
 - **Evidence:** `ENH-02`, `ENH-06` to `ENH-09`.
 
-### BE-004 The administrator's organization list is limited to 30 reads an hour — Major — Open (Ijaz)
+### BE-004 The administrator's organization list is limited to 30 reads an hour — Major — Fixed by the backend (re-probed 2026-11-04)
 - **Steps:** sign in as the administrator and open Organizations, Moderators, Invitations or the Users "add account" form, about 15 to 30 times in an hour (a few rehearsals).
 - **Expected:** these screens keep opening.
 - **Actual:** `GET /api/organizations/admin/` answers `429 "Request was throttled. Expected available in 3405 seconds."`; the four screens show "The organizations could not be loaded" for almost an hour. Measured: refused at read 15 after the earlier test runs had used the rest.
@@ -93,21 +93,21 @@ Status: **Open**, **Fixed** (commit named), **Decision** (needs the owner's call
 - **Decision (open):** make it work **offline** by copying the runtime (`node_modules/@mediapipe/tasks-vision/wasm`, about 22 MB for the two files actually used) and the model (a few hundred KB) into `public/mediapipe/`. It makes the repository and the deployed folder about 22 MB larger. Recommended before the defence if the venue's internet is not certain.
 - **Evidence:** `CRAWL-user/dashboard/live-enhancement`. **Files:** `LiveEnhancementPanel.tsx`.
 
-### BE-001 Login identifier has no length limit — Minor — Open (Ijaz)
+### BE-001 Login identifier has no length limit — Minor — Fixed by the backend (re-probed 2026-11-04)
 - **Steps:** `POST /api/auth/login/` with `{"identifier": "a" x 300000, "password": "x"}`.
 - **Expected:** `400` ("too long").
 - **Actual:** `500`. The server log says `sqlite3.OperationalError: LIKE or GLOB pattern too complex`. PostgreSQL (production) does not use `LIKE` for this, so it would not crash there, but nothing stops a very large string from being processed.
 - **Fix idea:** cap `identifier` (and other free-text login fields) at 254 characters in the serializer, and `password` at a sensible maximum.
 - **Evidence:** `SEC-11`.
 
-### BE-002 Unknown API address answers HTML — Minor — Open (Ijaz)
+### BE-002 Unknown API address answers HTML — Minor — Fixed by the backend (re-probed 2026-11-04)
 - **Steps:** `GET /api/images/abc/` (a path that matches no route, because the route expects a number).
 - **Expected:** `404` with JSON, like every other API error.
 - **Actual:** `404` with an HTML page (Django's). Clients that always parse JSON break; the website now turns this into a sentence, but other clients will not.
 - **Fix idea:** a JSON 404 (and 500) handler for paths that start with `/api/`.
 - **Evidence:** `SEC-10 /api/images/abc/`.
 
-### BE-003 Health check is slow when a service is down — Minor — Open (Ijaz)
+### BE-003 Health check is slow when a service is down — Minor — Fixed by the backend (re-probed 2026-11-04)
 - **Steps:** stop Redis, open Admin, System Monitoring.
 - **Actual:** `GET /api/system/health/` takes 6 to 18 seconds before answering `503` (the checks wait for their timeouts one after another), so the page shows "Loading" that long, and the admin bell asks for the same endpoint.
 - **Fix idea:** short timeouts (1 to 2 s) per check, run the checks in parallel, and cache the answer for a few seconds.

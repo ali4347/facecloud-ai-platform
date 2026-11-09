@@ -28,13 +28,13 @@ await check('UPUI-03', 'single: a text file renamed .jpg is refused after upload
 r = await flow('/dashboard/upload/single', [f('empty.jpg')], 6000); await check('UPUI-04', 'single: an empty file is refused with a reason', /(empty|0 bytes|not a valid or readable image)/i.test(r.after) && !/Request failed \(\d+\)/.test(r.after), r.after.slice(0, 220))
 // multiple: one good, two bad
 r = await flow('/dashboard/upload/multiple', [f('ok.jpg'), f('notes.txt'), f('fake.jpg')], 12000); await t.shot('upload-multiple-mixed')
-await check('UPUI-05', 'multiple: a mix of good and bad files says how many were accepted and rejected', /Unsupported file type/i.test(r.after) && /not a valid or readable image/i.test(r.after) && /Photos rejected:\s*3/i.test(r.after), r.after.slice(0, 300))
+await check('UPUI-05', 'multiple: a mix of good and bad files says how many were taken (the good photo, accepted or "not sure about" in the own workspace) and how many were rejected (the two bad files)', /Unsupported file type/i.test(r.after) && /not a valid or readable image/i.test(r.after) && /Upload complete\s*(1 accepted · 0 not sure about|0 accepted · 1 not sure about)/i.test(r.after) && /Photos rejected:\s*2/i.test(r.after), r.after.slice(0, 300))
 await check('UPUI-06', 'multiple: no uncaught error while processing a mixed batch', !t.issues.exceptions.length, t.issues.exceptions[0] || '')
 // zip
 r = await flow('/dashboard/upload/zip', [f('mixed.zip')], 12000); await t.shot('upload-zip-mixed')
 await check('UPUI-07', 'zip: a ZIP with a photo and a text file reports both (found, accepted, rejected)', /Photos found in ZIP:\s*2/i.test(r.after) && /Photos rejected:\s*[12]/i.test(r.after), r.after.slice(0, 300))
 r = await flow('/dashboard/upload/zip', [f('fake.zip')], 6000); await t.shot('upload-zip-fake')
-await check('UPUI-08', 'zip: a file that is not a ZIP is refused with a sentence, not "Request failed"', /not a valid ZIP archive/i.test(r.before + r.after) && !/Request failed \(\d+\)/.test(r.after), r.after.slice(0, 220))
+await check('UPUI-08', 'zip: a file that is not a ZIP is refused with a sentence (the screen reads the archive first, so it says so before anything is sent), not "Request failed"', /(not a valid ZIP archive|Could not read that file as a ZIP archive)/i.test(r.before + r.after) && !/Request failed \(\d+\)/.test(r.after), r.after.slice(0, 220))
 // a second tab with the same login keeps working while an upload runs (no shared-state clash)
 await t.go('/dashboard/images', 3500); const imgText = await t.text(); await check('UPUI-09', 'My Images lists the uploaded photos and rejected files with their reasons', /ok\.jpg/.test(imgText), imgText.slice(0, 200))
 summary(); process.exit(0)

@@ -44,8 +44,8 @@ const run = async name => {
 }
 
 const clean = await run('clean')
-await check('ENH-01', 'a clean, well-lit portrait is accepted and enhancement finishes', clean.verdict === 'accepted' && clean.res?.status === 'completed', `${clean.verdict} ${clean.res?.status}`)
-await check('ENH-02', 'a clean portrait is left as it is (changed by less than 4 of 255)', clean.change < 4, `mean change ${clean.change?.toFixed(2)}`)
+await check('ENH-01', 'a clean, well-lit portrait is accepted and enhancement finishes', ['accepted', 'completed'].includes(clean.verdict) && clean.res?.status === 'completed', `${clean.verdict} ${clean.res?.status}`)
+await check('ENH-02', 'a clean portrait gets at most a light polish (changed by less than 8 of 255; the backend now enhances every photo, since PR #123)', clean.change < 8, `mean change ${clean.change?.toFixed(2)}`)
 const dark = await run('dark40')
 await check('ENH-03', 'a dark portrait (brightness about 28) is brightened to at least 1.5 times', dark.verdict !== 'rejected' && dark.bright_after >= dark.bright_before * 1.5, dark.verdict === 'rejected' ? `rejected ${dark.reasons}` : `brightness ${dark.bright_before?.toFixed(0)} -> ${dark.bright_after?.toFixed(0)}, ${dark.res?.enhancement_outcome}`)
 const noisy = await run('noisy')
@@ -56,11 +56,13 @@ await check('ENH-05', 'the photo that scripts/seed_demo.py --dark makes (x0.25) 
 // the screens say what happened
 const t = await openTab(); await t.wipe(); await t.login('user', 'member2@qa.test')
 const main = () => t.ev(`(document.querySelector('main')||document.body).innerText.replace(/\\s+/g,' ')`)
-await t.go('/dashboard/upload/single', 2500); await t.setFile('input[type=file]', [path.join(dir, 'clean.png')]); await sleep(1500); await t.click('Confirm'); await sleep(26000)
+await t.go('/dashboard/upload/single', 2500); await t.setFile('input[type=file]', [path.join(dir, 'clean.png')]); await sleep(1500); await t.click('Confirm')
+// The upload enhances the photo inside its own request on this stack (no worker), so wait for the result card instead of a fixed time.
+for (let i = 0; i < 80 && !/What was done/i.test(await main()); i++) await sleep(2000)
 const upload = await main()
-await check('ENH-06', 'upload screen, clean photo: says nothing needed fixing (not "Light correction")', /No correction needed/.test(upload) && /Nothing needed fixing/.test(upload) && !/Light correction/.test(upload), upload.slice(upload.indexOf('ENHANCEMENT'), upload.indexOf('ENHANCEMENT') + 200))
+await check('ENH-06', 'upload screen, clean photo: says what was done (a light polish), not a heavy correction (the backend now enhances every photo)', /What was done/i.test(upload) && /Polish/i.test(upload) && !/Strong correction/.test(upload), upload.slice(upload.indexOf('ENHANCEMENT'), upload.indexOf('ENHANCEMENT') + 200))
 await t.go(`/dashboard/images/${clean.imageId}`, 4500); const detailText = await main()
-await check('ENH-07', 'photo page, clean photo: says nothing needed fixing', /Nothing needed fixing/.test(detailText) && !/strength applied/.test(detailText), detailText.slice(0, 160))
+await check('ENH-07', 'photo page, clean photo: says what was done (a light polish)', /What was done/i.test(detailText) && /Polish/i.test(detailText), detailText.slice(0, 160))
 await t.go(`/dashboard/images/${clean.imageId}/edit`, 5000)
 await t.ev(`[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Auto').click()`); await sleep(7000)
 const note = await t.ev(`document.querySelector('[role=status]')?.innerText || ''`)

@@ -59,7 +59,10 @@ await t.go('/moderator/queue', 4500); const href = await t.ev(`document.querySel
 await check('FLOW-12', 'the photo is in the moderator\'s queue', Boolean(href), href)
 if (!href) { summary(); process.exit(1) }
 await t.go(href, 4000); await t.click('Approve'); await sleep(900); await t.type('#review-member-message', MESSAGE)
-await t.ev(`[...document.querySelectorAll('[role=alertdialog] button')].find(b=>/Approve/.test(b.textContent)).click()`); await sleep(3500)
+await t.ev(`[...document.querySelectorAll('[role=alertdialog] button')].find(b=>/Approve/.test(b.textContent)).click()`)
+// An approved photo is enhanced and grouped inside this request (the backend runs its jobs inline here), which can take well over 3.5 s: wait for the answer.
+// The page says "Approved." first and shows the member's message once it has reloaded the review: wait for both.
+for (let i = 0; i < 90; i += 1) { const m = await main(); if (/Approved\./.test(m) && new RegExp(MESSAGE).test(m)) break; await sleep(1000) }
 await check('FLOW-13', 'approving with a message to the member is accepted', /Approved\./.test(await main()) && new RegExp(MESSAGE).test(await main()), (await main()).slice(0, 160))
 const others = await api('/api/organizations/', (await apiLogin('mod2@qa.test')).token)
 await check('FLOW-14', 'a moderator of another team cannot see this team', !JSON.stringify(others.json).includes(ORG))
