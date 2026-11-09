@@ -58,6 +58,7 @@ import SystemMonitoring from './pages/admin/SystemMonitoring'
 import UploadStatistics from './pages/admin/UploadStatistics'
 import RejectionSummary from './pages/admin/RejectionSummary'
 import ImageMonitoring from './pages/admin/ImageMonitoring'
+import PrivacyAudit from './pages/admin/PrivacyAudit'
 
 // Moderator pages
 import ModeratorDashboard from './pages/moderator/ModeratorDashboard'
@@ -151,6 +152,7 @@ export default function App() {
           <Route path="users" element={<UsersPage />} />
           <Route path="audit-logs" element={<AuditLogs />} />
           <Route path="security" element={<Security />} />
+          <Route path="privacy" element={<PrivacyAudit />} />
           <Route path="organizations" element={<Organizations />} />
           <Route path="moderators" element={<Moderators />} />
           <Route path="moderation" element={<ModerationOverview />} />

@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
-  ClipboardList, Server, UserCog, ShieldCheck, Eye, ScrollText,
+  ClipboardList, Server, UserCog, ShieldCheck, LockKeyhole, Eye, ScrollText,
   HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck, Mail
 } from 'lucide-react'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
@@ -41,6 +41,7 @@ const adminNav = [
   { label: 'Invitations',        icon: Mail,             to: '/admin/invitations' },
   { label: 'Audit Logs',         icon: ClipboardList,    to: '/admin/audit-logs' },
   { label: 'Security Monitoring',icon: ShieldCheck,      to: '/admin/security' },
+  { label: 'Privacy Audit',      icon: LockKeyhole,      to: '/admin/privacy' },
   { label: 'System Monitoring',  icon: Server,           to: '/admin/system' },
   { label: 'Statistics',         icon: LineChart,        to: '/admin/statistics' },
   { label: 'Upload Statistics',  icon: BarChart3,        to: '/admin/upload-statistics' },
