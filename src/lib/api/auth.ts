@@ -131,6 +131,22 @@ export async function verifyEmail(registrationId: string, token: string): Promis
   })
 }
 
+/**
+ * Confirm a changed email address from the link emailed to the new one (`/verify-email-change/<uid>/<token>`). A GET that does
+ * the work, so ask once per visit; asking again is harmless. Anonymous, and limited to 10 requests an hour (then 429, with how long to wait).
+ *
+ * 200 "Email verified successfully." the first time and 200 "Email is already verified." after that (a used link, or an address that
+ * was never waiting); 400 "Invalid link." (no such account) or "Invalid or expired token.". An unverified account cannot sign in, so
+ * until this succeeds the person is locked out.
+ */
+export async function confirmEmailChange(uidb64: string, token: string, signal?: AbortSignal): Promise<{ alreadyConfirmed: boolean }> {
+  const data = await apiFetch<{ detail?: string }>(
+    `/api/auth/verify-email/change/${encodeURIComponent(uidb64)}/${encodeURIComponent(token)}/`, { anonymous: true, signal },
+  )
+  // The server answers both successes with 200 and tells them apart only by the sentence.
+  return { alreadyConfirmed: /already/i.test(data?.detail ?? '') }
+}
+
 /** Email a fresh link and retire the old one. Has a cooldown; a 429 says how long to wait. */
 export async function resendVerificationLink(registrationId: string): Promise<void> {
   await apiFetch('/api/auth/verify-email/resend/', {
@@ -176,6 +192,68 @@ export async function confirmPasswordReset(
     body: { uidb64, token, new_password: newPassword },
     anonymous: true,
   })
+}
+
+/** What an emailed account invitation is for. `organization_name` is set for a moderator and null otherwise. */
+export interface AccountInvitationPreview {
+  email: string
+  role: Role
+  expires_at: string
+  organization_name: string | null
+}
+
+/**
+ * Look at an administrator's account invitation before creating the account (the link in the email is
+ * /accept-invitation?token=…). Anonymous, and throttled to 30 requests an hour together with `acceptAccountInvitation`.
+ * A wrong, used, cancelled or expired token answers one 404 sentence; show it as it is.
+ */
+export function inspectAccountInvitation(token: string, signal?: AbortSignal): Promise<AccountInvitationPreview> {
+  return apiFetch<AccountInvitationPreview>('/api/auth/invitations/inspect/', { body: { token }, anonymous: true, signal })
+}
+
+/** The account that was created. `dashboard` says which portal's sign-in page it belongs to. */
+export interface AcceptedAccountInvitation {
+  role: Role
+  dashboard: Role
+  user: ApiUser
+}
+
+/**
+ * Create the invited account. The email and the role are the invitation's; the person chooses the username and password.
+ *
+ * The answer carries sign-in tokens like a login does, and they are deliberately dropped: tokens are kept per portal, and
+ * this page is the user portal's address, so a moderator's or an administrator's tokens would be filed under the wrong one.
+ * The caller sends the person to that account's own sign-in page instead.
+ *
+ * Refusals: 400 with per-field messages (`username`, `password`, and `token` when the invitation was used or has expired
+ * in the meantime), 409 when the address already has an account. Read the per-field messages with `invitationFieldErrors`.
+ */
+export async function acceptAccountInvitation(input: {
+  token: string; username: string; password: string
+}): Promise<AcceptedAccountInvitation> {
+  const data = await apiFetch<TokenPayload>('/api/auth/invitations/accept/', { body: input, anonymous: true })
+  const role = (data.role ?? data.dashboard ?? 'user') as Role
+  return { role, dashboard: (data.dashboard ?? role) as Role, user: data.user ?? { email: '' } }
+}
+
+/** The messages the server attached to each field of the invitation form, and the one it could not attach to a field. */
+export interface InvitationFieldErrors { username?: string; password?: string; token?: string; other?: string }
+
+/**
+ * Split a refused `acceptAccountInvitation` into the field messages the server wrote. DRF sends a field's message as a string
+ * or as a list of strings (a password can fail several rules at once); the list is joined into separate lines. Anything that
+ * is not about a field (a 409, a 429, the network) is returned as `other`, in the server's own words.
+ */
+export function invitationFieldErrors(error: unknown): InvitationFieldErrors {
+  if (!(error instanceof ApiError)) return { other: 'Could not create the account. Please try again.' }
+  const lines = (value: unknown): string | undefined => {
+    const list = (Array.isArray(value) ? value : [value]).filter((line): line is string => typeof line === 'string' && line.trim() !== '')
+    return list.length ? list.join('\n') : undefined
+  }
+  const body = error.status === 400 && error.body && typeof error.body === 'object' ? error.body as Record<string, unknown> : {}
+  const found: InvitationFieldErrors = { username: lines(body.username), password: lines(body.password), token: lines(body.token) }
+  if (found.username || found.password || found.token) return found
+  return { other: error.message }
 }
 
 /** The name to show for a signed-in person. */

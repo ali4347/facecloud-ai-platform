@@ -13,6 +13,7 @@ import Register from './pages/Register'
 import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import VerifyEmailChange from './pages/VerifyEmailChange'
 import Unauthorized from './pages/Unauthorized'
 import AdminLogin from './pages/admin/AdminLogin'
 import ModeratorLogin from './pages/moderator/ModeratorLogin'
@@ -42,6 +43,7 @@ import AdminOverview from './pages/admin/AdminOverview'
 import MyOrganization from './pages/user/MyOrganization'
 import Organizations from './pages/admin/Organizations'
 import InvitationAccept from './pages/InvitationAccept'
+import AcceptInvitation from './pages/AcceptInvitation'
 import IdentityReview from './pages/moderator/IdentityReview'
 import ModerationLogs from './pages/moderator/ModerationLogs'
 import RejectedImages from './pages/moderator/RejectedImages'
@@ -90,12 +92,17 @@ export default function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
+        {/* The link emailed to a new address after the email was changed; opening it confirms the address. */}
+        <Route path="/verify-email-change/:uid/:token" element={<VerifyEmailChange />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         
         {/* Protected Admin & Moderator Login Paths */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/moderator/login" element={<ModeratorLogin />} />
         <Route path="/invitations/:token" element={<InvitationAccept />} />
+        {/* The administrator's account invitation (create the account, choose a password), emailed as /accept-invitation?token=…
+            Not the team invitation above. Public, and it never signs anyone in: each account type signs in on its own page. */}
+        <Route path="/accept-invitation" element={<AcceptInvitation />} />
 
         {/* User Dashboard Protected Pipeline */}
         <Route 
