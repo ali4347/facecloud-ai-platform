@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Loader2 } from 'lucide-react'
+import { inShell } from '../../lib/inShell'
 
 interface ConfirmDialogProps {
   title: string
@@ -37,7 +38,7 @@ export function ConfirmDialog({
     return () => document.removeEventListener('keydown', onKey)
   }, [])
 
-  return (
+  return inShell(
     <div className="fixed inset-0 z-[70] flex overflow-y-auto p-4 bg-black/70 backdrop-blur-[2px]"
       onMouseDown={e => { if (e.target === e.currentTarget && !busy) onCancel() }}>
       <div role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"
