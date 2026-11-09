@@ -3,7 +3,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { useBatchProgress } from '../../lib/imageData'
 import { statusLabel } from '../../lib/imageData'
-import { PIPELINE_STAGES, cancelBatch, retryBatch } from '../../lib/api/images'
+import { cancelBatch, retryBatch, stageOrder } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
 import { explainReason } from '../../lib/reasons'
 import { ReportButton } from '../../components/features/ReportButton'
@@ -34,7 +34,8 @@ export default function ProcessingPage() {
   const breakdown = useReasonBreakdown(data, finished)
   const [action, setAction] = useState<{ busy: boolean; message: string }>({ busy: false, message: '' })
 
-  const currentIndex = data ? PIPELINE_STAGES.indexOf(data.stage as typeof PIPELINE_STAGES[number]) : -1
+  const stages = stageOrder(data)
+  const currentIndex = data ? stages.indexOf(data.stage) : -1
   const failedStatus = data?.status === 'failed'
   const partial = data?.status === 'partial'
 
@@ -117,7 +118,7 @@ export default function ProcessingPage() {
               subtitle={`${Math.round(data.progress_percentage)}% through`}
             >
               <div className="space-y-4">
-                {PIPELINE_STAGES.map((stage, index) => {
+                {stages.map((stage, index) => {
                   const copy = STAGE_LABELS[stage] ?? { label: stage, detail: '' }
                   const done = index < currentIndex || (finished && !failedStatus)
                   const active = index === currentIndex && !finished

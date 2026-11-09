@@ -106,7 +106,7 @@ export function PublicNavbar() {
 
             {/* Desktop nav links */}
             <div className={cn(
-              "hidden md:flex items-center gap-7 text-sm font-medium",
+              "hidden lg:flex items-center gap-7 text-sm font-medium",
               onMedia ? "text-white/70" : "text-ink-mute"
             )}>
               {menuItems.map(item => {
@@ -145,7 +145,7 @@ export function PublicNavbar() {
             </div>
 
             {/* Desktop CTAs */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
               <Link
                 to="/roles/moderator"
                 className={cn(
@@ -191,7 +191,7 @@ export function PublicNavbar() {
             <button
               onClick={() => setMobileOpen(o => !o)}
               className={cn(
-                "md:hidden p-2 transition-colors",
+                "lg:hidden p-2 transition-colors",
                 onMedia ? "text-white/70 hover:text-white" : "text-ink-mute hover:text-ink"
               )}
               aria-label="Toggle menu"
@@ -213,7 +213,7 @@ export function PublicNavbar() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 bg-black/80 backdrop-blur-xs z-[90] md:hidden"
+              className="fixed inset-0 bg-black/80 backdrop-blur-xs z-[90] lg:hidden"
               aria-hidden="true"
             />
 
@@ -223,7 +223,7 @@ export function PublicNavbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed inset-x-0 top-0 z-[100] w-full bg-surface-soft border-b border-ink/15 px-6 pt-5 pb-8 flex flex-col gap-5 shadow-2xl md:hidden overflow-y-auto max-h-[100vh]"
+              className="fixed inset-x-0 top-0 z-[100] w-full bg-surface-soft border-b border-ink/15 px-6 pt-5 pb-8 flex flex-col gap-5 shadow-2xl lg:hidden overflow-y-auto max-h-[100vh]"
             >
               {/* Header row: Logo + Close button */}
               <div className="flex items-center justify-between pb-4 border-b border-ink/10">

@@ -10,6 +10,7 @@ import {
   type DisplayStatus,
   type ImageListItem,
   type Page,
+  type PhotoFilter,
   type UploadBatch,
 } from './api/images'
 import { getUserDashboard, type UserDashboard } from './api/dashboard'
@@ -90,16 +91,18 @@ function demoPage(): Page<ImageListItem> {
   return { count: results.length, next: null, previous: null, results }
 }
 
-export function useMyImages(page = 1, status?: string): AsyncState<Page<ImageListItem>> {
+export function useMyImages(page = 1, status?: string, filter: PhotoFilter = {}): AsyncState<Page<ImageListItem>> {
+  // A new object each render must not look like a new request: the filter is keyed by its content.
+  const filterKey = JSON.stringify(filter)
   return useApiResource(
-    signal => listMyImages({ page, status }, signal),
+    signal => listMyImages({ page, status, ...filter }, signal),
     () => {
       const all = demoPage()
       if (!status) return all
       const results = all.results.filter(image => image.display_status === status)
       return { ...all, count: results.length, results }
     },
-    [page, status],
+    [page, status, filterKey],
   )
 }
 

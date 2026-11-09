@@ -3,6 +3,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { UPLOAD_KINDS, UPLOAD_LIMITS, UploadArt } from '../../components/features/uploadKinds'
 import { ArrowRight, CheckCircle } from 'lucide-react'
+import { USE_API } from '../../lib/api/config'
 
 export default function UploadCenter() {
   return (
@@ -38,7 +39,7 @@ export default function UploadCenter() {
             {[
               { text: 'File Formats: JPG, JPEG, PNG', ok: true },
               { text: 'ZIP files must contain only valid images (uncompressed folder hierarchies)', ok: true },
-              { text: `Single image file size limit: ${UPLOAD_LIMITS.image}; ZIP limit: ${UPLOAD_LIMITS.zip}`, ok: true },
+              { text: `Single image file size limit: ${UPLOAD_LIMITS.image}; ZIP limit: ${UPLOAD_LIMITS.zip}${USE_API ? `, at most ${UPLOAD_LIMITS.zipPhotos} photos` : ''}`, ok: true },
               { text: 'Target face must be centered and face forward directly', ok: false },
               { text: 'Image resolution must not display excessive motion blur or noise indicators', ok: false }
             ].map((g, i) => (

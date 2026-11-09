@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ArrowRight, Loader2, RefreshCw, Users } from 'lucide-react'
+import { AlertTriangle, ArrowRight, History, Loader2, RefreshCw, Users } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { IdentityGroupCard } from '../../components/features/IdentityGroupCard'
 import { EmptyState } from '../../components/ui/EmptyState'
@@ -7,6 +7,8 @@ import { ConsentBanner } from '../../components/features/ConsentPrompt'
 import { usePersonFolders } from '../../lib/personFolders'
 import { useApiResource } from '../../lib/useApiResource'
 import { listReviewItems } from '../../lib/api/identityReview'
+import { SuggestedMerges } from '../../components/features/SuggestedMerges'
+import { USE_API } from '../../lib/api/config'
 
 export default function IdentityGroups() {
   const { data, loading, error, isDemo, reload } = usePersonFolders()
@@ -24,7 +26,10 @@ export default function IdentityGroups() {
           loading ? 'Loading…'
           : `${folders.length} person folder${folders.length === 1 ? '' : 's'} · ${totalImages} photo${totalImages === 1 ? '' : 's'}`
         }
+        action={USE_API ? <Link to="/dashboard/groups/history" className="fc-btn-secondary !py-2 !px-3 text-xs font-bold inline-flex items-center gap-1.5"><History className="w-3.5 h-3.5" />History</Link> : undefined}
       />
+
+      <SuggestedMerges onMerged={reload} />
 
       <ConsentBanner />
 

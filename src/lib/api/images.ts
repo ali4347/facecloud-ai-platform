@@ -109,6 +109,15 @@ export interface ImageListItem {
   updated_at: string
 }
 
+/**
+ * The status to show for a photo. A stored quality decision of `rejected` (what an administrator's or a moderator's rejection writes) is shown as rejected.
+ * The server's own Rejected filter lists such a photo, but while its setting QUALITY_CHECKS_REJECT is off (the usual) it does not count that decision when it
+ * words `display_status` or filters Accepted: the photo is then worded from its enhancement ("Completed") and is listed under Accepted as well.
+ * This follows the same stored decision the Rejected filter does, until the server words it too.
+ */
+export const photoStatus = (image: Pick<ImageListItem, 'display_status' | 'quality_decision'>): DisplayStatus =>
+  image.quality_decision?.decision === 'rejected' ? 'rejected' : image.display_status
+
 /** The sub-scores worth showing, in the order they read best. */
 export const QUALITY_MEASURES = [
   { key: 'sharpness_score', label: 'Sharpness' },

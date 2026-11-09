@@ -47,6 +47,8 @@ export interface IdentityGroupImage {
   matching_confidence: number | null
   /** 'needs_review' while the match is only a suggestion; such a photo is shown in the folder but not counted in it. */
   membership_state?: string | null
+  /** The face that puts this photo in this folder: what moving it, taking it out and making it the cover act on. */
+  membership_id?: number | null
 }
 
 export type ExportStatus = 'queued' | 'generating' | 'ready' | 'failed' | 'expired'
@@ -121,4 +123,56 @@ export function shareIdentityExport(exportId: number, ttlHours?: number): Promis
   return apiFetch<FolderShareLink>(`/api/identities/exports/${exportId}/share/`, {
     method: 'POST', body: ttlHours ? { ttl_hours: ttlHours } : {},
   })
+}
+
+/* ── Moving faces, covers, suggestions and history ─────────────────────── */
+
+/** Move one face to another folder. Moving a folder's last photo deletes that folder. */
+export function moveMembership(membershipId: number, targetGroupId: number, reason = ''): Promise<unknown> {
+  return apiFetch(`/api/identities/memberships/${membershipId}/move/`, { method: 'PATCH', body: { target_group_id: targetGroupId, ...(reason ? { reason } : {}) } })
+}
+
+/** Take one face out of its folder (the photo stays in the library). Taking out a folder's last photo deletes the folder. */
+export function removeMembership(membershipId: number, reason = ''): Promise<unknown> {
+  return apiFetch(`/api/identities/memberships/${membershipId}/remove/`, { method: 'PATCH', body: reason ? { reason } : {} })
+}
+
+/** Make this face the folder's cover. */
+export function setFolderCover(groupId: number, membershipId: number): Promise<unknown> {
+  return apiFetch(`/api/identities/groups/${groupId}/profile/`, { method: 'PATCH', body: { membership_id: membershipId } })
+}
+
+/** Delete a folder that still has photos: they stay in the library, in no folder. */
+export function dissolveFolder(groupId: number, reason = ''): Promise<void> {
+  return apiFetch<void>(`/api/identities/groups/${groupId}/delete/`, { method: 'DELETE', body: { dissolve: true, ...(reason ? { reason } : {}) } })
+}
+
+export interface FolderRef { id: number; display_name: string; member_count: number }
+
+/** Two folders that may be the same person. Nothing is merged for the person: they choose. `source` is the one that would go away. */
+export interface SuggestedMerge {
+  source_group: number
+  target_group: number
+  /** 0 to 1. */
+  similarity: number
+  source: FolderRef
+  target: FolderRef
+}
+export function listSuggestedMerges(signal?: AbortSignal): Promise<SuggestedMerge[]> {
+  return apiFetch<SuggestedMerge[]>('/api/identities/groups/suggested-merges/', { signal })
+}
+
+export type IdentityChangeAction = 'renamed' | 'merged' | 'moved' | 'removed' | 'profile_set' | 'deleted' | 'reviewed' | 'archived'
+export interface IdentityChange {
+  id: number
+  action: IdentityChangeAction
+  group: number | null
+  membership: number | null
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  reason: string
+  created_at: string
+}
+export function listIdentityHistory(page = 1, signal?: AbortSignal): Promise<Page<IdentityChange>> {
+  return apiFetch<Page<IdentityChange>>(`/api/identities/history/?page=${page}&page_size=30`, { signal })
 }

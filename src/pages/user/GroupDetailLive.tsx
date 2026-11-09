@@ -2,17 +2,21 @@ import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle, ArrowLeft, Archive, Check, CheckCircle, CheckSquare, Copy, Download, Eye,
-  GitMerge, ImageOff, Link2, Loader2, Pencil, Square, Trash2, Users, X,
+  ArrowRightLeft, GitMerge, ImageOff, Link2, Loader2, Pencil, Square, Star, Trash2, UserMinus, Users, X,
 } from 'lucide-react'
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { MergeFolderPanel } from '../../components/features/MergeFolderPanel'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
-import { deleteImage, getImageThumbnail } from '../../lib/api/images'
+import { getImageThumbnail } from '../../lib/api/images'
+import { moveToTrash } from '../../lib/api/library'
+import { MoveFaceDialog } from '../../components/features/MoveFaceDialog'
+import { NoticeBar } from '../../components/ui/NoticeBar'
+import { useNotice } from '../../lib/useNotice'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { deleteEmptyFolder } from '../../lib/api/identityReview'
 import {
-  createGroupExport, downloadIdentityExport, getIdentityExport, renameIdentityGroup, shareIdentityExport,
-  type IdentityGroupExport,
+  createGroupExport, dissolveFolder, downloadIdentityExport, getIdentityExport, removeMembership, renameIdentityGroup, setFolderCover, shareIdentityExport,
+  type IdentityGroupExport, type IdentityGroupImage,
 } from '../../lib/api/identities'
 import { formatBytes } from '../../lib/imageData'
 import { useFolderImages, usePersonFolder } from '../../lib/personFolders'
@@ -97,6 +101,12 @@ export default function GroupDetailLive() {
 
   // ── Selection (kept across pages; "select all" means this page) ───────────
   const [selected, setSelected] = useState<Set<number>>(new Set())
+  // Moving a photo, taking it out, choosing the cover, and deleting the folder while keeping its photos.
+  const { notice, setNotice, ok, fail } = useNotice()
+  const [moving, setMoving] = useState<IdentityGroupImage | null>(null)
+  const [removing, setRemoving] = useState<IdentityGroupImage | null>(null)
+  const [dissolving, setDissolving] = useState(false)
+  const [faceBusy, setFaceBusy] = useState(false)
   const pageIds = images.map(image => image.id)
   const allOnPage = pageIds.length > 0 && pageIds.every(imageId => selected.has(imageId))
   const toggleOne = (imageId: number) => setSelected(current => {
@@ -114,17 +124,35 @@ export default function GroupDetailLive() {
   const deleteSelectedPhotos = async () => {
     const ids = [...selected]
     setDeleting(true); setDeleteMessage('')
-    let gone = 0
-    let firstError = ''
-    for (const photoId of ids) {
-      try { await deleteImage(photoId); gone += 1 }
-      catch (caught) { if (!firstError) firstError = caught instanceof Error ? caught.message : 'A photo could not be deleted.' }
+    try {
+      const result = await moveToTrash(ids)
+      setDeleting(false)
+      setSelected(new Set())
+      folder.reload(); photos.reload()
+      if (result.skipped.length > 0) { setDeleteMessage(`${result.trashed_ids.length} moved to the trash, ${result.skipped.length} could not be moved right now (still being processed, or waiting for a moderator).`); return }
+      setConfirmingDelete(false)
+      ok(`${result.trashed_ids.length} photo${result.trashed_ids.length === 1 ? '' : 's'} moved to the trash.`)
+    } catch (caught) {
+      setDeleting(false)
+      setDeleteMessage(caught instanceof Error ? caught.message : 'The photos could not be moved to the trash.')
     }
-    setDeleting(false)
-    setSelected(new Set())
-    folder.reload(); photos.reload()
-    if (gone < ids.length) { setDeleteMessage(`${gone} deleted, ${ids.length - gone} could not be deleted: ${firstError}`); return }
-    setConfirmingDelete(false)
+  }
+
+  const takeOut = async () => {
+    if (!removing?.membership_id) return
+    setFaceBusy(true)
+    try { await removeMembership(removing.membership_id); setRemoving(null); ok('Took the photo out of this folder. It is still in your library.'); folder.reload(); photos.reload() }
+    catch (caught) { fail(caught instanceof Error ? caught.message : 'Could not take the photo out.'); setRemoving(null) } finally { setFaceBusy(false) }
+  }
+  const makeCover = async (image: IdentityGroupImage) => {
+    if (!image.membership_id) return
+    try { await setFolderCover(groupId, image.membership_id); ok('That photo is now the folder cover.'); folder.reload() }
+    catch (caught) { fail(caught instanceof Error ? caught.message : 'Could not set the cover.') }
+  }
+  const dissolve = async () => {
+    setFaceBusy(true)
+    try { await dissolveFolder(groupId); navigate('/dashboard/groups', { replace: true }) }
+    catch (caught) { fail(caught instanceof Error ? caught.message : 'Could not delete the folder.'); setDissolving(false) } finally { setFaceBusy(false) }
   }
 
   // ── ZIP and secure link ───────────────────────────────────────────────────
@@ -288,6 +316,12 @@ export default function GroupDetailLive() {
               <Trash2 className="w-4 h-4" /> Delete empty folder
             </button>
           )}
+          {total > 0 && (
+            <button onClick={() => setDissolving(true)}
+              className="fc-btn-secondary text-sm py-2 px-4 flex items-center gap-2 text-error">
+              <Trash2 className="w-4 h-4" /> Delete folder, keep photos
+            </button>
+          )}
         </div>
       </div>
 
@@ -399,7 +433,7 @@ export default function GroupDetailLive() {
                         className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-150 cursor-pointer group ${
                           isSelected ? 'border-accent shadow-[0_0_0_1px_rgba(249,115,22,0.3)]' : 'border-line'
                         }`}
-                        onClick={() => toggleOne(image.id)}
+                        onClick={() => navigate(`/dashboard/images/${image.id}`)}
                       >
                         <div className="aspect-[4/3] relative bg-surface-mute">
                           <AuthedImage
@@ -409,11 +443,23 @@ export default function GroupDetailLive() {
                             className="w-full h-full !border-0"
                             rounded="rounded-none"
                           />
-                          <div className={`absolute inset-0 bg-black/40 transition-opacity duration-150 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-                          <div className={`absolute top-2 left-2 transition-all duration-150 ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                            {isSelected ? <CheckSquare className="w-5 h-5 text-accent drop-shadow" /> : <Square className="w-5 h-5 text-white drop-shadow" />}
-                          </div>
+                          <div className={`absolute inset-0 bg-black/40 transition-opacity duration-150 pointer-events-none ${isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                          {/* Picking a photo is the checkbox's job; a click anywhere else on the card opens the photo. */}
+                          <button
+                            type="button" role="checkbox" aria-checked={isSelected} onClick={e => { e.stopPropagation(); toggleOne(image.id) }}
+                            aria-label={`${isSelected ? 'Unselect' : 'Select'} ${image.original_name}`} title={isSelected ? 'Unselect' : 'Select'}
+                            className="absolute top-2 left-2 z-10 w-6 h-6 rounded-lg bg-surface/90 border border-line shadow-sm flex items-center justify-center cursor-pointer"
+                          >
+                            {isSelected ? <CheckSquare className="w-4 h-4 text-accent" /> : <Square className="w-4 h-4 text-ink-mute" />}
+                          </button>
                           <div className="absolute top-2 right-2">{uploadStatusBadge(image.display_status)}</div>
+                          {image.membership_id ? (
+                            <div className="absolute bottom-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
+                              <button type="button" onClick={() => setMoving(image)} aria-label={`Move ${image.original_name} to another folder`} title="Move to another folder" className="p-1.5 rounded-lg bg-black/50 border border-white/20 text-white hover:bg-black/70 cursor-pointer"><ArrowRightLeft className="w-3.5 h-3.5" /></button>
+                              <button type="button" onClick={() => setRemoving(image)} aria-label={`Take ${image.original_name} out of this folder`} title="Take out of this folder" className="p-1.5 rounded-lg bg-black/50 border border-white/20 text-white hover:bg-black/70 cursor-pointer"><UserMinus className="w-3.5 h-3.5" /></button>
+                              <button type="button" onClick={() => void makeCover(image)} aria-label={`Make ${image.original_name} the folder cover`} title="Make the folder cover" className="p-1.5 rounded-lg bg-black/50 border border-white/20 text-white hover:bg-black/70 cursor-pointer"><Star className="w-3.5 h-3.5" /></button>
+                            </div>
+                          ) : null}
                           <Link
                             to={`/dashboard/images/${image.id}`} onClick={e => e.stopPropagation()}
                             aria-label={`Open ${image.original_name}`}
@@ -535,12 +581,24 @@ export default function GroupDetailLive() {
       )}
 
       {confirmingDelete && (
-        <ConfirmDialog title={`Delete ${selected.size} photo${selected.size === 1 ? '' : 's'}?`} confirmLabel="Delete" busyLabel="Deleting…" danger busy={deleting} error={deleteMessage || null}
+        <ConfirmDialog title={`Move ${selected.size} photo${selected.size === 1 ? '' : 's'} to the trash?`} confirmLabel="Move to trash" busyLabel="Moving…" danger busy={deleting} error={deleteMessage || null}
           onConfirm={() => void deleteSelectedPhotos()} onCancel={() => setConfirmingDelete(false)}>
-          <p>The selected photo{selected.size === 1 ? '' : 's'} will be permanently deleted from your account, not only from this folder, together with their enhanced versions.</p>
-          <p>This cannot be undone.</p>
+          <p>The selected photo{selected.size === 1 ? '' : 's'} will leave your whole library, not only this folder.</p>
+          <p>You can put {selected.size === 1 ? 'it' : 'them'} back from the Trash for a while; after that they are deleted for good.</p>
         </ConfirmDialog>
       )}
+      {moving?.membership_id && <MoveFaceDialog membershipId={moving.membership_id} fromGroupId={groupId} fromCount={total} onClose={() => setMoving(null)} onMoved={target => { ok(`Moved the photo to “${target.display_name}”.`); folder.reload(); photos.reload() }} />}
+      {removing && (
+        <ConfirmDialog title="Take this photo out of the folder?" confirmLabel="Take out" busyLabel="Taking out…" danger busy={faceBusy} onConfirm={() => void takeOut()} onCancel={() => setRemoving(null)}>
+          <p><strong className="text-ink">{removing.original_name}</strong> stays in your library; it is just not filed under this person any more.{total <= 1 ? ' It is the last photo here, so the folder will be deleted.' : ''}</p>
+        </ConfirmDialog>
+      )}
+      {dissolving && (
+        <ConfirmDialog title="Delete this folder?" confirmLabel="Delete folder" busyLabel="Deleting…" danger busy={faceBusy} onConfirm={() => void dissolve()} onCancel={() => setDissolving(false)}>
+          <p>The folder is deleted. Its {total} photo{total === 1 ? '' : 's'} stay in your library, in no folder.</p>
+        </ConfirmDialog>
+      )}
+      {notice && <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 w-[min(32rem,calc(100vw-2rem))]"><NoticeBar notice={notice} onDismiss={() => setNotice(null)} /></div>}
     </div>
   )
 }

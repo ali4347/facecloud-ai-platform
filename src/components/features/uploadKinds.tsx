@@ -4,8 +4,12 @@ import { cn } from '../../lib/utils'
 
 export type UploadKind = 'single' | 'multiple' | 'zip'
 
-/** What one upload screen takes. The live screens follow the backend's limits; the offline demo screens keep their own, smaller ones. `zipPhotos` is how many photos one ZIP may hold (counted in the browser before it is sent): 20, because the enhancement models are heavy for the GPU the project runs on. */
-export const UPLOAD_LIMITS = USE_API ? { photos: 150, zipPhotos: 20, zip: '2 GB', image: '400 MB' } : { photos: 50, zipPhotos: 50, zip: '200 MB', image: '50 MB' }
+/**
+ * What one upload screen takes. The live screens keep the photo counts low (10 in a batch, 20 inside a ZIP) because the enhancement
+ * models are heavy for the GPU the project runs on (the backend itself would take 150); the size limits follow the backend.
+ * The offline demo screens keep their own, smaller ones.
+ */
+export const UPLOAD_LIMITS = USE_API ? { photos: 10, zipPhotos: 20, zip: '2 GB', image: '400 MB' } : { photos: 50, zipPhotos: 50, zip: '200 MB', image: '50 MB' }
 const LIMITS = UPLOAD_LIMITS
 
 export interface UploadKindInfo {
@@ -53,9 +57,12 @@ export const UPLOAD_KINDS: UploadKindInfo[] = [
     title: 'ZIP Archive Upload',
     cta: 'Upload a ZIP',
     short: 'ZIP archive',
-    blurb: 'Send a whole ZIP of portraits. FaceCloud checks every photo and sorts the accepted ones into person folders.',
-    line: 'A whole folder, sorted by person.',
-    facts: [`Up to ${LIMITS.zip}`, 'Sorted by person', 'Download as ZIP'],
+    // The live screen counts the photos inside the archive and refuses more than the limit; the offline demo has no such count, only a size.
+    blurb: USE_API
+      ? `Send a ZIP of up to ${LIMITS.zipPhotos} portraits. FaceCloud checks every photo and sorts the accepted ones into person folders.`
+      : 'Send a whole ZIP of portraits. FaceCloud checks every photo and sorts the accepted ones into person folders.',
+    line: USE_API ? `A ZIP of up to ${LIMITS.zipPhotos} photos, sorted by person.` : 'A whole folder, sorted by person.',
+    facts: [USE_API ? `Up to ${LIMITS.zipPhotos} photos` : `Up to ${LIMITS.zip}`, 'Sorted by person', 'Download as ZIP'],
   },
 ]
 

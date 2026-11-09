@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router-dom'
 import { USE_API } from '../../lib/api/config'
 import { startCameraSession, endCameraSession as endCameraSessionApi, endCameraSessionOnExit } from '../../lib/api/camera'
 import { EnhancementReport } from './EnhancementReport'
+import { LightingPicker } from './LightingPicker'
 import { levelLabel } from '../../lib/api/enhancements'
-import type { EnhancementLevel, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
+import type { EnhancementLevel, EnhancementLighting, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
 import { ApiError } from '../../lib/api/client'
+import { passedChecks } from '../../lib/api/images'
 import {
   LIVE_SNAPSHOT_STEPS, dataUrlToJpegFile, enhanceStoredPhoto, reasonText, submitSnapshot,
 } from '../../lib/liveSnapshot'
@@ -90,6 +92,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
   const [liveRefused, setLiveRefused] = useState<{ verdict: string; reasons: string[] } | null>(null)
   const [liveError, setLiveError] = useState('')
   const [liveStyle, setLiveStyle] = useState<EnhancementStyle>('ai_max')
+  const [liveLighting, setLiveLighting] = useState<EnhancementLighting>('auto')
   const [liveLevel, setLiveLevel] = useState<EnhancementLevel>('auto')
   const steps = USE_API ? LIVE_SNAPSHOT_STEPS : PIPELINE_STEPS
 
@@ -676,7 +679,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         const photo = await submitSnapshot(file, cameraSessionRef.current)
         imageId = photo.id
         setLiveImageId(photo.id)
-        if (photo.display_status !== 'accepted') {
+        if (!passedChecks(photo.display_status)) {
           const reasons = photo.quality_decision?.rejection_reasons?.filter(Boolean) ?? []
           if (reasons.length === 0 && photo.face_validation?.rejection_reason) reasons.push(photo.face_validation.rejection_reason)
           setLiveRefused({ verdict: photo.display_status, reasons })
@@ -684,7 +687,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
         }
       }
       setPipelineStep(2)
-      const { result, blob } = await enhanceStoredPhoto(imageId, liveStyle, liveLevel)
+      const { result, blob } = await enhanceStoredPhoto(imageId, liveStyle, liveLevel, liveLighting)
       setPipelineStep(3)
       setEnhancedSnapshotDataUrl(prev => {
         if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev)
@@ -698,7 +701,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
     } finally {
       setSnapshotProcessing(false)
     }
-  }, [snapshotDataUrl, liveImageId, liveStyle, liveLevel])
+  }, [snapshotDataUrl, liveImageId, liveStyle, liveLevel, liveLighting])
 
   const runEnhancePipeline = useCallback(async () => {
     if (USE_API && snapshotDataUrl && liveImageId !== null) { await runRealPipeline(); return }
@@ -1330,6 +1333,9 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                       <option value="medium">Moderate</option>
                       <option value="high">Strong</option>
                     </select>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <LightingPicker id="live-lighting" value={liveLighting} onChange={setLiveLighting} />
                   </div>
                 </div>
               )}

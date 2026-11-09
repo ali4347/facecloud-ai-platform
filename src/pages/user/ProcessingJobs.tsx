@@ -7,8 +7,14 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { useBatches, formatBytes, statusLabel, statusTone } from '../../lib/imageData'
 import { formatDateTime } from '../../lib/utils'
 import {
-  AlertTriangle, ArrowRight, FolderArchive, FileText, Images, Loader2, RefreshCw,
+  AlertTriangle, ArrowRight, FolderArchive, FileText, Images, Loader2, Pencil, RefreshCw, Trash2,
 } from 'lucide-react'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
+import { Modal } from '../../components/ui/Modal'
+import { NoticeBar } from '../../components/ui/NoticeBar'
+import { useNotice } from '../../lib/useNotice'
+import { deleteBatch, renameBatch, type UploadBatch } from '../../lib/api/images'
+import { USE_API } from '../../lib/api/config'
 
 const TONE_CLASSES: Record<string, string> = {
   good: 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/25',
@@ -26,6 +32,26 @@ export default function ProcessingJobs() {
   const [status, setStatus] = useState<string>('All')
   const { data, loading, error, isDemo, reload } = useBatches()
   const batches = useMemo(() => data ?? [], [data])
+  const { notice, setNotice, ok } = useNotice()
+  const [renaming, setRenaming] = useState<UploadBatch | null>(null)
+  const [nameBuffer, setNameBuffer] = useState('')
+  const [deleting, setDeleting] = useState<UploadBatch | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [dialogError, setDialogError] = useState('')
+  const startRename = (batch: UploadBatch) => { setNameBuffer(batch.display_name || ''); setDialogError(''); setRenaming(batch) }
+  const saveName = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!renaming || !nameBuffer.trim()) return
+    setBusy(true); setDialogError('')
+    try { await renameBatch(renaming.id, nameBuffer.trim()); setRenaming(null); ok('Renamed.'); reload() }
+    catch (caught) { setDialogError(caught instanceof Error ? caught.message : 'Could not rename the upload.') } finally { setBusy(false) }
+  }
+  const removeBatch = async () => {
+    if (!deleting) return
+    setBusy(true); setDialogError('')
+    try { await deleteBatch(deleting.id); setDeleting(null); ok('Upload deleted, with its photos.'); reload() }
+    catch (caught) { setDialogError(caught instanceof Error ? caught.message : 'Could not delete the upload.') } finally { setBusy(false) }
+  }
 
   const visible = batches.filter(batch => {
     const name = batch.display_name || batch.original_archive_name || `Upload ${batch.id}`
@@ -185,12 +211,20 @@ export default function ProcessingJobs() {
                           : formatDateTime(batch.created_at)}
                       </td>
                       <td>
-                        <Link
-                          to={`/dashboard/processing/${batch.id}`}
-                          className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline"
-                        >
-                          Open <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
+                        <div className="flex items-center gap-3 whitespace-nowrap">
+                          <Link
+                            to={`/dashboard/processing/${batch.id}`}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#FB923C] hover:underline"
+                          >
+                            Open <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                          {USE_API && (
+                            <>
+                              <button type="button" onClick={() => startRename(batch)} aria-label={`Rename upload ${batch.id}`} title="Rename" className="text-ink-mute hover:text-ink cursor-pointer"><Pencil className="w-3.5 h-3.5" /></button>
+                              <button type="button" onClick={() => { setDialogError(''); setDeleting(batch) }} aria-label={`Delete upload ${batch.id} and its photos`} title="Delete the upload and its photos" className="text-error hover:opacity-80 cursor-pointer"><Trash2 className="w-3.5 h-3.5" /></button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   )
@@ -199,6 +233,25 @@ export default function ProcessingJobs() {
             </table>
           </div>
         </ChartCard>
+      )}
+      {notice && <div className="sticky bottom-24 z-30 mt-6"><NoticeBar notice={notice} onDismiss={() => setNotice(null)} /></div>}
+      {renaming && (
+        <Modal title="Rename this upload" onClose={() => setRenaming(null)} busy={busy}>
+          <form onSubmit={saveName} className="space-y-3">
+            <label className="block text-[11px] font-semibold text-ink">Name<input autoFocus value={nameBuffer} onChange={event => setNameBuffer(event.target.value)} maxLength={120} className="fc-input mt-1.5" /></label>
+            {dialogError && <p role="alert" className="text-xs text-red-500">{dialogError}</p>}
+            <div className="flex justify-end gap-2 pt-1">
+              <button type="button" onClick={() => setRenaming(null)} disabled={busy} className="fc-btn-secondary text-xs py-2 px-4">Cancel</button>
+              <button type="submit" disabled={busy || !nameBuffer.trim()} className="fc-btn-primary !py-2 !px-4 text-xs font-bold inline-flex items-center gap-2 disabled:opacity-60 cursor-pointer">{busy && <Loader2 className="w-3.5 h-3.5 animate-spin" />}Save</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+      {deleting && (
+        <ConfirmDialog title="Delete this upload and its photos?" confirmLabel="Delete everything" busyLabel="Deleting…" danger busy={busy} error={dialogError || null} onConfirm={() => void removeBatch()} onCancel={() => setDeleting(null)}>
+          <p><strong className="text-ink">{deleting.display_name || deleting.original_archive_name || `Upload ${deleting.id}`}</strong> and its {deleting.total_files} photo{deleting.total_files === 1 ? '' : 's'} (and their enhanced versions) will be permanently deleted.</p>
+          <p>This does not go to the trash and cannot be undone. To keep the option of putting photos back, move them to the trash from My Images instead.</p>
+        </ConfirmDialog>
       )}
     </div>
   )

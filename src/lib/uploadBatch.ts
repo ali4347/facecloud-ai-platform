@@ -20,7 +20,8 @@ export function tally(progress: BatchProgress | null) {
   const count = (status: string) => rows.filter(row => row.status === status).length
   return {
     total: rows.length,
-    accepted: count('accepted'),
+    // A photo that passed and was enhanced is reported as "completed" by the backend; both mean it was accepted.
+    accepted: count('accepted') + count('completed'),
     inReview: count('needs_review'),
     rejected: count('rejected'),
     failed: count('failed'),

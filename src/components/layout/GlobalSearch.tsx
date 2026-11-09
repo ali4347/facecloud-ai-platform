@@ -70,6 +70,7 @@ export function GlobalSearch({ role, inputRef }: { role: Role; inputRef: React.R
     ...results.jobs.map(item => ({ key: `j${item.id}`, to: `/dashboard/processing/${item.id}` })),
   ], [results])
 
+  const seeAll = `/dashboard/search?q=${encodeURIComponent(query.trim())}`
   const go = (to: string) => { setOpen(false); setQuery(''); setResults(null); navigate(to) }
   const empty = ready && !loading && !error && results !== null && options.length === 0
 
@@ -78,7 +79,7 @@ export function GlobalSearch({ role, inputRef }: { role: Role; inputRef: React.R
     if (event.key === 'Escape') { setOpen(false); event.currentTarget.blur() }
     else if (event.key === 'ArrowDown') { event.preventDefault(); setOpen(true); setActive(i => Math.min(i + 1, options.length - 1)) }
     else if (event.key === 'ArrowUp') { event.preventDefault(); setActive(i => Math.max(i - 1, 0)) }
-    else if (event.key === 'Enter' && options.length > 0) { event.preventDefault(); go(options[active >= 0 ? active : 0].to) }
+    else if (event.key === 'Enter' && ready) { event.preventDefault(); go(active >= 0 && options[active] ? options[active].to : seeAll) }
   }
 
   const rowClass = (key: string) =>
@@ -159,6 +160,11 @@ export function GlobalSearch({ role, inputRef }: { role: Role; inputRef: React.R
                 </button>
               ))}
             </div>
+          )}
+          {ready && (
+            <button type="button" onClick={() => go(seeAll)} className="w-full mt-1 px-3 py-2 rounded-xl text-left text-[12px] font-semibold text-accent hover:bg-surface-mute cursor-pointer border-t border-line">
+              See all results for “{query.trim()}”, with albums, places and photos that look like it
+            </button>
           )}
         </div>
       )}

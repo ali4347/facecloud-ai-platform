@@ -25,6 +25,15 @@ import UploadSingle from './pages/user/UploadSingle'
 import UploadMultiple from './pages/user/UploadMultiple'
 import UploadZip from './pages/user/UploadZip'
 import ProcessingPage from './pages/user/ProcessingPage'
+import Albums from './pages/user/Albums'
+import AlbumDetail from './pages/user/AlbumDetail'
+import Trash from './pages/user/Trash'
+import Duplicates from './pages/user/Duplicates'
+import Places from './pages/user/Places'
+import Moments, { EventDetail, MemoryDetail } from './pages/user/Moments'
+import Search from './pages/user/Search'
+import FolderHistory from './pages/user/FolderHistory'
+import ComparePage from './pages/user/ComparePage'
 import MyImages from './pages/user/MyImages'
 import ImageDetail from './pages/user/ImageDetail'
 import PhotoEditor from './pages/user/PhotoEditor'
@@ -123,8 +132,19 @@ export default function App() {
           <Route path="images" element={<MyImages />} />
           <Route path="images/:id" element={<ImageDetail />} />
           <Route path="images/:id/edit" element={<PhotoEditor />} />
+          <Route path="images/:id/compare" element={<ComparePage />} />
+          <Route path="albums" element={<Albums />} />
+          <Route path="albums/:id" element={<AlbumDetail />} />
+          <Route path="trash" element={<Trash />} />
+          <Route path="duplicates" element={<Duplicates />} />
+          <Route path="places" element={<Places />} />
+          <Route path="moments" element={<Moments />} />
+          <Route path="moments/memories/:id" element={<MemoryDetail />} />
+          <Route path="moments/events/:id" element={<EventDetail />} />
+          <Route path="search" element={<Search />} />
           <Route path="groups" element={<IdentityGroups />} />
           <Route path="groups/review" element={<PersonReview />} />
+          <Route path="groups/history" element={<FolderHistory />} />
           <Route path="groups/:id" element={<GroupDetail />} />
           <Route path="downloads" element={<Downloads />} />
           <Route path="notifications" element={<Notifications />} />

@@ -1,8 +1,8 @@
 import { CheckCircle2, Loader2 } from 'lucide-react'
-import { PIPELINE_STAGES, type BatchProgress } from '../../lib/api/images'
+import { stageOrder, type BatchProgress } from '../../lib/api/images'
 
 /** The steps a batch goes through, each tied to the backend stage it stands for. */
-const STEPS: { label: string; stage: (typeof PIPELINE_STAGES)[number] }[] = [
+const STEPS: { label: string; stage: string }[] = [
   { label: 'Archive received', stage: 'uploaded' },
   { label: 'Preparing the photos', stage: 'preprocessing' },
   { label: 'Checking faces', stage: 'face_validation' },
@@ -12,9 +12,9 @@ const STEPS: { label: string; stage: (typeof PIPELINE_STAGES)[number] }[] = [
   { label: 'Finishing', stage: 'finalizing' },
 ]
 
-const indexOf = (stage: string) => {
+const indexIn = (order: readonly string[], stage: string) => {
   // "queued" sits between received and preparing.
-  const i = PIPELINE_STAGES.indexOf(stage as (typeof PIPELINE_STAGES)[number])
+  const i = order.indexOf(stage)
   return i < 0 ? 0 : i
 }
 
@@ -23,13 +23,15 @@ const indexOf = (stage: string) => {
  * simulated: a step is done when the batch has moved past it and current when the batch is on it.
  */
 export function BatchStageList({ progress }: { progress: BatchProgress | null }) {
-  const current = progress ? indexOf(progress.stage) : 0
+  const order = stageOrder(progress)
+  const current = progress ? indexIn(order, progress.stage) : 0
+  const steps = [...STEPS].sort((a, b) => indexIn(order, a.stage) - indexIn(order, b.stage))
   const perStage = (stage: string) => progress?.images.filter(row => row.stage === stage).length ?? 0
 
   return (
     <ol className="space-y-2">
-      {STEPS.map(step => {
-        const at = indexOf(step.stage)
+      {steps.map(step => {
+        const at = indexIn(order, step.stage)
         const done = at < current
         const active = at === current || (step.stage === 'preprocessing' && progress?.stage === 'queued')
         const here = perStage(step.stage) + (step.stage === 'preprocessing' ? perStage('queued') : 0)

@@ -8,26 +8,44 @@ import { ApiError } from '../../lib/api/client'
 import { getImageThumbnail, type ImageListItem } from '../../lib/api/images'
 import {
   changedNothing, downloadEnhanced, getEnhancementResult, isEnhancementSettled, levelLabel,
-  type EnhancementLevel, type EnhancementResult, type EnhancementStyle,
+  type EnhancementLevel, type EnhancementLighting, type EnhancementResult, type EnhancementStyle,
 } from '../../lib/api/enhancements'
 import { downloadEdit, listEdits } from '../../lib/api/editor'
 import { enhanceStoredPhoto } from '../../lib/liveSnapshot'
 import { saveBlob } from '../../lib/saveBlob'
+import { LightingPicker } from './LightingPicker'
 
 const STYLE_LABEL: Record<EnhancementStyle, string> = { natural: 'Natural', dynamic: 'Dynamic', ai_max: 'AI Enhance' }
+
+/** The picture the card shows as "after", handed to the page so it can show and offer the very same one. */
+export interface EnhancedAfter {
+  blob: Blob
+  /** Differs for every picture the card has made, so a page can tell one from the next. */
+  key: string
+  /** The current edit rather than the enhancement itself. */
+  edited: boolean
+  /** The enhancement found nothing to fix, so this is the photo as it was. */
+  unchanged: boolean
+  filename: string
+}
 
 interface EnhancedVersionCardProps {
   image: ImageListItem
   /** Called after something changed so the page can reload the photo. */
   onChanged: () => void
+  /** Told the "after" picture whenever it is ready, and `null` when there is none (no enhancement yet, or it did not finish). Must keep the same identity between renders. */
+  onAfterChange?: (after: EnhancedAfter | null) => void
 }
+
+const enhancedFilename = (originalName: string, result: EnhancementResult) =>
+  `facecloud-${originalName.replace(/\.[^.]+$/, '')}.${result.output_format === 'png' ? 'png' : 'jpg'}`
 
 /**
  * What the photo looks like after enhancement, with the ways to change it:
  * enhance (or enhance again with another style and strength), edit with sliders,
  * and download. Everything shown comes from the backend; nothing here is simulated.
  */
-export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardProps) {
+export function EnhancedVersionCard({ image, onChanged, onAfterChange }: EnhancedVersionCardProps) {
   const [result, setResult] = useState<EnhancementResult | null>(null)
   const [before, setBefore] = useState<string | null>(null)
   const [after, setAfter] = useState<string | null>(null)
@@ -35,6 +53,7 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [style, setStyle] = useState<EnhancementStyle>('natural')
+  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
   const [level, setLevel] = useState<EnhancementLevel>('auto')
   const urls = useRef<string[]>([])
 
@@ -44,7 +63,7 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
   /* Load the "after" picture: the current edit if there is one, otherwise the enhanced photo. */
   const showResult = useCallback(async (next: EnhancementResult, signal?: AbortSignal) => {
     setResult(next)
-    if (next.status !== 'completed') return
+    if (next.status !== 'completed') { onAfterChange?.(null); return }
     const [thumb, edits] = await Promise.all([
       getImageThumbnail(image.id, 1024, signal),
       listEdits(next.id, signal).catch(() => []),
@@ -52,15 +71,17 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
     const current = edits.find(edit => edit.is_current && edit.status === 'completed')
     const blob = current ? await downloadEdit(current.id, signal) : await downloadEnhanced(next.id, signal)
     if (signal?.aborted) return
+    const afterUrl = track(blob)
     setBefore(track(thumb))
-    setAfter(track(blob))
+    setAfter(afterUrl)
     setEditing(Boolean(current))
-  }, [image.id])
+    onAfterChange?.({ blob, key: afterUrl, edited: Boolean(current), unchanged: !current && changedNothing(next), filename: enhancedFilename(image.original_name, next) })
+  }, [image.id, image.original_name, onAfterChange])
 
   /* Start from whatever the photo already has; keep following it while it is still being made. */
   const latestId = image.latest_enhancement?.id ?? null
   useEffect(() => {
-    if (latestId === null) { setResult(null); setBefore(null); setAfter(null); return }
+    if (latestId === null) { setResult(null); setBefore(null); setAfter(null); onAfterChange?.(null); return }
     const ctl = new AbortController()
     ;(async () => {
       try {
@@ -73,20 +94,22 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
         }
         await showResult(current, ctl.signal)
       } catch (caught) {
-        if (!ctl.signal.aborted) setError(caught instanceof Error ? caught.message : 'Could not load the enhanced photo.')
+        if (!ctl.signal.aborted) { setError(caught instanceof Error ? caught.message : 'Could not load the enhanced photo.'); onAfterChange?.(null) }
       }
     })()
     return () => ctl.abort()
-  }, [latestId, showResult])
+  }, [latestId, showResult, onAfterChange])
 
   const enhance = async () => {
     setBusy(true); setError('')
     try {
-      const { result: made, blob } = await enhanceStoredPhoto(image.id, style, level)
+      const { result: made, blob } = await enhanceStoredPhoto(image.id, style, level, lighting)
       setResult(made)
       setBefore(await getImageThumbnail(image.id, 1024).then(track))
-      setAfter(track(blob))
+      const afterUrl = track(blob)
+      setAfter(afterUrl)
       setEditing(false)
+      onAfterChange?.({ blob, key: afterUrl, edited: false, unchanged: changedNothing(made), filename: enhancedFilename(image.original_name, made) })
       onChanged()
     } catch (caught) {
       setError(caught instanceof ApiError || caught instanceof Error ? caught.message : 'Could not enhance this photo.')
@@ -102,7 +125,7 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
       const edits = await listEdits(result.id).catch(() => [])
       const current = edits.find(edit => edit.is_current && edit.status === 'completed')
       const blob = current ? await downloadEdit(current.id) : await downloadEnhanced(result.id)
-      saveBlob(blob, `facecloud-${image.original_name.replace(/\.[^.]+$/, '')}.${result.output_format === 'png' ? 'png' : 'jpg'}`)
+      saveBlob(blob, enhancedFilename(image.original_name, result))
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Download failed.')
     } finally {
@@ -157,6 +180,9 @@ export function EnhancedVersionCard({ image, onChanged }: EnhancedVersionCardPro
                 <option value="medium">Moderate</option>
                 <option value="high">Strong</option>
               </select>
+            </div>
+            <div className="sm:col-span-2">
+              <LightingPicker id="enh-lighting" value={lighting} onChange={setLighting} disabled={busy} />
             </div>
           </div>
         )}
