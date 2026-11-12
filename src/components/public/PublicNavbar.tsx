@@ -102,7 +102,7 @@ export function PublicNavbar() {
             )}
           >
             {/* Logo */}
-            <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} tone={onMedia ? "dark" : "app"} />
+            <FaceCloudLogo variant="horizontal" size="md" href="/" priority={true} tone={onMedia ? "light" : "app"} />
 
             {/* Desktop nav links */}
             <div className={cn(

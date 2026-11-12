@@ -13,8 +13,9 @@ export interface FaceCloudLogoProps {
   decorative?: boolean
   /** Where the logo sits. 'app' follows the light / dark appearance; 'dark' is
    *  a surface that is always dark (the hero video, a photo), so it always
-   *  gets the dark-background treatment. */
-  tone?: 'dark' | 'app'
+   *  gets the dark-background treatment. 'light' is a surface that is always
+   *  bright (the hero video's sky), so it always gets the light-background one. */
+  tone?: 'dark' | 'app' | 'light'
 }
 
 /*
@@ -81,7 +82,7 @@ export function FaceCloudLogo({
   decorative = false,
   tone = 'dark',
 }: FaceCloudLogoProps) {
-  const t = toneConfig[tone]
+  const t = toneConfig[tone === 'light' ? 'app' : tone]
 
   // Which lockup to draw. The older 'light' / 'dark' names meant the horizontal lockup.
   let lockup: Lockup = variant === 'light' || variant === 'dark' ? 'horizontal' : variant
@@ -114,6 +115,8 @@ export function FaceCloudLogo({
      the appearance (see .fc-logo-on-light / .fc-logo-on-dark in index.css). */
   const artwork = tone === 'dark'
     ? picture('dark', '')
+    : tone === 'light'
+    ? picture('light', '')
     : [picture('light', 'fc-logo-on-light'), picture('dark', 'fc-logo-on-dark')]
 
   const innerContent = (

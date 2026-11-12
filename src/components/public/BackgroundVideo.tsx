@@ -1,198 +1,65 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAppearance } from '../../lib/theme'
 
-const FORWARD_VIDEO_SRC = '/videos/facecloud-hero-forward.mp4'
-const REVERSE_VIDEO_SRC = '/videos/facecloud-hero-reverse.mp4'
-const POSTER_SRC = '/videos/facecloud-hero-poster.jpg'
-
-/* The light appearance has its own cut of the same footage: the black ground is replaced by the page's own cream
-   (#F3ECE4, the light --a-surface-soft) through a luminance matte, so the portrait stands on the page instead of in a
-   black box. Baked with ffmpeg; the dark files are untouched. */
-const FORWARD_LIGHT_SRC = '/videos/facecloud-hero-forward-light.mp4'
-const REVERSE_LIGHT_SRC = '/videos/facecloud-hero-reverse-light.mp4'
-const POSTER_LIGHT_SRC = '/videos/facecloud-hero-poster-light.jpg'
-
-type PlaybackDirection = 'forward' | 'reverse'
+/* One seamless loop for both appearances: the footage's last second is blended into its first (baked with ffmpeg), so it neither jumps nor plays
+   backwards. The poster is its first frame, so nothing else shows while it loads. The earlier forward / reverse cuts of the dark portrait and the
+   light appearance's matte cut are no longer used here; their files are still in public/videos. */
+const VIDEO_SRC = '/videos/facecloud-hero-sunset.mp4'
+const POSTER_SRC = '/videos/facecloud-hero-sunset-poster.jpg'
+const PLAYBACK_RATE = 0.7
 
 export function BackgroundVideo() {
   const [appearance] = useAppearance()
   const light = appearance === 'light'
-  const [playbackDirection, setPlaybackDirection] = useState<PlaybackDirection>('forward')
-  const forwardVideoRef = useRef<HTMLVideoElement>(null)
-  const reverseVideoRef = useRef<HTMLVideoElement>(null)
-  const motionWrapperRef = useRef<HTMLDivElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  // Someone who asked for less motion sees the still poster, not the video.
+  const reducedMotion = useRef(window.matchMedia('(prefers-reduced-motion: reduce)').matches).current
 
-  // Preload reverse video on mount, and again when the appearance swaps the footage (the videos are remounted).
-  useEffect(() => {
-    setPlaybackDirection('forward')
-    reverseVideoRef.current?.load()
-  }, [appearance])
-
-  // Auto-play forward video on mount or when playable
-  const handleForwardCanPlay = () => {
-    if (playbackDirection === 'forward') {
-      forwardVideoRef.current?.play().catch(() => {})
-    }
-  }
-
-  const handleForwardEnded = async () => {
-    const forward = forwardVideoRef.current
-    const reverse = reverseVideoRef.current
-
-    if (!forward || !reverse) return
-
-    forward.pause()
-    reverse.currentTime = 0
-
-    setPlaybackDirection('reverse')
-
-    try {
-      await reverse.play()
-    } catch {
-      // Fallback: if autoplay blocked, restart forward video
-      handleReverseError()
-    }
-  }
-
-  const handleReverseEnded = async () => {
-    const forward = forwardVideoRef.current
-    const reverse = reverseVideoRef.current
-
-    if (!forward || !reverse) return
-
-    reverse.pause()
-    forward.currentTime = 0
-
-    setPlaybackDirection('forward')
-
-    try {
-      await forward.play()
-    } catch {
-      // Keep initial reverse frame visible if playback is blocked
-    }
-  }
-
-  const handleReverseError = () => {
-    setPlaybackDirection('forward')
-    const forward = forwardVideoRef.current
-    if (forward) {
-      forward.currentTime = 0
-      forward.play().catch(() => {})
-    }
-  }
-
-  // Handle tab visibility changes
+  // Pause while the tab is hidden, and carry on when it comes back.
   useEffect(() => {
     const handleVisibilityChange = () => {
-      const activeVideo =
-        playbackDirection === 'forward'
-          ? forwardVideoRef.current
-          : reverseVideoRef.current
-
-      if (document.hidden) {
-        forwardVideoRef.current?.pause()
-        reverseVideoRef.current?.pause()
-      } else {
-        activeVideo?.play().catch(() => {})
-      }
+      const video = videoRef.current
+      if (!video || reducedMotion) return
+      if (document.hidden) video.pause()
+      else video.play().catch(() => {})
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [playbackDirection])
+  }, [reducedMotion])
 
-  // Desktop subtle mouse parallax on shared motion wrapper
-  useEffect(() => {
-    const wrapper = motionWrapperRef.current
-    if (!wrapper) return
-
-    const reducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches
-    const desktop = window.matchMedia('(min-width: 1024px)').matches
-    const finePointer = window.matchMedia('(pointer: fine)').matches
-
-    if (reducedMotion || !desktop || !finePointer) return
-
-    let frame = 0
-
-    const handleMove = (event: MouseEvent) => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        const x = ((event.clientX / window.innerWidth) - 0.5) * 10
-        const y = ((event.clientY / window.innerHeight) - 0.5) * 8
-        wrapper.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.18)`
-      })
-    }
-
-    window.addEventListener('mousemove', handleMove, { passive: true })
-
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('mousemove', handleMove)
-      if (wrapper) wrapper.style.transform = ''
-    }
-  }, [appearance])
-
-  const getVideoClass = (direction: PlaybackDirection) => {
-    const active = playbackDirection === direction
-
-    return [
-      'pointer-events-none absolute inset-0',
-      'h-full w-full object-cover',
-      'scale-[1.08] lg:scale-[1.18]',
-      'origin-center will-change-transform',
-      'transition-opacity duration-100 ease-linear',
-      active ? 'opacity-100 z-[1]' : 'opacity-0 z-0',
-    ].join(' ')
-  }
+  // Slower than real time: the footage plays at 0.7x. The rate is set again whenever playback starts, because a browser can reset it.
+  const slow = () => { const video = videoRef.current; if (video) { video.defaultPlaybackRate = PLAYBACK_RATE; video.playbackRate = PLAYBACK_RATE } }
 
   return (
     <div className="fc-hero-ground absolute inset-0 overflow-hidden pointer-events-none z-0">
-      {/* Shared Parallax Motion Wrapper. Keyed by the appearance so the other cut of the footage loads cleanly; in the
+      {/* Keyed by the appearance so the video remounts cleanly (it stays still: the cursor does not move or zoom it); in the
           light appearance its edges fade out, so no rectangle of the video's frame can show against the page. */}
       <div
         key={appearance}
-        ref={motionWrapperRef}
         className="absolute inset-0 w-full h-full pointer-events-none"
         style={light ? {
           WebkitMaskImage: 'radial-gradient(ellipse 62% 72% at 50% 56%, #000 52%, transparent 100%)',
           maskImage: 'radial-gradient(ellipse 62% 72% at 50% 56%, #000 52%, transparent 100%)',
         } : undefined}
       >
-        {/* Forward Video */}
         <video
-          ref={forwardVideoRef}
-          autoPlay
+          ref={videoRef}
+          autoPlay={!reducedMotion}
+          loop
           muted
           playsInline
-          preload="auto"
-          poster={light ? POSTER_LIGHT_SRC : POSTER_SRC}
+          preload={reducedMotion ? 'none' : 'auto'}
+          poster={POSTER_SRC}
           aria-hidden="true"
           tabIndex={-1}
-          onCanPlay={handleForwardCanPlay}
-          onEnded={handleForwardEnded}
-          className={getVideoClass('forward')}
+          onLoadedMetadata={slow}
+          onPlay={slow}
+          className="pointer-events-none absolute inset-0 z-[1] h-full w-full object-cover scale-[1.08] lg:scale-[1.18] origin-center will-change-transform"
         >
-          <source src={light ? FORWARD_LIGHT_SRC : FORWARD_VIDEO_SRC} type="video/mp4" />
-        </video>
-
-        {/* Reverse Video */}
-        <video
-          ref={reverseVideoRef}
-          muted
-          playsInline
-          preload="metadata"
-          poster={light ? POSTER_LIGHT_SRC : POSTER_SRC}
-          aria-hidden="true"
-          tabIndex={-1}
-          onEnded={handleReverseEnded}
-          onError={handleReverseError}
-          className={getVideoClass('reverse')}
-        >
-          <source src={light ? REVERSE_LIGHT_SRC : REVERSE_VIDEO_SRC} type="video/mp4" />
+          <source src={VIDEO_SRC} type="video/mp4" />
         </video>
       </div>
 
