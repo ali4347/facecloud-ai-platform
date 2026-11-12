@@ -7,6 +7,8 @@ import { cancelBatch, retryBatch, stageOrder } from '../../lib/api/images'
 import { formatDateTime } from '../../lib/utils'
 import { explainReason } from '../../lib/reasons'
 import { ReportButton } from '../../components/features/ReportButton'
+import { BatchPhotoResults } from '../../components/features/BatchPhotoResults'
+import { USE_API } from '../../lib/api/config'
 import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
 import { useReasonBreakdown } from '../../lib/uploadBatch'
 import { useState } from 'react'
@@ -113,6 +115,13 @@ export default function ProcessingPage() {
       {data && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-8 space-y-6">
+            {/* A finished upload opens on its photos and their reports; the stage list below it is all "done" by then. */}
+            {finished && USE_API && data.images.length > 0 && (
+              <ChartCard title="Results" subtitle="Each photo and what was done to it">
+                <BatchPhotoResults rows={data.images} />
+              </ChartCard>
+            )}
+
             <ChartCard
               title="What is happening"
               subtitle={`${Math.round(data.progress_percentage)}% through`}
