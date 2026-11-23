@@ -1,6 +1,6 @@
 import { API_URL } from './config'
-import { ApiError, apiFetch, apiFetchBlob } from './client'
-import type { ImageListItem, Page, PlaceBrief } from './images'
+import { apiFetch, apiFetchBlob } from './client'
+import type { ImageListItem, Page } from './images'
 
 /** The address of a protected file as the API gives it (absolute), as the path the client wants. */
 export function pathOf(url: string): string {
@@ -24,17 +24,6 @@ function query(params: Record<string, string | number | boolean | undefined>): s
   const text = q.toString()
   return text ? `?${text}` : ''
 }
-
-/* ------------------------------------------------------------------ places */
-
-export interface Place extends PlaceBrief {
-  photo_count: number
-  cover_thumbnail_url: string | null
-  /** The place's own centre, not any photo's position. */
-  latitude: number
-  longitude: number
-}
-export const getPlace = (id: number, signal?: AbortSignal) => apiFetch<Place>(`/api/places/${id}/`, { signal })
 
 /* ------------------------------------------------------------------ albums */
 
@@ -124,18 +113,3 @@ export const trashThumbnail = (item: TrashItem, signal?: AbortSignal) => apiFetc
 export const deleteForever = (imageIds: number[]) =>
   apiFetch<{ deleted_ids: number[]; not_found_ids: number[] }>('/api/images/bulk-delete/', { body: { image_ids: imageIds } })
 
-/* ---------------------------------------------------------------- location */
-
-export interface PhotoLocation { latitude: number; longitude: number; place: PlaceBrief | null }
-/** Where a photo was taken; null when it has no location (the server answers 404). */
-export async function getLocation(imageId: number, signal?: AbortSignal): Promise<PhotoLocation | null> {
-  try {
-    return await apiFetch<PhotoLocation>(`/api/images/${imageId}/location/`, { signal })
-  } catch (caught) {
-    if (caught instanceof ApiError && caught.status === 404) return null
-    throw caught
-  }
-}
-export const removeLocation = (imageId: number) => apiFetch<void>(`/api/images/${imageId}/location/`, { method: 'DELETE' })
-export const removeLocations = (imageIds: number[]) =>
-  apiFetch<{ removed_ids: number[]; without_location_ids: number[]; not_found_ids: number[] }>('/api/images/location/remove/', { body: { image_ids: imageIds } })

@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom'
 import { USE_API } from '../../lib/api/config'
 import { startCameraSession, endCameraSession as endCameraSessionApi, endCameraSessionOnExit } from '../../lib/api/camera'
 import { EnhancementReport } from './EnhancementReport'
-import { LightingPicker } from './LightingPicker'
 import { levelLabel } from '../../lib/api/enhancements'
 import type { EnhancementLevel, EnhancementLighting, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
 import { ApiError } from '../../lib/api/client'
@@ -92,7 +91,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
   const [liveRefused, setLiveRefused] = useState<{ verdict: string; reasons: string[] } | null>(null)
   const [liveError, setLiveError] = useState('')
   const [liveStyle, setLiveStyle] = useState<EnhancementStyle>('ai_max')
-  const [liveLighting, setLiveLighting] = useState<EnhancementLighting>('auto')
+  const liveLighting: EnhancementLighting = 'auto'          // the lighting choice was removed from the screen: the engine decides
   const [liveLevel, setLiveLevel] = useState<EnhancementLevel>('auto')
   const steps = USE_API ? LIVE_SNAPSHOT_STEPS : PIPELINE_STEPS
 
@@ -701,7 +700,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
     } finally {
       setSnapshotProcessing(false)
     }
-  }, [snapshotDataUrl, liveImageId, liveStyle, liveLevel, liveLighting])
+  }, [snapshotDataUrl, liveImageId, liveStyle, liveLevel])
 
   const runEnhancePipeline = useCallback(async () => {
     if (USE_API && snapshotDataUrl && liveImageId !== null) { await runRealPipeline(); return }
@@ -1333,9 +1332,6 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                       <option value="medium">Moderate</option>
                       <option value="high">Strong</option>
                     </select>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <LightingPicker id="live-lighting" value={liveLighting} onChange={setLiveLighting} />
                   </div>
                 </div>
               )}

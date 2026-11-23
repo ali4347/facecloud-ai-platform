@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { AlertTriangle, Camera, FolderHeart, Loader2, MapPin, ScanFace, Search as SearchIcon, Sparkles, Upload, UserRound } from 'lucide-react'
+import { AlertTriangle, Camera, FolderHeart, Loader2, ScanFace, Search as SearchIcon, Sparkles, Upload, UserRound } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ImageCard } from '../../components/features/ImageCard'
 import { UrlThumb } from '../../components/features/UrlThumb'
@@ -81,11 +81,6 @@ export default function Search() {
                 <div className="flex flex-wrap gap-2">{r.albums!.map(album => <Link key={album.id} to={`/dashboard/albums/${album.id}`} className="px-3.5 py-2 rounded-xl border border-line bg-surface-mute text-xs font-semibold text-ink hover:border-accent/40">{album.title} <span className="text-ink-faint font-normal">· {album.photo_count}</span></Link>)}</div>
               </Section>
             )}
-            {(r.places?.length ?? 0) > 0 && (
-              <Section icon={MapPin} title="Places" count={r.places!.length}>
-                <div className="flex flex-wrap gap-2">{r.places!.map(place => <Link key={place.id} to={`/dashboard/images?place=${place.id}`} className="px-3.5 py-2 rounded-xl border border-line bg-surface-mute text-xs font-semibold text-ink hover:border-accent/40">{place.name}, {place.country} <span className="text-ink-faint font-normal">· {place.photo_count}</span></Link>)}</div>
-              </Section>
-            )}
             {r.groups.length > 0 && (
               <Section icon={UserRound} title="Person folders" count={r.groups.length}>
                 <div className="flex flex-wrap gap-2">{r.groups.map(group => <Link key={group.id} to={`/dashboard/groups/${group.id}`} className="px-3.5 py-2 rounded-xl border border-line bg-surface-mute text-xs font-semibold text-ink hover:border-accent/40">{group.display_name} <span className="text-ink-faint font-normal">· {group.member_count}</span></Link>)}</div>
@@ -96,7 +91,7 @@ export default function Search() {
                 <div className="flex flex-wrap gap-2">{r.jobs.map(job => <Link key={job.id} to={`/dashboard/processing/${job.id}`} className="px-3.5 py-2 rounded-xl border border-line bg-surface-mute text-xs font-semibold text-ink hover:border-accent/40">{job.display_name} <span className="text-ink-faint font-normal">· {job.total_files} file{job.total_files === 1 ? '' : 's'}</span></Link>)}</div>
               </Section>
             )}
-            {r.images.length + r.groups.length + r.jobs.length + (r.people?.length ?? 0) + (r.albums?.length ?? 0) + (r.places?.length ?? 0) === 0 && !(semantic.data?.results.length) && (
+            {r.images.length + r.groups.length + r.jobs.length + (r.people?.length ?? 0) + (r.albums?.length ?? 0) === 0 && !(semantic.data?.results.length) && (
               <EmptyState icon={SearchIcon} title="Nothing found" description={`Nothing of yours matches “${query}”. Try another word, or search by a face above.`} />
             )}
           </>

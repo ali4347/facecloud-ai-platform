@@ -1,11 +1,12 @@
-import { Download, Eye, Loader2, MapPin } from 'lucide-react'
+import { Download, Eye, Loader2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useState, type MouseEvent } from 'react'
 import { AuthedImage } from '../ui/AuthedImage'
 import { uploadStatusBadge } from '../ui/StatusBadge'
-import { downloadImage, getImageThumbnail, photoStatus, type ImageListItem } from '../../lib/api/images'
+import { downloadImage, getPhotoPicture, photoStatus, type ImageListItem } from '../../lib/api/images'
 import { formatBytes } from '../../lib/imageData'
 import { formatDateTime } from '../../lib/utils'
+import { photoTitle } from '../../lib/photoTitle'
 import { USE_API } from '../../lib/api/config'
 import { FavoriteButton } from './FavoriteButton'
 
@@ -80,8 +81,8 @@ export function ImageCard({ image, selectable = false, selected = false, onToggl
         )}
 
         <AuthedImage
-          load={canPreview ? signal => getImageThumbnail(image.id, 256, signal) : null}
-          cacheKey={`image-${image.id}`}
+          load={canPreview ? signal => getPhotoPicture(image.id, 256, signal) : null}
+          cacheKey={`image-${image.id}-${image.latest_enhancement?.id ?? 'none'}`}
           alt={image.original_name}
           className="w-full h-full !border-0"
           rounded="rounded-none"
@@ -112,8 +113,8 @@ export function ImageCard({ image, selectable = false, selected = false, onToggl
       </div>
 
       <div className="p-3">
-        <p className="text-sm font-semibold text-ink truncate mb-1" title={image.original_name}>
-          {image.original_name}
+        <p className="text-sm font-semibold text-ink truncate mb-1" title={`${photoTitle(image)} (${image.original_name})`}>
+          {photoTitle(image)}
         </p>
         <div className="flex items-center justify-between gap-2">
           {uploadStatusBadge(photoStatus(image))}
@@ -126,11 +127,6 @@ export function ImageCard({ image, selectable = false, selected = false, onToggl
         )}
         {downloadError && <p className="text-xs text-error mt-1.5">{downloadError}</p>}
         <p className="text-xs text-ink-mute mt-1">{formatDateTime(image.taken_at ?? image.created_at)}</p>
-        {image.place && (
-          <p className="text-[11px] text-ink-faint mt-0.5 flex items-center gap-1 truncate" title={`${image.place.name}, ${image.place.country}`}>
-            <MapPin className="w-3 h-3 flex-shrink-0" />{image.place.name}
-          </p>
-        )}
       </div>
     </div>
   )

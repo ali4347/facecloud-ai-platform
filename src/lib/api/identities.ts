@@ -45,6 +45,8 @@ export interface IdentityGroupImage {
   height: number | null
   display_status: string
   matching_confidence: number | null
+  /** When the photo was uploaded (newer backends only). */
+  created_at?: string
   /** 'needs_review' while the match is only a suggestion; such a photo is shown in the folder but not counted in it. */
   membership_state?: string | null
   /** The face that puts this photo in this folder: what moving it, taking it out and making it the cover act on. */

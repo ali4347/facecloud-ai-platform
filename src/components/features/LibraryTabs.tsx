@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Clock, Copy, Heart, Images, MapPin, Trash2, FolderHeart } from 'lucide-react'
+import { Clock, Copy, Heart, Images, Trash2, FolderHeart } from 'lucide-react'
 
 const TABS = [
   { to: '/dashboard/images', label: 'All photos', icon: Images, match: (path: string, search: string) => path === '/dashboard/images' && !/favorite=/.test(search) },
   { to: '/dashboard/images?favorite=true', label: 'Favourites', icon: Heart, match: (path: string, search: string) => path === '/dashboard/images' && /favorite=/.test(search) },
   { to: '/dashboard/albums', label: 'Albums', icon: FolderHeart, match: (path: string) => path.startsWith('/dashboard/albums') },
-  { to: '/dashboard/places', label: 'Places', icon: MapPin, match: (path: string) => path.startsWith('/dashboard/places') },
   { to: '/dashboard/moments', label: 'Moments', icon: Clock, match: (path: string) => path.startsWith('/dashboard/moments') },
   { to: '/dashboard/duplicates', label: 'Duplicates', icon: Copy, match: (path: string) => path.startsWith('/dashboard/duplicates') },
   { to: '/dashboard/trash', label: 'Trash', icon: Trash2, match: (path: string) => path.startsWith('/dashboard/trash') },

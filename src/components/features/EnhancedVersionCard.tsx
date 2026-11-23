@@ -13,7 +13,6 @@ import {
 import { downloadEdit, listEdits } from '../../lib/api/editor'
 import { enhanceStoredPhoto } from '../../lib/liveSnapshot'
 import { saveBlob } from '../../lib/saveBlob'
-import { LightingPicker } from './LightingPicker'
 
 const STYLE_LABEL: Record<EnhancementStyle, string> = { natural: 'Natural', dynamic: 'Dynamic', ai_max: 'AI Enhance' }
 
@@ -53,7 +52,7 @@ export function EnhancedVersionCard({ image, onChanged, onAfterChange }: Enhance
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [style, setStyle] = useState<EnhancementStyle>('natural')
-  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const lighting: EnhancementLighting = 'auto'          // the lighting choice was removed from the screen: the engine decides
   const [level, setLevel] = useState<EnhancementLevel>('auto')
   const urls = useRef<string[]>([])
 
@@ -180,9 +179,6 @@ export function EnhancedVersionCard({ image, onChanged, onAfterChange }: Enhance
                 <option value="medium">Moderate</option>
                 <option value="high">Strong</option>
               </select>
-            </div>
-            <div className="sm:col-span-2">
-              <LightingPicker id="enh-lighting" value={lighting} onChange={setLighting} disabled={busy} />
             </div>
           </div>
         )}

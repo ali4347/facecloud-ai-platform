@@ -11,7 +11,7 @@ import { useMyImages } from '../../lib/imageData'
 import { useFaceConsent } from '../../lib/consent'
 import { requestIdentityAnalysis } from '../../lib/api/identities'
 import { photoStatus, type PhotoFilter } from '../../lib/api/images'
-import { getAlbum, getPlace, moveToTrash, setFavorites } from '../../lib/api/library'
+import { getAlbum, moveToTrash, setFavorites } from '../../lib/api/library'
 import { useApiResource } from '../../lib/useApiResource'
 import { LibraryTabs } from '../../components/features/LibraryTabs'
 import { AddToAlbumDialog } from '../../components/features/AddToAlbumDialog'
@@ -49,8 +49,6 @@ function useFilterFromAddress() {
       favorite: p.get('favorite') === 'true' ? true : undefined,
       album: wholeNumber(p.get('album')),
       person: p.getAll('person').map(Number).filter(n => Number.isInteger(n) && n > 0),
-      place: wholeNumber(p.get('place')),
-      country: /^[A-Za-z]{2}$/.test(p.get('country') ?? '') ? p.get('country')!.toUpperCase() : undefined,
       takenFrom: /^\d{4}-\d{2}-\d{2}$/.test(p.get('taken_from') ?? '') ? p.get('taken_from')! : undefined,
       takenTo: /^\d{4}-\d{2}-\d{2}$/.test(p.get('taken_to') ?? '') ? p.get('taken_to')! : undefined,
     }
@@ -62,11 +60,8 @@ function useFilterFromAddress() {
 /** What the list is narrowed to, as removable chips (favourites have their own tab, so they are not one). */
 function FilterChips({ filter, drop }: { filter: PhotoFilter; drop: (...names: string[]) => void }) {
   const album = useApiResource(signal => (filter.album ? getAlbum(filter.album, signal) : Promise.resolve(null)), () => null, [filter.album], { skip: !filter.album || !USE_API })
-  const place = useApiResource(signal => (filter.place ? getPlace(filter.place, signal) : Promise.resolve(null)), () => null, [filter.place], { skip: !filter.place || !USE_API })
   const chips: { label: string; on: () => void }[] = []
   if (filter.album) chips.push({ label: `Album: ${album.data?.title ?? '…'}`, on: () => drop('album') })
-  if (filter.place) chips.push({ label: `Place: ${place.data ? place.data.name : '…'}`, on: () => drop('place') })
-  if (filter.country) chips.push({ label: `Country: ${filter.country}`, on: () => drop('country') })
   if (filter.person?.length) chips.push({ label: filter.person.length === 1 ? 'With one person' : `With ${filter.person.length} people`, on: () => drop('person') })
   if (filter.takenFrom || filter.takenTo) chips.push({ label: `Taken ${filter.takenFrom ?? '…'} to ${filter.takenTo ?? '…'}`, on: () => drop('taken_from', 'taken_to') })
   if (chips.length === 0) return null

@@ -7,7 +7,7 @@ import {
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { MergeFolderPanel } from '../../components/features/MergeFolderPanel'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
-import { getImageThumbnail } from '../../lib/api/images'
+import { getImageThumbnail, getPhotoPicture } from '../../lib/api/images'
 import { moveToTrash } from '../../lib/api/library'
 import { MoveFaceDialog } from '../../components/features/MoveFaceDialog'
 import { NoticeBar } from '../../components/ui/NoticeBar'
@@ -21,6 +21,7 @@ import {
 import { formatBytes } from '../../lib/imageData'
 import { useFolderImages, usePersonFolder } from '../../lib/personFolders'
 import { formatDate } from '../../lib/utils'
+import { photoDateTime } from '../../lib/photoTitle'
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -163,6 +164,12 @@ export default function GroupDetailLive() {
   const [copied, setCopied] = useState(false)
 
   const total = folder.data?.imageCount ?? 0
+  /** "Ali Hassan · Nov 21, 2026, 12:46 PM": this folder's person and when the photo was added (the file name stays in the tooltip). */
+  const folderPhotoTitle = (image: { original_name: string; created_at?: string }) => {
+    const when = image.created_at ? photoDateTime(image.created_at) : ''
+    const who = folder.data?.label ?? 'Photo'
+    return when ? `${who} · ${when}` : image.original_name
+  }
   // The folder's own figure when the backend gives it; otherwise the suggestions among the tiles on this page.
   const suggested = folder.data?.suggestedCount ?? images.filter(image => image.membership_state === 'needs_review').length
 
@@ -437,7 +444,7 @@ export default function GroupDetailLive() {
                       >
                         <div className="aspect-[4/3] relative bg-surface-mute">
                           <AuthedImage
-                            load={image.thumbnail_url ? signal => getImageThumbnail(image.id, 256, signal) : null}
+                            load={image.thumbnail_url ? signal => getPhotoPicture(image.id, 256, signal) : null}
                             cacheKey={`folder-photo-${image.id}`}
                             alt={image.original_name}
                             className="w-full h-full !border-0"
@@ -452,7 +459,11 @@ export default function GroupDetailLive() {
                           >
                             {isSelected ? <CheckSquare className="w-4 h-4 text-accent" /> : <Square className="w-4 h-4 text-ink-mute" />}
                           </button>
-                          <div className="absolute top-2 right-2">{uploadStatusBadge(image.display_status)}</div>
+                          <div className="absolute top-2 right-2">
+                            {image.membership_state === 'needs_review'
+                              ? <span title="The system is not sure this is the same person. Use 'Take out of this folder' if it is not." className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-amber-500/90 text-white shadow-sm">Suggested · not sure</span>
+                              : uploadStatusBadge(image.display_status)}
+                          </div>
                           {image.membership_id ? (
                             <div className="absolute bottom-2 left-2 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                               <button type="button" onClick={() => setMoving(image)} aria-label={`Move ${image.original_name} to another folder`} title="Move to another folder" className="p-1.5 rounded-lg bg-black/50 border border-white/20 text-white hover:bg-black/70 cursor-pointer"><ArrowRightLeft className="w-3.5 h-3.5" /></button>
@@ -469,7 +480,7 @@ export default function GroupDetailLive() {
                           </Link>
                         </div>
                         <div className="p-3 bg-surface-mute">
-                          <p className="text-xs font-semibold text-ink truncate" title={image.original_name}>{image.original_name}</p>
+                          <p className="text-xs font-semibold text-ink truncate" title={`${folderPhotoTitle(image)} (${image.original_name})`}>{folderPhotoTitle(image)}</p>
                           <p className="text-[10px] text-ink-mute mt-0.5">
                             {formatBytes(image.file_size)}
                             {image.width && image.height ? ` · ${image.width}×${image.height}` : ''}

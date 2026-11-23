@@ -30,7 +30,6 @@ import { BeforeAfterSlider } from '../../components/features/BeforeAfterSlider'
 import { makeLocalPreview } from '../../lib/previewEnhance'
 import { EnhancementReport } from '../../components/features/EnhancementReport'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
-import { LightingPicker } from '../../components/features/LightingPicker'
 import { PresetPicker } from '../../components/features/PresetPicker'
 import { ignoredChoice, presetPair, type PresetKey } from '../../lib/enhancementPresets'
 import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
@@ -65,7 +64,7 @@ const ENHANCE_WAIT_POLLS = Math.ceil(ENHANCE_WAIT_MS / 1500)
 /** The demo walks the same stages so the prototype still shows the flow. */
 const DEMO_STEP_MS = 650
 
-const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp,image/bmp,image/tiff,image/gif'
+const ACCEPTED_TYPES = 'image/jpeg,image/png,image/webp,image/bmp,image/tiff,image/gif,image/heic,image/heif,.heic,.heif'      // HEIC/HEIF (iPhone) is converted to a JPEG by the server
 
 type Phase = 'idle' | 'uploading' | 'processing' | 'done' | 'failed'
 
@@ -93,7 +92,7 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
   // below uses the same choice for a photo the pipeline did not enhance. The refs hold what was chosen when the upload started.
   const [preset, setPreset] = useState<PresetKey>('auto')
   const presetRef = useRef<PresetKey>('auto')
-  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const lighting: EnhancementLighting = 'auto'          // the lighting choice was removed from the screen: the engine decides
   const lightingRef = useRef<EnhancementLighting>('auto')
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
@@ -464,7 +463,7 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                     </div>
                     <span className="text-xs font-bold text-ink">Click to browse, or drop a file here</span>
                     <span className="text-[10px] text-ink-faint">
-                      JPG, PNG, WebP, BMP, TIFF or a still GIF
+                      JPG, PNG, WebP, HEIC (iPhone), BMP, TIFF or a still GIF
                     </span>
                   </div>
                 </label>
@@ -505,7 +504,6 @@ export default function UploadSingle({ embedded = false }: { embedded?: boolean 
                   </p>
                   <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
                   {USE_API && <PresetPicker id="upload-preset" value={preset} onChange={setPreset} />}
-                  {USE_API && <LightingPicker id="upload-lighting" value={lighting} onChange={setLighting} />}
                   <button
                     type="button"
                     onClick={start}

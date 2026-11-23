@@ -1,6 +1,5 @@
 import { ApiError, apiFetch } from './client'
 import type { ImageListItem, Page } from './images'
-import type { Place } from './library'
 
 function query(params: Record<string, string | number | undefined>): string {
   const q = new URLSearchParams()
@@ -8,18 +7,6 @@ function query(params: Record<string, string | number | undefined>): string {
   const text = q.toString()
   return text ? `?${text}` : ''
 }
-
-/* ------------------------------------------------------------------ places */
-
-export interface PlacesResponse {
-  /** The credit for the place names; it must be shown wherever they are. */
-  attribution: string
-  /** False when this server has no place-name file: photos keep a position but get no named place. */
-  names_available: boolean
-  places: Place[]
-}
-export const listPlaces = (params: { q?: string; country?: string; limit?: number } = {}, signal?: AbortSignal) =>
-  apiFetch<PlacesResponse>(`/api/places/${query({ q: params.q, country: params.country, limit: params.limit ?? 48 })}`, { signal })
 
 /* ------------------------------------------------------------------ events */
 

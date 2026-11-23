@@ -37,7 +37,7 @@ export default function UploadCenter() {
         <ChartCard title="Upload Guidelines" subtitle="Biometric compliance rules">
           <div className="space-y-3">
             {[
-              { text: 'File Formats: JPG, JPEG, PNG', ok: true },
+              { text: 'File Formats: JPG, PNG, WebP, HEIC (iPhone)', ok: true },
               { text: 'ZIP files must contain only valid images (uncompressed folder hierarchies)', ok: true },
               { text: `Single image file size limit: ${UPLOAD_LIMITS.image}; ZIP limit: ${UPLOAD_LIMITS.zip}${USE_API ? `, at most ${UPLOAD_LIMITS.zipPhotos} photos` : ''}`, ok: true },
               { text: 'Target face must be centered and face forward directly', ok: false },

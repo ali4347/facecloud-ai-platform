@@ -16,8 +16,8 @@ import { findDuplicates, rerunChecks } from '../../lib/api/tools'
 import { AdvisorPanel } from '../../components/features/AdvisorPanel'
 import { FavoriteButton } from '../../components/features/FavoriteButton'
 import { AddToAlbumDialog } from '../../components/features/AddToAlbumDialog'
-import { PhotoLocationCard } from '../../components/features/PhotoLocationCard'
 import { formatDateTime } from '../../lib/utils'
+import { photoTitle } from '../../lib/photoTitle'
 import { saveBlob } from '../../lib/saveBlob'
 import { FACE_RESTORATION_LIMIT } from '../../lib/enhancementPresets'
 import { explainReason, REJECTING_CODES } from '../../lib/reasons'
@@ -120,8 +120,8 @@ export default function ImageDetail() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
         <PageHeader
-          title={image?.original_name ?? 'Photo'}
-          subtitle={image ? `${image.taken_at ? `Taken ${formatDateTime(image.taken_at)} · ` : ''}Uploaded ${formatDateTime(image.created_at)}` : 'Loading…'}
+          title={image ? photoTitle(image) : 'Photo'}
+          subtitle={image ? `${image.original_name} · ${image.taken_at ? `Taken ${formatDateTime(image.taken_at)} · ` : ''}Uploaded ${formatDateTime(image.created_at)}` : 'Loading…'}
           action={USE_API && image && image.thumbnail_url ? (
             <>
               <FavoriteButton imageId={image.id} value={Boolean(image.is_favorite)} />
@@ -322,7 +322,6 @@ export default function ImageDetail() {
                 )}
 
                 {USE_API && <DuplicateNotice imageId={image.id} refresh={dupRefresh} />}
-                {USE_API && image.has_location && <PhotoLocationCard imageId={image.id} onRemoved={reload} />}
                 {albumNote && <p role="status" className="text-xs text-emerald-400">{albumNote}</p>}
 
                 <Link

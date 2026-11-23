@@ -1,6 +1,6 @@
 import type { EnhancementLevel, EnhancementLighting, EnhancementResult, EnhancementStyle } from './api/enhancements'
 
-export type PresetKey = 'auto' | 'standard' | 'pro'
+export type PresetKey = 'auto' | 'pro'
 
 /** Faces per photo the server restores with AI, the largest first (CODEFORMER_MAX_FACES; the face analysis and the identity check use the same five). */
 export const FACE_RESTORATION_LIMIT = 5
@@ -8,12 +8,11 @@ export const FACE_RESTORATION_LIMIT = 5
 export interface Preset { key: PresetKey; label: string; hint: string; level: EnhancementLevel; style: EnhancementStyle }
 
 /**
- * The three presets. The backend resolves a preset to a level + style pair (`enhancement/serializers.py` PRESETS); the pair is sent instead of the
+ * The two presets a person can pick (Standard was removed from the screens 2026-11-23; the server still accepts it, and `presetOf` still names an older Standard result). The backend resolves a preset to a level + style pair (`enhancement/serializers.py` PRESETS); the pair is sent instead of the
  * name so this works on a backend that predates presets too, and the result reports the pair that was used either way.
  */
 export const PRESETS: readonly Preset[] = [
   { key: 'auto', label: 'Auto', hint: 'Fast', level: 'auto', style: 'natural' },
-  { key: 'standard', label: 'Standard', hint: 'Balanced', level: 'high', style: 'natural' },
   { key: 'pro', label: 'Pro', hint: 'AI Max', level: 'high', style: 'ai_max' },
 ]
 
@@ -25,8 +24,9 @@ export function presetPair(key: PresetKey): { level: EnhancementLevel; style: En
 
 /** Which preset a (level, style) pair is, by name, or null when it is none of the three (a pair set some other way, or one the server did not report). */
 export function presetOf(level: EnhancementLevel | undefined | null, style: EnhancementStyle | undefined | null): 'Auto' | 'Standard' | 'Pro' | null {
+  if (level === 'high' && style === 'natural') return 'Standard'          // no longer offered, but an older result may have been made with it
   const found = PRESETS.find(item => item.level === level && item.style === style)
-  return found ? (found.label as 'Auto' | 'Standard' | 'Pro') : null
+  return found ? (found.label as 'Auto' | 'Pro') : null
 }
 
 const LIGHTING_WORDS: Record<EnhancementLighting, string> = { auto: 'Auto', dark: 'Dark photo', light: 'Light photo' }

@@ -69,15 +69,6 @@ export interface EnhancementSummary {
   download_url?: string | null
 }
 
-/** Where a photo was taken, by name. The coordinates are never in a photo row; the photo's own `/location/` call has them. */
-export interface PlaceBrief {
-  id: number
-  name: string
-  region: string
-  country: string
-  country_code: string
-}
-
 export interface ImageListItem {
   id: number
   batch: number
@@ -103,8 +94,6 @@ export interface ImageListItem {
   is_favorite?: boolean
   /** The capture time from the file's EXIF data; null when it has none. */
   taken_at?: string | null
-  place?: PlaceBrief | null
-  has_location?: boolean
   created_at: string
   updated_at: string
 }
@@ -155,6 +144,8 @@ export interface UploadBatch {
 export interface BatchImageProgress {
   image_id: number
   filename: string
+  /** The photograph's file is kept, so it can be looked at (newer backends only; a photograph refused at upload never had one stored). */
+  has_preview?: boolean
   stage: string
   status: string
   progress_percentage: number
@@ -275,9 +266,6 @@ export interface PhotoFilter {
   album?: number
   /** Several ids: photos that contain all of those people. */
   person?: number[]
-  place?: number
-  /** Two letters, e.g. "PK". */
-  country?: string
   /** YYYY-MM-DD, inclusive, on the capture date (the upload date when the file has none). */
   takenFrom?: string
   takenTo?: string
@@ -294,8 +282,6 @@ export function listMyImages(
   if (params.favorite) query.set('favorite', 'true')
   if (params.album) query.set('album', String(params.album))
   for (const person of params.person ?? []) query.append('person', String(person))
-  if (params.place) query.set('place', String(params.place))
-  if (params.country) query.set('country', params.country)
   if (params.takenFrom) query.set('taken_from', params.takenFrom)
   if (params.takenTo) query.set('taken_to', params.takenTo)
   const suffix = query.toString() ? `?${query}` : ''
@@ -341,9 +327,14 @@ export function retryBatch(batchId: number): Promise<unknown> {
  * object URL.
  */
 export function getImageThumbnail(
-  imageId: number, size = 256, signal?: AbortSignal,
+  imageId: number, size = 256, signal?: AbortSignal, version: 'original' | 'enhanced' = 'original',
 ): Promise<Blob> {
-  return apiFetchBlob(`/api/images/${imageId}/thumbnail/?size=${size}`, { signal })
+  return apiFetchBlob(`/api/images/${imageId}/thumbnail/?size=${size}${version === 'enhanced' ? '&version=enhanced' : ''}`, { signal })
+}
+
+/** What a photo list shows for a photo: its latest enhanced picture, the original when there is none. The before/after slider asks for the original on purpose (getImageThumbnail's default). */
+export function getPhotoPicture(imageId: number, size = 256, signal?: AbortSignal): Promise<Blob> {
+  return getImageThumbnail(imageId, size, signal, 'enhanced')
 }
 
 /** Delete one photo and its enhanced copies. This cannot be undone. */

@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FolderArchive, Loader2, Search, Users } from 'lucide-react'
 import { AuthedImage } from '../ui/AuthedImage'
-import { getImageThumbnail } from '../../lib/api/images'
+import { getPhotoPicture } from '../../lib/api/images'
 import { SEARCH_MIN_LENGTH, searchEverything, type SearchResults } from '../../lib/api/search'
 import { USE_API } from '../../lib/api/config'
 import { statusLabel } from '../../lib/imageData'
@@ -124,7 +124,7 @@ export function GlobalSearch({ role, inputRef }: { role: Role; inputRef: React.R
                 <button key={item.id} type="button" role="option" aria-selected={options[active]?.key === `i${item.id}`}
                   className={rowClass(`i${item.id}`)} onClick={() => go(`/dashboard/images/${item.id}`)}>
                   <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-surface-mute">
-                    <AuthedImage load={item.thumbnail_url ? signal => getImageThumbnail(item.id, 256, signal) : null}
+                    <AuthedImage load={item.thumbnail_url ? signal => getPhotoPicture(item.id, 256, signal) : null}
                       cacheKey={`search-${item.id}`} alt="" className="w-full h-full !border-0" rounded="rounded-none" />
                   </div>
                   <span className="flex-1 min-w-0 text-[13px] text-ink truncate">{item.name}</span>
@@ -163,7 +163,7 @@ export function GlobalSearch({ role, inputRef }: { role: Role; inputRef: React.R
           )}
           {ready && (
             <button type="button" onClick={() => go(seeAll)} className="w-full mt-1 px-3 py-2 rounded-xl text-left text-[12px] font-semibold text-accent hover:bg-surface-mute cursor-pointer border-t border-line">
-              See all results for “{query.trim()}”, with albums, places and photos that look like it
+              See all results for “{query.trim()}”, with albums and photos that look like it
             </button>
           )}
         </div>

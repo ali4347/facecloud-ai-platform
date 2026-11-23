@@ -8,7 +8,6 @@ import { ChartCard } from '../../components/ui/ChartCard'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
 import { uploadMultiple, type ImageListItem, type UploadBatch } from '../../lib/api/images'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
-import { LightingPicker } from '../../components/features/LightingPicker'
 import { PresetPicker } from '../../components/features/PresetPicker'
 import { presetPair, type PresetKey } from '../../lib/enhancementPresets'
 import { UPLOAD_LIMITS } from '../../components/features/uploadKinds'
@@ -43,7 +42,7 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
   // How the person wants these photos enhanced: a preset and a lighting, sent WITH the upload (the server's pipeline does the work). `sent` is what the
   // upload went with and what the server said it took (see BatchEnhancementPanel).
   const [preset, setPreset] = useState<PresetKey>('auto')
-  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const lighting: EnhancementLighting = 'auto'          // the lighting choice was removed from the screen: the engine decides
   const [sent, setSent] = useState<{ preset: PresetKey; lighting: EnhancementLighting; echoed: UploadBatch['auto_enhance_options'] } | null>(null)
   const [picked, setPicked] = useState<Picked[]>([])
   const [uploading, setUploading] = useState(false)
@@ -159,7 +158,7 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
                     <Upload className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-bold text-ink">Click to browse or drop files here</span>
-                  <span className="text-[10px] text-ink-mute">JPG, PNG or WebP · up to {MAX_FILES} photos per batch</span>
+                  <span className="text-[10px] text-ink-mute">JPG, PNG, WebP or HEIC · up to {MAX_FILES} photos per batch</span>
                 </div>
               </label>
             </ChartCard>
@@ -199,7 +198,6 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
                   <div className="space-y-3 pt-2">
                   <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
                   <PresetPicker id="upload-preset" value={preset} onChange={setPreset} />
-                  <LightingPicker id="upload-lighting" value={lighting} onChange={setLighting} />
                   <div className="flex gap-3">
                     <button onClick={reset} className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center">Cancel</button>
                     <label className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center cursor-pointer">
@@ -257,7 +255,7 @@ export default function UploadMultipleLive({ embedded = false }: { embedded?: bo
                         {stage === 'done' ? (
                           <div className="flex items-center gap-2">
                             {uploadStatusBadge(live?.status ?? (image.status === 'rejected' ? 'rejected' : image.display_status))}
-                            {image.status !== 'rejected' && (
+                            {image.thumbnail_url && (
                               <Link to={`/dashboard/images/${image.id}`} aria-label={`Details for ${image.original_name}`} className="text-ink-mute hover:text-ink"><Eye className="w-3.5 h-3.5" /></Link>
                             )}
                           </div>

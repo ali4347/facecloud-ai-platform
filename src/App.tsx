@@ -29,7 +29,6 @@ import Albums from './pages/user/Albums'
 import AlbumDetail from './pages/user/AlbumDetail'
 import Trash from './pages/user/Trash'
 import Duplicates from './pages/user/Duplicates'
-import Places from './pages/user/Places'
 import Moments, { EventDetail, MemoryDetail } from './pages/user/Moments'
 import Search from './pages/user/Search'
 import FolderHistory from './pages/user/FolderHistory'
@@ -137,7 +136,7 @@ export default function App() {
           <Route path="albums/:id" element={<AlbumDetail />} />
           <Route path="trash" element={<Trash />} />
           <Route path="duplicates" element={<Duplicates />} />
-          <Route path="places" element={<Places />} />
+          <Route path="places" element={<Navigate to="/dashboard/images" replace />} />
           <Route path="moments" element={<Moments />} />
           <Route path="moments/memories/:id" element={<MemoryDetail />} />
           <Route path="moments/events/:id" element={<EventDetail />} />

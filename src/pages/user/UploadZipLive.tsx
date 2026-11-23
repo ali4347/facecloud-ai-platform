@@ -7,7 +7,6 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { uploadZip, type UploadBatch } from '../../lib/api/images'
 import { SubmitToSelect } from '../../components/features/SubmitToSelect'
-import { LightingPicker } from '../../components/features/LightingPicker'
 import { PresetPicker } from '../../components/features/PresetPicker'
 import { presetPair, type PresetKey } from '../../lib/enhancementPresets'
 import type { EnhancementLighting } from '../../lib/api/enhancements'
@@ -19,6 +18,7 @@ import { readZipContents } from '../../lib/zipContents'
 import { UPLOAD_LIMITS } from '../../components/features/uploadKinds'
 import { tally, useFinishedBatch, useReasonBreakdown } from '../../lib/uploadBatch'
 import { BatchStageList } from '../../components/features/BatchStageList'
+import { BatchPhotoRows } from '../../components/features/BatchPhotoRows'
 import { BatchEnhancementPanel } from '../../components/features/BatchEnhancementPanel'
 import { RejectionBreakdown } from '../../components/features/RejectionBreakdown'
 
@@ -34,7 +34,7 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
   // How the person wants these photos enhanced: a preset and a lighting, sent WITH the upload (the server's pipeline does the work). `sent` is what the
   // upload went with (the server's own echo is on `made`, see BatchEnhancementPanel).
   const [preset, setPreset] = useState<PresetKey>('auto')
-  const [lighting, setLighting] = useState<EnhancementLighting>('auto')
+  const lighting: EnhancementLighting = 'auto'          // the lighting choice was removed from the screen: the engine decides
   const [sent, setSent] = useState<{ preset: PresetKey; lighting: EnhancementLighting } | null>(null)
   const [zipFile, setZipFile] = useState<File | null>(null)
   // Photos found inside the chosen archive, and whether that is still being read.
@@ -183,7 +183,6 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
                     <div className="space-y-3">
                     <SubmitToSelect teams={target.teams} value={target.organizationId} onChange={target.setOrganizationId} />
                     <PresetPicker id="upload-preset" value={preset} onChange={setPreset} />
-                    <LightingPicker id="upload-lighting" value={lighting} onChange={setLighting} />
                     <div className="flex gap-3">
                       <button onClick={reset} className="fc-btn-secondary !py-2.5 !px-4 text-xs flex-1 justify-center">Cancel</button>
                       <button onClick={confirmAndUpload} className="fc-btn-primary !py-2.5 !px-4 text-xs flex-1 justify-center gap-2">
@@ -226,17 +225,21 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
               title={stage === 'processing' ? 'Processing…' : 'Results'}
               subtitle={stage === 'processing' ? 'Enhancing and validating photos' : 'Will appear here when processing finishes'}
             >
-              <div className="h-64 flex flex-col items-center justify-center text-center text-ink-mute gap-2">
-                {stage === 'processing' || stage === 'uploading' ? (
-                  <Loader2 className="w-8 h-8 text-accent animate-spin" />
-                ) : (
-                  <HelpCircle className="w-8 h-8 text-ink-mute opacity-40" />
-                )}
-                <p className="text-xs font-semibold">
-                  {stage === 'processing' ? 'Processing your archive, please wait…'
-                    : stage === 'uploading' ? 'Uploading, please wait…' : 'Upload a ZIP to see results here.'}
-                </p>
-              </div>
+              {stage === 'processing' ? (
+                <div className="space-y-3">
+                  {progress && (
+                    <div className="w-full h-1.5 bg-surface-mute rounded-full overflow-hidden">
+                      <div className="h-full bg-accent transition-all duration-500 rounded-full" style={{ width: `${progress.progress_percentage}%` }} />
+                    </div>
+                  )}
+                  <BatchPhotoRows progress={progress} done={false} />
+                </div>
+              ) : (
+                <div className="h-64 flex flex-col items-center justify-center text-center text-ink-mute gap-2">
+                  {stage === 'uploading' ? <Loader2 className="w-8 h-8 text-accent animate-spin" /> : <HelpCircle className="w-8 h-8 text-ink-mute opacity-40" />}
+                  <p className="text-xs font-semibold">{stage === 'uploading' ? 'Uploading, please wait…' : 'Upload a ZIP to see results here.'}</p>
+                </div>
+              )}
             </ChartCard>
           )}
 
@@ -255,6 +258,10 @@ export default function UploadZipLive({ embedded = false }: { embedded?: boolean
                 </div>
 
                 <RejectionBreakdown groups={breakdown.groups} loading={breakdown.loading} />
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-ink-mute">Photos in the archive</p>
+                  <BatchPhotoRows progress={progress} done />
+                </div>
                 {made && <BatchEnhancementPanel batchId={made.id} choice={sent ?? undefined} echoed={made.auto_enhance_options} />}
 
                 <div className="space-y-3">

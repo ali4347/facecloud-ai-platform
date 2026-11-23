@@ -1,5 +1,5 @@
 import { apiFetch } from './client'
-import type { Album, Place } from './library'
+import type { Album } from './library'
 
 export interface SearchImage { id: number; name: string; thumbnail_url: string | null; status: string; created_at: string }
 export interface SearchGroup { id: number; display_name: string; member_count: number }
@@ -16,7 +16,6 @@ export interface SearchResults {
   /** The kinds below come from newer backends. */
   people?: PersonChip[]
   albums?: Album[]
-  places?: Place[]
 }
 
 /** Only the caller's own photos, person folders and uploads. The backend wants at least two characters. */
