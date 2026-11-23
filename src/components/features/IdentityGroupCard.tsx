@@ -1,7 +1,7 @@
 import { Users, ChevronRight, UserCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { AuthedImage } from '../ui/AuthedImage'
-import { getImageThumbnail } from '../../lib/api/images'
+import { getPhotoPicture } from '../../lib/api/images'
 import type { FolderView } from '../../lib/personFolders'
 import { formatDate } from '../../lib/utils'
 
@@ -17,8 +17,8 @@ function CoverMosaic({ folder }: { folder: FolderView }) {
       {ids.map((imageId, index) => (
         <div key={imageId} className={ids.length === 3 && index === 0 ? 'row-span-2' : ''}>
           <AuthedImage
-            load={signal => getImageThumbnail(imageId, 256, signal)}
-            cacheKey={`cover-${imageId}`}
+            load={signal => getPhotoPicture(imageId, 256, signal)}          // the enhanced picture when there is one
+            cacheKey={`cover-enhanced-${imageId}`}
             alt=""
             className="w-full h-full !border-0"
             rounded="rounded-none"

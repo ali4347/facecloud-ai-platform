@@ -7,7 +7,7 @@ import {
 import { AuthedImage } from '../../components/ui/AuthedImage'
 import { MergeFolderPanel } from '../../components/features/MergeFolderPanel'
 import { uploadStatusBadge } from '../../components/ui/StatusBadge'
-import { getImageThumbnail, getPhotoPicture } from '../../lib/api/images'
+import { getPhotoPicture } from '../../lib/api/images'
 import { moveToTrash } from '../../lib/api/library'
 import { MoveFaceDialog } from '../../components/features/MoveFaceDialog'
 import { NoticeBar } from '../../components/ui/NoticeBar'
@@ -517,8 +517,8 @@ export default function GroupDetailLive() {
             {group.coverImageIds[0] !== undefined && (
               <div className="h-28 rounded-xl overflow-hidden relative">
                 <AuthedImage
-                  load={signal => getImageThumbnail(group.coverImageIds[0], 256, signal)}
-                  cacheKey={`folder-cover-${group.coverImageIds[0]}`}
+                  load={signal => getPhotoPicture(group.coverImageIds[0], 256, signal)}
+                  cacheKey={`folder-cover-enhanced-${group.coverImageIds[0]}`}
                   alt={`A photo of ${group.label}`}
                   className="w-full h-full !border-0"
                   rounded="rounded-none"

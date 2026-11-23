@@ -42,6 +42,7 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
   const applied = result.applied_stages ?? []
   const skipped = result.skipped_stages ?? []
   const hasStageData = result.applied_stages !== undefined
+  const unmet = skipped.filter(item => item.stage !== 'polish')          // what was needed and refused (a refused polish is listed too, but it is not a restoration)
   const hasDetails = skipped.length > 0 || result.diagnosis != null || result.plan != null || !!result.hd_unavailable_reason
 
   // The backend's own sentence wins; otherwise build one from the stages that ran.
@@ -91,10 +92,21 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
       {result.hd_unavailable_reason && (
         <p role="status" className="flex items-start gap-2 p-3 rounded-xl text-[#FCD34D] bg-[#F59E0B]/10 border border-[#F59E0B]/25">
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-px" />
-          <span>
-            <span className="font-semibold">HD restoration is not available on this server.</span>{' '}
-            <span className="text-ink-mute">This photo needed restoration, so it was only lightly adjusted and is not presented as restored.</span>
-          </span>
+          {/* Two different things share this field. "...not available on this server": a model could not run (older staged pipeline). "...not completed": the model ran and its result did not
+              pass the safety checks (the adaptive engine), so saying the server lacks it would be false. */}
+          {/not available on this server/i.test(result.hd_unavailable_reason) ? (
+            <span>
+              <span className="font-semibold">HD restoration is not available on this server.</span>{' '}
+              <span className="text-ink-mute">This photo needed restoration, so it was only lightly adjusted and is not presented as restored.</span>
+            </span>
+          ) : (
+            <span>
+              <span className="font-semibold">
+                {unmet.length > 0 ? `${unmet.map(item => stageName(item.stage)).join(' and ')} could not be applied safely.` : 'Some restoration could not be applied safely.'}
+              </span>{' '}
+              <span className="text-ink-mute">The result did not pass the safety checks (it would have changed the face or invented detail), so this photo was only lightly adjusted and is not presented as restored.</span>
+            </span>
+          )}
         </p>
       )}
 

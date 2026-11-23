@@ -46,6 +46,12 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-23 (later) — Person-folder covers show the enhanced picture; the report no longer says "not available on this server" when the safety checks refused a restoration
+*Status: committed and pushed. `npx tsc -p tsconfig.app.json --noEmit` and `npx oxlint src` pass. Not checked in a browser.*
+
+- **`src/components/features/IdentityGroupCard.tsx`, `src/pages/user/GroupDetailLive.tsx`:** the folder mosaic and the folder page's cover use `getPhotoPicture` (the enhanced picture when there is one), with a new cache key.
+- **`src/components/features/EnhancementReport.tsx`:** `hd_unavailable_reason` is one field for two different things. "...not available on this server" (a model could not run) keeps its old sentence; "...not completed" (the adaptive engine ran the model and its result failed the safety checks, e.g. a face restoration that would have changed the face) now says "<stage> could not be applied safely" and why. Before, it told a person whose photo had just been through Real-ESRGAN and NAFNet that HD restoration was unavailable on the server.
+
 ### 2026-11-23 — Working-tree changes of the owner's other session, recorded and committed: Places removed, Standard preset and Lighting picker removed, HEIC accepted, photo titles, per-photo rows on the ZIP screen
 *Status: committed `d32f83f` and pushed 2026-11-23. These changes were in the working tree when the owner asked for the commit; Claude did not write them, so this entry records what `git diff` shows. `npm run build` passes on the working tree (checked 2026-11-23); not checked in a browser by Claude.*
 
