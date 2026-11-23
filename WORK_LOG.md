@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-11-13
+**Last updated:** 2026-11-23
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,26 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-11-23 — Working-tree changes of the owner's other session, recorded and committed: Places removed, Standard preset and Lighting picker removed, HEIC accepted, photo titles, per-photo rows on the ZIP screen
+*Status: committed `d32f83f` and pushed 2026-11-23. These changes were in the working tree when the owner asked for the commit; Claude did not write them, so this entry records what `git diff` shows. `npm run build` passes on the working tree (checked 2026-11-23); not checked in a browser by Claude.*
+
+- **Places removed from the frontend:** `src/pages/user/Places.tsx` and `src/components/features/PhotoLocationCard.tsx` deleted (the owner's own change; both were staged as deletions); the `/dashboard/places` route redirects to `/dashboard/images`; the Places tab (`LibraryTabs.tsx`), the place and country filters and chips (`MyImages.tsx`, `images.ts` `PhotoFilter`), `Place`/`PlaceBrief`/`listPlaces`/`getPlace`/location calls (`library.ts`, `discover.ts`, `images.ts`), the Places section of search (`Search.tsx`, `search.ts`) and the location card of the photo page (`ImageDetail.tsx`) are gone. The backend routes are untouched.
+- **Standard preset and Lighting picker removed from the screens:** `enhancementPresets.ts` offers `auto` and `pro`; `presetOf` still names an older Standard result; `PresetPicker.tsx` is two buttons; `LightingPicker` is no longer used by `UploadSingle`, `UploadMultipleLive`, `UploadZipLive`, `EnhancedVersionCard` and `LiveEnhancementPanel`, and `lighting` is the constant `'auto'` there. The file `LightingPicker.tsx` itself is kept.
+- **HEIC / HEIF accepted:** `UploadSingle.tsx` `ACCEPTED_TYPES` adds `image/heic`, `image/heif`, `.heic`, `.heif`; the hints on the single, multiple and ZIP screens and the Upload Center guidelines say so (the server converts HEIC to a JPEG).
+- **Photo titles:** new `src/lib/photoTitle.ts` (`photoTitle`: the people in the photo and its upload time, "Photo" when it is in no folder); used by `ImageCard.tsx` (the file name is the tooltip) and the photo page (file name moves to the subtitle).
+- **ZIP screen lists each photo:** new `src/components/features/BatchPhotoRows.tsx` (one row per photo from the server's `progress.images`: thumbnail when `has_preview`, stage and percentage while running, final status and a link afterwards), used by `UploadZipLive.tsx` while processing and in the finished results; `BatchImageProgress.has_preview` and `IdentityGroupImage.created_at` added to the types; `UploadMultipleLive.tsx` shows the details link for any photo that has a thumbnail, not only the not-rejected ones.
+- **Also in this commit, from the 2026-11-21 entry below:** the enhanced picture in photo lists, and the "Suggested · not sure" badge.
+- **Docs:** `README.md` (Places route retired, search, photo page, upload screens, presets, My Images titles).
+- **Not done:** the My Images list still shows a placeholder for a rejected photo whose file the server did not keep, and the picture of an enhanced photo in the list is not yet checked in a browser; the owner raised both on 2026-11-23 and this is the next task.
+
+### 2026-11-21 — Photo lists show the enhanced picture; "Suggested · not sure" badge in a person folder (found in the working tree, not made in this session)
+*Status: uncommitted. These four files were already modified when the 2026-11-21 report was started; they are not Claude's change of this session, so this entry only records what `git diff` shows. Not built in a browser by Claude; `npx tsc -p tsconfig.app.json --noEmit`, `oxlint src` and `npm run build` pass on a copy of the working tree.*
+
+- **`src/lib/api/images.ts`:** `getImageThumbnail` takes a fourth argument `version: 'original' | 'enhanced'` (default original) and adds `&version=enhanced` to `/api/images/{id}/thumbnail/`; new `getPhotoPicture(id, size, signal)` = the latest enhanced picture, the original when there is none. The backend reads the parameter in `thumbnails/views.py:41-45`.
+- **`src/components/features/ImageCard.tsx`, `src/components/layout/GlobalSearch.tsx`, `src/pages/user/GroupDetailLive.tsx`:** photo lists (My Images and Albums cards, the global search rows, the Person Folder photos) use `getPhotoPicture`; the card's cache key now includes the latest enhancement id so a new enhancement replaces the picture. The before/after slider still asks for the original on purpose.
+- **`src/pages/user/GroupDetailLive.tsx`:** a photo whose `membership_state` is `needs_review` shows an amber "Suggested · not sure" badge (tooltip: "The system is not sure this is the same person. Use 'Take out of this folder' if it is not.") instead of the status badge. The backend sends `membership_state` (`identities/image_serializers.py:12,28`).
+- **Not done:** not committed; not on the live site (its bundle does not contain these strings); not checked in a browser.
 
 ### 2026-11-13 — Landing hero: a new background video, on trial (the owner decides whether to keep it)
 *Status: committed in `1a8bb40` and pushed 2026-11-13: the owner tested it locally and then asked for it to be pushed (so it stays). The loose end of round 1 (low contrast of the paragraph, email field and pills over the bright video) is still open.*
