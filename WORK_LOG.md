@@ -46,11 +46,29 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-24 — Admin Inbox: contact messages and early-access e-mails; the landing page's early-access box sends to the server
+*Status: committed and pushed. `npx tsc -p tsconfig.app.json --noEmit` and `npx oxlint src` pass, `npm run build` passes on a copy. Not checked in a browser. The backend side is PR #165 (`/api/contact/admin/*`, `/api/contact/early-access/`), checked against the running server.*
+
+- **`src/pages/admin/ContactInbox.tsx`** (route `/admin/inbox`, sidebar "Inbox"): two tabs, "Contact messages" (list on the left, the full text on the right: name, e-mail, company, reason, message, delivery state, a Reply link, mark read/unread) and "Early-access e-mails". Search, "Unread only", "Mark all read". A link from the bell (`?kind=contact&id=7`) opens that message and marks it read.
+- **`src/lib/api/adminInbox.ts`**: the API calls. **`src/lib/useInboxUnread.ts`**: the unread count for the sidebar badge (every minute, and when the page or a notification changes it).
+- **`src/lib/api/notifications.ts`**: `resolveNotificationPath` now ignores a query when it checks a link against the known pages, and `/admin/inbox` is a known page.
+- **`src/components/public/HeroSection.tsx`**: with `VITE_USE_API=true` the early-access address is sent to `POST /api/contact/early-access/` (an error is shown under the box); the demo build still only plays the animation.
+
 ### 2026-11-23 (later) — Person-folder covers show the enhanced picture; the report no longer says "not available on this server" when the safety checks refused a restoration
 *Status: committed and pushed. `npx tsc -p tsconfig.app.json --noEmit` and `npx oxlint src` pass. Not checked in a browser.*
 
 - **`src/components/features/IdentityGroupCard.tsx`, `src/pages/user/GroupDetailLive.tsx`:** the folder mosaic and the folder page's cover use `getPhotoPicture` (the enhanced picture when there is one), with a new cache key.
 - **`src/components/features/EnhancementReport.tsx`:** `hd_unavailable_reason` is one field for two different things. "...not available on this server" (a model could not run) keeps its old sentence; "...not completed" (the adaptive engine ran the model and its result failed the safety checks, e.g. a face restoration that would have changed the face) now says "<stage> could not be applied safely" and why. Before, it told a person whose photo had just been through Real-ESRGAN and NAFNet that HD restoration was unavailable on the server.
+
+### 2026-11-23 — The name of the outside AI service is hidden everywhere: Pro's report says "FaceCloud AI"
+*Status: uncommitted. Checked: `npm run build` and `oxlint` pass; a script ran the scrub over sample answers (the sentence, the engine id, an "API key" message, `DEEPIMAGE_API_KEY`) and every result was still valid JSON. Not checked in a browser against a real Pro result.*
+
+- **Why:** the owner's screenshot of a Pro result's "What was done" showed "Deep Image Auto Enhance Normal, a cloud AI model", "cloud enhance" and "deep_image_auto_enhance (auto_enhance)". The service's name (and any key's name) must not appear on any screen.
+- **`src/lib/brandText.ts` (new):** `scrubVendor(text)` turns the service's name (any spelling: spaces, underscores, hyphens, with or without "Auto Enhance Normal", "API", "API key") into "FaceCloud AI", and drops the trailing ", a cloud AI model". Only letters are matched, so JSON stays valid.
+- **`src/lib/api/client.ts`:** `load()` passes every API answer's text through `scrubVendor` before parsing, so the summary sentence, the stage list, the processing summary, the details, failure reasons and error messages are all covered on every screen (photo page, batch results, processing page, compare, admin lists) without touching each one.
+- **`src/lib/stageNames.ts`:** a stage the server calls `cloud_enhance` is shown as "AI enhance" ("Improved the photograph with AI") instead of "cloud enhance". **`src/components/features/EnhancementReport.tsx`:** the engine's variant "(auto_enhance)" is not shown next to "FaceCloud AI".
+- **Result in the screenshot's place:** "Enhanced: improved the photograph with FaceCloud AI." / "AI enhance · Applied · FaceCloud AI" / Processing summary "AI enhance · FaceCloud AI · AI".
+- **Not covered:** files the server itself makes (the downloaded report, e-mails, the admin's raw logs) are written by the backend; if they name the service, that has to be changed there (a prompt for the backend engineer can be written if the owner wants it). Request bodies are not touched.
 
 ### 2026-11-23 — Working-tree changes of the owner's other session, recorded and committed: Places removed, Standard preset and Lighting picker removed, HEIC accepted, photo titles, per-photo rows on the ZIP screen
 *Status: committed `d32f83f` and pushed 2026-11-23. These changes were in the working tree when the owner asked for the commit; Claude did not write them, so this entry records what `git diff` shows. `npm run build` passes on the working tree (checked 2026-11-23); not checked in a browser by Claude.*

@@ -4,6 +4,7 @@ import type { EnhancementResult } from '../../lib/api/enhancements'
 import { ENGINES, STAGES, stageName } from '../../lib/stageNames'
 import { LightingBadge } from './LightingPicker'
 import { ProcessingSummaryBox } from './ProcessingSummaryBox'
+import { BRAND_AI } from '../../lib/brandText'
 import { presetOf } from '../../lib/enhancementPresets'
 
 /** The first sentence of a long technical reason, so a file path does not fill the screen. */
@@ -73,7 +74,7 @@ export function EnhancementReport({ result }: { result: EnhancementResult }) {
               <span className="text-ink-soft">
                 <span className="font-semibold text-ink">{stageName(stage.stage)}</span>
                 {' · '}{(stage.stage ? STAGES[stage.stage]?.done(stage) : undefined) ?? 'Applied'}
-                {stage.engine ? <span className="text-ink-faint"> · {ENGINES[stage.engine] ?? stage.engine}{stage.variant ? ` (${stage.variant})` : ''}</span> : null}
+                {stage.engine ? <span className="text-ink-faint"> · {ENGINES[stage.engine] ?? stage.engine}{stage.variant && stage.engine !== BRAND_AI ? ` (${stage.variant})` : ''}</span> : null}
               </span>
             </li>
           ))}

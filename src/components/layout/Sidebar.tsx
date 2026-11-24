@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, LockKeyhole, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck, Mail
+  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck, Mail, Inbox
 } from 'lucide-react'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
 import { useModeratorOrganization } from '../../lib/moderationData'
@@ -15,6 +15,7 @@ import { cn } from '../../lib/utils'
 import { useUserDashboard, formatBytes } from '../../lib/imageData'
 import { FaceCloudLogo } from '../branding/FaceCloudLogo'
 import { UserMenu } from '../ui/UserMenu'
+import { useInboxUnread } from '../../lib/useInboxUnread'
 
 interface SidebarProps {
   role: 'user' | 'admin' | 'moderator'
@@ -39,6 +40,7 @@ const adminNav = [
   { label: 'Moderators',         icon: UserCog,          to: '/admin/moderators' },
   { label: 'Moderation',         icon: Eye,              to: '/admin/moderation' },
   { label: 'Invitations',        icon: Mail,             to: '/admin/invitations' },
+  { label: 'Inbox',              icon: Inbox,            to: '/admin/inbox' },
   { label: 'Audit Logs',         icon: ClipboardList,    to: '/admin/audit-logs' },
   { label: 'Security Monitoring',icon: ShieldCheck,      to: '/admin/security' },
   { label: 'Privacy Audit',      icon: LockKeyhole,      to: '/admin/privacy' },
@@ -93,6 +95,7 @@ const roleHome = {
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation()
+  const inboxUnread = useInboxUnread(role === 'admin')          // contact messages and early-access addresses nobody has opened
   // A person who owns an organization also gets its management page, between Downloads and Settings.
   const { owned } = useOwnedOrganizations(role === 'user')
   const { team } = useModeratorOrganization(role === 'moderator')
@@ -152,6 +155,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
                 />
               )}
               <item.icon className="w-[19px] h-[19px]" aria-hidden="true" />
+              {item.to === '/admin/inbox' && inboxUnread > 0 && <span className="absolute top-1 right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-accent text-white text-[9px] font-bold flex items-center justify-center" aria-label={`${inboxUnread} unread`}>{inboxUnread > 9 ? '9+' : inboxUnread}</span>}
             </NavLink>
           )
         })}
@@ -221,6 +225,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
                     )}
                   />
                   <span className="flex-1 truncate">{item.label}</span>
+                  {item.to === '/admin/inbox' && inboxUnread > 0 && <span className="min-w-[18px] h-[18px] px-1.5 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0" aria-label={`${inboxUnread} unread`}>{inboxUnread > 99 ? '99+' : inboxUnread}</span>}
                   {active && <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />}
                 </NavLink>
               )

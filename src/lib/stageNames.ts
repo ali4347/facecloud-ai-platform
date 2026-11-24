@@ -7,6 +7,7 @@ export const STAGES: Record<string, { name: string; done: (s: AppliedStage) => s
   polish: { name: 'Polish', done: () => 'Balanced the contrast and sharpened lightly' },
   deblur: { name: 'Blur', done: () => 'Removed blur' },
   face_restore: { name: 'Face', done: () => 'Restored the face' },
+  cloud_enhance: { name: 'AI enhance', done: () => 'Improved the photograph with AI' },
   detail: { name: 'Detail', done: () => 'Brought back fine detail' },
   colourize: { name: 'Colour', done: () => 'Added colour to a black-and-white photo' },
   upscale: {

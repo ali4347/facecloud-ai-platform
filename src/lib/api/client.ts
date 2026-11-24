@@ -1,6 +1,7 @@
 import { API_URL } from './config'
 import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, clearTokens } from './tokens'
 import { currentPortal } from '../portal'
+import { scrubVendor } from '../brandText'
 
 export class ApiError extends Error {
   readonly status: number
@@ -261,7 +262,7 @@ async function load<T>(path: string, options: RequestOptions): Promise<T> {
 
   if (response.status === 204) return undefined as T
 
-  const text = await response.text()
+  const text = scrubVendor(await response.text())
   let parsed: unknown = null
   if (text) {
     try { parsed = JSON.parse(text) } catch { throw pageInsteadOfJson(response.status) }

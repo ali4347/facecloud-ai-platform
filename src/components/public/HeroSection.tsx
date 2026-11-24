@@ -4,6 +4,9 @@ import { ArrowRight, Check, Zap, Shield, Users, Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ScrambleText } from '../animation/ScrambleText'
 import { useAppearance } from '../../lib/theme'
+import { USE_API } from '../../lib/api/config'
+import { submitEarlyAccess } from '../../lib/api/adminInbox'
+import { messageFor } from '../../lib/useApiResource'
 
 const SUBMITTED_TEXT = "You're on the list — we'll be in touch."
 
@@ -17,6 +20,8 @@ const STATS = [
 export function HeroSection() {
   const [email, setEmail]           = useState('')
   const [submitted, setSubmitted]   = useState(false)
+  const [sending, setSending]       = useState(false)
+  const [formError, setFormError]   = useState('')
   const prefersReduced              = useReducedMotion()
   const [appearance]                = useAppearance()
   const light                       = appearance === 'light'
@@ -28,9 +33,17 @@ export function HeroSection() {
     }
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) return
+    if (!email.trim() || sending) return
+    setFormError('')
+    if (USE_API) {
+      // The address is kept on the server and shown to the administrators; the demo build only plays the animation.
+      setSending(true)
+      try { await submitEarlyAccess(email.trim()) }
+      catch (caught) { setFormError(messageFor(caught)); setSending(false); return }
+      setSending(false)
+    }
     setSubmitted(true)
     resetTimeoutRef.current = setTimeout(() => {
       setEmail('')
@@ -143,6 +156,7 @@ export function HeroSection() {
                 <button
                   type="submit"
                   aria-label="Request early access"
+                  disabled={sending}
                   className="flex-shrink-0 w-9 h-9 rounded-full bg-gradient-to-r from-[#F97316] to-[#FB923C] hover:from-[#FB923C] hover:to-[#FFA43A]
                              flex items-center justify-center transition-all cursor-pointer shadow-[0_2px_12px_rgba(249,115,22,0.4)]"
                 >
@@ -164,6 +178,7 @@ export function HeroSection() {
               </motion.div>
             )}
           </AnimatePresence>
+          {formError && <p role="alert" className="mt-2 text-xs text-[#F87171] text-center max-w-[420px]">{formError}</p>}
 
           {/* Demo link */}
           <Link

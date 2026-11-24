@@ -61,13 +61,14 @@ export function updateNotificationPreferences(patch: Partial<NotificationPrefere
 const ROUTE_ALIASES: Record<string, string> = { '/dashboard/uploads': '/dashboard/jobs' }
 const KNOWN_PREFIXES = [
   '/dashboard/images', '/dashboard/groups', '/dashboard/downloads', '/dashboard/jobs', '/dashboard/processing',
-  '/dashboard/notifications', '/dashboard/activity', '/dashboard/settings', '/dashboard/upload',
+  '/dashboard/notifications', '/dashboard/activity', '/dashboard/settings', '/dashboard/upload', '/admin/inbox',
 ]
 
 export function resolveNotificationPath(path: string): string | null {
   if (!path) return null
   const aliased = ROUTE_ALIASES[path] ?? path
-  return KNOWN_PREFIXES.some(prefix => aliased === prefix || aliased.startsWith(prefix + '/')) ? aliased : null
+  const bare = aliased.split('?')[0]          // a link may carry a query (/admin/inbox?kind=contact&id=7)
+  return KNOWN_PREFIXES.some(prefix => bare === prefix || bare.startsWith(prefix + '/')) ? aliased : null
 }
 
 /** Tell the bell that something changed the unread count (the page and the bell are separate components). */
