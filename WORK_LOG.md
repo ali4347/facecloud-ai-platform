@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-11-23
+**Last updated:** 2026-11-25
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -59,6 +59,28 @@ Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncomm
 
 - **`src/components/features/IdentityGroupCard.tsx`, `src/pages/user/GroupDetailLive.tsx`:** the folder mosaic and the folder page's cover use `getPhotoPicture` (the enhanced picture when there is one), with a new cache key.
 - **`src/components/features/EnhancementReport.tsx`:** `hd_unavailable_reason` is one field for two different things. "...not available on this server" (a model could not run) keeps its old sentence; "...not completed" (the adaptive engine ran the model and its result failed the safety checks, e.g. a face restoration that would have changed the face) now says "<stage> could not be applied safely" and why. Before, it told a person whose photo had just been through Real-ESRGAN and NAFNet that HD restoration was unavailable on the server.
+
+### 2026-11-25 — The `qa/` folder is taken off GitHub (kept on the owner's machine)
+*Status: committed and pushed 2026-11-25 (hash in the commit message "chore: remove the qa folder from the repository"). The owner asked "github ma sy qa wala folder nikal do".*
+
+- **What was done:** `git rm -r --cached qa` removed its 44 tracked files from the repository; the files on disk (83 MB with the screenshots) were **not** deleted. `.gitignore` now ignores `qa/` as a whole (it ignored only `qa/out/*` before) so it cannot be added again by accident. `README.md` (Testing line) says so.
+- **What this does not do:** the files are still in the **earlier commits' history** on GitHub (anyone with the repository can open an old commit); removing them from history needs a history rewrite and a force-push, which was not done and was not asked for. The backend prompts and the gaps register that lived there (`PROMPT_FOR_BACKEND_*.md`, `BACKEND_GAPS.md`) are therefore no longer shared through this repository.
+- **Not affected:** the app, `dist/`, the live site. `.github/workflows/ci.yml` and `package.json` do not use `qa/`.
+
+### 2026-11-25 — Which version is on the live domain (checked, nothing deployed)
+*Status: uncommitted (documentation only). Read-only check with `curl` of public pages and a throwaway build in the session's scratchpad; the project folder, `dist/` and the live site were not touched.*
+
+- **Finding:** `https://facecloudai.com` (and `www.`) serves bundle `assets/index-CRIwtYwx.js` + `index-C1IlbFRp.css`, `Last-Modified` Tue 24 Nov 2026 15:58 GMT. Building `git HEAD` (`1c33f73`, "feat(admin): Inbox for contact messages…") in a temp copy with `VITE_USE_API=true VITE_API_URL=https://api.facecloudai.com` gives the **same file names and the same size (2,524,216 bytes)**, so the live site is exactly `1c33f73`, in **live mode**, with the API at `https://api.facecloudai.com` baked in. It is no longer a demo build (earlier entries and the 2026-11-09 state note said it was).
+- **Contains:** the hero video `facecloud-hero-sunset.mp4` (and it answers 200), the enhanced pictures in lists and "Suggested · not sure", the ZIP screen's "Photos in the archive", HEIC, "FaceCloud AI" (the vendor-name scrub), the admin Inbox and early-access box. **The project's local `dist/` (built 2026-11-23 18:28) is older and different (`index-bBxadiYC.js`, built without an API URL); it is not what is live.**
+- **API:** `https://api.facecloudai.com/api/auth/refresh/` answers 405 to a GET (a POST-only Django endpoint), `/api/` and `/api/health/` answer 404 JSON; so a backend is running there. Not checked: whether sign-in, uploads or CORS work from the live page (no account was used).
+- **Still wrong on the live site:** `<link rel="canonical">`, `og:url` and `sitemap.xml` name `https://www.facecloudai.pro/`; that domain answers a Vercel "DEPLOYMENT_NOT_FOUND" page (404), so search engines are pointed at a dead address.
+- **Docs fixed:** `DEFENCE_PREP.md` (said the live site is a demo build), the header state note of §6.
+
+### 2026-11-24 — `DEFENCE_PREP.md`: a Roman Urdu + English study file for the defence (frontend)
+*Status: uncommitted. Documentation only, no code changed. Every statement was taken from the repo (`package.json`, `src/`, `.github/workflows/ci.yml`, `public/.htaccess`, `tsconfig*.json`) while writing; things not verified are marked "[check nahi kiya]" in the file.*
+
+- **New file `DEFENCE_PREP.md` (repo root), for the owner's own revision before the defence on 2026-11-25:** the pitch; every language and format used; each library with what it does, where it is used and how many files (`@radix-ui/*` and `class-variance-authority` are installed but imported nowhere, and the file says so); folder structure; how routing, the three portals, the JWT flow (memory access token, rotating refresh token, single refresh in flight), the request de-duplication, demo vs live mode, `useApiResource`, polling, `AuthedImage`, the upload flow and the ZIP reader, the enhancement report, the live camera (MediaPipe), consent, the theme and the dialogs work and where the code is; React, TypeScript and browser-API tables; security, performance, testing/CI and deployment answers; the frontend's honest weaknesses; 30 rapid-fire questions; a checklist.
+- **Facts found while writing, worth knowing:** no `React.lazy` / code splitting (one ~3.2 MB bundle); no `createContext`; no unit-test framework (the QA scripts and CI are the tests); `"strict"` is not written in `tsconfig*.json`; `ProtectedRoute` only reads the stored session, so the real access control is the backend's; `README_BACKEND_ROADMAP.md` describes a Node/Prisma backend while the errors the frontend handles are Django REST Framework's (the file says to confirm with the backend engineer).
 
 ### 2026-11-23 — The name of the outside AI service is hidden everywhere: Pro's report says "FaceCloud AI"
 *Status: uncommitted. Checked: `npm run build` and `oxlint` pass; a script ran the scrub over sample answers (the sentence, the engine id, an "API key" message, `DEEPIMAGE_API_KEY`) and every result was still valid JSON. Not checked in a browser against a real Pro result.*
@@ -2635,7 +2657,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 
 ## 6. Pending Work (audit of 2026-10-18)
 
-**State:** the frontend is committed and pushed: origin/main is at the docs commit of 2026-11-09 (`791849f`) plus the small log correction after it. The live site (www.facecloudai.com) is still the demo build and is untouched.
+**State:** the frontend is committed and pushed: origin/main is at the docs commit of 2026-11-09 (`791849f`) plus the small log correction after it. The live site (facecloudai.com) was a demo build until at least 2026-11-09; on 2026-11-25 it was found to be a live-mode build of `1c33f73` (see the 2026-11-25 entry).
 
 **Frontend screens still on demo data (no backend call):**
 - Admin: all connected (2026-10-18); Statistics is routed (2026-10-19); the Privacy Audit (`/admin/privacy`) was added on 2026-11-05. Moderation Overview, Invitations and the failed uploads / failed jobs cards on System Monitoring are connected (2026-10-19). Only the single security-alert detail endpoint is still unused. `Rejections.tsx` and `SystemHealth.tsx` are deliberately not routed (duplicates).

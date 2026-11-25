@@ -31,6 +31,5 @@ dist-ssr
 # Backend node_modules
 backend/node_modules/
 
-# QA run output (screenshots and results of the last run)
-qa/out/*
-!qa/out/.gitkeep
+# The QA folder (scripts, reports, prompts for the backend engineer) stays on the owner's machine only; it was removed from GitHub on 2026-11-25
+qa/
