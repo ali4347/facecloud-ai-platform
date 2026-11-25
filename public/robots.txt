@@ -7,4 +7,4 @@ Disallow: /admin/
 Disallow: /moderator
 Disallow: /moderator/
 
-Sitemap: https://www.facecloudai.pro/sitemap.xml
+Sitemap: https://www.facecloudai.com/sitemap.xml
