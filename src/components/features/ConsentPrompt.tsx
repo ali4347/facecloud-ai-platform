@@ -13,9 +13,11 @@ import { useFaceConsent } from '../../lib/consent'
  * answer: photos are still enhanced and checked, only Person Folders stay off. If the
  * privacy policy changed after they agreed, the wording asks them to confirm again.
  */
-export function ConsentCard({ selectedCount = 0, onAllowed, onNotNow }: {
+export function ConsentCard({ selectedCount = 0, forPro = false, onAllowed, onNotNow }: {
   /** How many photos are selected, when the question comes from a selection; 0 otherwise. */
   selectedCount?: number
+  /** True when the question comes from choosing Pro: the same permission, asked in the words of that choice. */
+  forPro?: boolean
   /** Called after the yes has been saved. */
   onAllowed: () => void
   onNotNow: () => void
@@ -35,11 +37,14 @@ export function ConsentCard({ selectedCount = 0, onAllowed, onNotNow }: {
           <h2 id="consent-title" className="text-[15px] font-bold text-ink">
             {consent.needsReconfirm
               ? 'Please confirm face grouping again'
+              : forPro ? 'Allow the face check to use Pro?'
               : selectedCount > 0 ? 'Group these photos by person?' : 'Group your photos by person?'}
           </h2>
           <p className="text-[13px] text-ink-mute leading-relaxed">
             {consent.needsReconfirm
               ? 'Our privacy policy has changed since you agreed. To group photos by person we need you to confirm again.'
+              : forPro
+              ? 'Pro may send your photo to a cloud AI service, then checks on our server that every face still looks like the person in your photo. For that check FaceCloud needs your permission to analyse the faces in the photos you upload.'
               : `${selectedCount > 0 ? `You selected ${selectedCount} photo${selectedCount === 1 ? '' : 's'}. ` : ''}To put photos of the same person into a Person Folder, FaceCloud needs your permission to analyse the faces in the photos you upload.`}
           </p>
         </div>
@@ -49,7 +54,9 @@ export function ConsentCard({ selectedCount = 0, onAllowed, onNotNow }: {
         {[
           'Only photos you upload are analysed.',
           'You can turn this off at any time in Settings → Camera & Privacy, and ask for your face data to be deleted.',
-          'If you say not now, your photos are still enhanced and checked. Only Person Folders stay off.',
+          forPro
+            ? 'If you say not now, Pro is not used: your photo gets the standard Auto enhancement instead.'
+            : 'If you say not now, your photos are still enhanced and checked. Only Person Folders stay off.',
         ].map(line => (
           <li key={line} className="flex gap-2.5">
             <ShieldCheck className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
@@ -80,6 +87,20 @@ export function ConsentCard({ selectedCount = 0, onAllowed, onNotNow }: {
         <p className="text-[10px] text-ink-faint">Privacy policy version {consent.policyVersion}</p>
       )}
     </section>
+  )
+}
+
+/**
+ * Shown where Pro is chosen, and only while the person has not given the face permission Pro needs. Without it the server cannot use Pro and quietly
+ * gives the photo the standard enhancement, so the question is asked here, before the upload. "Not now" lets the caller step back to a choice that needs no permission.
+ */
+export function ProConsentNotice({ onNotNow }: { onNotNow: () => void }) {
+  const consent = useFaceConsent()
+  if (!consent.needsConsent) return null
+  return (
+    <div className="mt-3">
+      <ConsentCard forPro onAllowed={() => undefined} onNotNow={onNotNow} />
+    </div>
   )
 }
 

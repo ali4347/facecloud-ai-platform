@@ -1,4 +1,5 @@
 import { PRESETS, type PresetKey } from '../../lib/enhancementPresets'
+import { ProConsentNotice } from './ConsentPrompt'
 
 const HINTS: Record<PresetKey, string> = {
   auto: 'FaceCloud chooses how strongly to correct each photo.',
@@ -32,6 +33,7 @@ export function PresetPicker({ id, value, onChange, disabled = false }: { id: st
         })}
       </div>
       <p id={`${id}-hint`} className="text-[11px] text-ink-faint mt-1.5">{HINTS[value]}</p>
+      {value === 'pro' && <ProConsentNotice onNotNow={() => onChange('auto')} />}
     </div>
   )
 }
