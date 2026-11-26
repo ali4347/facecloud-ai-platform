@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-27 — Google Search Console verification tag; the moderator page in the sitemap
+*Status: committed and pushed to `origin main` (hash in `git log`: "feat(seo): Google Search Console verification tag ..."). `npm run build` passes and `dist/index.html` carries the tag; `xmllint --noout public/sitemap.xml` passes.*
+
+- **Asked by the owner:** add `<meta name="google-site-verification" content="SgloG-qFaSO9HOIfB6ZFwBq-iP_tSBE9FvPC-cUxawA" />` to the page head for Search Console and easier crawling.
+- **`index.html`:** the tag sits in the head under the canonical link. It is a public ownership token, not a secret.
+- **`public/sitemap.xml`:** `https://www.facecloudai.com/roles/moderator` added. It is the one public page that was missing; `robots.txt` already allows it, because `Disallow: /moderator` does not cover `/roles/moderator`.
+- **Still to do by the owner:** deploy the build, then press Verify in Search Console and submit `https://www.facecloudai.com/sitemap.xml` there.
+
 ### 2026-11-27 — Committed and pushed: the 2026-11-27 work
 *Status: **committed `e710753`** (the work) plus this entry's own commit, both pushed to `origin main`.*
 
