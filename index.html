@@ -11,8 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <!-- Primary SEO -->
-    <title>FaceCloud — AI-Powered Facial Image Enhancement Platform</title>
-    <meta name="description" content="FaceCloud uses AI to enhance low-light facial images, validate quality, and automatically group photos by identity — with secure, role-based access for teams." />
+    <title>FaceCloud — AI Facial Image Enhancement &amp; Identity Grouping</title>
+    <meta name="description" content="Enhance low-light facial images with AI, check face quality automatically and group photos by identity, with secure role-based access for teams." />
     <meta name="keywords" content="FaceCloud, AI image enhancement, facial recognition, Zero-DCE, face validation, identity grouping, facial image platform" />
     <link rel="canonical" href="https://www.facecloudai.com/" />
 
@@ -20,17 +20,18 @@
     <meta name="google-site-verification" content="SgloG-qFaSO9HOIfB6ZFwBq-iP_tSBE9FvPC-cUxawA" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="FaceCloud — AI-Powered Facial Image Enhancement Platform" />
-    <meta property="og:description" content="FaceCloud uses AI to enhance low-light facial images, validate quality, and automatically group photos by identity — with secure, role-based access for teams." />
+    <meta property="og:title" content="FaceCloud — AI Facial Image Enhancement &amp; Identity Grouping" />
+    <meta property="og:description" content="Enhance low-light facial images with AI, check face quality automatically and group photos by identity, with secure role-based access for teams." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.facecloudai.com/" />
-    <meta property="og:image" content="/branding/facecloud-social-preview.png" />
+    <meta property="og:image" content="https://www.facecloudai.com/branding/facecloud-social-preview.png" />
+    <meta property="og:site_name" content="FaceCloud" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FaceCloud — AI-Powered Facial Image Enhancement Platform" />
-    <meta name="twitter:description" content="FaceCloud uses AI to enhance low-light facial images, validate quality, and automatically group photos by identity." />
-    <meta name="twitter:image" content="/branding/facecloud-social-preview.png" />
+    <meta name="twitter:title" content="FaceCloud — AI Facial Image Enhancement &amp; Identity Grouping" />
+    <meta name="twitter:description" content="Enhance low-light facial images with AI, check face quality automatically and group photos by identity, with secure role-based access for teams." />
+    <meta name="twitter:image" content="https://www.facecloudai.com/branding/facecloud-social-preview.png" />
 
     <meta name="theme-color" content="#050816" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,11 +45,22 @@
       "name": "FaceCloud",
       "url": "https://www.facecloudai.com",
       "description": "AI-powered facial image enhancement, validation, and identity organization platform.",
+      "logo": "https://www.facecloudai.com/branding/facecloud-favicon-512.png",
       "sameAs": []
     }
     </script>
 
-    <!-- FAQPage Schema -->
+    <!-- WebSite Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "FaceCloud",
+      "url": "https://www.facecloudai.com/"
+    }
+    </script>
+
+    <!-- FAQPage Schema: keep in step with FAQ_ITEMS in src/pages/Landing.tsx (structured data must match the visible answers) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -91,7 +103,7 @@
           "name": "Is there an API for integrations?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Pro plan subscribers get access to the FaceCloud REST API. Full Swagger documentation and testing playgrounds are available at the /docs endpoint."
+            "text": "API access for integrations is planned together with paid plans, in a later version. Interactive API documentation is generated from the backend."
           }
         },
         {
@@ -99,7 +111,7 @@
           "name": "What are the plan limits?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "The Free plan allows 50 images/month with 500 MB storage. Basic supports 2,000 images with 10 GB. Pro offers unlimited uploads with 100 GB storage and priority processing."
+            "text": "Plans, pricing and limits are coming in a later version, so the figures on the pricing cards are not final and are not enforced yet."
           }
         }
       ]

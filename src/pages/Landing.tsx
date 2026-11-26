@@ -11,6 +11,7 @@ import { BeforeAfterSlider } from '../components/features/BeforeAfterSlider'
 import { BackgroundVideo } from '../components/public/BackgroundVideo'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
+import { ExploreLinks } from '../components/public/ExploreLinks'
 import { HeroSection } from '../components/public/HeroSection'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChildren'
@@ -1182,6 +1183,7 @@ export default function Landing() {
 
         {/* ── 13. Footer ────────────────────────────────────────── */}
         {/* ── 13. Footer ────────────────────────────────────────── */}
+        <ExploreLinks current="/" />
         <PublicFooter />
 
       </div>

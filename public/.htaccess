@@ -20,7 +20,16 @@
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # 2. Everything else is a client-side route, so hand it the app shell —
+  # 2. Public marketing pages (/, /about, /contact, /roles/moderator, /login,
+  #    /register) have a pre-built copy in /_seo/ with that page's own title,
+  #    description, canonical and social tags, written at build time by the
+  #    seoPages plugin in vite.config.ts from src/lib/seoPages.ts. Serving it
+  #    means crawlers and link previews that do not run JavaScript see the right
+  #    tags. "/" needs no rule: index.html already is the home page's copy.
+  RewriteCond %{DOCUMENT_ROOT}/_seo/$1.html -f
+  RewriteRule ^(.+?)/?$ /_seo/$1.html [L]
+
+  # 3. Everything else is a client-side route, so hand it the app shell —
   #    except requests that look like a static file. Those are left alone and
   #    404 naturally: a missing bundle should report as missing, not come back
   #    as HTML, which the browser then reports as a MIME type error.
@@ -30,9 +39,9 @@
 </IfModule>
 
 <IfModule mod_headers.c>
-  # index.html names the hashed bundles, so a cached copy can point at files
+  # index.html and the /_seo/ pages name the hashed bundles, so a cached copy can point at files
   # that no longer exist after a deploy.
-  <FilesMatch "index\.html$">
+  <FilesMatch "\.html$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
   </FilesMatch>
 

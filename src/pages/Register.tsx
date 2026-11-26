@@ -6,10 +6,8 @@ import { register, registerFromInvitation, savePendingRegistration } from '../li
 import { previewInvitation, type InvitationPreview } from '../lib/api/organizations'
 import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function Register() {
-  useDocumentTitle('Create an account')
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')

@@ -37,6 +37,7 @@ export function PublicFooter() {
           <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Company</h4>
           <ul className="space-y-2 font-medium">
             <li><Link to="/about" className="hover:text-[#F97316] transition-colors">About Us</Link></li>
+            <li><Link to="/roles/moderator" className="hover:text-[#F97316] transition-colors">Moderator Role &amp; Plans</Link></li>
             <li><Link to="/contact" className="hover:text-[#F97316] transition-colors">Contact</Link></li>
           </ul>
         </div>
@@ -47,6 +48,7 @@ export function PublicFooter() {
             <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Portals</h4>
             <ul className="space-y-2 font-medium">
               <li><Link to="/login" className="hover:text-[#F97316] transition-colors">Login</Link></li>
+              <li><Link to="/register" className="hover:text-[#F97316] transition-colors">Create Account</Link></li>
             </ul>
           </div>
           <div className="space-y-1 pt-1">

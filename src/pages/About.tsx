@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom'
 import { Shield, Users, Activity, ExternalLink, MapPin } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
+import { ExploreLinks } from '../components/public/ExploreLinks'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 interface Person {
   name: string
@@ -101,7 +101,6 @@ function PersonCard({ person, large }: { person: Person; large: boolean }) {
 }
 
 export default function About() {
-  useDocumentTitle('About')
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])
@@ -317,6 +316,7 @@ export default function About() {
       </div>
 
       {/* Footer */}
+      <ExploreLinks current="/about" />
       <PublicFooter />
     </div>
   )

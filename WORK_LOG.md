@@ -46,6 +46,36 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-27 — SEO for every public page: titles, descriptions, canonicals, pre-built HTML, internal links
+*Status: committed and pushed to `origin main` (commit "feat(seo): per-page titles, descriptions and canonicals ..."). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the touched files and `npm run build` pass. The built `dist/` was served by the Mac's own Apache 2.4 with the real `.htaccess` on port 8789 (stopped afterwards). Results:*
+- *`curl`: `/`, `/about`, `/about/`, `/contact`, `/roles/moderator`, `/login` and `/register` each returned their own `<title>`; `/dashboard`, `/forgot-password`, `/roles` and unknown paths got the app shell; `/assets/missing.js` still returned 404.*
+- *Headless Chrome: every public page has exactly one canonical, `index, follow`, its own description and og:url, and the three JSON-LD blocks. After clicking a link and going Back, the tags followed the route. `/forgot-password` showed `noindex, nofollow` with no canonical, and an unknown path `noindex, follow`. No console errors. Screenshots of the Explore block at 1440 x 900 and 390 x 844 showed no sideways scroll.*
+
+- **Asked by the owner:** "hr page ki internal linking kr do or hr page ka seo perspective k acording meta title discription or canononicals add kr do" (internal linking on every page, plus an SEO title, description and canonical per page).
+- **`src/lib/seoPages.ts` (new):** the one list. For each of `/`, `/about`, `/contact`, `/roles/moderator`, `/login` and `/register` it holds the title (under 60 characters), the description (127 to 153 characters, written from what each page says) and a short name. It also has the `noindex` route prefixes, the canonical URL helper (`https://www.facecloudai.com` plus the path) and the BreadcrumbList JSON-LD.
+- **`src/components/seo/RouteSeo.tsx` (new, mounted in `App.tsx` before `<Routes>`):**
+  - On every route change it sets the title, description, `robots`, canonical, og:title/description/url, twitter:title/description and the breadcrumb for public pages.
+  - Portals and e-mail-link pages get `noindex, nofollow` and lose the canonical; unknown paths get `noindex, follow`.
+  - Private pages that name their tab with `useDocumentTitle` still win the title.
+- **`useDocumentTitle` removed** from `About`, `Contact`, `ModeratorRole`, `Login` and `Register`: their titles come from the list now.
+- **`vite.config.ts`:** the `seoPages` build plugin writes `dist/_seo/<path>.html` for every public page except home, which goes into `dist/index.html`.
+  - Each copy carries that page's tags plus the breadcrumb, and drops the FAQ structured data, which belongs to the home page only.
+  - A tag that cannot be found exactly once fails the build, so the SEO cannot go stale silently.
+- **`public/.htaccess`:** a new rule serves `/_seo/<path>.html` when it exists, before the app-shell fallback (`RewriteCond %{DOCUMENT_ROOT}/_seo/$1.html -f`). The no-cache header now covers every `.html` file, not only `index.html`.
+- **`public/robots.txt`:** `Disallow: /_seo/`, so the copies are never indexed under their file URLs.
+- **`public/sitemap.xml`:** `<lastmod>` on every URL.
+- **`index.html`:**
+  - Home title and description now come from the list.
+  - og:image and twitter:image are absolute URLs; `og:site_name` was added.
+  - Organization `logo` and a WebSite schema block were added.
+  - The FAQ structured data had two answers that no longer matched the page (an API at /docs; the old 50/2,000/unlimited plan limits). They now say what the visible FAQ says.
+- **Internal links:**
+  - **`src/components/public/ExploreLinks.tsx` (new):** an "Explore FaceCloud" block of four cards with descriptive link text. It sits above the footer on Home, About, Contact and the Moderator page, and leaves out the page it is on.
+  - **Footer:** now also links "Moderator Role & Plans" and "Create Account".
+  - Login and Register already link to home and to each other.
+- **`README.md`:** an "SEO per page" part in §16 Deployment (including: upload `dist/_seo/`), and the footer line.
+- **To do by the owner:** deploy the new build, including `_seo/` and the updated `.htaccess`. Then submit the sitemap in Search Console.
+
 ### 2026-11-27 — Google Search Console verification tag; the moderator page in the sitemap
 *Status: committed and pushed to `origin main` (hash in `git log`: "feat(seo): Google Search Console verification tag ..."). `npm run build` passes and `dist/index.html` carries the tag; `xmllint --noout public/sitemap.xml` passes.*
 

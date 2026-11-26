@@ -83,7 +83,7 @@ FaceCloud uses a **Cinematic Dark Liquid-Glass UI** aesthetic:
 17. **13 / FAQ** — Accordion with Framer Motion layout height animation.
 18. **14 / API / Integrations Teaser** — Terminal-style code block showing example REST request.
 19. **Final CTA** — Call to action with orange gradient orb background.
-20. **Footer** — Logo, Product links (Features, Methodology, Pricing, Security, FAQ), Portals, Compliance.
+20. **Footer** — Logo, Product links (Features, Methodology, Pricing, Security, FAQ), Company (About Us, Moderator Role & Plans, Contact), Portals (Login, Create Account), Compliance. Above it on every public page: **Explore FaceCloud**, four link cards to the other public pages.
 
 ### Public Marketing Pages
 * **About Page (`/about`)**: Full-width marketing overview highlighting the product genesis and core mission:
@@ -455,6 +455,19 @@ deployed backend.
 * **SPA Routing Configuration**: React Router owns every path, so the server must return `index.html` for any route
   that is not a real file. Two config files cover this, and both are built from `public/`:
   * `public/.htaccess` — the one that matters for the live site. It ships inside `dist/` on every build.
+* **SEO per page**: every public page has its own title, meta description, canonical, Open Graph / Twitter tags and
+  breadcrumb data, all kept in one list, `src/lib/seoPages.ts`:
+  * In the browser, `src/components/seo/RouteSeo.tsx` (mounted in `App.tsx`) rewrites the head on every route change,
+    and marks the portals, the e-mail-link pages and unknown paths `noindex` with no canonical.
+  * At build time, the `seoPages` plugin in `vite.config.ts` writes a ready-made copy of each public page into
+    `dist/_seo/` (`about.html`, `contact.html`, `roles/moderator.html`, `login.html`, `register.html`; the home
+    page's values go into `dist/index.html`). `.htaccess` serves that copy for its route, so crawlers and link
+    previews that do not run JavaScript see the right tags too. **Upload `dist/_seo/` with the rest.**
+  * Adding a public page means one entry in `seoPages.ts` and a `<url>` in `public/sitemap.xml`.
+  * Internal links: every public page ends with an "Explore FaceCloud" block (`src/components/public/ExploreLinks.tsx`)
+    linking to the other public pages, and the footer links every public page.
+  * `index.html` carries the Google Search Console verification tag; the FAQ structured data in it must match
+    `FAQ_ITEMS` in `Landing.tsx`.
 
 > [!WARNING]
 > **Build the hosting copy as the demo, not with your local settings.** `.env.local` (which points at `http://127.0.0.1:8000` and turns the API on)

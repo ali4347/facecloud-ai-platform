@@ -83,11 +83,13 @@ import ReportsExports from './pages/moderator/ReportsExports'
 import NotFound from './pages/NotFound'
 
 import { ScrollToTop } from './components/layout/ScrollToTop'
+import { RouteSeo } from './components/seo/RouteSeo'
 
 export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <RouteSeo />
       <Routes>
         {/* Public Marketing & Auth */}
         <Route path="/" element={<Landing />} />

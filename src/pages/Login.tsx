@@ -7,10 +7,8 @@ import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 import { saveSession, type Session } from '../lib/session'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 export default function Login() {
-  useDocumentTitle('Sign in')
   const navigate = useNavigate()
   const location = useLocation()
   /* The form starts empty in both modes: the demo must not hand its credentials to whoever opens the page. */

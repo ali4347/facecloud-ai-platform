@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react'
 import { Mail, ShieldCheck, HelpCircle, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
+import { ExploreLinks } from '../components/public/ExploreLinks'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
 import { USE_API } from '../lib/api/config'
 import { apiFetch, ApiError } from '../lib/api/client'
-import { useDocumentTitle } from '../lib/useDocumentTitle'
 
 interface FormFields {
   name: string
@@ -24,7 +24,6 @@ interface FormErrors {
 }
 
 export default function Contact() {
-  useDocumentTitle('Contact')
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
   }, [])
@@ -436,6 +435,7 @@ export default function Contact() {
       </div>
 
       {/* Footer */}
+      <ExploreLinks current="/contact" />
       <PublicFooter />
     </div>
   )

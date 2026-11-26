@@ -6,5 +6,6 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /moderator
 Disallow: /moderator/
+Disallow: /_seo/
 
 Sitemap: https://www.facecloudai.com/sitemap.xml
