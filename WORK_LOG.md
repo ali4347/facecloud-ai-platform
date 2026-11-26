@@ -46,6 +46,14 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-27 — Committed and pushed: the 2026-11-27 work
+*Status: **committed `e710753`** (the work) plus this entry's own commit, both pushed to `origin main`.*
+
+- **Asked by the owner:** "commit all changing and push on github". This also gives the go-ahead for the seven real-people photos in `public/team/`.
+- **Commit `e710753`** holds every change of the 2026-11-27 entries below: admin Image Monitoring without photos or Accept/Reject, moderator Suspend/Activate, the sidebar rail fit, footer and landing copy, landing pricing, the moderator plans and background, the About page owners and teams with `public/team/*.jpg`, plus `DEFENCE_PREP.md` (until now untracked), `README.md` and this file.
+- **Checks before the commit:** `npx tsc -p tsconfig.app.json --noEmit` and `npm run build` pass; `npx oxlint src` shows two old warnings in files not touched (`ProtectedRoute.tsx`, `FloatingNav.tsx`). `.env`, `dist/` and `node_modules/` are ignored; `DEFENCE_PREP.md` was searched for keys and passwords, and none were found.
+- **Still open:** the server still lets the admin fetch a user's photo (§7); the backend prompt for Ijaz has not been sent.
+
 ### 2026-11-27 (latest) — About page: Athar Ammar added to the Marketing Team
 *Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npm run build` passes. Screenshots in a headless Chrome at 1440 x 1750 and 390 x 844: all seven pictures load, no page errors, no sideways scroll on the phone.*
 
