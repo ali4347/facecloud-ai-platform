@@ -8,7 +8,7 @@
 > **Section 2 (Change Log)** and refresh any affected status section, in the same sitting as the work.
 > (Enforced for Claude Code by `CLAUDE.md` and the Stop hook in `.claude/hooks/check-work-log.sh`.)
 
-**Last updated:** 2026-11-25
+**Last updated:** 2026-11-27
 **Repository:** `git@github.com:ali4347/facecloud-ai-platform.git` (branch `main`)
 **Live site:** https://facecloudai.com (Hostinger, manual upload of `dist/`)
 
@@ -45,6 +45,109 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 ## 2. Change Log (newest first — add new entries at the top of this list)
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
+
+### 2026-11-27 (latest) — About page: Athar Ammar added to the Marketing Team
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npm run build` passes. Screenshots in a headless Chrome at 1440 x 1750 and 390 x 844: all seven pictures load, no page errors, no sideways scroll on the phone.*
+
+- **Asked by the owner** (LinkedIn PDF and a picture screenshot): add Athar Ammar to the Marketing Team as the second card.
+- **`src/pages/About.tsx`:** a new Marketing Team entry between Kamal Ahmad and Ali Awan: Athar Ammar, "Business Development Manager" (his current role at Datamart on the profile), "New clients, outreach and digital growth" (Claude's wording), "Los Angeles, United States" (the profile says Los Angeles Metropolitan Area), LinkedIn `atharammar`. The Marketing Team now has three cards, so it uses the same 3-column grid as the Development Team.
+- **`public/team/athar-ammar.jpg`** (new, untracked): cropped from the screenshot, put on the orange gradient with the same Vision cut-out tool as the others, 400 x 400 JPEG. A real person's photo: goes to GitHub only with the owner's OK.
+- **`README.md`:** the About line lists him.
+
+### 2026-11-27 (later still) — About page: a Development Team and a Marketing Team under the owners
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the file and `npm run build` pass. Screenshots in a headless Chrome at 1440 x 1750 and 390 x 844 (dark): all six pictures load, no page errors, no sideways scroll on the phone.*
+
+- **Asked by the owner** (LinkedIn PDFs and picture screenshots of five people): under Ownership add two teams. Development: Ali Hassan (frontend and UI/UX), Ijaz (backend), Vaneeza (computer vision, "add a designation related to it"). Marketing: Kamal (marketing head), Ali Awan (sales head).
+- **`src/pages/About.tsx`:** a `Person` type, a `TEAMS` list and one `PersonCard` component that now draws the owners' cards too (large) and the team cards (compact, 80 px picture). **Development Team** (3 columns on a wide screen): Ali Hassan, "Frontend & UI/UX Lead", "Web app, design system and user experience"; Ijaz Ahmad, "Backend Engineer", "APIs, database and the processing pipeline"; Vaneeza Sohaib, "Computer Vision Engineer", "Face detection, quality checks and enhancement models". **Marketing Team** (2 columns): Kamal Ahmad, "Head of Marketing", "Brand, search and growth"; Ali Awan, "Head of Sales", "Partnerships and customer accounts". All "Lahore, Pakistan", each with a LinkedIn link (`alihassankhandev`, `ijaz-ahmad-0a5004285`, `vaneeza-sohaib-836a18372`, `kamal-ahmad-rana`, `aliawan512`). The role names and the one-line descriptions are Claude's wording for what the owner said; the places are from the profiles.
+- **Vaneeza Sohaib** has no picture on her profile (a letter avatar), so her card shows "VS" on the same orange gradient instead of a photo.
+- **`public/team/ali-hassan.jpg`, `ijaz-ahmad.jpg`, `kamal-ahmad.jpg`, `ali-awan.jpg` (new, 400 x 400 JPEG, 34 to 41 KB):** cut from the owner's screenshots and set on orange with the same person-segmentation tool as the owners' pictures. Ijaz's and Kamal's pictures carry LinkedIn's #OPENTOWORK frame; the square is cut inside the frame and what is left of the frame outside the person turns orange.
+- **Real people's pictures:** six now in `public/team/`; local until the owner says to commit and push.
+- **Docs:** `README.md` (About page).
+
+### 2026-11-27 (later) — About page: "Ownership", the owners' pictures on orange, the three placeholder team cards removed
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the file and `npm run build` pass. Screenshots in a headless Chrome at 1440 x 900 and 390 x 844 (dark): both pictures load, no page errors, no sideways scroll on the phone.*
+
+- **Asked by the owner** (a screenshot of the team section in the light appearance): make the background of the owners' pictures orange, FaceCloud's main colour; remove the three team members below; change "Meet the Team" to "Ownership".
+- **`public/team/valentyn-p.jpg`, `public/team/muhammad-asif.jpg` (replaced, 400 x 400 JPEG):** the person is cut out with Apple's Vision person segmentation (`VNGeneratePersonSegmentationRequest`, accurate, through a small Swift tool in the scratchpad, not in the repository) and set on a radial orange wash from #FB923C to #EA580C. The cut-out is limited to the round picture, so the viewer's dark ground outside it does not count as the person.
+- **`src/pages/About.tsx`:** the heading is now "[Ownership]" (highlighted; the eyebrow "The Founders" is kept); the cards for Ali Chaudhry, Maria F. and David S. are removed, so the section has only the two owners' cards.
+- **Then (same day):** Valentyn P.'s line "Software Engineer at HubSpot · Customer Agent AI" is removed at the owner's request (his `title` is empty and an empty title is not drawn); Muhammad Asif keeps "CEO, Datamart".
+- **Docs:** `README.md` (About page).
+
+### 2026-11-27 — About page: the two owners added to the team section, with their pictures
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the file and `npm run build` pass. Screenshots in a headless Chrome at 1440 x 900 and 390 x 844 (dark): both pictures load, no page errors, no sideways scroll on the phone.*
+
+- **Asked by the owner** (two LinkedIn profile PDFs, screenshots of both profile pictures and of `/about`): these two people are the owners, add their data to the team section; Valentyn P. is the main owner.
+- **`src/pages/About.tsx`:** an `OWNERS` list and a row of two larger cards above the existing three: picture, a role badge, name, title, place and a "LinkedIn" link (new tab, `rel="noopener noreferrer"`). **Valentyn P.**: "Founder & Owner", "Software Engineer at HubSpot · Customer Agent AI", Greater Sacramento, United States, `linkedin.com/in/vpodk/`; his card has the orange ring as the main owner. **Muhammad Asif**: "Co-Owner", "CEO, Datamart", Lahore, Pakistan, `linkedin.com/in/asif4347/`. The titles and places are read from the screenshots/PDFs; the FaceCloud roles ("Founder & Owner", "Co-Owner") are Claude's wording for "main owner" / "owner". The three earlier cards (Ali Chaudhry, Maria F., David S.) are kept.
+- **`public/team/valentyn-p.jpg`, `public/team/muhammad-asif.jpg` (new, 400 x 400 JPEG, about 40 KB each):** cut out of the owner's screenshots of the LinkedIn picture viewer with macOS `sips` (a square just inside the round picture, so the rounded crop shows no dark corner).
+- **Real people's pictures:** these are new pictures of real people in the repository; they stay local until the owner says to commit and push them.
+- **Docs:** `README.md` (About page, The Team).
+
+### 2026-11-27 — Moderator role page: the same plain dark ground as the home page (no red-brown wash)
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npm run build` passes. Checked in a headless Chrome at 1440 x 900 (dark): the layers behind the page are now the same as on the home page, and a screenshot shows no wash.*
+
+- **Asked by the owner** (screenshots of `/roles/moderator` and the home page): the moderator page has a red shade; match it to the home page.
+- **Cause:** the page's wrapper used `fc-app-bg`, which paints three orange radial glows (`--s-glow`, 8% orange) over the ground. On a page this tall each glow spreads over a large area, and the see-through panels pick it up, so the whole page reads red-brown. The home page uses `bg-surface-soft` only (the same ground colour, 14 11 10, without the glows).
+- **`src/pages/ModeratorRole.tsx`:** the wrapper is now `bg-surface-soft text-ink` like the home page. The small orange glow behind the hero is kept.
+- **Not changed:** `/about` and `/contact` use the same `fc-app-bg` and so have the same wash; left as they are until the owner asks.
+
+### 2026-11-27 — Moderator role page: a Plans section with three cards
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the file and `npm run build` pass. Screenshots in a headless Chrome at 1440 x 900 and 390 x 844 (dark appearance): no page errors, no sideways scroll on the phone.*
+
+- **Asked by the owner:** pricing cards on the moderator page: two with a price and limits, one with unlimited features. He gave no figures, so the prices and limits are Claude's proposal for him to change.
+- **`src/pages/ModeratorRole.tsx`:** new section `#plans` ("07 · Plans", also in the page's jump links), styled like the landing page's plan cards. **Team** $29/mo: 1 moderator, 10 members, 50 GB, 2,000 images/mo. **Business** $79/mo: 3 moderators, 50 members, 200 GB, 10,000 images/mo. **Enterprise** "Custom", "On request": unlimited moderators, members, storage and images, every feature; its button is "Contact us" (`/contact`), the other two have a disabled "Coming soon" button. The feature lines only name things the page already describes (claims, escalation, bulk decisions up to 50, team performance, reports in JSON/CSV/PDF, the organization's logo and colour, audit history). The "Pricing and plans" note in the Roadmap section, which said pricing had not been decided, now says the plans below are planned and not on sale yet.
+- **Display only:** no billing and no such limits exist in the backend; an administrator still sets an organization's seats by hand.
+- **Docs:** `README.md` (`/roles/moderator`).
+
+### 2026-11-27 — Landing Pricing: new storage and image limits on the three plans
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npm run build` passes.*
+
+- **Asked by the owner** (a screenshot of the Pricing cards): Free 10 images; Basic 10 GB, 250 images; Pro 30 GB, 1000 images.
+- **`src/pages/Landing.tsx` (`PRICING_PLANS`):** Free 500 MB (unchanged) / 10 images a month (was 50); Basic 10 GB / 250 (was 2,000); Pro 30 GB (was 100 GB) / 1,000 (was Unlimited). Prices, features and the "Coming soon" state unchanged. Display only: there are no plans or quotas in the backend.
+
+### 2026-11-27 — Landing Features: four cards removed
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit` and `npm run build` pass.*
+
+- **Asked by the owner** (a screenshot of `/#features`): remove the JWT, API, audit logs and moderator review cards.
+- **`src/pages/Landing.tsx`:** `FEATURE_GRID` loses "Moderator Review Queue", "Detailed Audit Logs", "JWT Authorization" and "API Docs & Playgrounds"; 8 cards remain (two full rows of four). The `ScrollText`, `Key` and `Terminal` icon imports went with them (`AlertTriangle` is still used elsewhere on the page).
+
+### 2026-11-27 — Footer: new text under the logo, "Login", and a shorter copyright line
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npm run build` passes.*
+
+- **Asked by the owner** (a screenshot of the public footer): replace "Powered by DATAMART / DTM.IO. Advanced facial image organization, quality check, and Zero-DCE restorative node suite." with his own sentence.
+- **`src/components/public/PublicFooter.tsx`:** now "A creative platform to direct your best work. To facilitate the studios, creators and agencies. Powered by DATAMART Inc." (his wording; only "Powerd" spelled "Powered" and the capitals evened out).
+- **Then (same day):** the Portals link "User Login" now reads "Login"; under "Registry Compliance" (heading kept) the line is now "© <year> FaceCloud. All rights reserved." (the sentence about datasets and Django SQL is gone). The year is still the current year from the browser's clock.
+
+### 2026-11-26 (later still) — The icon rail no longer runs up over the top bar (the administrator's rail was too long for its column)
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit` and `npm run build` pass. Measured in a headless Chrome on a demo copy (port 5241, stopped afterwards) at 1440 wide and 1080 / 900 / 813 / 760 / 680 high, for all three portals; screenshot looked at for the administrator at 813.*
+
+- **Asked by the owner** (Roman Urdu, a screenshot of `/admin` at about 1440 x 813): move the sidebar down from the top left, it mixes with the top menu bar.
+- **Cause:** the rail is centred in the column between the top bar (84px) and the bottom pill (88px). The administrator's rail has 16 icons since the Inbox was added; at 36px each it is about 765px tall, the column only 641px, and a centred box that is too tall spills out equally at both ends, so its top sat at 22px, over the top bar (which ends at 68px).
+- **`src/index.css`:** the column no longer centres its content (`justify-content: flex-start`); the rail centres itself with `margin-top/bottom: auto`, which only has an effect while there is room. So a rail that fits is centred as before, and one that does not starts at the column's top, under the top bar, and runs down beside the bottom pill (plain CSS that every browser has; `safe center` was tried first and dropped because older Safari lacks it). The icon size is no longer three fixed steps but computed: `--rail-item = clamp(24px, (100vh - 96px - fixed parts - gaps) / icon count, --rail-max)`, with `--rail-max` 42px, 36px under 880px of height and 31px under 790px (the old steps, now upper limits), and the gap 2 to 4px by icon count. The icon inside follows its button.
+- **`src/components/layout/Sidebar.tsx`:** the rail gets `--rail-n` (its icon count) as an inline style; the `gap-1` class moved into the stylesheet.
+- **Measured (rail top / bottom, icon size):** administrator 84 / 886, 39.6px at 900 high; 84 / 799, 34.2px at 813; 84 / 734, 31px at 760; 84 / 666, 26.8px at 680; centred (118 / 958, 42px) at 1080. The user's (7 icons) and the moderator's (12 icons) rails are where they were, same sizes as before.
+- **Not checked:** Safari and Firefox, and the light appearance.
+- **Docs:** `README.md` (the rail line under Responsive Layouts).
+
+### 2026-11-26 (later) — Admin Moderators: Suspend (with an optional reason) and Activate
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit` and `npx oxlint src` pass, `npm run build` passes. Not checked in a browser, and no account was suspended to try it (the owner's own local database).*
+
+- **Asked by the owner** (Roman Urdu, a screenshot of `/admin/moderators` on localhost): the Moderators list should have options such as suspend. It only listed the accounts; a moderator could be suspended from the Users screen only.
+- **`src/pages/admin/Moderators.tsx`:** a new **Actions** column with **Suspend** / **Activate**. Suspend opens the console's confirm dialog (the moderator is signed out everywhere, nothing is deleted) with an optional reason; Activate acts at once. Errors show in the dialog (suspend) or in a red notice (activate). The reason is shown under the Suspended badge. In the demo build the change is kept for the session only.
+- **`src/lib/api/adminUsers.ts`:** `setAdminUserSuspended(id, suspended, reason = '')` sends `suspension_reason` with a suspension when a reason was written (the backend already accepts it and clears it on reactivation). The Users screen calls it without a reason, unchanged.
+- **`src/lib/useAdminUserList.ts`:** `AccountRow.suspensionReason?` from the server's `suspension_reason`.
+- **No backend change.** Read in the backend (`accounts/views.py` `AdminUserUpdateView`): PATCH takes `is_suspended`, `suspension_reason`, `is_active`, `role`, and bumps the token version so the account is signed out. There is no delete call. Taking the moderator role away (`role: "user"`) is possible there but leaves the person's moderator membership of the organization in place, so it was **not** added; it needs the owner's decision.
+- **Local servers:** the owner's backend was started for him on `127.0.0.1:8000` (`runserver`, his own database, no Celery worker); the website was already running on `localhost:5173`.
+- **Docs:** `README.md` (`/admin/moderators`).
+
+### 2026-11-26 — Admin Image Monitoring: the administrator no longer sees users' photographs and no longer accepts or rejects them (privacy)
+*Status: **committed and pushed 2026-11-27** with the other changes of that day (the hash is in the entry "Committed and pushed: the 2026-11-27 work"). `npx tsc -p tsconfig.app.json --noEmit` and `npx oxlint src` pass (the five old warnings only), `npm run build` passes. Not checked in a browser. The live site is unchanged.*
+
+- **Asked by the owner** (Roman Urdu, a screenshot of `/admin/images` on the live site): it is a privacy problem that the administrator sees every user's photograph; accepting and rejecting should be automatic, not the administrator looking at a photo; the administrator should get a few details only. This reverses the Accept / Under review / Reject buttons he asked for on 2026-11-01.
+- **`src/pages/admin/ImageMonitoring.tsx`:** the thumbnail in each row is replaced by a plain file icon; the big preview in the details card is replaced by a note ("The photo itself is private"); the "Decide on this photo" row, its confirm dialog and the in-place row update are removed; the owner's e-mail is no longer shown in the card (the username stays). Columns are now File, Owner, Size, Quality result, Scores, Enhancement. The page subtitle says the photos are private. Sorting, paging and the facts in the card (size, dimensions, verdict, faces found, sharpness, brightness, duplicates, enhancements) are unchanged.
+- **`src/lib/api/adminSystem.ts`:** `getSystemImagePreview`, `decideSystemImage`, `systemDecisionsAvailable`, `DECISION_OF_ACTION` and `SystemImageAction` are deleted, so the admin console has no code that asks for a picture or sends a decision. `listSystemImages` and `getSystemImage` stay.
+- **Not a full fix by itself:** the server still answers `GET /api/system/images/{id}/preview/` and `POST /api/system/images/{id}/decision/` for an administrator's token. The prompt for the backend is `qa/PROMPT_FOR_BACKEND_ADMIN_NO_PHOTOS.md` (local, `qa/` is not on GitHub); it has to be sent to Ijaz.
+- **Not changed:** the moderator portal (a team's moderator still sees and reviews the team's photos: that is the role), the user's own screens, the backend.
+- **Docs:** `README.md` (`/admin/images`), `DEFENCE_PREP.md` (admin line, endpoint example, a new security question).
 
 ### 2026-11-24 — Admin Inbox: contact messages and early-access e-mails; the landing page's early-access box sends to the server
 *Status: committed and pushed. `npx tsc -p tsconfig.app.json --noEmit` and `npx oxlint src` pass, `npm run build` passes on a copy. Not checked in a browser. The backend side is PR #165 (`/api/contact/admin/*`, `/api/contact/early-access/`), checked against the running server.*
@@ -2672,7 +2775,7 @@ ui (9: ChartCard, DataTable, EmptyState, GradientButton, NotificationDropdown, S
 Phase 2 (small-face floor, ignored background faces, completely-dark-only rejection, warnings list), Phase 3 (accepted photos enhanced automatically, batch-enhance must skip rejected photos), Phase 4 (groups enhanced per person),
 photo delete clean-up and bulk delete, `best_score` on new-group decisions, an activity `?type=` filter; open PR #84 (readable emailed links in development) and five dependency PRs. Deployment (VPS, HTTPS, Postgres, Redis, Celery, SMTP) is not started.
 
-**Done (2026-11-06):** the administrator's Accept / Under review / Reject on a photo and the `ordering` parameter on `GET /api/system/images/` (backend #147) are in and used: the buttons switched on by themselves, and the sort is the server's (see the 2026-11-06 entry). `qa/PROMPT_FOR_BACKEND_ADMIN_IMAGES.md` is closed and need not be sent; `qa/PROMPT_FOR_BACKEND_DUPLICATES.md` is closed too (#146 added the matches list and keeps decisions on a re-check).
+**Withdrawn (2026-11-26):** the administrator's Accept / Under review / Reject and the photo preview were taken out of the admin screen for privacy (see that entry). **Done (2026-11-06):** the administrator's Accept / Under review / Reject on a photo and the `ordering` parameter on `GET /api/system/images/` (backend #147) are in and used: the buttons switched on by themselves, and the sort is the server's (see the 2026-11-06 entry). `qa/PROMPT_FOR_BACKEND_ADMIN_IMAGES.md` is closed and need not be sent; `qa/PROMPT_FOR_BACKEND_DUPLICATES.md` is closed too (#146 added the matches list and keeps decisions on a re-check).
 
 **Backend change waiting (2026-10-24):** the adaptive engine's "polish" (`feat/adaptive-polish`, commit 8845a4a, flag `ADAPTIVE_POLISH_ENABLED` off by default) passed QA script 16 (flag off identical to the unchanged backend; dark/noisy untouched; a polished photo is the same photo and sharper) but polishes few ordinary photos and only slightly. It needs the owner's decision on strength and the backend developer's merge; turn it on with that one `.env` line, off by removing it.
 
@@ -2682,6 +2785,7 @@ photo delete clean-up and bulk delete, `best_score` on new-group decisions, an a
 
 ## 7. Known Issues / Tech Debt
 
+- **The server still lets an administrator fetch a user's photograph (found 2026-11-26).** The admin screen no longer asks for it, but `GET /api/system/images/{id}/preview/` and `POST /api/system/images/{id}/decision/` still answer. Prompt: `qa/PROMPT_FOR_BACKEND_ADMIN_NO_PHOTOS.md` (not sent yet). The frontend change itself is uncommitted and not deployed, so the live site still shows the photographs.
 - **A photo the administrator put under review is not in the owner's In review tab (found 2026-11-09).** Same backend gap (BG-16 part 2, `qa/PROMPT_FOR_BACKEND_ADMIN_REJECT.md`): a personal workspace's `needs_review` is read as accepted. Needs the owner's decision: let a person's hold show as In review (waiting for the administrator), or stop offering "Put under review" for personal photos.
 - **A photo an administrator or a moderator rejected still reads Completed / Accepted on the server (found 2026-11-09).** Backend gap BG-16, prompt `qa/PROMPT_FOR_BACKEND_ADMIN_REJECT.md`. The frontend shows it as rejected itself (`photoStatus`) and leaves it out of the Accepted tab until the server does.
 - **A changed email locks the person out until the link is opened (found 2026-11-05).** The backend marks the account unverified and refuses sign-in and refresh for it; there is no resend for it. If the link expires, is lost or the new address was mistyped, nobody can sign in to start again. `/verify-email-change/:uid/:token` says "If you can sign in" and offers Contact us. Needs a backend way out (a resend for an unverified account whose email changed, or keep the old address until the new one is confirmed). The app itself has no email-change screen.

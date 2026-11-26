@@ -1,11 +1,104 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Shield, Users, Activity } from 'lucide-react'
+import { Shield, Users, Activity, ExternalLink, MapPin } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
 import { useDocumentTitle } from '../lib/useDocumentTitle'
+
+interface Person {
+  name: string
+  role: string
+  title: string
+  place: string
+  /** A picture in public/team, or '' for initials on orange. */
+  photo: string
+  linkedin: string
+  main?: boolean
+}
+
+/* The owners and the two teams, as the owner of this project named them (2026-11-27). The pictures are from their LinkedIn profiles, set on
+   FaceCloud's orange. Valentyn P. is the main owner. */
+const OWNERS: Person[] = [
+  {
+    name: 'Valentyn P.', role: 'Founder & Owner', title: '', place: 'Greater Sacramento, United States',
+    photo: '/team/valentyn-p.jpg', linkedin: 'https://www.linkedin.com/in/vpodk/', main: true,
+  },
+  {
+    name: 'Muhammad Asif', role: 'Co-Owner', title: 'CEO, Datamart', place: 'Lahore, Pakistan',
+    photo: '/team/muhammad-asif.jpg', linkedin: 'https://www.linkedin.com/in/asif4347/', main: false,
+  },
+]
+
+const TEAMS: { name: string; people: Person[] }[] = [
+  {
+    name: 'Development Team',
+    people: [
+      { name: 'Ali Hassan', role: 'Frontend & UI/UX Lead', title: 'Web app, design system and user experience', place: 'Lahore, Pakistan', photo: '/team/ali-hassan.jpg', linkedin: 'https://www.linkedin.com/in/alihassankhandev/' },
+      { name: 'Ijaz Ahmad', role: 'Backend Engineer', title: 'APIs, database and the processing pipeline', place: 'Lahore, Pakistan', photo: '/team/ijaz-ahmad.jpg', linkedin: 'https://www.linkedin.com/in/ijaz-ahmad-0a5004285/' },
+      { name: 'Vaneeza Sohaib', role: 'Computer Vision Engineer', title: 'Face detection, quality checks and enhancement models', place: 'Lahore, Pakistan', photo: '', linkedin: 'https://www.linkedin.com/in/vaneeza-sohaib-836a18372/' },
+    ],
+  },
+  {
+    name: 'Marketing Team',
+    people: [
+      { name: 'Kamal Ahmad', role: 'Head of Marketing', title: 'Brand, search and growth', place: 'Lahore, Pakistan', photo: '/team/kamal-ahmad.jpg', linkedin: 'https://www.linkedin.com/in/kamal-ahmad-rana/' },
+      { name: 'Athar Ammar', role: 'Business Development Manager', title: 'New clients, outreach and digital growth', place: 'Los Angeles, United States', photo: '/team/athar-ammar.jpg', linkedin: 'https://www.linkedin.com/in/atharammar/' },
+      { name: 'Ali Awan', role: 'Head of Sales', title: 'Partnerships and customer accounts', place: 'Lahore, Pakistan', photo: '/team/ali-awan.jpg', linkedin: 'https://www.linkedin.com/in/aliawan512/' },
+    ],
+  },
+]
+
+const initials = (name: string) => name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase()
+
+/** One person: an owner's card is larger; a team member's is compact. */
+function PersonCard({ person, large }: { person: Person; large: boolean }) {
+  const ring = person.main ? 'border-[#F97316]/40 ring-1 ring-[#F97316]/30' : 'border-ink/[0.06]'
+  const avatar = large ? 'w-24 h-24' : 'w-20 h-20'
+  return (
+    <div className={`fc-panel ${large ? 'p-7' : 'p-6'} h-full flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border ${ring}`}>
+      {person.photo ? (
+        <img
+          src={person.photo}
+          alt={person.name}
+          width={large ? 96 : 80}
+          height={large ? 96 : 80}
+          loading="lazy"
+          className={`${avatar} rounded-full object-cover border-2 border-[#F97316]/50 shadow-[0_4px_20px_rgba(249,115,22,0.25)]`}
+        />
+      ) : (
+        <div
+          role="img"
+          aria-label={person.name}
+          className={`${avatar} rounded-full flex items-center justify-center text-xl font-bold text-white border-2 border-[#F97316]/50 shadow-[0_4px_20px_rgba(249,115,22,0.25)]`}
+          style={{ background: 'radial-gradient(circle at 50% 42%, #FB923C 0%, #EA580C 100%)' }}
+        >
+          {initials(person.name)}
+        </div>
+      )}
+      <div className="space-y-1.5">
+        <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#F97316]/10 border border-[#F97316]/30 text-[9px] font-bold text-[#FB923C] uppercase tracking-wider">
+          {person.role}
+        </span>
+        <h3 className="text-sm font-bold text-ink uppercase tracking-wider">{person.name}</h3>
+        {person.title && <p className="text-xs text-ink-mute font-medium">{person.title}</p>}
+        <p className="text-[11px] text-ink-faint flex items-center justify-center gap-1">
+          <MapPin className="w-3 h-3" aria-hidden />{person.place}
+        </p>
+      </div>
+      <a
+        href={person.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FB923C] hover:underline mt-auto"
+      >
+        LinkedIn <ExternalLink className="w-3 h-3" aria-hidden />
+        <span className="sr-only">profile of {person.name} (opens in a new tab)</span>
+      </a>
+    </div>
+  )
+}
 
 export default function About() {
   useDocumentTitle('About')
@@ -156,7 +249,7 @@ export default function About() {
           </div>
         </section>
 
-        {/* ── SECTION 4 — Team ──────────────────────────────────── */}
+        {/* ── SECTION 4 — Ownership ──────────────────────────────────── */}
         <section className="py-20 bg-ink/[0.03] border-t border-ink/[0.05]">
           <div className="max-w-5xl mx-auto px-6">
             <div className="text-center mb-14 space-y-3">
@@ -165,48 +258,35 @@ export default function About() {
               </RevealOnScroll>
               <RevealOnScroll delay={0.05}>
                 <h2 className="text-3xl font-medium text-ink tracking-tight" style={{ fontFamily: "'Space Mono', serif" }}>
-                  <HeadingText text="Meet the [Team]" />
+                  <HeadingText text="[Ownership]" />
                 </h2>
               </RevealOnScroll>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <RevealOnScroll delay={0.05}>
-                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border border-ink/[0.06]">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#F97316] to-[#EA580C] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(249, 115, 22,0.25)]">
-                    A.C.
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-ink uppercase tracking-wider">Ali Chaudhry</h3>
-                    <p className="text-[10px] text-ink-faint font-semibold mt-0.5">Co-Founder &amp; Lead Architect</p>
-                  </div>
-                </div>
-              </RevealOnScroll>
-
-              <RevealOnScroll delay={0.1}>
-                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border border-ink/[0.06]">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#EA580C] to-[var(--s-ok)] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(234, 88, 12,0.25)]">
-                    M.F.
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-ink uppercase tracking-wider">Maria F.</h3>
-                    <p className="text-[10px] text-ink-faint font-semibold mt-0.5">Co-Founder &amp; Product Lead</p>
-                  </div>
-                </div>
-              </RevealOnScroll>
-
-              <RevealOnScroll delay={0.15}>
-                <div className="fc-panel p-6 flex flex-col items-center text-center space-y-4 rounded-2xl bg-ink/[0.04] border border-ink/[0.06]">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--s-ok)] to-[#F97316] flex items-center justify-center text-xs font-bold text-white tracking-wider shadow-[0_4px_16px_rgba(79,255,176,0.25)]">
-                    D.S.
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-ink uppercase tracking-wider">David S.</h3>
-                    <p className="text-[10px] text-ink-faint font-semibold mt-0.5">Security Architect</p>
-                  </div>
-                </div>
-              </RevealOnScroll>
+            {/* The owners, with their pictures on FaceCloud's orange. */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {OWNERS.map((owner, index) => (
+                <RevealOnScroll key={owner.name} delay={0.05 * (index + 1)} className="h-full">
+                  <PersonCard person={owner} large />
+                </RevealOnScroll>
+              ))}
             </div>
+
+            {/* The two teams under the owners. */}
+            {TEAMS.map(team => (
+              <div key={team.name} className="mt-16">
+                <RevealOnScroll>
+                  <h3 className="text-center text-xs font-bold text-[#F97316] tracking-widest uppercase mb-6">{team.name}</h3>
+                </RevealOnScroll>
+                <div className={`grid grid-cols-1 sm:grid-cols-2 ${team.people.length >= 3 ? 'lg:grid-cols-3 max-w-4xl' : 'max-w-3xl'} gap-6 mx-auto`}>
+                  {team.people.map((person, index) => (
+                    <RevealOnScroll key={person.name} delay={0.05 * (index + 1)} className="h-full">
+                      <PersonCard person={person} large={false} />
+                    </RevealOnScroll>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

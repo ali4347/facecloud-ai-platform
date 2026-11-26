@@ -39,11 +39,11 @@ export function listAdminUsersPage(
   return apiFetch<AdminUserPage>(`/api/user/admin/users/?${query}`, { signal })
 }
 
-/** Suspend or reactivate an account. Reactivating clears the stored reason on the backend. */
-export function setAdminUserSuspended(id: number, suspended: boolean): Promise<AdminUser> {
+/** Suspend or reactivate an account. A reason, when given, is stored with the suspension; reactivating clears it on the backend. */
+export function setAdminUserSuspended(id: number, suspended: boolean, reason = ''): Promise<AdminUser> {
   return apiFetch<AdminUser>(`/api/user/admin/users/${id}/`, {
     method: 'PATCH',
-    body: { is_suspended: suspended },
+    body: suspended && reason ? { is_suspended: true, suspension_reason: reason } : { is_suspended: suspended },
   })
 }
 

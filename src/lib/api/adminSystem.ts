@@ -1,4 +1,4 @@
-import { ApiError, apiFetch, apiFetchBlob } from './client'
+import { ApiError, apiFetch } from './client'
 
 /* The administrator's read-only views of the whole system. Every shape below is what the backend sends
    (backend docs/FRONTEND_API_GUIDE.md section 10); a field the backend does not send is not here. */
@@ -282,40 +282,8 @@ export function listSystemImages(page: number, pageSize: number, signal?: AbortS
 export function getSystemImage(id: number, signal?: AbortSignal): Promise<SystemImageDetail> {
   return apiFetch<SystemImageDetail>(`/api/system/images/${id}/`, { signal })
 }
-/**
- * What the administrator can decide on a photo: the moderator's own words (`approve`, `reject`, `keep_in_review`). `reject` needs a reason (400 without
- * one, at most 500 characters); a photo that cannot be decided (refused at upload, in the trash, its quality check failed or not finished) answers 409
- * with a sentence. The answer is the photo's detail, as `GET` gives it. The screen still asks first (an OPTIONS call) whether the server has this, and
- * keeps the buttons off on one that does not.
- */
-export type SystemImageAction = 'approve' | 'reject' | 'keep_in_review'
-
-/** The server's verdict word for each action, to show which one is already in force. */
-export const DECISION_OF_ACTION: Record<SystemImageAction, string> = { approve: 'accepted', reject: 'rejected', keep_in_review: 'needs_review' }
-
-export function decideSystemImage(id: number, action: SystemImageAction, reason: string): Promise<SystemImageDetail> {
-  return apiFetch<SystemImageDetail>(`/api/system/images/${id}/decision/`, { body: reason ? { action, reason } : { action } })
-}
-
-/* Asked once per page load, and only the answer "no, that address does not exist" is remembered: a server that was
-   merely slow or unreachable is asked again next time. */
-let decisionsAvailable: boolean | null = null
-/** True when this backend can record an administrator's decision. A question (OPTIONS), not an action: nothing changes. */
-export async function systemDecisionsAvailable(id: number): Promise<boolean> {
-  if (decisionsAvailable !== null) return decisionsAvailable
-  try {
-    await apiFetch(`/api/system/images/${id}/decision/`, { method: 'OPTIONS' })
-    return (decisionsAvailable = true)
-  } catch (caught) {
-    if (caught instanceof ApiError && (caught.status === 404 || caught.status === 405)) return (decisionsAvailable = false)
-    return false
-  }
-}
-
-/** The photo's preview, behind the token like every other file. */
-export function getSystemImagePreview(id: number, signal?: AbortSignal): Promise<Blob> {
-  return apiFetchBlob(`/api/system/images/${id}/preview/`, { signal })
-}
+/* Deliberately not here: the photo's picture (`/preview/`) and the administrator's own accept / reject (`/decision/`). A user's photograph is private,
+   so this console reads facts about the file only, and the verdict is the automatic check's. */
 
 // ── Privacy audit ────────────────────────────────────────────────────────────
 

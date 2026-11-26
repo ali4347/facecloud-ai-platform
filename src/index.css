@@ -1009,8 +1009,12 @@ html[data-theme='light'] .fc-glass-hover:hover {
 @media (min-width: 1024px) {
   /* On a desk the aside is only the column between the top bar and the
      bottom pill; the visible rail is the pill inside it, centred when short.
-     It never scrolls: scrolling would clip the names beside the icons, so on
-     a short screen the icons shrink instead. */
+     A rail too long for that column (the administrator's, with 17 icons) starts
+     at the column's top instead, just under the top bar, and runs down beside
+     the bottom pill: the rail's auto margins centre it only while there is room,
+     so it cannot spill upwards over the top bar (works in every browser).
+     It never scrolls: scrolling would clip the names beside the icons, so the
+     icons shrink until the rail fits between the top bar and the screen's foot. */
   .fc-sidebar {
     background: transparent;
     border: 0;
@@ -1018,9 +1022,18 @@ html[data-theme='light'] .fc-glass-hover:hover {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     pointer-events: none;
-    justify-content: center;
+    justify-content: flex-start;
   }
   .fc-rail {
+    /* --rail-n comes from the Sidebar (the icon count). --rail-fixed is everything in the rail that is not an icon or a gap: padding, border,
+       the brand mark, the two rules and the account button. 96px = the top bar's 84px plus 12px kept free at the foot. */
+    --rail-fixed: 118px;
+    --rail-max: 42px;
+    --rail-gap: clamp(2px, calc(44px / var(--rail-n, 10)), 4px);
+    --rail-item: clamp(24px, calc((100vh - 96px - var(--rail-fixed) - (var(--rail-n, 10) + 3) * var(--rail-gap)) / var(--rail-n, 10)), var(--rail-max));
+    gap: var(--rail-gap);
+    margin-top: auto;
+    margin-bottom: auto;
     pointer-events: auto;
     position: relative;
     background: linear-gradient(160deg, var(--l-sheen) 0%, rgba(255,255,255,0) 45%), var(--l-fill);
@@ -1033,8 +1046,8 @@ html[data-theme='light'] .fc-glass-hover:hover {
 }
 .fc-rail-item {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: var(--rail-item, 42px);
+  height: var(--rail-item, 42px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1077,15 +1090,11 @@ html[data-theme='light'] .fc-glass-hover:hover {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
-@media (max-height: 880px) {
-  .fc-rail-item { width: 36px; height: 36px; }
-  .fc-rail-item svg { width: 17px; height: 17px; }
-}
-@media (max-height: 790px) {
-  .fc-rail-item { width: 31px; height: 31px; }
-  .fc-rail-item svg { width: 15px; height: 15px; }
-  .fc-rail { gap: 2px; }
-}
+/* The icon follows its button (19px in a 42px button, 15px in a 31px one). */
+.fc-rail-item svg { width: clamp(13px, calc(var(--rail-item, 42px) * 0.46), 19px); height: clamp(13px, calc(var(--rail-item, 42px) * 0.46), 19px); }
+/* A short screen: smaller buttons at most, whatever the count. */
+@media (max-height: 880px) { .fc-rail { --rail-max: 36px; } }
+@media (max-height: 790px) { .fc-rail { --rail-max: 31px; --rail-gap: 2px; } }
 
 .fc-nav-item {
   display: flex;

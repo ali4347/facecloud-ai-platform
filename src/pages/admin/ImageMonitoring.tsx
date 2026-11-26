@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Check, ChevronLeft, ChevronRight, Clock, Eye, X, XCircle, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, FileImage, Loader2, ShieldCheck, X } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { StatusBadge } from '../../components/ui/StatusBadge'
-import { AuthedImage } from '../../components/ui/AuthedImage'
 import { AsyncGate } from '../../components/admin/AsyncGate'
-import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { mockImages } from '../../data/mock'
-import {
-  DECISION_OF_ACTION, decideSystemImage, getSystemImage, getSystemImagePreview, listSystemImages, systemDecisionsAvailable,
-  type Paged, type SystemImageAction, type SystemImageDetail, type SystemImageRow,
-} from '../../lib/api/adminSystem'
+import { getSystemImage, listSystemImages, type Paged, type SystemImageDetail, type SystemImageRow } from '../../lib/api/adminSystem'
 import { USE_API } from '../../lib/api/config'
 import { formatBytes } from '../../lib/imageData'
 import { explainReason } from '../../lib/reasons'
@@ -61,7 +56,7 @@ function verdict(img: SystemImageRow): { tone: 'success' | 'warning' | 'error' |
 
 const score = (n: number | null | undefined) => (n === null || n === undefined ? '—' : String(Math.round(n)))
 
-/** What needs a person's eye first: unsure photos, then refused ones, then the ones still being checked, then the good ones. */
+/** What is worth knowing first: unsure photos, then refused ones, then the ones still being checked, then the good ones. */
 function attentionRank(img: SystemImageRow): number {
   if (img.rejection_reason) return 2
   switch (img.quality?.decision) {
@@ -95,23 +90,13 @@ function sortRows(rows: SystemImageRow[], key: SortKey): SystemImageRow[] {
   return [...rows].sort((a, b) => compare[key](a, b) || newest(a, b))
 }
 
-/** The three things an administrator can do with a photo, in the order they are shown. */
-const ACTIONS: { action: SystemImageAction; label: string; past: string; icon: typeof Check; tone: string }[] = [
-  { action: 'approve', label: 'Accept', past: 'accepted', icon: Check, tone: 'border-[#10B981]/35 text-[#10B981] [html[data-theme=light]_&]:text-[#047857] hover:bg-[#10B981]/10 data-[current=true]:bg-[#10B981]/15' },
-  { action: 'keep_in_review', label: 'Under review', past: 'under review', icon: Clock, tone: 'border-[#F59E0B]/35 text-[#D97706] [html[data-theme=light]_&]:text-[#B45309] hover:bg-[#F59E0B]/10 data-[current=true]:bg-[#F59E0B]/15' },
-  { action: 'reject', label: 'Reject', past: 'rejected', icon: XCircle, tone: 'border-[#EF4444]/35 text-[#F87171] [html[data-theme=light]_&]:text-[#B91C1C] hover:bg-[#EF4444]/10 data-[current=true]:bg-[#EF4444]/15' },
-]
-
-function DetailPanel({ id, onClose, onDecided }: { id: number; onClose: () => void; onDecided: (photo: SystemImageDetail) => void }) {
+/**
+ * A user's photograph is private: this console never asks the server for the picture, only for facts about the file. Accepting and rejecting is
+ * the automatic check's job (and, inside a team, its moderator's); the administrator reads the result here and decides nothing.
+ */
+function DetailPanel({ id, onClose }: { id: number; onClose: () => void }) {
   const [detail, setDetail] = useState<SystemImageDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
-  // Deciding: is the backend able to record it, which action is being confirmed, and how it went.
-  const [canDecide, setCanDecide] = useState<boolean | null>(null)
-  const [pending, setPending] = useState<SystemImageAction | null>(null)
-  const [reason, setReason] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [decideError, setDecideError] = useState<string | null>(null)
-  const [done, setDone] = useState<string | null>(null)
   const reduced = useReducedMotion()
 
   useEffect(() => {
@@ -126,39 +111,10 @@ function DetailPanel({ id, onClose, onDecided }: { id: number; onClose: () => vo
   }, [id])
 
   useEffect(() => {
-    if (!USE_API) return
-    let current = true
-    setCanDecide(null)
-    systemDecisionsAvailable(id).then(ok => { if (current) setCanDecide(ok) })
-    return () => { current = false }
-  }, [id])
-
-  // While a decision is being confirmed, Escape belongs to that dialog, not to this panel.
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !pending) onClose() }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose, pending])
-
-  const submit = async () => {
-    const chosen = ACTIONS.find(a => a.action === pending)
-    if (!chosen || !detail) return
-    setBusy(true)
-    setDecideError(null)
-    try {
-      // The answer is the photo's detail as it is now: the panel and the row in the list both take it from here.
-      const decided = await decideSystemImage(detail.id, chosen.action, reason.trim())
-      setDetail(decided)
-      setDone(`Marked as ${chosen.past}.`)
-      setPending(null)
-      setReason('')
-      onDecided(decided)
-    } catch (caught) {
-      setDecideError(messageFor(caught))
-    } finally {
-      setBusy(false)
-    }
-  }
+  }, [onClose])
 
   const reasons = detail?.rejection_reason ? [detail.rejection_reason] : []
   return (
@@ -180,53 +136,24 @@ function DetailPanel({ id, onClose, onDecided }: { id: number; onClose: () => vo
           {!detail && !error && USE_API && <div className="py-10 text-center"><Loader2 className="w-5 h-5 mx-auto animate-spin text-ink-faint" /></div>}
           {detail && (
             <>
-              <AuthedImage load={signal => getSystemImagePreview(detail.id, signal)} cacheKey={`sys-${detail.id}`} alt={detail.original_name}
-                className="w-full h-64 object-contain bg-surface-mute" rounded="rounded-2xl" />
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-surface-mute border border-line text-xs">
+                <ShieldCheck className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#10B981]" aria-hidden="true" />
+                <div>
+                  <p className="font-semibold text-ink">The photo itself is private</p>
+                  <p className="text-ink-mute mt-1">Only its owner can see it. This page shows the facts about the file, and the result of the automatic quality check.</p>
+                </div>
+              </div>
               <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
-                <div><dt className="text-ink-faint">Owner</dt><dd className="font-semibold text-ink">{detail.owner.username}</dd><dd className="text-ink-mute break-all">{detail.owner.email}</dd></div>
+                <div><dt className="text-ink-faint">Owner</dt><dd className="font-semibold text-ink">{detail.owner.username}</dd></div>
                 <div><dt className="text-ink-faint">Uploaded</dt><dd className="font-semibold text-ink">{formatDateTime(detail.created_at)}</dd></div>
                 <div><dt className="text-ink-faint">Size</dt><dd className="font-semibold text-ink">{formatBytes(detail.file_size)}</dd></div>
                 <div><dt className="text-ink-faint">Dimensions</dt><dd className="font-semibold text-ink">{detail.width && detail.height ? `${detail.width} × ${detail.height}` : '—'}</dd></div>
-                <div><dt className="text-ink-faint">Quality verdict</dt><dd className="font-semibold text-ink">{verdict(detail).label}</dd></div>
+                <div><dt className="text-ink-faint">Quality result (automatic)</dt><dd className="font-semibold text-ink">{verdict(detail).label}</dd></div>
                 <div><dt className="text-ink-faint">Faces found</dt><dd className="font-semibold text-ink">{detail.face_validation?.face_count ?? '—'}</dd></div>
                 <div><dt className="text-ink-faint">Sharpness</dt><dd className="font-semibold text-ink">{score(detail.quality?.sharpness_score)}</dd></div>
                 <div><dt className="text-ink-faint">Brightness</dt><dd className="font-semibold text-ink">{score(detail.quality?.brightness_score)}</dd></div>
                 <div><dt className="text-ink-faint">Duplicate matches</dt><dd className="font-semibold text-ink">{detail.duplicate_matches}</dd></div>
               </dl>
-              {!detail.rejection_reason && (
-                <section aria-label="Decide on this photo" className="space-y-2">
-                  <h3 className="text-xs font-bold text-ink">Decide on this photo</h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    {ACTIONS.map(a => {
-                      const current = detail.quality?.decision === DECISION_OF_ACTION[a.action]
-                      const settled = Boolean(detail.quality?.decision)
-                      return (
-                        <button
-                          key={a.action}
-                          type="button"
-                          data-current={current}
-                          aria-pressed={current}
-                          disabled={!canDecide || !settled || current || busy}
-                          title={current ? `Already ${a.past}` : undefined}
-                          onClick={() => { setPending(a.action); setDecideError(null); setReason('') }}
-                          className={`inline-flex items-center justify-center gap-1.5 px-1.5 py-2 rounded-xl border text-xs font-bold whitespace-nowrap bg-transparent transition-colors cursor-pointer disabled:cursor-not-allowed disabled:hover:bg-transparent ${current ? '' : 'disabled:opacity-40'} ${a.tone}`}
-                        >
-                          <a.icon className="w-3.5 h-3.5" aria-hidden="true" />{a.label}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  {canDecide === false && (
-                    <p className="text-[11px] text-ink-faint">
-                      The backend cannot record an administrator's decision yet, so these stay off. They switch on by themselves once it can.
-                    </p>
-                  )}
-                  {canDecide && !detail.quality?.decision && (
-                    <p className="text-[11px] text-ink-faint">You can decide once the quality check has finished.</p>
-                  )}
-                  {done && <p role="status" className="text-[11px] font-semibold text-[#10B981]">{done}</p>}
-                </section>
-              )}
               {reasons.length > 0 && (
                 <div className="p-3 rounded-2xl bg-surface-mute border border-line text-xs">
                   <p className="font-semibold text-ink">{explainReason(reasons[0]).title}</p>
@@ -251,32 +178,6 @@ function DetailPanel({ id, onClose, onDecided }: { id: number; onClose: () => vo
           )}
         </div>
       </motion.aside>
-
-      {pending && detail && (
-        <ConfirmDialog
-          title={pending === 'approve' ? 'Accept this photo?' : pending === 'reject' ? 'Reject this photo?' : 'Put this photo under review?'}
-          confirmLabel={pending === 'approve' ? 'Accept' : pending === 'reject' ? 'Reject' : 'Put under review'}
-          busyLabel="Saving…"
-          danger={pending === 'reject'}
-          busy={busy}
-          error={decideError}
-          confirmDisabled={pending === 'reject' && !reason.trim()}
-          onConfirm={() => void submit()}
-          onCancel={() => setPending(null)}
-        >
-          <p>
-            {pending === 'approve' && <>This sets <span className="font-semibold text-ink">{detail.original_name}</span> to accepted. {detail.owner.username} is told.</>}
-            {pending === 'keep_in_review' && <>This puts <span className="font-semibold text-ink">{detail.original_name}</span> back under review. {detail.owner.username} is not told.</>}
-            {pending === 'reject' && <>This rejects <span className="font-semibold text-ink">{detail.original_name}</span>. {detail.owner.username} is told, with your reason.</>}
-          </p>
-          {pending === 'reject' && (
-            <label className="block">
-              <span className="text-xs font-semibold text-ink">Reason, shown to the owner</span>
-              <textarea className="fc-input mt-1 w-full text-xs" rows={3} maxLength={500} value={reason} onChange={e => setReason(e.target.value)} />
-            </label>
-          )}
-        </ConfirmDialog>
-      )}
     </div>
   )
 }
@@ -288,24 +189,16 @@ export default function ImageMonitoring() {
   const ordering = SORTS.find(option => option.key === sort)?.ordering
   const state = useApiResource(signal => listSystemImages(page, PAGE_SIZE, signal, ordering), demoPage, [page, ordering])
   const changeSort = (next: SortKey) => { setSort(next); setPage(1) }
-  /* A decision answers with the photo as it is now. It is kept here and drawn over its row, so the list does not jump or reload; a fresh
-     answer from the server (another page, another order, a reload) replaces it. */
-  const [decided, setDecided] = useState<Record<number, SystemImageDetail>>({})
-  useEffect(() => { setDecided({}) }, [state.data])
-  const showing = (row: SystemImageRow): SystemImageRow => {
-    const now = decided[row.id]
-    return now ? { ...row, quality: now.quality, status: now.status, rejection_reason: now.rejection_reason, latest_enhancement: now.latest_enhancement } : row
-  }
 
   return (
     <div className="space-y-6 page-enter">
-      <PageHeader title="Image Monitoring" subtitle="Every photo uploaded to the platform, with its quality result. Sort it, and open a photo to accept, reject or put it under review." />
+      <PageHeader title="Image Monitoring" subtitle="Every upload on the platform, with the result of the automatic quality check. The photos themselves are private: only the file's details are shown here." />
 
       <AsyncGate state={state} what="the images">
         {data => {
           // The server has already ordered and paged the list. Only the demo build's sample, and "needs review first" (no server field), are ordered here.
           const clientOrder = state.isDemo || sort === 'attention'
-          const rows = (clientOrder ? sortRows(data.results, state.isDemo ? sort : 'attention') : data.results).slice(0, PAGE_SIZE).map(showing)
+          const rows = (clientOrder ? sortRows(data.results, state.isDemo ? sort : 'attention') : data.results).slice(0, PAGE_SIZE)
           const lastPage = Math.max(1, Math.ceil(data.count / PAGE_SIZE))
           const hasNext = Boolean(data.next)
           return (
@@ -327,7 +220,7 @@ export default function ImageMonitoring() {
                 <div className="overflow-x-auto">
                   <table className="w-full fc-table">
                     <thead>
-                      <tr><th>Photo</th><th>Owner</th><th>File</th><th>Quality result</th><th>Scores</th><th>Enhancement</th><th /></tr>
+                      <tr><th>File</th><th>Owner</th><th>Size</th><th>Quality result</th><th>Scores</th><th>Enhancement</th><th /></tr>
                     </thead>
                     <tbody>
                       {rows.map(img => {
@@ -336,7 +229,9 @@ export default function ImageMonitoring() {
                           <tr key={img.id}>
                             <td>
                               <div className="flex items-center gap-3">
-                                <AuthedImage load={signal => getSystemImagePreview(img.id, signal)} cacheKey={`sys-${img.id}`} alt={img.original_name} box={36} rounded="rounded-lg" />
+                                <span className="w-9 h-9 flex-shrink-0 rounded-lg bg-surface-mute border border-line flex items-center justify-center" aria-hidden="true">
+                                  <FileImage className="w-4 h-4 text-ink-faint" />
+                                </span>
                                 <div className="min-w-0">
                                   <p className="font-bold text-ink truncate max-w-[180px]">{img.original_name}</p>
                                   <p className="text-[10px] text-ink-faint">{formatDateTime(img.created_at)}</p>
@@ -385,7 +280,7 @@ export default function ImageMonitoring() {
         }}
       </AsyncGate>
 
-      {selected !== null && <DetailPanel id={selected} onClose={() => setSelected(null)} onDecided={photo => setDecided(current => ({ ...current, [photo.id]: photo }))} />}
+      {selected !== null && <DetailPanel id={selected} onClose={() => setSelected(null)} />}
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, type CSSProperties } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
@@ -131,7 +131,8 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
       )}
     >
       {/* ── Desk: an icon rail. The brand mark on top, the account at the foot. ── */}
-      <div className="fc-rail hidden lg:flex flex-col items-center gap-1 px-2.5 py-2.5">
+      {/* --rail-n: how many icons this role has. The stylesheet sizes the icons from it, so a long rail (the administrator's) still fits under the top bar. */}
+      <div className="fc-rail hidden lg:flex flex-col items-center px-2.5 py-2.5" style={{ '--rail-n': nav.length } as CSSProperties}>
         <FaceCloudLogo variant="icon" size="xs" tone="app" showText={false} showSubtitle={false} href={roleHome[role]} priority={true} />
         <div className="w-6 border-t border-line/60 my-2" />
         {nav.map(item => {

@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  ArrowRight, Ban, BarChart3, Bell, Check, Clock, Eye, FileText, GitMerge, Hand, Hourglass,
-  Layers, ListChecks, Lock, ScrollText, ShieldCheck, UserCog, X,
+  ArrowRight, Ban, BarChart3, Bell, Check, Clock, Eye, FileText, GitMerge, Hand, HardDrive, Hourglass,
+  Image, Layers, ListChecks, Lock, ScrollText, ShieldCheck, UserCog, Users, X,
 } from 'lucide-react'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
@@ -34,6 +34,7 @@ const SECTIONS = [
   { id: 'limits', label: 'Boundaries' },
   { id: 'access', label: 'Getting access' },
   { id: 'status', label: 'Roadmap' },
+  { id: 'plans', label: 'Plans' },
 ]
 
 const HIGHLIGHTS = [
@@ -203,6 +204,34 @@ const STATUS_COLUMNS = [
   },
 ]
 
+/*
+ * Plans for an organization with moderators. Shown, not sold: billing is not built (the administrator sets an organization's seats by hand), so
+ * every card says "Coming soon" like the plans on the landing page. Two priced tiers with limits, and one with no limits that is arranged by contact.
+ */
+const MODERATOR_PLANS: {
+  name: string; price: number | null; moderators: string; members: string; storage: string; images: string
+  features: string[]; missing: string[]; highlight: boolean
+}[] = [
+  {
+    name: 'Team', price: 29, moderators: '1 moderator', members: '10 members', storage: '50 GB', images: '2,000 images/mo',
+    features: ['Review queue with claims and deadlines', 'Escalation to owners', 'Member invitations and management', 'Rejected photos and batch retry', 'Reports in JSON and CSV'],
+    missing: ['Bulk decisions', 'Team performance', 'PDF reports', 'Your organization’s logo and colour'],
+    highlight: false,
+  },
+  {
+    name: 'Business', price: 79, moderators: '3 moderators', members: '50 members', storage: '200 GB', images: '10,000 images/mo',
+    features: ['Everything in Team', 'Bulk decisions, up to 50 at a time', 'Team performance and deadlines met', 'Reports in JSON, CSV and PDF', 'Your organization’s logo and colour'],
+    missing: ['Unlimited seats and storage', 'Priority support'],
+    highlight: false,
+  },
+  {
+    name: 'Enterprise', price: null, moderators: 'Unlimited moderators', members: 'Unlimited members', storage: 'Unlimited storage', images: 'Unlimited images',
+    features: ['Everything in Business', 'Unlimited seats and storage', 'Every moderator feature, with no limits', 'Priority processing', 'Priority support', 'Full audit history export'],
+    missing: [],
+    highlight: true,
+  },
+]
+
 function Mark({ allowed }: { allowed: boolean }) {
   return allowed ? (
     <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[var(--s-ok)]/15 text-[var(--s-ok)]">
@@ -236,7 +265,7 @@ export default function ModeratorRole() {
   }, [])
 
   return (
-    <div className="relative min-h-screen fc-app-bg overflow-x-hidden flex flex-col justify-between">
+    <div className="relative min-h-screen bg-surface-soft text-ink overflow-x-hidden flex flex-col justify-between">
       <PublicNavbar />
 
       <main className="flex-grow pt-28 pb-16">
@@ -497,11 +526,90 @@ export default function ModeratorRole() {
               <div className="fc-panel p-6 mt-5 space-y-2">
                 <h3 className="text-sm font-bold text-ink">Pricing and plans</h3>
                 <p className="text-sm text-ink-mute leading-relaxed">
-                  Moderator access is a role within an organization, not a separately priced product, and today it is not
-                  tied to a subscription tier. Seat limits and pricing for moderators have not been decided yet — they
-                  are listed above as planned, not promised.
+                  Moderator access is a role within an organization, not a separately priced product. The plans below
+                  are planned, not on sale yet: until billing arrives, an administrator sets an organization’s seats by hand.
                 </p>
               </div>
+            </RevealOnScroll>
+          </div>
+        </section>
+
+        {/* ── Plans ────────────────────────────────────────────── */}
+        <section id="plans" className="py-16 scroll-mt-28">
+          <div className="max-w-6xl mx-auto px-6">
+            <Heading
+              tag="07 · Plans"
+              title="Plans for teams with [moderators]"
+              subtitle="Two plans with set limits, and one with no limits at all. Every plan includes the review queue, the audit trail and the guardrails above."
+            />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {MODERATOR_PLANS.map((plan, index) => (
+                <RevealOnScroll key={plan.name} delay={0.06 * index} className="h-full">
+                  <div className={`fc-panel p-6 flex flex-col h-full relative ${plan.highlight ? 'ring-2 ring-[#F97316]/50 border-[#F97316]/40' : ''}`}>
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-lg font-bold text-ink">{plan.name}</h3>
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#F97316]/10 border border-[#F97316]/30 text-[9px] font-bold text-[#FB923C] uppercase tracking-wider">
+                          {plan.price === null ? 'On request' : 'Coming soon'}
+                        </span>
+                      </div>
+                      <div className="flex items-end gap-1">
+                        {plan.price === null ? (
+                          <span className="text-4xl font-bold text-ink tracking-tight">Custom</span>
+                        ) : (
+                          <>
+                            <span className="text-4xl font-bold text-ink tracking-tight">${plan.price}</span>
+                            <span className="text-sm text-ink-faint font-medium pb-1">/mo</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px] font-medium text-ink-mute">
+                        <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" aria-hidden /> {plan.moderators}</span>
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" aria-hidden /> {plan.members}</span>
+                        <span className="flex items-center gap-1"><HardDrive className="w-3 h-3" aria-hidden /> {plan.storage}</span>
+                        <span className="flex items-center gap-1"><Image className="w-3 h-3" aria-hidden /> {plan.images}</span>
+                      </div>
+                    </div>
+
+                    <div className="h-px bg-ink/[0.08] mb-4" />
+
+                    <ul className="space-y-2.5 flex-1">
+                      {plan.features.map(f => (
+                        <li key={f} className="flex items-center gap-2 text-[11px] text-ink-soft font-medium">
+                          <Check className="w-3.5 h-3.5 text-[var(--s-ok)] flex-shrink-0" aria-hidden />
+                          {f}
+                        </li>
+                      ))}
+                      {plan.missing.map(f => (
+                        <li key={f} className="flex items-center gap-2 text-[11px] text-ink-faint font-medium">
+                          <span className="w-3.5 h-3.5 flex items-center justify-center flex-shrink-0" aria-hidden>—</span>
+                          <span><span className="sr-only">Not included: </span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {plan.price === null ? (
+                      <Link to="/contact" className="fc-btn-primary mt-6 text-center text-sm font-bold py-3 rounded-2xl block w-full">
+                        Contact us
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        aria-label={`${plan.name} plan, coming soon`}
+                        className="mt-6 text-center text-sm font-bold py-3 rounded-2xl block w-full bg-ink/[0.04] border border-ink/[0.08] text-ink-faint cursor-not-allowed"
+                      >
+                        Coming soon
+                      </button>
+                    )}
+                  </div>
+                </RevealOnScroll>
+              ))}
+            </div>
+            <RevealOnScroll delay={0.1}>
+              <p className="text-center text-xs text-ink-faint mt-8 font-medium">
+                Plans are coming in a later version. Until then an administrator sets an organization’s seats by hand.
+              </p>
             </RevealOnScroll>
           </div>
         </section>

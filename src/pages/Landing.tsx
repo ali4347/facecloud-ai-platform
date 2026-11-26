@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion, useInView } from 'framer-motion'
 import {
   Shield, Zap, Check, ArrowUpRight, ArrowRight, Activity, AlertTriangle, FolderOpen,
-  Cpu, Eye, Users, BarChart3, Upload, Mail, ScrollText, Key, Terminal,
+  Cpu, Eye, Users, BarChart3, Upload, Mail,
   ChevronDown, HardDrive, Image, Briefcase, Building2, Camera, UserCheck,
   Code2, ExternalLink
 } from 'lucide-react'
@@ -76,32 +76,28 @@ const FEATURE_GRID = [
   { icon: Users,         t: 'Identity Clustering',   d: 'Groups matched records into clean profile directories.' },
   { icon: Shield,        t: 'Secure Cloud Buckets',  d: 'S3 architecture encrypts assets at rest.' },
   { icon: BarChart3,     t: 'Admin Statistics',      d: 'Provides high-level user metrics & performance charts.' },
-  { icon: AlertTriangle, t: 'Moderator Review Queue', d: 'Allows overriding of flagged quality rejections.' },
-  { icon: ScrollText,    t: 'Detailed Audit Logs',   d: 'Complete session traceability for security audits.' },
   { icon: Mail,          t: 'Automated Notifications', d: 'Keeps team members updated on processing progress.' },
-  { icon: Key,           t: 'JWT Authorization',     d: 'Zero-trust authentication for all system APIs.' },
-  { icon: Terminal,      t: 'API Docs & Playgrounds', d: 'Swagger specification with live testing tool.' },
   { icon: Activity,      t: 'Cluster Live Diagnostics', d: 'Real-time microservice status indicator.' },
 ]
 
 const PRICING_PLANS = [
   {
     name: 'Free', priceMonthly: 0, priceYearly: 0,
-    storage: '500 MB', uploads: '50 images', highlight: false,
+    storage: '500 MB', uploads: '10 images', highlight: false,
     features: ['Zero-DCE Enhancement', 'Face Detection', 'Basic Quality Checks', 'Single Upload Mode'],
     missing: ['Person Folder Clustering', 'Priority Processing', 'API Access', 'ZIP Upload'],
     cta: 'Get Started', link: '/login',
   },
   {
     name: 'Basic', priceMonthly: 19, priceYearly: 15,
-    storage: '10 GB', uploads: '2,000 images', highlight: false,
+    storage: '10 GB', uploads: '250 images', highlight: false,
     features: ['Zero-DCE Enhancement', 'Face Detection', 'Quality Checks', 'Person Folder Clustering', 'All Upload Modes'],
     missing: ['Priority Processing', 'API Access'],
     cta: 'Upgrade', link: '/login',
   },
   {
     name: 'Pro', priceMonthly: 49, priceYearly: 39,
-    storage: '100 GB', uploads: 'Unlimited', highlight: true,
+    storage: '30 GB', uploads: '1,000 images', highlight: true,
     features: ['Zero-DCE Enhancement', 'Face Detection', 'Quality Checks', 'Person Folder Clustering', 'All Upload Modes', 'Priority Processing', 'API Access'],
     missing: [],
     cta: 'Go Pro', link: '/login',

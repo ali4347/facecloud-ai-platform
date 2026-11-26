@@ -12,6 +12,8 @@ export interface AccountRow {
   email: string
   role: Role
   suspended: boolean
+  /** Why the account was suspended, when the administrator wrote a reason. */
+  suspensionReason?: string
   /** Photos the account uploaded; null where the backend does not report it. */
   uploads: number | null
   /** Null if the account never signed in (or the demo data, which has no sign-ins). */
@@ -46,7 +48,7 @@ export function useAdminUserList(search: string, page: number, role?: Role): Asy
         count: rows.length < result.results.length ? rows.length : result.count,
         rows: rows.map(u => ({
           id: String(u.id), name: u.username, email: u.email, role: u.role,
-          suspended: u.is_suspended || !u.is_active, uploads: u.uploads_count ?? null,
+          suspended: u.is_suspended || !u.is_active, suspensionReason: u.suspension_reason || undefined, uploads: u.uploads_count ?? null,
           lastLogin: u.last_login ?? null, joinedAt: u.date_joined,
         })),
       }

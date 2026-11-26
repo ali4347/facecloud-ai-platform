@@ -6,9 +6,10 @@ import { StatusBadge } from '../../components/ui/StatusBadge'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
-import { createAdminUser } from '../../lib/api/adminUsers'
+import { createAdminUser, setAdminUserSuspended } from '../../lib/api/adminUsers'
 import { teamsOf, useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { USE_API } from '../../lib/api/config'
 import { USERS_PAGE_SIZE, useAdminUserList, type AccountRow } from '../../lib/useAdminUserList'
@@ -19,14 +20,21 @@ export default function Moderators() {
   const [formOpen, setFormOpen] = useState(false)
   const [justCreated, setJustCreated] = useState<NewAccount | null>(null)
   const [addedInDemo, setAddedInDemo] = useState<AccountRow[]>([])
+  const [demoSuspended, setDemoSuspended] = useState<Record<string, boolean>>({})
+  const [busyId, setBusyId] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [toSuspend, setToSuspend] = useState<AccountRow | null>(null)
+  const [reason, setReason] = useState('')
+  const [suspendError, setSuspendError] = useState<string | null>(null)
 
   const [page, setPage] = useState(1)
   const orgs = useAdminOrganizations()
   const { data, loading, error, isDemo, reload } = useAdminUserList(search, page, 'moderator')
 
   const moderators = useMemo(
-    () => [...(page === 1 && !search.trim() ? addedInDemo : []), ...(data?.rows ?? [])],
-    [data, addedInDemo, page, search],
+    () => [...(page === 1 && !search.trim() ? addedInDemo : []), ...(data?.rows ?? [])]
+      .map(m => ({ ...m, suspended: m.id in demoSuspended ? demoSuspended[m.id] : m.suspended })),
+    [data, addedInDemo, demoSuspended, page, search],
   )
 
   const total = (data?.count ?? 0) + addedInDemo.length
@@ -47,6 +55,35 @@ export default function Moderators() {
     setFormOpen(false)
   }
 
+  /* The same call as on the Users screen. Live: the server signs the moderator out everywhere and the list is read again. Demo: kept for the session only. */
+  const changeSuspended = async (moderator: AccountRow, suspend: boolean) => {
+    setNotice(null); setSuspendError(null)
+    if (isDemo || moderator.id.startsWith('demo-')) {
+      setDemoSuspended(map => ({ ...map, [moderator.id]: suspend }))
+      setToSuspend(null)
+      return
+    }
+    setBusyId(moderator.id)
+    try {
+      await setAdminUserSuspended(Number(moderator.id), suspend, reason.trim())
+      setToSuspend(null)
+      reload()
+    } catch (caught) {
+      const text = caught instanceof Error ? caught.message : 'Could not change the account.'
+      if (suspend) setSuspendError(text); else setNotice(text)
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  /* Suspending signs the moderator out, so it asks first; activating does not. */
+  const toggleSuspended = (moderator: AccountRow) => {
+    if (moderator.suspended) { void changeSuspended(moderator, false); return }
+    setSuspendError(null)
+    setReason('')
+    setToSuspend(moderator)
+  }
+
   return (
     <div className="space-y-6 page-enter">
       <PageHeader
@@ -63,6 +100,12 @@ export default function Moderators() {
         <div className="p-3 rounded-2xl text-xs flex items-center gap-2 bg-surface-mute border border-line text-ink-soft">
           <AlertTriangle className="w-4 h-4 text-[#F59E0B] flex-shrink-0" />
           Showing demo data, and nothing created here is saved. Set <code className="fc-kbd">VITE_USE_API=true</code> to see the real moderators.
+        </div>
+      )}
+
+      {notice && (
+        <div role="alert" className="p-3 rounded-2xl text-xs bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">
+          {notice}
         </div>
       )}
 
@@ -124,7 +167,12 @@ export default function Moderators() {
                 </div>
               )},
               { key: 'suspended', label: 'Status', render: row => (
-                <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />
+                <div>
+                  <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />
+                  {Boolean(row.suspended) && Boolean(row.suspensionReason) && (
+                    <p className="text-[11px] text-ink-faint mt-1 max-w-[220px] truncate" title={String(row.suspensionReason)}>{String(row.suspensionReason)}</p>
+                  )}
+                </div>
               )},
               // The backend stamps last_login on every successful sign-in; null means the account never signed in.
               { key: 'lastLogin', label: 'Last sign-in', render: row => (
@@ -132,6 +180,16 @@ export default function Moderators() {
               )},
               { key: 'joinedAt', label: 'Created', render: row => (
                 <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span>
+              )},
+              { key: 'actions', label: 'Actions', render: row => (
+                <button
+                  type="button"
+                  disabled={busyId === row.id}
+                  onClick={() => toggleSuspended(row as unknown as AccountRow)}
+                  className={`text-xs font-medium hover:underline cursor-pointer disabled:opacity-50 ${row.suspended ? 'text-[#10B981]' : 'text-[#EF4444]'}`}
+                >
+                  {busyId === row.id ? 'Saving…' : row.suspended ? 'Activate' : 'Suspend'}
+                </button>
               )},
             ]}
           />
@@ -148,6 +206,17 @@ export default function Moderators() {
               className="px-3 py-1.5 rounded-xl border border-line bg-surface disabled:opacity-40 cursor-pointer disabled:cursor-default flex items-center gap-1">Next<ChevronRight className="w-3.5 h-3.5" /></button>
           </div>
         </div>
+      )}
+
+      {toSuspend && (
+        <ConfirmDialog title={`Suspend ${toSuspend.name}?`} confirmLabel="Suspend" busyLabel="Suspending…" danger busy={busyId === toSuspend.id} error={suspendError}
+          onConfirm={() => void changeSuspended(toSuspend, true)} onCancel={() => setToSuspend(null)}>
+          <p>{toSuspend.name} is signed out on every device and cannot open the moderator panel until you activate the account again. Nothing is deleted.</p>
+          <label className="block">
+            <span className="text-xs font-semibold text-ink">Reason (optional, kept with the account)</span>
+            <textarea className="fc-input mt-1 w-full text-xs" rows={2} maxLength={300} value={reason} onChange={e => setReason(e.target.value)} />
+          </label>
+        </ConfirmDialog>
       )}
     </div>
   )

@@ -16,7 +16,7 @@ export function PublicFooter() {
         <div className="space-y-3.5">
           <FaceCloudLogo variant="horizontal" size="sm" href="/" priority={false} tone="app" />
           <p className="text-[10px] text-ink-faint font-medium leading-relaxed">
-            Powered by DATAMART / DTM.IO. Advanced facial image organization, quality check, and Zero-DCE restorative node suite.
+            A creative platform to direct your best work. To facilitate the studios, creators and agencies. Powered by DATAMART Inc.
           </p>
         </div>
 
@@ -46,13 +46,13 @@ export function PublicFooter() {
           <div className="space-y-2">
             <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Portals</h4>
             <ul className="space-y-2 font-medium">
-              <li><Link to="/login" className="hover:text-[#F97316] transition-colors">User Login</Link></li>
+              <li><Link to="/login" className="hover:text-[#F97316] transition-colors">Login</Link></li>
             </ul>
           </div>
           <div className="space-y-1 pt-1">
             <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Registry Compliance</h4>
             <p className="text-[10px] text-ink-faint leading-relaxed font-medium">
-              &copy; {new Date().getFullYear()} FaceCloud. Registered datasets under local Django SQL configurations. All rights reserved.
+              &copy; {new Date().getFullYear()} FaceCloud. All rights reserved.
             </p>
           </div>
         </div>
