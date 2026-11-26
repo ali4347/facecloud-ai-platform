@@ -11,6 +11,7 @@ import { EnhancementReport } from './EnhancementReport'
 import { levelLabel } from '../../lib/api/enhancements'
 import type { EnhancementLevel, EnhancementLighting, EnhancementResult, EnhancementStyle } from '../../lib/api/enhancements'
 import { ApiError } from '../../lib/api/client'
+import { ProConsentNotice } from './ConsentPrompt'
 import { passedChecks } from '../../lib/api/images'
 import {
   LIVE_SNAPSHOT_STEPS, dataUrlToJpegFile, enhanceStoredPhoto, reasonText, submitSnapshot,
@@ -1335,6 +1336,7 @@ export function LiveEnhancementPanel({ className }: LiveEnhancementPanelProps) {
                   </div>
                 </div>
               )}
+              {USE_API && !snapshotProcessing && liveStyle === 'ai_max' && <ProConsentNotice onNotNow={() => setLiveStyle('natural')} />}
 
               {/* Enhance button */}
               {!snapshotProcessing && (
