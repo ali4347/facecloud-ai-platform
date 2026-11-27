@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react'
-import { Building2, CheckCircle, Loader2, Plus, X } from 'lucide-react'
+import { useState } from 'react'
+import { Building2, CheckCircle, Info, Mail, Plus } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { GradientButton } from '../../components/ui/GradientButton'
 import { AsyncGate } from '../../components/admin/AsyncGate'
-import { createAdminOrganization, updateAdminOrganization, type AdminOrganization, type OrganizationPlan } from '../../lib/api/adminOrganizations'
+import {
+  createOrganizationForOwner, isWaitingForOwner, updateAdminOrganization, type AdminOrganization, type CreatedForOwner, type OrganizationPlan,
+} from '../../lib/api/adminOrganizations'
+import { Modal } from '../../components/ui/Modal'
+import { InvitationStatusChip, OwnerInvitationPanel } from '../../components/admin/OwnerInvitationPanel'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
-import { listAdminUsersPage, type AdminUser } from '../../lib/api/adminUsers'
 import { USE_API } from '../../lib/api/config'
 import type { ModeratorDataScope, PlanLimits, PlanUsage } from '../../lib/api/organizations'
 import { useAdminOrganizations } from '../../lib/useAdminOrganizations'
@@ -21,58 +24,28 @@ const PLANS: OrganizationPlan[] = ['free', 'team', 'enterprise']
 const seats = (used: number | undefined, limit: number | null | undefined) => (used === undefined ? '—' : limit === null || limit === undefined ? String(used) : `${used} of ${limit}`)
 const full = (usage?: PlanUsage, limits?: PlanLimits) => Boolean(usage && limits && limits.moderators !== null && usage.moderators >= limits.moderators)
 
-/** Pick the account that will own the organization: type to search the accounts on the server, then choose one. */
-function OwnerPicker({ value, onChange }: { value: AdminUser | null; onChange: (user: AdminUser | null) => void }) {
-  const [text, setText] = useState('')
-  const [found, setFound] = useState<AdminUser[]>([])
-  const [searching, setSearching] = useState(false)
-  useEffect(() => {
-    if (value || !USE_API || text.trim().length < 2) { setFound([]); return }
-    const controller = new AbortController()
-    setSearching(true)
-    const timer = setTimeout(() => {
-      listAdminUsersPage({ q: text.trim(), page: 1, pageSize: 6 }, controller.signal)
-        .then(p => { if (!controller.signal.aborted) setFound(p.results.filter(u => u.is_active)) })
-        .catch(() => { if (!controller.signal.aborted) setFound([]) })
-        .finally(() => { if (!controller.signal.aborted) setSearching(false) })
-    }, 250)
-    return () => { controller.abort(); clearTimeout(timer) }
-  }, [text, value])
-
-  if (value) {
-    return (
-      <div className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-surface-mute border border-line text-xs">
-        <span><strong className="text-ink">{value.username}</strong> <span className="text-ink-mute">{value.email}</span></span>
-        <button type="button" onClick={() => { onChange(null); setText('') }} aria-label="Choose someone else" className="text-ink-mute hover:text-ink cursor-pointer"><X className="w-4 h-4" /></button>
-      </div>
-    )
-  }
-  return (
-    <div className="relative">
-      <input id="org-owner" className="fc-input" value={text} onChange={e => setText(e.target.value)} placeholder="Type a username or email…" autoComplete="off" />
-      {(searching || found.length > 0) && (
-        <ul className="absolute z-10 left-0 right-0 top-[46px] rounded-xl bg-surface border border-line shadow-soft-lg p-1.5 text-xs">
-          {searching && found.length === 0 && <li className="px-3 py-2 text-ink-faint flex items-center gap-2"><Loader2 className="w-3.5 h-3.5 animate-spin" />Searching…</li>}
-          {found.map(u => (
-            <li key={u.id}><button type="button" onClick={() => onChange(u)} className="w-full text-left px-3 py-2 rounded-lg hover:bg-surface-mute cursor-pointer">
-              <strong className="text-ink">{u.username}</strong> <span className="text-ink-mute">{u.email}</span> <span className="text-ink-faint capitalize">· {u.role}</span></button></li>
-          ))}
-        </ul>
-      )}
-      {USE_API && text.trim().length >= 2 && !searching && found.length === 0 && <p className="text-[10px] text-ink-faint mt-1">No active account matches.</p>}
-    </div>
-  )
+/** How an organization's state reads in the list. `pending_owner`: created from an e-mail address, nobody belongs to it yet. */
+function orgStatusBadge(status: string) {
+  if (status === 'active') return <StatusBadge status="success" label="Active" />
+  if (status === 'pending_owner') return <StatusBadge status="info" label="Waiting for owner" />
+  return <StatusBadge status="warning" label="Suspended" />
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export default function Organizations() {
-  const state = useAdminOrganizations()
+  const [showPersonal, setShowPersonal] = useState(false)
+  // Shared organizations only, unless the administrator asks for the personal workspaces too (every account has one).
+  const state = useAdminOrganizations(showPersonal ? 'all' : 'organization')
   const [formOpen, setFormOpen] = useState(false)
   const [name, setName] = useState('')
   const [plan, setPlan] = useState<OrganizationPlan>('free')
-  const [owner, setOwner] = useState<AdminUser | null>(null)
+  const [ownerEmail, setOwnerEmail] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const [created, setCreated] = useState<string | null>(null)
+  const [created, setCreated] = useState<CreatedForOwner | null>(null)
+  const [demoCreated, setDemoCreated] = useState<string | null>(null)
+  const [invitationFor, setInvitationFor] = useState<AdminOrganization | null>(null)
   const [addedInDemo, setAddedInDemo] = useState<AdminOrganization[]>([])
   const [editing, setEditing] = useState<AdminOrganization | null>(null)
   const [suspending, setSuspending] = useState<AdminOrganization | null>(null)
@@ -81,45 +54,69 @@ export default function Organizations() {
   const [working, setWorking] = useState(false)
   const [form, setForm] = useState({ name: '', plan: 'free' as OrganizationPlan, scope: 'own_members' as ModeratorDataScope, reason: '' })
 
-  const apply = async (org: AdminOrganization, patch: Parameters<typeof updateAdminOrganization>[1], done: string) => {
+  const apply = async (org: AdminOrganization, patch: Parameters<typeof updateAdminOrganization>[1], doneText: string) => {
+    let done = doneText
     setWorking(true); setNotice(null)
     try {
-      if (USE_API) { await updateAdminOrganization(org.id, patch); state.reload() }
+      if (USE_API) {
+        const updated = await updateAdminOrganization(org.id, patch); state.reload()
+        // Reactivating an organization whose owner never accepted puts it back to waiting, not to active.
+        if (patch.status === 'active' && updated?.status === 'pending_owner') done = `${org.name} is waiting for its owner again.`
+      }
       else setDemoPatch(p => ({ ...p, [org.id]: { ...p[org.id], ...(patch.name ? { name: patch.name } : {}), ...(patch.plan ? { plan: patch.plan } : {}), ...(patch.status ? { status: patch.status } : {}), ...(patch.moderator_data_scope ? { moderator_data_scope: patch.moderator_data_scope } : {}) } }))
       setNotice({ text: done }); setEditing(null); setSuspending(null)
     } catch (caught) { setNotice({ text: messageFor(caught), bad: true }) } finally { setWorking(false) }
   }
-  const [showPersonal, setShowPersonal] = useState(false)
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    const email = ownerEmail.trim()
+    if (!name.trim()) { setError('Give the organization a name.'); return }
+    if (!EMAIL_RE.test(email)) { setError('Enter the owner’s e-mail address.'); return }
     if (!USE_API) {
-      setAddedInDemo(rows => [{ id: 100 + rows.length, name: name.trim(), slug: name.trim().toLowerCase().replace(/\s+/g, '-'), status: 'active', plan, is_personal: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, ...rows])
-      setCreated(name.trim()); setFormOpen(false); setName(''); return
+      setAddedInDemo(rows => [{ id: 100 + rows.length, name: name.trim(), slug: name.trim().toLowerCase().replace(/\s+/g, '-'), status: 'pending_owner', plan, is_personal: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }, ...rows])
+      setDemoCreated(name.trim()); setFormOpen(false); setName(''); setOwnerEmail(''); return
     }
-    if (!owner) { setError('Choose the account that will own the organization.'); return }
     setBusy(true)
     try {
-      await createAdminOrganization({ name: name.trim(), owner_id: owner.id, plan })
-      setCreated(name.trim()); setFormOpen(false); setName(''); setOwner(null); state.reload()
+      const answer = await createOrganizationForOwner({ name: name.trim(), owner_email: email, plan })
+      setCreated(answer); setFormOpen(false); setName(''); setOwnerEmail(''); state.reload()
     } catch (caught) { setError(messageFor(caught)) } finally { setBusy(false) }
   }
 
   return (
     <div className="page-enter">
       <PageHeader title="Organizations" subtitle="Each organization is a separate project: its moderators and members only ever see its own photos and people."
-        action={<GradientButton leftIcon={<Plus className="w-4 h-4" />} onClick={() => { setCreated(null); setFormOpen(true) }}>New organization</GradientButton>} />
+        action={<GradientButton leftIcon={<Plus className="w-4 h-4" />} onClick={() => { setCreated(null); setDemoCreated(null); setError(''); setFormOpen(true) }}>New organization</GradientButton>} />
 
       <AsyncGate state={state} what="the organizations">
         {all => {
           const rows = [...addedInDemo, ...all].map(o => ({ ...o, ...demoPatch[o.id] })).filter(o => showPersonal || !o.is_personal)
-          const personal = all.filter(o => o.is_personal).length
           return (
             <div className="space-y-5">
-              {created && (
+              {demoCreated && (
                 <div role="status" className="p-3 rounded-2xl text-xs bg-[#10B981]/10 border border-[#10B981]/25 text-[#10B981] flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4" /> “{created}” was created{USE_API ? '' : ' (demo — nothing is saved)'}. Add its moderators from Moderators → Create moderator.
+                  <CheckCircle className="w-4 h-4" /> “{demoCreated}” was created and waits for its owner (demo — nothing is saved and no e-mail is sent).
+                </div>
+              )}
+              {created && (
+                <div role="status" className="p-4 rounded-2xl text-xs bg-[#10B981]/10 border border-[#10B981]/25 space-y-2">
+                  <p className="font-semibold text-[#10B981] flex items-center gap-2"><CheckCircle className="w-4 h-4" />
+                    {created.created
+                      ? `“${created.name}” was created and is waiting for its owner.`
+                      : `“${created.name}” already exists and is waiting for this owner. Nothing new was created and no second e-mail was sent.`}
+                  </p>
+                  {created.owner_invitation && (
+                    <p className="text-ink-soft">
+                      Invitation for <strong className="text-ink">{created.owner_invitation.email}</strong>: {created.owner_invitation.email_status === 'failed'
+                        ? <span className="text-[#F87171]">the e-mail could not be sent ({created.owner_invitation.email_failure_reason || 'no reason given'}). Use Resend.</span>
+                        : created.owner_invitation.email_status === 'sent' ? 'e-mail sent.' : 'e-mail about to be sent.'}{' '}
+                      {created.owner_account_exists === true && 'This address already has a FaceCloud account: they will be asked to sign in, then accept.'}
+                      {created.owner_account_exists === false && 'There is no account with this address yet: they will create one from the invitation.'}
+                    </p>
+                  )}
+                  <p className="text-ink-mute">Nobody belongs to it until they accept. No password is sent; the link works once and expires.</p>
+                  <button type="button" onClick={() => setInvitationFor(created)} className="font-bold text-[#FB923C] hover:underline cursor-pointer">Open the invitation</button>
                 </div>
               )}
 
@@ -128,28 +125,29 @@ export default function Organizations() {
               )}
 
               {formOpen && (
-                <ChartCard title="New organization" subtitle="Give the project a name and the person who owns it">
-                  <form onSubmit={submit} className="space-y-4 max-w-xl">
+                <ChartCard title="New organization" subtitle="The owner does not need an account: they get an invitation e-mail and become the owner when they accept it">
+                  <form onSubmit={submit} className="space-y-4 max-w-xl" noValidate>
                     {error && <div role="alert" className="p-3 rounded-2xl text-xs bg-[#EF4444]/10 border border-[#EF4444]/25 text-[#F87171]">{error}</div>}
                     <div className="space-y-1.5">
-                      <label htmlFor="org-name" className={labelClass}>Name</label>
+                      <label htmlFor="org-name" className={labelClass}>Organization name</label>
                       <input id="org-name" className="fc-input" value={name} onChange={e => setName(e.target.value)} maxLength={120} required />
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label htmlFor="org-owner" className={labelClass}>Owner</label>
-                        {USE_API ? <OwnerPicker value={owner} onChange={setOwner} /> : <input className="fc-input" placeholder="(demo) any account" disabled />}
+                        <label htmlFor="org-owner-email" className={labelClass}>Owner email</label>
+                        <input id="org-owner-email" type="email" className="fc-input" value={ownerEmail} onChange={e => setOwnerEmail(e.target.value)} autoComplete="off" placeholder="owner@company.com" required />
                       </div>
                       <div className="space-y-1.5">
-                        <label htmlFor="org-plan" className={labelClass}>Plan</label>
+                        <label htmlFor="org-plan" className={labelClass}>Subscription plan</label>
                         <select id="org-plan" className="fc-input" value={plan} onChange={e => setPlan(e.target.value as OrganizationPlan)}>
                           {PLANS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
                         </select>
                       </div>
                     </div>
-                    <p className="text-[10px] text-ink-faint">The owner can invite members and sees the whole organization. Moderators are added afterwards from Moderators, each tied to one organization.</p>
+                    <p className="text-[10px] text-ink-faint flex gap-1.5"><Info className="w-3 h-3 flex-shrink-0 mt-px" />
+                      The organization waits for its owner and nobody can use it until they accept. The owner then invites the moderators, and the moderators invite the members.</p>
                     <div className="flex gap-2 pt-1">
-                      <GradientButton type="submit" disabled={busy} leftIcon={<Building2 className="w-4 h-4" />}>{busy ? 'Creating…' : 'Create organization'}</GradientButton>
+                      <GradientButton type="submit" disabled={busy} leftIcon={<Mail className="w-4 h-4" />}>{busy ? 'Creating…' : 'Create Organization & Send Invitation'}</GradientButton>
                       <GradientButton type="button" variant="secondary" onClick={() => setFormOpen(false)} disabled={busy}>Cancel</GradientButton>
                     </div>
                   </form>
@@ -159,9 +157,7 @@ export default function Organizations() {
               <div className="fc-card overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-line text-xs text-ink-mute">
                   <span>{rows.length} organization{rows.length === 1 ? '' : 's'}</span>
-                  {personal > 0 && (
-                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={showPersonal} onChange={e => setShowPersonal(e.target.checked)} />Also show the {personal} personal workspace{personal === 1 ? '' : 's'}</label>
-                  )}
+                  <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={showPersonal} onChange={e => setShowPersonal(e.target.checked)} />Also show personal workspaces</label>
                 </div>
                 {rows.length === 0 ? (
                   <p className="py-12 text-center text-sm text-ink-faint">No organization yet. Create the first one with the button above.</p>
@@ -174,16 +170,23 @@ export default function Organizations() {
                           <tr key={o.id}>
                             <td><div className="flex items-center gap-3"><div className="w-8 h-8 rounded-xl bg-accent-tint flex items-center justify-center"><Building2 className="w-4 h-4 text-accent" /></div>
                               <div><p className="text-sm font-semibold text-ink">{o.name}</p><p className="text-[10px] text-ink-faint">{o.is_personal ? 'Personal workspace' : `${o.slug} · created ${formatDate(o.created_at)}`}</p></div></div></td>
-                            <td className="text-sm text-ink-soft">{o.owner?.username ?? '—'}</td>
+                            <td className="text-sm text-ink-soft">
+                              {o.owner?.username ?? (isWaitingForOwner(o) && o.owner_invitation
+                                ? <div className="space-y-1"><p className="text-xs break-all">Invited: {o.owner_invitation.email}</p><InvitationStatusChip status={o.owner_invitation.status} /></div>
+                                : '—')}
+                            </td>
                             <td className="text-sm text-ink-soft">{o.member_count ?? '—'}</td>
                             <td className="text-sm text-ink-soft">{seats(o.usage?.moderators, o.limits?.moderators)}{full(o.usage, o.limits) && <span className="ml-1.5 text-[10px] font-semibold text-[#F59E0B]">full</span>}</td>
                             <td className="text-sm text-ink-soft capitalize">{o.plan}</td>
-                            <td><StatusBadge status={o.status === 'active' ? 'success' : 'warning'} label={o.status === 'active' ? 'Active' : 'Suspended'} /></td>
+                            <td>{orgStatusBadge(o.status)}</td>
                             <td>
                               {o.is_personal ? <span className="text-[10px] text-ink-faint">—</span> : (
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
+                                  {isWaitingForOwner(o) && (
+                                    <button type="button" onClick={() => setInvitationFor(o)} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] cursor-pointer">Invitation</button>
+                                  )}
                                   <button type="button" onClick={() => { setForm({ name: o.name, plan: o.plan as OrganizationPlan, scope: o.moderator_data_scope ?? 'own_members', reason: '' }); setNotice(null); setEditing(o) }} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] cursor-pointer">Edit</button>
-                                  {o.status === 'active'
+                                  {o.status === 'active' || isWaitingForOwner(o)
                                     ? <button type="button" onClick={() => { setForm(f => ({ ...f, reason: '' })); setNotice(null); setSuspending(o) }} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] !text-[#F59E0B] cursor-pointer">Suspend</button>
                                     : <button type="button" onClick={() => void apply(o, { status: 'active' }, `${o.name} is active again.`)} disabled={working} className="fc-btn-secondary !py-1 !px-2.5 text-[10px] !text-[#10B981] cursor-pointer disabled:opacity-50">Reactivate</button>}
                                 </div>
@@ -218,6 +221,12 @@ export default function Organizations() {
             <div className="flex justify-end gap-2 pt-1"><GradientButton type="button" variant="secondary" onClick={() => setEditing(null)} disabled={working}>Cancel</GradientButton><GradientButton type="submit" disabled={working}>{working ? 'Saving…' : 'Save changes'}</GradientButton></div>
           </form>
         </div>
+      )}
+
+      {invitationFor && (
+        <Modal title={`Owner invitation · ${invitationFor.name}`} onClose={() => setInvitationFor(null)} wide>
+          <OwnerInvitationPanel organizationId={invitationFor.id} organizationName={invitationFor.name} initial={invitationFor.owner_invitation} onChanged={state.reload} />
+        </Modal>
       )}
 
       {suspending && (

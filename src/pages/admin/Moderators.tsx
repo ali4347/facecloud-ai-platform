@@ -43,7 +43,7 @@ export default function Moderators() {
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
     if (USE_API) {
-      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: 'moderator', ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
+      await createAdminUser({ username: account.username, email: account.email, ...(account.password ? { password: account.password } : {}), role: 'moderator', ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
       reload()
     } else {
       setAddedInDemo(rows => [{

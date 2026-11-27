@@ -10,7 +10,8 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
-import { createAdminUser, setAdminUserSuspended } from '../../lib/api/adminUsers'
+import { createAdminUser, sendAdminPasswordReset, setAdminUserSuspended, type AccountType } from '../../lib/api/adminUsers'
+import { UserDetailsDialog } from '../../components/admin/UserDetailsDialog'
 import { teamsOf, useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { USE_API } from '../../lib/api/config'
 import { USERS_PAGE_SIZE, useAdminUserList, type AccountRow as UserRow } from '../../lib/useAdminUserList'
@@ -40,7 +41,28 @@ export default function UsersPage() {
   const [toSuspend, setToSuspend] = useState<UserRow | null>(null)
   const [suspendError, setSuspendError] = useState<string | null>(null)
 
-  const { data, loading, error, isDemo, reload } = useAdminUserList(search, page)
+  // Personal users (only their own private workspace) and organization users can be listed apart.
+  const [accountType, setAccountType] = useState<'' | AccountType>('')
+  const [detailsFor, setDetailsFor] = useState<UserRow | null>(null)
+  const [toReset, setToReset] = useState<UserRow | null>(null)
+  const [resetBusy, setResetBusy] = useState(false)
+  const [resetError, setResetError] = useState<string | null>(null)
+  const [okNotice, setOkNotice] = useState<string | null>(null)
+
+  const { data, loading, error, isDemo, reload } = useAdminUserList(search, page, undefined, accountType || undefined)
+
+  const sendReset = async (user: UserRow) => {
+    setResetBusy(true); setResetError(null); setOkNotice(null)
+    try {
+      const answer = await sendAdminPasswordReset(Number(user.id))
+      setToReset(null)
+      setOkNotice(answer?.detail || `A password reset link was sent to ${user.email}.`)
+    } catch (caught) {
+      setResetError(caught instanceof Error ? caught.message : 'The reset link could not be sent.')
+    } finally {
+      setResetBusy(false)
+    }
+  }
 
   const users = useMemo(() => {
     const first = page === 1 && !search.trim() ? addedInDemo : []
@@ -55,7 +77,7 @@ export default function UsersPage() {
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
     if (USE_API) {
-      await createAdminUser({ username: account.username, email: account.email, password: account.password, role: account.role, ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
+      await createAdminUser({ username: account.username, email: account.email, ...(account.password ? { password: account.password } : {}), role: account.role, ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
       reload()
     } else {
       setAddedInDemo(rows => [{
@@ -119,6 +141,9 @@ export default function UsersPage() {
             {notice}
           </div>
         )}
+        {okNotice && (
+          <div role="status" className="p-3 rounded-2xl text-xs bg-[#10B981]/10 border border-[#10B981]/25 text-[#10B981]">{okNotice}</div>
+        )}
 
         {justCreated && <CreatedAccountNotice account={justCreated} demo={!USE_API} onDismiss={() => setJustCreated(null)} />}
 
@@ -135,8 +160,18 @@ export default function UsersPage() {
           />
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <SearchInput placeholder="Search users…" value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} className="w-72" />
+          {USE_API && (
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Account type">
+              {([['', 'All accounts'], ['personal', 'Personal'], ['organization', 'In an organization']] as const).map(([value, label]) => (
+                <button key={value || 'all'} type="button" aria-pressed={accountType === value} onClick={() => { setAccountType(value); setPage(1) }}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer ${accountType === value ? 'bg-accent/15 border-accent/30 text-accent' : 'bg-surface-mute border-line text-ink-mute hover:text-ink'}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="fc-card overflow-hidden">
@@ -186,6 +221,10 @@ export default function UsersPage() {
                   </div>
                 )},
                 { key: 'role', label: 'Role', render: row => roleBadge(row.role as Role) },
+                // Personal: only their own private workspace. Organization: also an active member of shared organizations.
+                ...(users.some(u => u.accountType) ? [{ key: 'accountType', label: 'Account', render: (row: Record<string, unknown>) => (
+                  <span className="text-xs text-ink-soft">{row.accountType === 'organization' ? `Organization${row.sharedOrganizations ? ` · ${String(row.sharedOrganizations)}` : ''}` : row.accountType === 'personal' ? 'Personal' : '—'}</span>
+                ) }] : []),
                 { key: 'suspended', label: 'Status', render: row => (
                   <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />
                 )},
@@ -199,14 +238,22 @@ export default function UsersPage() {
                 )},
                 { key: 'joinedAt', label: 'Joined', render: row => <span className="text-sm text-ink-mute">{formatDate(String(row.joinedAt))}</span> },
                 { key: 'actions', label: 'Actions', render: row => (
-                  <button
-                    type="button"
-                    disabled={busyId === row.id}
-                    onClick={() => toggleSuspended(row as unknown as UserRow)}
-                    className={`text-xs font-medium hover:underline cursor-pointer disabled:opacity-50 ${row.suspended ? 'text-[#10B981]' : 'text-[#EF4444]'}`}
-                  >
-                    {row.suspended ? 'Activate' : 'Suspend'}
-                  </button>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {USE_API && (
+                      <button type="button" onClick={() => setDetailsFor(row as unknown as UserRow)} className="text-xs font-medium text-ink-soft hover:underline cursor-pointer">Details</button>
+                    )}
+                    {USE_API && !row.suspended && (
+                      <button type="button" onClick={() => { setResetError(null); setToReset(row as unknown as UserRow) }} className="text-xs font-medium text-[#FB923C] hover:underline cursor-pointer">Reset password</button>
+                    )}
+                    <button
+                      type="button"
+                      disabled={busyId === row.id}
+                      onClick={() => toggleSuspended(row as unknown as UserRow)}
+                      className={`text-xs font-medium hover:underline cursor-pointer disabled:opacity-50 ${row.suspended ? 'text-[#10B981]' : 'text-[#EF4444]'}`}
+                    >
+                      {row.suspended ? 'Activate' : 'Suspend'}
+                    </button>
+                  </div>
                 )},
               ]}
             />
@@ -225,6 +272,15 @@ export default function UsersPage() {
           </div>
         )}
       </div>
+
+      {detailsFor && <UserDetailsDialog userId={Number(detailsFor.id)} name={detailsFor.name} onClose={() => setDetailsFor(null)} />}
+
+      {toReset && (
+        <ConfirmDialog title={`Send ${toReset.name} a password reset link?`} confirmLabel="Send reset link" busyLabel="Sending…" busy={resetBusy} error={resetError}
+          onConfirm={() => void sendReset(toReset)} onCancel={() => setToReset(null)}>
+          <p>{toReset.email} gets an e-mail with a link to choose a new password. You never see the password or the link.</p>
+        </ConfirmDialog>
+      )}
 
       {toSuspend && (
         <ConfirmDialog title={`Suspend ${toSuspend.name}?`} confirmLabel="Suspend" busyLabel="Suspending…" danger busy={busyId === toSuspend.id} error={suspendError}

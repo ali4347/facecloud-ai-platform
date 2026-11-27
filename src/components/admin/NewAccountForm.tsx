@@ -11,6 +11,7 @@ export type NewAccountRole = 'user' | 'moderator'
 export interface NewAccount {
   username: string
   email: string
+  /** Empty when the person is e-mailed a link to choose their own (the default). */
   password: string
   role: NewAccountRole
   /** Set for a moderator: the organization they work for. */
@@ -49,6 +50,8 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  /* By default the person chooses their own password from an e-mailed link, so the administrator never knows it. */
+  const [passwordMode, setPasswordMode] = useState<'link' | 'set'>('link')
   const [role, setRole] = useState<NewAccountRole>(roles[0])
   const [organizationId, setOrganizationId] = useState<number | ''>(organizations.length === 1 ? organizations[0].id : '')
   const [error, setError] = useState('')
@@ -57,12 +60,12 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (password.length < 8) { setError('The password needs at least 8 characters.'); return }
-    if (password !== confirm) { setError('The two passwords do not match.'); return }
+    if (passwordMode === 'set' && password.length < 8) { setError('The password needs at least 8 characters.'); return }
+    if (passwordMode === 'set' && password !== confirm) { setError('The two passwords do not match.'); return }
     if (role === 'moderator' && organizationId === '') { setError('Choose the organization this moderator works for.'); return }
     setBusy(true)
     try {
-      await onCreate({ username: username.trim(), email: email.trim(), password, role, ...(role === 'moderator' && organizationId !== '' ? { organizationId } : {}) })
+      await onCreate({ username: username.trim(), email: email.trim(), password: passwordMode === 'set' ? password : '', role, ...(role === 'moderator' && organizationId !== '' ? { organizationId } : {}) })
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Could not create the account. Please try again.')
     } finally {
@@ -92,6 +95,19 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
           </div>
         </div>
 
+        <fieldset className="space-y-2">
+          <legend className={labelClass}>Password</legend>
+          <label className="flex items-start gap-2 text-xs text-ink-soft cursor-pointer">
+            <input type="radio" name="password-mode" className="mt-0.5 accent-[#F97316]" checked={passwordMode === 'link'} onChange={() => setPasswordMode('link')} />
+            <span><strong className="text-ink">E-mail them a link to choose their own</strong> (recommended): you never know their password.</span>
+          </label>
+          <label className="flex items-start gap-2 text-xs text-ink-soft cursor-pointer">
+            <input type="radio" name="password-mode" className="mt-0.5 accent-[#F97316]" checked={passwordMode === 'set'} onChange={() => setPasswordMode('set')} />
+            <span>Set a password now and hand it over yourself.</span>
+          </label>
+        </fieldset>
+
+        {passwordMode === 'set' && (
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
@@ -102,14 +118,15 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
               </button>
             </div>
             <PasswordInput id="new-password" className="fc-input" value={password}
-              autoComplete="new-password" onChange={e => setPassword(e.target.value)} required />
+              autoComplete="new-password" onChange={e => setPassword(e.target.value)} required={passwordMode === 'set'} />
           </div>
           <div className="space-y-1.5">
             <label htmlFor="new-confirm" className={labelClass}>Confirm password</label>
             <PasswordInput id="new-confirm" className="fc-input" value={confirm}
-              autoComplete="new-password" onChange={e => setConfirm(e.target.value)} required />
+              autoComplete="new-password" onChange={e => setConfirm(e.target.value)} required={passwordMode === 'set'} />
           </div>
         </div>
+        )}
 
         {roles.length > 1 && (
           <div className="space-y-1.5 max-w-[16rem]">
@@ -167,14 +184,22 @@ export function CreatedAccountNotice({ account, demo = false, onDismiss }: { acc
           <X className="w-4 h-4" />
         </button>
       </div>
-      <p className="text-ink-soft">
-        Share these sign-in details with <span className="font-semibold text-ink">{account.username}</span> now.
-        The sign-in screens take the email address. The password is not shown again.
-      </p>
-      <div className="grid sm:grid-cols-2 gap-2">
-        <div><p className={labelClass}>Email (sign in with this)</p><p className="fc-kbd inline-block mt-1">{account.email}</p></div>
-        <div><p className={labelClass}>Password</p><p className="fc-kbd inline-block mt-1">{account.password}</p></div>
-      </div>
+      {account.password ? (
+        <>
+          <p className="text-ink-soft">
+            Share these sign-in details with <span className="font-semibold text-ink">{account.username}</span> now.
+            The sign-in screens take the email address. The password is not shown again.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <div><p className={labelClass}>Email (sign in with this)</p><p className="fc-kbd inline-block mt-1">{account.email}</p></div>
+            <div><p className={labelClass}>Password</p><p className="fc-kbd inline-block mt-1">{account.password}</p></div>
+          </div>
+        </>
+      ) : (
+        <p className="text-ink-soft">
+          {demo ? 'In the live app, ' : ''}<span className="font-semibold text-ink">{account.email}</span> {demo ? 'would get' : 'was sent'} a link to choose a password. They sign in with this e-mail address once they have set it. Nobody else ever sees the password.
+        </p>
+      )}
     </div>
   )
 }

@@ -131,7 +131,8 @@ export function removeOrgMember(organizationId: number, membershipId: number): P
 export interface InvitationPreview {
   organization_name: string
   email: string
-  role: 'member' | 'moderator'
+  /** `owner` for the invitation the Platform Administrator sends when creating an organization (backend PR #176). */
+  role: 'member' | 'moderator' | 'owner'
   expires_at: string
 }
 

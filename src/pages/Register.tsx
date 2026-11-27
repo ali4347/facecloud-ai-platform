@@ -41,7 +41,8 @@ export default function Register() {
     if (USE_API && invitationToken && invite) {
       try {
         const signedIn = await registerFromInvitation({ fullName: name, email: email.trim(), password, passwordConfirm: confirmPassword, invitationToken })
-        navigate(signedIn.dashboard === 'moderator' ? '/moderator' : '/dashboard', { replace: true })
+        // A new owner goes straight to their organization; a moderator to the moderator panel; anyone else to their dashboard.
+        navigate(invite.role === 'owner' ? '/dashboard/organization' : signedIn.dashboard === 'moderator' ? '/moderator' : '/dashboard', { replace: true })
       } catch (err) {
         const message = err instanceof ApiError ? err.message : 'Could not create the account. Please try again.'
         setEmailTaken(err instanceof ApiError && /already|exists|registered|taken/i.test(message))
@@ -101,10 +102,17 @@ export default function Register() {
           <p className="text-sm mb-6" style={{ color: 'rgb(var(--a-ink) / 0.48)' }}>
             Create your profile to process faces with AI.
           </p>
+          {!invitationToken && (
+            <p className="text-[11px] text-ink-faint -mt-4 mb-5">
+              This creates a personal account: your photos are private to you. You join an organization only by accepting an invitation from it.
+            </p>
+          )}
 
           {invite && (
             <div className="p-3 mb-5 rounded-2xl text-xs" style={{ background: 'rgba(249,115,22,0.08)', border: '1px solid rgba(249,115,22,0.25)', color: 'rgb(var(--a-ink-soft))' }}>
-              You were invited to <strong className="text-ink">{invite.organization_name}</strong> as a {invite.role}. Creating your account here joins it at once; there is no email to confirm.
+              {invite.role === 'owner'
+                ? <>You were invited to be the owner of <strong className="text-ink">{invite.organization_name}</strong>. Creating your account here accepts the invitation: you become its owner at once (the link already proved your e-mail address). Your personal photos stay private.</>
+                : <>You were invited to <strong className="text-ink">{invite.organization_name}</strong> as a {invite.role}. Creating your account here joins it at once; there is no email to confirm.</>}
             </div>
           )}
           {inviteProblem && (
@@ -150,7 +158,7 @@ export default function Register() {
             ))}
 
             <button type="submit" className="fc-btn-primary w-full mt-2" disabled={loading}>
-              {loading ? 'Registering…' : invite ? `Create account and join ${invite.organization_name}` : 'Create Account'}
+              {loading ? 'Registering…' : invite ? (invite.role === 'owner' ? `Create account and become the owner` : `Create account and join ${invite.organization_name}`) : 'Create Account'}
             </button>
           </form>
         </div>
