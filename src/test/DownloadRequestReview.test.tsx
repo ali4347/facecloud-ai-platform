@@ -5,7 +5,8 @@ import { ApiError } from '../lib/api/client'
 import type { DownloadRequest, DownloadRequestItem } from '../lib/api/downloads'
 
 vi.mock('../lib/api/config', () => ({ API_URL: 'http://api.test', USE_API: true }))
-vi.mock('../lib/session', async importOriginal => ({ ...(await importOriginal<object>()), getSession: () => ({ role: 'moderator', email: 'mod@x.test', name: 'Mod', initials: 'M' }) }))
+let me: { id: number | null; settled: boolean } = { id: 4, settled: true }
+vi.mock('../lib/useCurrentUserId', () => ({ useCurrentUserId: () => me }))
 const choose = vi.fn()
 vi.mock('../lib/moderationData', () => ({
   useModeratorOrganization: () => ({ organizationId: 9, team: { id: 9 }, teams: [{ id: 9 }, { id: 10 }], resolving: false, error: null }),
@@ -44,7 +45,7 @@ const confirmIn = (name: string) => {
   return { dialog, button: within(dialog).getByRole('button', { name }) as HTMLButtonElement }
 }
 
-beforeEach(() => { get.mockReset(); decide.mockReset(); revoke.mockReset(); choose.mockReset() })
+beforeEach(() => { get.mockReset(); decide.mockReset(); revoke.mockReset(); choose.mockReset(); me = { id: 4, settled: true } })
 
 describe('moderator request page', () => {
   it('shows the requester, message, quality and previews, and approves all with expected_version', async () => {
@@ -122,12 +123,41 @@ describe('moderator request page', () => {
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Approve all' })).toBeNull())
   })
 
-  it('the moderator’s own request has no decision controls', async () => {
-    get.mockResolvedValue(request({ requester: { id: 4, username: 'mod', email: 'MOD@x.test' } }))
+  it('the moderator’s own request (same user id) has no decision controls', async () => {
+    get.mockResolvedValue(request({ requester: { id: 4, username: 'mod', email: 'mod@x.test' } }))
     renderPage()
     expect(await screen.findByText(/You made this request yourself/)).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Approve all' })).toBeNull()
     expect(screen.queryByLabelText('Select p1.jpg')).toBeNull()
+  })
+
+  it('identity is the user id, not the e-mail: another person with the same address text is not "own"', async () => {
+    get.mockResolvedValue(request({ requester: { id: 99, username: 'other', email: 'mod@x.test' } }))
+    renderPage()
+    expect(await screen.findByRole('button', { name: 'Approve all' })).toBeTruthy()
+    expect(screen.queryByText(/You made this request yourself/)).toBeNull()
+  })
+
+  it('controls wait until the own id is known; if it cannot be had the server decides', async () => {
+    me = { id: null, settled: false }
+    get.mockResolvedValue(request())
+    const { unmount } = renderPage()
+    expect(await screen.findByText('Need these')).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Approve all' })).toBeNull()
+    unmount()
+    me = { id: null, settled: true }
+    renderPage()
+    expect(await screen.findByRole('button', { name: 'Approve all' })).toBeTruthy()
+  })
+
+  it('a 403 cannot_decide_own_request from the server is explained', async () => {
+    me = { id: null, settled: true }
+    get.mockResolvedValue(request())
+    decide.mockRejectedValue(new ApiError(403, 'x', { code: 'cannot_decide_own_request' }))
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'Approve all' }))
+    fireEvent.click(confirmIn('Approve all').button)
+    expect(await screen.findByText(/You made this request yourself/)).toBeTruthy()
   })
 
   it('a request this moderator may not see is explained, not shown as an error page', async () => {

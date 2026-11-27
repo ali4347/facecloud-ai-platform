@@ -18,7 +18,7 @@ import {
   requestErrorSentence, type DecisionAction, type ReasonInput,
 } from '../../lib/downloadApproval'
 import { chooseModeratorOrganization, useModeratorOrganization } from '../../lib/moderationData'
-import { getSession } from '../../lib/session'
+import { useCurrentUserId } from '../../lib/useCurrentUserId'
 import { formatDateTime } from '../../lib/utils'
 
 const ACTION_LABEL: Record<DecisionAction, string> = {
@@ -105,10 +105,14 @@ function DownloadRequestReviewLive() {
 
   const items = useMemo(() => data?.items ?? [], [data])
   const pendingIds = items.filter(item => item.status === 'pending').map(item => item.id)
-  const ownEmail = getSession()?.email?.toLowerCase() ?? ''
-  const isOwn = Boolean(data && ownEmail && data.requester.email.toLowerCase() === ownEmail)
+  /* One's own request is recognised by user id (GET /api/user/profile/), not by e-mail. The controls wait until that answer is in;
+     if the id cannot be had they are shown, because the server is the final authority and refuses a self-decision
+     (403 cannot_decide_own_request, explained when it happens). */
+  const me = useCurrentUserId()
+  const isOwn = Boolean(data && me.id !== null && data.requester.id === me.id)
+  const identityKnown = me.settled
   const open = Boolean(data && OPEN_STATUSES.includes(data.status))
-  const canDecide = open && !isOwn && pendingIds.length > 0
+  const canDecide = open && identityKnown && !isOwn && pendingIds.length > 0
 
   const toggle = (itemId: number) => setSelected(current => { const next = new Set(current); if (next.has(itemId)) next.delete(itemId); else next.add(itemId); return next })
   const plan = pendingAction ? planDecision(pendingAction, pendingIds, [...selected]) : null
