@@ -439,6 +439,8 @@ cp .env.example .env
 | `VITE_API_URL` | Backend origin, no trailing slash. `http://127.0.0.1:8000` for a local backend |
 | `VITE_USE_API` | `true` to call the API; anything else keeps the built-in mock data |
 
+Production builds take these from the tracked `.env.production` and are checked (see §16 Deployment); `.env` / `.env.local` are for your own machine.
+
 The flag exists so screens can be migrated one at a time: with `VITE_USE_API`
 unset the demo dashboard stays populated, and each screen switches over as its
 API calls are written. The sign-in screen is wired; the rest still read
@@ -480,11 +482,15 @@ deployed backend.
     text: team pictures say "name, role at FaceCloud"; the landing before/after demo describes the photo.
 
 > [!WARNING]
-> **Build the hosting copy as the demo, not with your local settings.** `.env.local` (which points at `http://127.0.0.1:8000` and turns the API on)
-> is read by every `npm run build` on your own machine, so a build made there carries that address and every visitor's browser would try to
-> reach *their* localhost. Build it with the settings overridden:
-> `VITE_USE_API=false VITE_API_URL= npm run build`, and check that `grep -c "127.0.0.1:8000" dist/assets/index-*.js` prints `0`
-> before uploading. (A build made from a clean checkout, which has no `.env.local`, is safe too.)
+> **A production build always talks to the live API, or it does not finish.** `npm run build` (Vite's production mode) reads the
+> tracked `.env.production` (`VITE_USE_API=true`, `VITE_API_URL=https://api.facecloudai.com`; public values, no secrets), which outranks
+> `.env.local`. `vite.config.ts` then refuses to build when the final values are anything else (an environment variable or a
+> `.env.production.local` can override the file), and refuses to finish when the bundle does not contain `https://api.facecloudai.com` or
+> contains a local API address. A missing configuration therefore fails the build instead of shipping the demo data. Rules and tests:
+> `scripts/build-safety.mjs`, `npm run test:build-safety`; check a finished folder with `npm run verify:bundle` (CI runs all of it).
+> * `npm run build:demo`: the deliberate offline demo (mode `demo`, `.env.demo`), not checked, never for the live site.
+> * `npm run build:local`: a build against your own backend (mode `development`, reads `.env.local`), not checked.
+> * `npm run dev` is unchanged.
 
 > [!IMPORTANT]
 > **`.htaccess` is a hidden file.** Most file managers and FTP clients do not show names beginning with a dot, so it

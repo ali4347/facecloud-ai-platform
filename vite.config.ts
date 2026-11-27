@@ -1,9 +1,10 @@
-import { defineConfig, type Plugin } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { PUBLIC_PAGES, canonicalUrl, type PageSeo } from './src/lib/seoPages.ts'
 import { PAGE_JSONLD_ID, pageStructuredData } from './src/lib/structuredData.ts'
+import { checkBundleCode, checkProductionEnv, describeProblems, isProductionBuild } from './scripts/build-safety.mjs'
 
 const escapeAttr = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -54,6 +55,8 @@ function seoPages(): Plugin {
     },
     closeBundle() {
       const shellPath = path.join(outDir, 'index.html')
+      // No page was written when the build stopped with an error; let that error be the one that is reported.
+      if (!fs.existsSync(shellPath)) return
       const shell = fs.readFileSync(shellPath, 'utf8')
       for (const page of PUBLIC_PAGES) {
         const file = page.path === '/' ? shellPath : path.join(outDir, '_seo', `${page.path.slice(1)}.html`)
@@ -64,7 +67,36 @@ function seoPages(): Plugin {
   }
 }
 
+/**
+ * A production build must talk to the live API. Without VITE_USE_API=true and VITE_API_URL the app silently runs on its demo
+ * data (src/lib/api/config.ts), and such a bundle was once deployed. So `vite build` in production mode (the default mode of
+ * `npm run build`) stops before building when the settings are not the live ones, and stops before writing when the bundle
+ * it produced does not contain the live API address or contains a local one. Rules: scripts/build-safety.mjs.
+ * `npm run dev`, `npm run build:demo` (mode "demo") and `npm run build:local` (mode "development") are not checked.
+ */
+function productionSafety(): Plugin {
+  let checking = false
+  return {
+    name: 'facecloud-production-safety',
+    apply: 'build',
+    config(config, { command, mode }) {
+      if (!isProductionBuild(command, mode)) return
+      checking = true
+      // loadEnv gives variables already set in the environment priority over the .env files, exactly as the build will.
+      const env = loadEnv(mode, config.envDir || config.root || process.cwd(), 'VITE_')
+      const problems = checkProductionEnv(env)
+      if (problems.length) throw new Error(describeProblems(`Refusing to build for production (mode "${mode}"):`, problems))
+    },
+    generateBundle(_options, bundle) {
+      if (!checking) return
+      const code = Object.values(bundle).map(file => (file.type === 'chunk' ? file.code : '')).join('\n')
+      const problems = checkBundleCode(code)
+      if (problems.length) this.error(describeProblems('The production bundle is not safe to deploy:', problems))
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), seoPages()],
+  plugins: [productionSafety(), react(), seoPages()],
 })
