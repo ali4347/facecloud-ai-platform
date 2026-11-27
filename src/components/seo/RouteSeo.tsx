@@ -1,13 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import {
-  BREADCRUMB_SCRIPT_ID,
-  NOINDEX_PREFIXES,
-  breadcrumbJsonLd,
-  canonicalUrl,
-  findPageSeo,
-  normalizePath,
-} from '../../lib/seoPages'
+import { NOINDEX_PREFIXES, canonicalUrl, findPageSeo, normalizePath } from '../../lib/seoPages'
+import { PAGE_JSONLD_ID, pageStructuredData } from '../../lib/structuredData'
 
 /** Finds `<meta {attr}="{key}">` in the head, creating it when missing. */
 function metaTag(attr: 'name' | 'property', key: string): HTMLMetaElement {
@@ -38,12 +32,13 @@ function setCanonical(href: string | null) {
   el.href = href
 }
 
-function setBreadcrumb(data: object | null) {
-  document.getElementById(BREADCRUMB_SCRIPT_ID)?.remove()
+/** Swaps the page's structured data (the one script with PAGE_JSONLD_ID, which the pre-built HTML also carries). */
+function setPageJsonLd(data: object | null) {
+  document.getElementById(PAGE_JSONLD_ID)?.remove()
   if (!data) return
   const script = document.createElement('script')
   script.type = 'application/ld+json'
-  script.id = BREADCRUMB_SCRIPT_ID
+  script.id = PAGE_JSONLD_ID
   script.textContent = JSON.stringify(data)
   document.head.appendChild(script)
 }
@@ -54,7 +49,8 @@ function isNoindex(path: string): boolean {
 
 /**
  * Keeps the head in step with the route: title, description, canonical, Open
- * Graph and Twitter tags for the public pages (from `seoPages.ts`), and
+ * Graph and Twitter tags and structured data for the public pages (from
+ * `seoPages.ts` and `structuredData.ts`), and
  * `noindex` for the portals, e-mail-link pages and unknown paths.
  *
  * Placed before <Routes>, so its effect runs before the page's own: a private
@@ -78,14 +74,14 @@ export function RouteSeo() {
       setMeta('property', 'og:url', url)
       setMeta('name', 'twitter:title', page.title)
       setMeta('name', 'twitter:description', page.description)
-      setBreadcrumb(breadcrumbJsonLd(page))
+      setPageJsonLd(pageStructuredData(page))
       return
     }
 
     // Not a public page: keep it out of the index and do not claim a canonical.
     setMeta('name', 'robots', isNoindex(path) ? 'noindex, nofollow' : 'noindex, follow')
     setCanonical(null)
-    setBreadcrumb(null)
+    setPageJsonLd(null)
   }, [pathname])
 
   return null

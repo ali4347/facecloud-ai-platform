@@ -377,7 +377,7 @@ export default function Contact() {
                   <Mail className="w-4.5 h-4.5" />
                 </div>
                 <div className="space-y-1.5">
-                  <h3 className="text-xs font-bold text-ink uppercase tracking-wider">General Support</h3>
+                  <h2 className="text-xs font-bold text-ink uppercase tracking-wider">General Support</h2>
                   <p className="text-[10px] text-ink-faint leading-relaxed font-semibold">
                     Have questions about setting up datasets or account billing?
                   </p>
@@ -396,7 +396,7 @@ export default function Contact() {
                   <ShieldCheck className="w-4.5 h-4.5" />
                 </div>
                 <div className="space-y-1.5">
-                  <h3 className="text-xs font-bold text-ink uppercase tracking-wider">Enterprise &amp; Partnerships</h3>
+                  <h2 className="text-xs font-bold text-ink uppercase tracking-wider">Enterprise &amp; Partnerships</h2>
                   <p className="text-[10px] text-ink-faint leading-relaxed font-semibold">
                     Inquiries regarding bulk DataMart integrations and dedicated custom model nodes.
                   </p>
@@ -419,7 +419,7 @@ export default function Contact() {
                     <HelpCircle className="w-4 h-4" />
                   </div>
                   <div className="space-y-0.5">
-                    <h4 className="text-[11px] font-bold text-ink uppercase tracking-wider group-hover:text-[#F97316] transition-colors">Looking for quick answers?</h4>
+                    <h2 className="text-[11px] font-bold text-ink uppercase tracking-wider group-hover:text-[#F97316] transition-colors">Looking for quick answers?</h2>
                     <p className="text-[9px] text-ink-faint font-medium">Check our FAQ section on the landing page.</p>
                   </div>
                 </div>

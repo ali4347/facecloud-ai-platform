@@ -2,7 +2,8 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
-import { BREADCRUMB_SCRIPT_ID, PUBLIC_PAGES, breadcrumbJsonLd, canonicalUrl, type PageSeo } from './src/lib/seoPages.ts'
+import { PUBLIC_PAGES, canonicalUrl, type PageSeo } from './src/lib/seoPages.ts'
+import { PAGE_JSONLD_ID, pageStructuredData } from './src/lib/structuredData.ts'
 
 const escapeAttr = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -30,14 +31,9 @@ function pageHtml(shell: string, page: PageSeo): string {
   html = replaceOnce(html, /<meta name="twitter:title" content="[^"]*" \/>/, `<meta name="twitter:title" content="${title}" />`, 'twitter:title')
   html = replaceOnce(html, /<meta name="twitter:description" content="[^"]*" \/>/, `<meta name="twitter:description" content="${description}" />`, 'twitter:description')
 
-  if (page.path !== '/') {
-    // The FAQ answers are on the home page only; structured data must match what the page shows.
-    html = replaceOnce(html, /\s*<!-- FAQPage Schema[^>]*-->\s*<script type="application\/ld\+json">[\s\S]*?<\/script>/, '', 'FAQPage block')
-    const crumbs = breadcrumbJsonLd(page)
-    if (crumbs) {
-      html = replaceOnce(html, /<\/head>/, `  <script type="application/ld+json" id="${BREADCRUMB_SCRIPT_ID}">${JSON.stringify(crumbs)}</script>\n  </head>`, '</head>')
-    }
-  }
+  // The page's own structured data (breadcrumb, page type, FAQ, people...); "<" is escaped so no text can close the script tag.
+  const jsonLd = JSON.stringify(pageStructuredData(page)).replace(/</g, '\\u003c')
+  html = replaceOnce(html, /<\/head>/, `  <script type="application/ld+json" id="${PAGE_JSONLD_ID}">${jsonLd}</script>\n  </head>`, '</head>')
   return html
 }
 
@@ -45,7 +41,7 @@ function pageHtml(shell: string, page: PageSeo): string {
  * After the build, writes one HTML file per public page (see src/lib/seoPages.ts):
  * the home page into dist/index.html, every other page into dist/_seo/<path>.html.
  * public/.htaccess serves those files for their routes, so the first response
- * already carries the page's own title, description, canonical and social tags.
+ * already carries the page's own title, description, canonical, social tags and structured data.
  * The app inside is the same bundle; RouteSeo keeps the tags right while browsing.
  */
 function seoPages(): Plugin {

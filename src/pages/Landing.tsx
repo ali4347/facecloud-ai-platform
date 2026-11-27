@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useReducedMotion, useInView } from 'framer-mot
 import {
   Shield, Zap, Check, ArrowUpRight, ArrowRight, Activity, AlertTriangle, FolderOpen,
   Cpu, Eye, Users, BarChart3, Upload, Mail,
-  ChevronDown, HardDrive, Image, Briefcase, Building2, Camera, UserCheck,
+  HardDrive, Image, Briefcase, Building2, Camera, UserCheck,
   Code2, ExternalLink
 } from 'lucide-react'
 import { BeforeAfterSlider } from '../components/features/BeforeAfterSlider'
@@ -12,6 +12,8 @@ import { BackgroundVideo } from '../components/public/BackgroundVideo'
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { ExploreLinks } from '../components/public/ExploreLinks'
+import { FaqList } from '../components/public/FaqList'
+import { HOME_FAQ } from '../content/faqs'
 import { HeroSection } from '../components/public/HeroSection'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { StaggerChildren, StaggerItem } from '../components/animation/StaggerChildren'
@@ -103,15 +105,6 @@ const PRICING_PLANS = [
     missing: [],
     cta: 'Go Pro', link: '/login',
   },
-]
-
-const FAQ_ITEMS = [
-  { q: 'What image formats are supported?', a: 'FaceCloud accepts JPEG, PNG, and WebP image formats. ZIP archives containing these formats are also supported for batch processing.' },
-  { q: 'How is my data secured?', a: 'All uploads are encrypted at rest using AES-256 and in transit via TLS 1.3. JWT-based authentication enforces role-based access control across all API endpoints.' },
-  { q: 'Can I delete my data?', a: 'Yes. Users can delete individual images or entire person folders from the dashboard at any time. Deleted data is permanently removed from all storage systems within 24 hours.' },
-  { q: 'What happens to rejected images?', a: 'Images that fail quality checks (blur, exposure, or face detection) are flagged for moderator review. Moderators can override rejections or confirm the automated decision.' },
-  { q: 'Is there an API for integrations?', a: 'API access for integrations is planned together with paid plans, in a later version. Interactive API documentation is generated from the backend.' },
-  { q: 'What are the plan limits?', a: 'Plans, pricing and limits are coming in a later version, so the figures on the pricing cards are not final and are not enforced yet.' },
 ]
 
 const SECURITY_LOGS_POOL = [
@@ -265,9 +258,6 @@ export default function Landing() {
   /* ── Pricing toggle ─────────────────────────────────────────── */
   const [yearlyBilling, setYearlyBilling] = useState(false)
 
-  /* ── FAQ accordion ──────────────────────────────────────────── */
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-
   /* ── Pipeline row status helper ─────────────────────────────── */
   const getPipelineStatus = useCallback((rowIdx: number) => {
     if (rowIdx < pipelineActiveIdx) return 'SUCCESS'
@@ -393,7 +383,7 @@ export default function Landing() {
                       {t.initials}
                     </div>
                     <div>
-                      <h4 className="text-[10px] font-bold text-ink-faint uppercase tracking-wider">{t.role}</h4>
+                      <p className="font-display text-[10px] font-bold text-ink-faint uppercase tracking-wider">{t.role}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -636,6 +626,8 @@ export default function Landing() {
                     afterStyle={{ filter: 'brightness(1.08) contrast(1.08) saturate(1.03)' }}
                     beforeLabel="BEFORE"
                     afterLabel="AFTER"
+                    beforeAlt="A woman with curly hair in a yellow sweater, arms crossed, in a dim, flat photo before FaceCloud enhancement"
+                    afterAlt="The same photo of the woman in the yellow sweater, brighter and clearer after FaceCloud AI enhancement"
                     initialPosition={sliderAutoPos}
                   />
                 </MacBookDemoFrame>
@@ -648,7 +640,7 @@ export default function Landing() {
             <div className="lg:col-span-4 space-y-4">
               <RevealOnScroll direction="right" delay={0.15}>
                 <div className="fc-panel p-5 bg-ink/[0.02]">
-                  <h4 className="text-xs font-bold text-ink mb-3">AI METADATA PARAMETERS</h4>
+                  <h3 className="text-xs font-bold text-ink mb-3">AI METADATA PARAMETERS</h3>
                   <div className="space-y-3 text-[10px] font-medium text-ink-mute">
                     <div className="flex justify-between">
                       <span>AI Model:</span>
@@ -1077,42 +1069,7 @@ export default function Landing() {
             subtitle="Everything you need to know about using FaceCloud."
           />
 
-          <div className="space-y-3">
-            {FAQ_ITEMS.map((item, idx) => (
-              <RevealOnScroll key={idx} delay={idx * 0.05}>
-                <div className="fc-panel overflow-hidden">
-                  <button
-                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                    className="w-full flex items-center justify-between p-5 text-left cursor-pointer group"
-                  >
-                    <span className="text-sm font-bold text-ink group-hover:text-[#FB923C] transition-colors pr-4">{item.q}</span>
-                    <motion.div
-                      animate={{ rotate: openFaq === idx ? 180 : 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="flex-shrink-0"
-                    >
-                      <ChevronDown className="w-4 h-4 text-ink-faint" />
-                    </motion.div>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {openFaq === idx && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-5 pb-5 text-xs text-ink-mute leading-relaxed font-medium border-t border-ink/[0.06] pt-4">
-                          {item.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div>
+          <FaqList items={HOME_FAQ} />
         </section>
 
         {/* ── 11.7 API / Integrations Teaser ───────────────────── */}

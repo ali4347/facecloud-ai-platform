@@ -22,7 +22,7 @@ export function PublicFooter() {
 
         {/* Product Links */}
         <div className="space-y-3">
-          <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Product</h4>
+          <h2 className="font-bold text-ink uppercase tracking-wider text-[10px]">Product</h2>
           <ul className="space-y-2 font-medium">
             <li><a href={getHref('#features')} className="hover:text-[#F97316] transition-colors">Features</a></li>
             <li><a href={getHref('#methodology')} className="hover:text-[#F97316] transition-colors">Methodology</a></li>
@@ -34,7 +34,7 @@ export function PublicFooter() {
 
         {/* Company Links */}
         <div className="space-y-3">
-          <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Company</h4>
+          <h2 className="font-bold text-ink uppercase tracking-wider text-[10px]">Company</h2>
           <ul className="space-y-2 font-medium">
             <li><Link to="/about" className="hover:text-[#F97316] transition-colors">About Us</Link></li>
             <li><Link to="/roles/moderator" className="hover:text-[#F97316] transition-colors">Moderator Role &amp; Plans</Link></li>
@@ -45,14 +45,14 @@ export function PublicFooter() {
         {/* Portals & Copyright */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Portals</h4>
+            <h2 className="font-bold text-ink uppercase tracking-wider text-[10px]">Portals</h2>
             <ul className="space-y-2 font-medium">
               <li><Link to="/login" className="hover:text-[#F97316] transition-colors">Login</Link></li>
               <li><Link to="/register" className="hover:text-[#F97316] transition-colors">Create Account</Link></li>
             </ul>
           </div>
           <div className="space-y-1 pt-1">
-            <h4 className="font-bold text-ink uppercase tracking-wider text-[10px]">Registry Compliance</h4>
+            <h2 className="font-bold text-ink uppercase tracking-wider text-[10px]">Registry Compliance</h2>
             <p className="text-[10px] text-ink-faint leading-relaxed font-medium">
               &copy; {new Date().getFullYear()} FaceCloud. All rights reserved.
             </p>

@@ -132,7 +132,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 ### Public / Auth Routes
 * `/` (Landing Page)
 * `/about`, `/contact` (public pages)
-* `/roles/moderator` (Moderator role guide — what the role can and cannot do, how a review works, build status, and a **Plans** section (Team $29/mo and Business $79/mo with seat, storage and image limits, "Coming soon"; Enterprise with no limits, "Contact us"; display only, there is no billing); an information page, not the portal; linked from the navbar as "Moderator" and from the Moderator Review card on the landing page)
+* `/roles/moderator` (Moderator role guide — what the role can and cannot do, how a review works, build status, and a **Plans** section (Team $29/mo and Business $79/mo with seat, storage and image limits, "Coming soon"; Enterprise with no limits, "Contact us"; display only, there is no billing); an information page, not the portal; linked from the navbar as "Moderator" and from the Moderator Review card on the landing page; ends with a **Moderator FAQ** of six questions, with FAQPage structured data)
 * `/login` (User Login: the field takes an email address or a username; for user accounts only; an admin or moderator account is refused here and signs in on its own page)
 * `/register?invitation=<token>` (the same page, opened from an organization invitation: the invited email is locked and one step creates the account and joins the organization)
 * `/register` (User Registration — full name, email, password; creates a real pending account when `VITE_USE_API=true`)
@@ -466,8 +466,18 @@ deployed backend.
   * Adding a public page means one entry in `seoPages.ts` and a `<url>` in `public/sitemap.xml`.
   * Internal links: every public page ends with an "Explore FaceCloud" block (`src/components/public/ExploreLinks.tsx`)
     linking to the other public pages, and the footer links every public page.
-  * `index.html` carries the Google Search Console verification tag; the FAQ structured data in it must match
-    `FAQ_ITEMS` in `Landing.tsx`.
+  * `index.html` carries the Google Search Console verification tag and the site-wide structured data
+    (Organization, WebSite).
+  * **Structured data per page** (`src/lib/structuredData.ts`, one `<script id="fc-page-jsonld">` per page, written
+    into the pre-built HTML and swapped by `RouteSeo`): home has WebPage, WebApplication (free account) and
+    FAQPage; About has AboutPage plus the owners and team as Person entries; Contact has ContactPage with the
+    contact e-mail; Moderator has WebPage plus FAQPage; Login and Register have WebPage. Every page except home
+    also gets a BreadcrumbList.
+  * **FAQs:** the questions live in `src/content/faqs.ts` (`HOME_FAQ`, `MODERATOR_FAQ`) and are rendered by
+    `src/components/public/FaqList.tsx`, which keeps every answer in the page while it is closed, so the visible
+    text and the FAQPage data are always the same. The About page's people are in `src/content/team.ts`.
+  * **Headings and pictures:** one `h1` per page and no skipped levels (checked in a browser). Every `<img>` has alt
+    text: team pictures say "name, role at FaceCloud"; the landing before/after demo describes the photo.
 
 > [!WARNING]
 > **Build the hosting copy as the demo, not with your local settings.** `.env.local` (which points at `http://127.0.0.1:8000` and turns the API on)

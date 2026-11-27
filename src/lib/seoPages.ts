@@ -100,14 +100,10 @@ export function canonicalUrl(path: string): string {
   return path === '/' ? `${SITE_URL}/` : `${SITE_URL}${path}`
 }
 
-/** id of the breadcrumb <script>, shared by the build step and RouteSeo so the browser replaces it rather than adding a second. */
-export const BREADCRUMB_SCRIPT_ID = 'fc-breadcrumb-jsonld'
-
-/** schema.org BreadcrumbList for a page: Home, then the page (none for Home itself). */
-export function breadcrumbJsonLd(page: PageSeo): object | null {
+/** schema.org BreadcrumbList node for a page: Home, then the page (none for Home itself). Used inside the page graph in structuredData.ts. */
+export function breadcrumbJsonLd(page: PageSeo): Record<string, unknown> | null {
   if (page.path === '/') return null
   return {
-    '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: canonicalUrl('/') },

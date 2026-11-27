@@ -7,6 +7,8 @@ import {
 import { PublicNavbar } from '../components/public/PublicNavbar'
 import { PublicFooter } from '../components/public/PublicFooter'
 import { ExploreLinks } from '../components/public/ExploreLinks'
+import { FaqList } from '../components/public/FaqList'
+import { MODERATOR_FAQ } from '../content/faqs'
 import { RevealOnScroll } from '../components/animation/RevealOnScroll'
 import { HeadingText } from '../components/animation/HeadingText'
 
@@ -35,6 +37,7 @@ const SECTIONS = [
   { id: 'access', label: 'Getting access' },
   { id: 'status', label: 'Roadmap' },
   { id: 'plans', label: 'Plans' },
+  { id: 'faq', label: 'FAQ' },
 ]
 
 const HIGHLIGHTS = [
@@ -610,6 +613,18 @@ export default function ModeratorRole() {
                 Plans are coming in a later version. Until then an administrator sets an organization’s seats by hand.
               </p>
             </RevealOnScroll>
+          </div>
+        </section>
+
+        {/* ── FAQ (the same list feeds the FAQPage structured data) ── */}
+        <section id="faq" className="py-16 scroll-mt-28">
+          <div className="max-w-3xl mx-auto px-6">
+            <Heading
+              tag="08 · FAQ"
+              title="Moderator [FAQ]"
+              subtitle="Short answers to what people ask most about the moderator role."
+            />
+            <FaqList items={MODERATOR_FAQ} />
           </div>
         </section>
 

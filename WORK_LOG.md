@@ -46,6 +46,44 @@ backend: `cd backend && npm run seed` / `npx prisma studio` · infra: `docker co
 
 Format: `### YYYY-MM-DD — short title` · status (`committed <hash>` / `uncommitted`) · what changed · files.
 
+### 2026-11-27 — SEO: alt text, heading order, structured data per page, FAQ data on home and the moderator page
+*Status: committed and pushed to `origin main` (commit "feat(seo): structured data per page, FAQ schema ..."). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the touched files and `npm run build` pass. Every JSON-LD block in `dist/index.html` and `dist/_seo/*.html` parses. The built `dist/` was served by the Mac's Apache with the real `.htaccess` (port 8789, stopped afterwards) and checked in headless Chrome:*
+- *each of the six public pages has one `h1`, no skipped heading levels and no `<img>` without alt;*
+- *the FAQ answers are in the page while closed;*
+- *the structured data swaps on client-side navigation and is removed on `/forgot-password`;*
+- *no console errors;*
+- *screenshots of the Moderator FAQ (1440 and 390 wide, no sideways scroll) and of the home FAQ (same look as before).*
+
+- **Asked by the owner:** "if there any picture add alt text of picture or heading structure or schema codes for pages and FAQS schema also add".
+- **Audit first** (headless Chrome, all six public pages). Found:
+  - skipped heading levels: testimonial roles and "AI METADATA PARAMETERS" as `h4` under an `h2` on home; the footer labels as `h4`; Contact going `h1` → `h3`/`h4`; team member names on the same level as their team name on About;
+  - the home FAQ answers were not in the page until clicked (`AnimatePresence` mounted them on open), so the FAQPage data described text Google could not see;
+  - weak alt text on the before/after demo and the team pictures.
+- **Headings:**
+  - **Landing:** testimonial role is now `<p class="font-display">` (same look), and "AI METADATA PARAMETERS" is `h3`.
+  - **Footer** labels are now `h2`; **Contact**'s "General Support", "Enterprise & Partnerships" and "Looking for quick answers?" are now `h2`.
+  - **About:** owner names stay `h3`; team member names are `h4` under the team's `h3`.
+- **Alt text:**
+  - **About pictures:** "name, role at FaceCloud" (`personAlt` in `src/content/team.ts`).
+  - **`BeforeAfterSlider`:** new `beforeAlt`/`afterAlt` props with neutral defaults ("Original photo, before enhancement"), because the dashboard uses it on users' own photos. The landing demo passes a description of the actual photo (a woman with curly hair in a yellow sweater, before and after).
+  - The gallery already had full descriptions; the decorative bullet icons stay `alt=""` and hidden.
+- **FAQ:**
+  - **`src/content/faqs.ts` (new):** `HOME_FAQ`, moved from `Landing.tsx` unchanged, and `MODERATOR_FAQ`, six new questions. Every answer restates what the Moderator page already says: what a moderator does; thumbnails, not originals; the 24 h deadline and 15 min claim; how someone becomes one and the 72 h invitation; what they cannot do; the Team/Business/Enterprise prices and limits with "coming soon".
+  - **`src/components/public/FaqList.tsx` (new):** shared accordion. A closed answer is folded to zero height and made `inert`, but stays in the page; questions are `h3` buttons with `aria-expanded`/`aria-controls`.
+  - **`ModeratorRole.tsx`:** new section `#faq` "08 · FAQ / Moderator FAQ" before the closing section, and added to the section list.
+- **Structured data:**
+  - **`src/lib/structuredData.ts` (new):** builds one JSON-LD `@graph` per public page.
+    - Every page except home: BreadcrumbList.
+    - Home: WebPage, WebApplication (free account offer only, because the paid plans are "coming soon"), FAQPage.
+    - About: AboutPage, plus Organization with the founder and the eight other people as Person (job title, picture, LinkedIn, place).
+    - Contact: ContactPage, plus Organization contact points with ali@facecloudai.com.
+    - Moderator: WebPage and FAQPage.
+    - Login and Register: WebPage.
+  - **Where it is written:** the build plugin writes it into each pre-built page as `<script id="fc-page-jsonld">`; `RouteSeo` swaps it on navigation and removes it on non-public pages.
+  - **`index.html`:** the hand-written FAQPage block is removed (now generated). Organization and WebSite got `@id`s, and WebSite names its publisher.
+- **`src/content/team.ts` (new):** the About people, moved out of `About.tsx` unchanged so the structured data uses the same list.
+- **`README.md`:** the SEO part of §16 and the `/roles/moderator` route line.
+
 ### 2026-11-27 — SEO for every public page: titles, descriptions, canonicals, pre-built HTML, internal links
 *Status: committed and pushed to `origin main` (commit "feat(seo): per-page titles, descriptions and canonicals ..."). `npx tsc -p tsconfig.app.json --noEmit`, `npx oxlint` on the touched files and `npm run build` pass. The built `dist/` was served by the Mac's own Apache 2.4 with the real `.htaccess` on port 8789 (stopped afterwards). Results:*
 - *`curl`: `/`, `/about`, `/about/`, `/contact`, `/roles/moderator`, `/login` and `/register` each returned their own `<title>`; `/dashboard`, `/forgot-password`, `/roles` and unknown paths got the app shell; `/assets/missing.js` still returned 404.*

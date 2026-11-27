@@ -5,6 +5,9 @@ interface BeforeAfterSliderProps {
   className?: string
   beforeLabel?: string
   afterLabel?: string
+  /** Alt text for the two pictures; say what the photo shows where the caller knows. */
+  beforeAlt?: string
+  afterAlt?: string
   beforeColor?: string
   afterColor?: string
   beforeSrc?: string
@@ -19,6 +22,8 @@ export function BeforeAfterSlider({
   className,
   beforeLabel = 'Original',
   afterLabel = 'Enhanced',
+  beforeAlt = 'Original photo, before enhancement',
+  afterAlt = 'The same photo after enhancement',
   beforeColor = '#1e293b',
   afterColor = '#3b82f6',
   beforeSrc,
@@ -111,7 +116,7 @@ export function BeforeAfterSlider({
         {hasImages ? (
           <img
             src={beforeSrc}
-            alt="Original unprocessed portrait"
+            alt={beforeAlt}
             className="w-full h-full object-cover"
             style={{ ...beforeStyle, objectPosition: 'center 30%' }}
             draggable={false}
@@ -139,7 +144,7 @@ export function BeforeAfterSlider({
         {hasImages ? (
           <img
             src={afterSrc}
-            alt="AI enhanced portrait"
+            alt={afterAlt}
             className="w-full h-full object-cover"
             style={{ ...afterStyle, objectPosition: 'center 30%' }}
             draggable={false}
