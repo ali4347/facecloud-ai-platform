@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { ImageOff, Loader2 } from 'lucide-react'
+import { ImageOff, Loader2, Lock } from 'lucide-react'
 import { USE_API } from '../../lib/api/config'
+import { isRestrictedPreview } from '../../lib/api/client'
 
 interface AuthedImageProps {
   /** Fetches the bytes. Given an abort signal; must honour it. */
@@ -12,6 +13,11 @@ interface AuthedImageProps {
   box?: number
   className?: string
   rounded?: string
+  /**
+   * The caller already knows this is a reduced, watermarked preview (the photo's organization requires download approval
+   * and there is no approval). The server also says so in `X-Preview-Restricted`, which is used when the browser may read it.
+   */
+  restricted?: boolean
 }
 
 /**
@@ -29,9 +35,10 @@ interface AuthedImageProps {
  * flickering.
  */
 export function AuthedImage({
-  load, cacheKey, alt, box, className, rounded = 'rounded-xl',
+  load, cacheKey, alt, box, className, rounded = 'rounded-xl', restricted = false,
 }: AuthedImageProps) {
   const [url, setUrl] = useState<string | null>(null)
+  const [serverRestricted, setServerRestricted] = useState(false)
   const [failed, setFailed] = useState(false)
   const [loading, setLoading] = useState(USE_API && load !== null)
 
@@ -48,6 +55,7 @@ export function AuthedImage({
       .then(blob => {
         if (controller.signal.aborted) return
         objectUrl = URL.createObjectURL(blob)
+        setServerRestricted(isRestrictedPreview(blob))
         setUrl(objectUrl)
       })
       .catch(() => {
@@ -69,7 +77,19 @@ export function AuthedImage({
   const shared = `${rounded} border border-line flex-shrink-0 ${className ?? ''}`
 
   if (url) {
-    return <img src={url} alt={alt} style={sizing} className={`${shared} object-cover`} />
+    if (!(restricted || serverRestricted)) return <img src={url} alt={alt} style={sizing} className={`${shared} object-cover`} />
+    // A reduced preview says so, so nobody mistakes the watermark for the photo itself.
+    return (
+      <span style={sizing} className={`relative block ${className ?? ''}`}>
+        <img src={url} alt={alt} className={`${rounded} border border-line w-full h-full object-cover`} />
+        <span
+          className="absolute bottom-1 left-1 right-1 inline-flex items-center justify-center gap-1 px-1.5 py-0.5 rounded-md bg-black/65 text-white text-[9px] font-bold leading-tight text-center pointer-events-none"
+          title="Preview only. The full photo can be downloaded once a moderator approves it."
+        >
+          <Lock className="w-2.5 h-2.5 flex-shrink-0" aria-hidden />{box && box < 72 ? 'Preview' : 'Preview only — approval required'}
+        </span>
+      </span>
+    )
   }
 
   if (loading) {

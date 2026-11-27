@@ -94,6 +94,10 @@ export interface ImageListItem {
   is_favorite?: boolean
   /** The capture time from the file's EXIF data; null when it has none. */
   taken_at?: string | null
+  /** The workspace the photo was uploaded into (its batch's organization); null only for a batch from before workspaces. Newer backends only. */
+  organization_id?: number | null
+  /** True when that organization requires a moderator's approval before a download (never for a personal workspace). Newer backends only. */
+  download_approval_required?: boolean
   created_at: string
   updated_at: string
 }

@@ -24,6 +24,10 @@ export interface Organization {
   brand_accent?: string
   /** A path that needs the Authorization header (fetch it as a blob), or null when there is no logo. */
   logo_url?: string | null
+  /** Members download an image only after a moderator approved it. Read-only here; only the platform administrator changes it. Missing on older backends. */
+  download_approval_required?: boolean
+  /** How many hours an approval lasts; null = the platform default (24). */
+  download_grant_hours?: number | null
 }
 
 /** The name members should see for an organization. */

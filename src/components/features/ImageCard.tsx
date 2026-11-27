@@ -9,6 +9,8 @@ import { formatDateTime } from '../../lib/utils'
 import { photoTitle } from '../../lib/photoTitle'
 import { USE_API } from '../../lib/api/config'
 import { FavoriteButton } from './FavoriteButton'
+import { AccessChip } from '../downloads/StatusChips'
+import type { EligibilityItem } from '../../lib/api/downloads'
 
 interface ImageCardProps {
   image: ImageListItem
@@ -18,9 +20,13 @@ interface ImageCardProps {
   onToggleSelect?: () => void
   /** Told when the heart is pressed, so a list that shows only favourites can drop the photo. */
   onFavoriteChange?: (next: boolean) => void
+  /** For a photo whose organization requires download approval: what requests/check/ said about it. */
+  access?: EligibilityItem
 }
 
-export function ImageCard({ image, selectable = false, selected = false, onToggleSelect, onFavoriteChange }: ImageCardProps) {
+export function ImageCard({ image, selectable = false, selected = false, onToggleSelect, onFavoriteChange, access }: ImageCardProps) {
+  /* Its organization requires approval: the preview is the server's reduced, watermarked copy until an approval is held. */
+  const needsApproval = Boolean(image.download_approval_required)
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState('')
   const navigate = useNavigate()
@@ -86,6 +92,7 @@ export function ImageCard({ image, selectable = false, selected = false, onToggl
           alt={image.original_name}
           className="w-full h-full !border-0"
           rounded="rounded-none"
+          restricted={needsApproval && access?.access_state !== 'granted'}
         />
 
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
@@ -103,6 +110,7 @@ export function ImageCard({ image, selectable = false, selected = false, onToggl
               disabled={downloading}
               className="p-2 bg-surface rounded-xl hover:bg-surface-mute shadow-sm cursor-pointer disabled:opacity-60"
               aria-label={`Download ${image.original_name}`}
+              title={needsApproval ? 'Needs a moderator’s approval in this organization' : undefined}
             >
               {downloading
                 ? <Loader2 className="w-4 h-4 text-ink animate-spin" />
@@ -124,6 +132,14 @@ export function ImageCard({ image, selectable = false, selected = false, onToggl
           <p className="text-xs text-error mt-1.5 truncate" title={image.rejection_reason}>
             ⚠ {image.rejection_reason}
           </p>
+        )}
+        {needsApproval && access && (
+          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+            <AccessChip state={access.access_state} title={access.detail || undefined} />
+            {!access.eligible && access.access_state === 'not_requested' && (
+              <span className="text-[10px] text-ink-faint truncate" title={access.detail}>{access.detail || 'Cannot be requested yet'}</span>
+            )}
+          </div>
         )}
         {downloadError && <p className="text-xs text-error mt-1.5">{downloadError}</p>}
         <p className="text-xs text-ink-mute mt-1">{formatDateTime(image.taken_at ?? image.created_at)}</p>
