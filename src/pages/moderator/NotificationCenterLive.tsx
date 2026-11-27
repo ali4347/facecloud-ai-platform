@@ -1,28 +1,30 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, ArrowUpRight, Check, CheckCircle2, ClipboardList, Clock, Inbox, Loader2 } from 'lucide-react'
+import { AlertTriangle, ArrowUpRight, Check, CheckCircle2, ClipboardList, Clock, FileDown, Inbox, Loader2 } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
 import {
-  announceNotificationsChanged, listNotifications, markAllNotificationsRead, markNotificationRead, type UserNotification,
+  announceNotificationsChanged, listNotifications, markAllNotificationsRead, markNotificationRead, resolveNotificationPath, type UserNotification,
 } from '../../lib/api/notifications'
 import { messageFor } from '../../lib/useApiResource'
 
-type Kind = 'Assignment' | 'Deadline' | 'Failure' | 'Escalation' | 'Other'
+type Kind = 'Assignment' | 'Download' | 'Deadline' | 'Failure' | 'Escalation' | 'Other'
 
-/** The four moderator events the backend sends, in the screen's own words. */
+/** The moderator events the backend sends, in the screen's own words. */
 const KIND: Record<string, Kind> = {
   moderator_review_assigned: 'Assignment', moderator_review_overdue: 'Deadline',
   moderator_review_escalated: 'Escalation', moderator_batch_failed: 'Failure',
+  download_request_received: 'Download',
 }
-const LEADS_TO: Record<Kind, string | null> = { Assignment: '/moderator/queue', Deadline: '/moderator/queue', Escalation: '/moderator/queue', Failure: '/moderator/batches', Other: null }
-const ICON: Record<Kind, React.ElementType> = { Assignment: ClipboardList, Deadline: Clock, Failure: AlertTriangle, Escalation: ArrowUpRight, Other: Inbox }
+/** Where a kind leads when the notification's own link is not one of this app's pages. A download request links to itself (action_path). */
+const LEADS_TO: Record<Kind, string | null> = { Assignment: '/moderator/queue', Download: '/moderator/download-requests', Deadline: '/moderator/queue', Escalation: '/moderator/queue', Failure: '/moderator/batches', Other: null }
+const ICON: Record<Kind, React.ElementType> = { Assignment: ClipboardList, Download: FileDown, Deadline: Clock, Failure: AlertTriangle, Escalation: ArrowUpRight, Other: Inbox }
 const COLOR: Record<Kind, string> = {
-  Assignment: 'text-[#FB923C] bg-[#FB923C]/10 border-[#FB923C]/20', Deadline: 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20',
+  Assignment: 'text-[#FB923C] bg-[#FB923C]/10 border-[#FB923C]/20', Download: 'text-sky-400 bg-sky-500/10 border-sky-500/20', Deadline: 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20',
   Failure: 'text-red-400 bg-red-500/10 border-red-500/20', Escalation: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
   Other: 'text-ink-mute bg-surface-mute border-line',
 }
-const ORDER: Kind[] = ['Assignment', 'Deadline', 'Failure', 'Escalation', 'Other']
+const ORDER: Kind[] = ['Assignment', 'Download', 'Deadline', 'Failure', 'Escalation', 'Other']
 
 function relativeTime(iso: string): string {
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
@@ -53,7 +55,7 @@ export function LiveNotificationCenter() {
   useEffect(() => { void load(1, true) }, [load])
 
   const grouped = useMemo(() => {
-    const groups: Record<Kind, UserNotification[]> = { Assignment: [], Deadline: [], Failure: [], Escalation: [], Other: [] }
+    const groups: Record<Kind, UserNotification[]> = { Assignment: [], Download: [], Deadline: [], Failure: [], Escalation: [], Other: [] }
     for (const n of items) groups[KIND[n.event_type] ?? 'Other'].push(n)
     return groups
   }, [items])
@@ -69,7 +71,7 @@ export function LiveNotificationCenter() {
     try { await markAllNotificationsRead(); setItems(current => current.map(x => ({ ...x, is_read: true }))); announceNotificationsChanged() }
     catch (caught) { setError(messageFor(caught)) }
   }
-  const open = async (n: UserNotification) => { await read(n); const to = LEADS_TO[KIND[n.event_type] ?? 'Other']; if (to) navigate(to) }
+  const open = async (n: UserNotification) => { await read(n); const to = resolveNotificationPath(n.action_path) ?? LEADS_TO[KIND[n.event_type] ?? 'Other']; if (to) navigate(to) }
 
   return (
     <div className="space-y-6 page-enter">

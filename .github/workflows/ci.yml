@@ -35,6 +35,8 @@ jobs:
       - name: Lint
         # Only this project's source; reference-templates/ vendors a jQuery copy.
         run: npx oxlint src
+      - name: Tests
+        run: npm test
       - name: Production build
         run: npm run build
 

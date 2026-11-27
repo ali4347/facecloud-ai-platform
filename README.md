@@ -170,6 +170,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/groups/review` (Review matches: the photos the face grouping was not sure about, each with the suggested folder and match percent; say yes, a different person (existing or new folder), or leave the face out)
 * `/dashboard/groups/:id` (one Person Folder: its photos (click a photo to open it; tick the box on its corner to select it), rename, Move selected photos to the trash, Delete empty folder, Delete folder but keep its photos, move a photo to another folder, take it out, make it the folder cover, Merge folder (move another folder's photos into this one), Download All / Download Selected as a ZIP, and a time-limited Secure Link to the whole folder's ZIP)
 * `/dashboard/downloads` (real download history; "Your secure links" lists every link made, how often it was opened, and lets you stop one; a new line is added each time a file is downloaded; time-limited secure links for enhanced photos and Person Folder ZIPs; expired batch ZIPs can be prepared again)
+* `/dashboard/download-requests` and `/dashboard/download-requests/:id` (Download approval: the member's requests to download photos of an organization that requires a moderator's approval. List with a status filter; a request page with each photo's decision, the denial reason, the approval's expiry (or "expired" / "withdrawn"), Cancel while pending, and "Download selected" / "Download all approved (ZIP)" through the authenticated routes. In the sidebar only for a member of such an organization)
 * `/dashboard/notifications` (real notifications: mark read / mark all read, open, dismiss, paging; the top-bar bell shows the same unread count)
 * `/dashboard/activity` (your real activity history, paged; picking a type chip or searching looks through your newest 500 events (the backend's window) and shows how many of each type there are, or says there are none)
 * `/dashboard/settings` (name, organization, job title, phone, country and the picture saved to the account; Delete my account (password and a typed word); password change; the list of signed-in devices with Revoke, and sign out of all devices; notification switches saved to the account. Against a backend that predates profile details/sessions (before backend PR #67) the extras and picture stay on this device and the device list is hidden)
@@ -208,7 +209,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/moderator/identity` (Person folders that hold photos submitted to your organization, with suggested merges of one member's folders)
 * `/moderator/rejected` (Rejected and needs-review photos submitted to your organization, with the reasons)
 * `/moderator/batches` (Uploads submitted to your organization: progress, outcome per photo, retry, cancel, reprocess)
-* `/moderator/notifications` (Assignments, deadlines, escalations and failed batches; the same items feed the bell in the top bar)
+* `/moderator/notifications` (Assignments, download requests, deadlines, escalations and failed batches; the same items feed the bell in the top bar)
+* `/moderator/download-requests` and `/moderator/download-requests/:id?organization=<id>` (Download approval queue of the working organization, filtered by status. A request page with the requester, message, previews from the moderator preview route, quality score, Approve all / Approve selected / Deny selected / Deny all with a reason (per-photo reasons optional), a confirmation before every decision, and Withdraw approval. No decision controls on the moderator's own request. A notification link switches the panel to the organization it names)
 * `/moderator/reports` (Make and download a report about your organization)
 * `/moderator/logs` (Decision Log: the latest decisions about photos, with today's counts; the full trail is Audit)
 * `/moderator/audit` (The organization's audit trail: who did what, searchable)
@@ -297,6 +299,12 @@ graph TD
 * **Review Queue**: Lists borderline files flagged by the quality validation step (e.g., high blur, low brightness, poor face-size ratio).
 * **Human-in-the-Loop Audit Card**: Allows moderators to view the raw image, quality scores, face boundaries, and choose to **Approve** (forces override index and maps to person folders) or **Reject** (logs reason and removes from active database indexes).
 * **Moderation Audit Log**: Tracks decision archives linking moderator accounts to approved or rejected items.
+* **Download approval** (backend: `docs/features/download-approval.md`). Off for every organization until the platform administrator turns it on; never for a personal workspace. When it is on:
+  * **My Images** checks the organization's photos with `POST /api/downloads/requests/check/`, shows each one's access ("Requested", "Approved", "Approval expired"…) and the server's reason when a photo cannot be requested, and adds "Select all eligible" and "Request download access" to the selection bar. Photos of a personal workspace or of an organization with approval off look and behave as before.
+  * Previews stay the server's reduced, watermarked copies until approved; they carry a "Preview only — approval required" badge (from the photo's data, and from `X-Preview-Restricted` when the browser may read it).
+  * The request dialog sends one request per organization with a `client_token` made once per dialog (a retry returns the same request) and explains every error code (`items_not_eligible`, `no_eligible_reviewer`, `approval_not_required`, `client_token_reused`, `organization_suspended`).
+  * Any download the server refuses with `403 download_approval_required` (a photo card, the editor, the comparison viewer, batch and person-folder ZIPs, share links, the download history) opens one dialog in the user portal (`DownloadAccessHost`) with the reason and, where it can help, "Request download access" for that photo and file. The address is never rebuilt by the frontend.
+  * Code: `src/lib/api/downloads.ts` (member calls), `src/lib/api/moderatorConsole.ts` (moderator calls), `src/lib/downloadApproval.ts` (wording, decision rules), `src/components/downloads/`, the four pages above. Tests: `src/test/` (Vitest).
 
 ---
 
@@ -399,11 +407,16 @@ FaceCloud is **multi-tenant**: one deployment serves many organizations, and eac
    ```txt
    http://localhost:5173
    ```
-4. **Compile and test the production build**:
+4. **Run the tests** (Vitest with Testing Library and jsdom; also run in CI):
+   ```bash
+   npm test
+   ```
+
+5. **Compile and test the production build**:
    ```bash
    npm run build
    ```
-5. **Preview the production bundle locally**:
+6. **Preview the production bundle locally**:
    ```bash
    npm run preview
    ```

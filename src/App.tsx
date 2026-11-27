@@ -79,6 +79,10 @@ import AdminSettings from './pages/admin/AdminSettings'
 import MemberManagement from './pages/moderator/MemberManagement'
 import BatchManagement from './pages/moderator/BatchManagement'
 import NotificationCenter from './pages/moderator/NotificationCenter'
+import DownloadRequestQueue from './pages/moderator/DownloadRequestQueue'
+import DownloadRequestReview from './pages/moderator/DownloadRequestReview'
+import DownloadRequests from './pages/user/DownloadRequests'
+import DownloadRequestDetail from './pages/user/DownloadRequestDetail'
 import ReportsExports from './pages/moderator/ReportsExports'
 import NotFound from './pages/NotFound'
 
@@ -149,6 +153,8 @@ export default function App() {
           <Route path="groups/history" element={<FolderHistory />} />
           <Route path="groups/:id" element={<GroupDetail />} />
           <Route path="downloads" element={<Downloads />} />
+          <Route path="download-requests" element={<DownloadRequests />} />
+          <Route path="download-requests/:id" element={<DownloadRequestDetail />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="activity" element={<ActivityLogs />} />
           <Route path="organization" element={<MyOrganization />} />
@@ -207,6 +213,9 @@ export default function App() {
           <Route path="rejected" element={<RejectedImages />} />
           <Route path="batches" element={<BatchManagement />} />
           <Route path="notifications" element={<NotificationCenter />} />
+          <Route path="download-requests" element={<DownloadRequestQueue />} />
+          {/* Links from notifications carry ?organization=<id>; the page switches the panel to it. */}
+          <Route path="download-requests/:id" element={<DownloadRequestReview />} />
           <Route path="reports" element={<ReportsExports />} />
           <Route path="audit" element={<ModeratorAudit />} />
           <Route path="settings" element={<ModeratorSettings />} />
