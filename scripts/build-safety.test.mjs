@@ -1,4 +1,4 @@
-// node --test scripts/
+// npm run test:build-safety  (node --test scripts/build-safety.test.mjs; Node 22 needs the file named)
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { PRODUCTION_API_URL, checkBundleCode, checkProductionEnv, isProductionBuild } from './build-safety.mjs'

@@ -9,7 +9,7 @@
     "build:demo": "tsc -b && vite build --mode demo",
     "build:local": "tsc -b && vite build --mode development",
     "verify:bundle": "node scripts/verify-bundle.mjs dist",
-    "test:build-safety": "node --test scripts/",
+    "test:build-safety": "node --test scripts/build-safety.test.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },
