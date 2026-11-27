@@ -32,9 +32,9 @@ describe('client', () => {
   })
 
   it('marks a preview the server says is restricted', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(new Blob(['x']), { status: 200, headers: { 'X-Preview-Restricted': 'approval-required' } })))
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('x', { status: 200, headers: { 'X-Preview-Restricted': 'approval-required' } })))
     expect(isRestrictedPreview(await apiFetchBlob('/api/images/5/thumbnail/?size=256'))).toBe(true)
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(new Blob(['x']), { status: 200 })))
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('x', { status: 200 })))
     expect(isRestrictedPreview(await apiFetchBlob('/api/images/6/thumbnail/?size=256'))).toBe(false)
   })
 })
