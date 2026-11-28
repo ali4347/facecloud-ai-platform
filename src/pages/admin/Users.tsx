@@ -10,7 +10,7 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { NewAccountForm, CreatedAccountNotice } from '../../components/admin/NewAccountForm'
 import type { NewAccount } from '../../components/admin/NewAccountForm'
-import { createAdminUser, sendAdminPasswordReset, setAdminUserSuspended, type AccountType } from '../../lib/api/adminUsers'
+import { accountTypeLabel, createAdminUser, sendAdminPasswordReset, setAdminUserSuspended, type AccountType } from '../../lib/api/adminUsers'
 import { UserDetailsDialog } from '../../components/admin/UserDetailsDialog'
 import { teamsOf, useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { USE_API } from '../../lib/api/config'
@@ -77,7 +77,7 @@ export default function UsersPage() {
   /* Live: the backend creates the account and the list is read again. Demo: kept for the session only. */
   const handleCreate = async (account: NewAccount) => {
     if (USE_API) {
-      await createAdminUser({ username: account.username, email: account.email, ...(account.password ? { password: account.password } : {}), role: account.role, ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}) })
+      await createAdminUser({ username: account.username, email: account.email, ...(account.password ? { password: account.password } : {}), role: account.role, ...(account.organizationId !== undefined ? { organization_id: account.organizationId } : {}), ...(account.reason ? { reason: account.reason } : {}) })
       reload()
     } else {
       setAddedInDemo(rows => [{
@@ -164,7 +164,7 @@ export default function UsersPage() {
           <SearchInput placeholder="Search users…" value={search} onChange={e => { setSearch(e.target.value); setPage(1) }} className="w-72" />
           {USE_API && (
             <div className="flex flex-wrap gap-2" role="group" aria-label="Account type">
-              {([['', 'All accounts'], ['personal', 'Personal'], ['organization', 'In an organization']] as const).map(([value, label]) => (
+              {([['', 'All accounts'], ['personal', 'Personal only'], ['organization', 'Personal + Organization(s)']] as const).map(([value, label]) => (
                 <button key={value || 'all'} type="button" aria-pressed={accountType === value} onClick={() => { setAccountType(value); setPage(1) }}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer ${accountType === value ? 'bg-accent/15 border-accent/30 text-accent' : 'bg-surface-mute border-line text-ink-mute hover:text-ink'}`}>
                   {label}
@@ -223,7 +223,7 @@ export default function UsersPage() {
                 { key: 'role', label: 'Role', render: row => roleBadge(row.role as Role) },
                 // Personal: only their own private workspace. Organization: also an active member of shared organizations.
                 ...(users.some(u => u.accountType) ? [{ key: 'accountType', label: 'Account', render: (row: Record<string, unknown>) => (
-                  <span className="text-xs text-ink-soft">{row.accountType === 'organization' ? `Organization${row.sharedOrganizations ? ` · ${String(row.sharedOrganizations)}` : ''}` : row.accountType === 'personal' ? 'Personal' : '—'}</span>
+                  <span className="text-xs text-ink-soft">{accountTypeLabel(row.accountType as AccountType | null, row.sharedOrganizations as number | null)}</span>
                 ) }] : []),
                 { key: 'suspended', label: 'Status', render: row => (
                   <StatusBadge status={row.suspended ? 'error' : 'success'} label={row.suspended ? 'Suspended' : 'Active'} />

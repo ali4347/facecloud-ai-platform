@@ -119,8 +119,11 @@ export async function listAccountInvitations(status: InvitationStatus | '', sign
   return Array.isArray(data) ? data : data.results ?? []
 }
 
-/** 409 when the address already has an account or a waiting invitation; 400 for a moderator without a team. */
-export function inviteAccount(body: { email: string; role: 'user' | 'moderator'; organization_id?: number }): Promise<AccountInvitation> {
+/**
+ * 409 when the address already has an account or a waiting invitation; 400 for a moderator without a team, or without a `reason`
+ * (backend PR #176: required with role moderator, at least 8 characters, kept in the organization's audit trail; not sent otherwise).
+ */
+export function inviteAccount(body: { email: string; role: 'user' | 'moderator'; organization_id?: number; reason?: string }): Promise<AccountInvitation> {
   return apiFetch<AccountInvitation>('/api/user/admin/invitations/', { body })
 }
 

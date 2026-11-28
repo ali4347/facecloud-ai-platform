@@ -5,6 +5,8 @@ import { GradientButton } from '../ui/GradientButton'
 import { PasswordInput } from '../ui/PasswordInput'
 import { ChartCard } from '../ui/ChartCard'
 import type { AdminOrganization } from '../../lib/api/adminOrganizations'
+import { ModeratorReasonField } from './ModeratorReasonField'
+import { normalizeReason, reasonProblem, serverReasonError } from '../../lib/moderatorReason'
 
 export type NewAccountRole = 'user' | 'moderator'
 
@@ -16,6 +18,8 @@ export interface NewAccount {
   role: NewAccountRole
   /** Set for a moderator: the organization they work for. */
   organizationId?: number
+  /** Set for a moderator: why the administrator assigns them (backend `reason`, kept in the organization's audit trail). */
+  reason?: string
 }
 
 const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
@@ -56,6 +60,9 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
   const [organizationId, setOrganizationId] = useState<number | ''>(organizations.length === 1 ? organizations[0].id : '')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  // Only a moderator assignment needs a reason (backend PR #176); an ordinary account does not.
+  const [reason, setReason] = useState('')
+  const [reasonError, setReasonError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,11 +70,23 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
     if (passwordMode === 'set' && password.length < 8) { setError('The password needs at least 8 characters.'); return }
     if (passwordMode === 'set' && password !== confirm) { setError('The two passwords do not match.'); return }
     if (role === 'moderator' && organizationId === '') { setError('Choose the organization this moderator works for.'); return }
+    setReasonError('')
+    if (role === 'moderator') {
+      const problem = reasonProblem(reason)
+      if (problem) { setReasonError(problem); return }
+    }
     setBusy(true)
     try {
-      await onCreate({ username: username.trim(), email: email.trim(), password: passwordMode === 'set' ? password : '', role, ...(role === 'moderator' && organizationId !== '' ? { organizationId } : {}) })
+      await onCreate({
+        username: username.trim(), email: email.trim(), password: passwordMode === 'set' ? password : '', role,
+        ...(role === 'moderator' && organizationId !== '' ? { organizationId } : {}),
+        ...(role === 'moderator' ? { reason: normalizeReason(reason) } : {}),
+      })
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Could not create the account. Please try again.')
+      // The server's own sentence about the reason goes under the field; anything else above the form.
+      const aboutReason = serverReasonError(caught)
+      if (aboutReason) setReasonError(aboutReason)
+      else setError(caught instanceof Error ? caught.message : 'Could not create the account. Please try again.')
     } finally {
       setBusy(false)
     }
@@ -161,6 +180,10 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
               </>
             )}
           </div>
+        )}
+
+        {role === 'moderator' && (
+          <ModeratorReasonField id="new-moderator-reason" value={reason} onChange={value => { setReason(value); setReasonError('') }} error={reasonError} />
         )}
 
         <div className="flex gap-2 pt-1">

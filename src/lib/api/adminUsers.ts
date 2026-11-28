@@ -27,6 +27,18 @@ export interface AdminUser {
 
 export type AccountType = 'personal' | 'organization'
 
+/**
+ * How an account reads in the admin screens. The two types are not exclusive identities: every account has its private
+ * workspace, and an "organization" account is also an active member of shared organizations. So it reads
+ * "Personal + 2 Organizations", never just "Organization".
+ */
+export function accountTypeLabel(type: AccountType | null | undefined, sharedCount?: number | null): string {
+  if (type === 'personal') return 'Personal'
+  if (type !== 'organization') return '—'
+  if (typeof sharedCount !== 'number' || sharedCount < 1) return 'Personal + Organization(s)'
+  return `Personal + ${sharedCount} Organization${sharedCount === 1 ? '' : 's'}`
+}
+
 /** Every account, newest first. Administrator only. */
 export function listAdminUsers(signal?: AbortSignal): Promise<AdminUser[]> {
   return apiFetch<AdminUser[]>('/api/user/admin/users/', { signal })
@@ -66,6 +78,11 @@ export interface NewAccountRequest {
   role: 'user' | 'moderator'
   /** The organization a moderator works for. Required for a moderator once there is more than one organization. */
   organization_id?: number
+  /**
+   * Required with role `moderator` (backend PR #176): why the administrator adds this moderator instead of the organization's owner
+   * inviting them; at least 8 characters, kept in the organization's audit trail. Not sent for any other role. Missing or short: 400 on `reason`.
+   */
+  reason?: string
 }
 
 /**

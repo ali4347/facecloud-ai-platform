@@ -17,6 +17,8 @@ export default function Register() {
   const [error, setError] = useState('')
   // Arriving from an organization invitation link: the address is the invited one, and signing up joins the organization too.
   const invitationToken = useSearchParams()[0].get('invitation') ?? ''
+  /* From an invitation, signing in comes back to that invitation to accept it (Login follows only safe addresses: see safeNext). */
+  const signInHref = invitationToken ? `/login?next=${encodeURIComponent(`/invitations/${encodeURIComponent(invitationToken)}`)}` : '/login'
   const [invite, setInvite] = useState<InvitationPreview | null>(null)
   const [inviteProblem, setInviteProblem] = useState('')
   const [emailTaken, setEmailTaken] = useState(false)
@@ -121,10 +123,10 @@ export default function Register() {
             </div>
           )}
           {error && (
-            <div className="p-3 mb-5 rounded-2xl text-sm"
+            <div role="alert" className="p-3 mb-5 rounded-2xl text-sm"
               style={{ background: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.25)', color: '#F87171' }}>
               {error}
-              {emailTaken && invitationToken && <> <Link to="/login" className="font-semibold underline">Sign in</Link>, then open the invitation link again to join.</>}
+              {emailTaken && invitationToken && <> <Link to={signInHref} className="font-semibold underline">Sign in</Link> with that address and you come straight back to the invitation to accept it.</>}
             </div>
           )}
 
@@ -165,7 +167,7 @@ export default function Register() {
 
         <div className="text-center text-xs" style={{ color: 'rgb(var(--a-ink) / 0.38)' }}>
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold transition-colors"
+          <Link to={signInHref} className="font-semibold transition-colors"
             style={{ color: '#FB923C' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#FB923C')}
             onMouseLeave={e => (e.currentTarget.style.color = '#FB923C')}

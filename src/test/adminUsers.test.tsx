@@ -35,10 +35,12 @@ describe('admin Users: personal and organization accounts', () => {
     listPage.mockResolvedValue(page([user(1), user(2, { account_type: 'organization', shared_organization_count: 2 })]))
     renderPage()
     expect(await screen.findByText('Personal')).toBeTruthy()
-    expect(screen.getByText('Organization · 2')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'In an organization' }))
+    // Not exclusive identities: an organization account keeps its personal workspace, and the label says so.
+    expect(screen.getByText('Personal + 2 Organizations')).toBeTruthy()
+    expect(screen.queryByText(/^Organization( ·|$)/)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Personal + Organization(s)' }))
     await waitFor(() => expect(listPage).toHaveBeenLastCalledWith(expect.objectContaining({ accountType: 'organization', page: 1 }), expect.anything()))
-    fireEvent.click(screen.getByRole('button', { name: 'Personal' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Personal only' }))
     await waitFor(() => expect(listPage).toHaveBeenLastCalledWith(expect.objectContaining({ accountType: 'personal' }), expect.anything()))
   })
 
@@ -71,7 +73,7 @@ describe('admin Users: personal and organization accounts', () => {
     const dialog = await screen.findByRole('dialog')
     expect(await within(dialog).findByText('Personal workspace')).toBeTruthy()
     expect(within(dialog).getByText('Event Planners')).toBeTruthy()
-    expect(within(dialog).getByText('Organization (1)')).toBeTruthy()
+    expect(within(dialog).getByText('Personal + 1 Organization')).toBeTruthy()
     expect(within(dialog).queryByText('user1', { selector: 'span.font-semibold' })).toBeNull()
   })
 

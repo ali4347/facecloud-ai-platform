@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Building2, Loader2, Lock, User } from 'lucide-react'
 import { Modal } from '../ui/Modal'
-import { getAdminUserDetail, type AdminUserDetail } from '../../lib/api/adminUsers'
+import { accountTypeLabel, getAdminUserDetail, type AdminUserDetail } from '../../lib/api/adminUsers'
 import { formatBytes } from '../../lib/imageData'
 import { messageFor } from '../../lib/useApiResource'
 import { formatDate } from '../../lib/utils'
@@ -34,7 +34,7 @@ export function UserDetailsDialog({ userId, name, onClose }: { userId: number; n
           <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div><dt className="text-ink-faint">E-mail</dt><dd className="font-semibold text-ink break-all">{detail.email}</dd></div>
             <div><dt className="text-ink-faint">Account type</dt><dd className="font-semibold text-ink">
-              {detail.account_type === 'organization' ? `Organization (${detail.shared_organization_count ?? shared.length})` : detail.account_type === 'personal' ? 'Personal' : '—'}</dd></div>
+              {accountTypeLabel(detail.account_type, detail.shared_organization_count ?? shared.length)}</dd></div>
             <div><dt className="text-ink-faint">Role</dt><dd className="font-semibold text-ink capitalize">{detail.role}</dd></div>
             <div><dt className="text-ink-faint">Status</dt><dd className="font-semibold text-ink">{detail.is_suspended ? 'Suspended' : detail.is_active ? 'Active' : 'Inactive'}{detail.is_email_verified ? ' · verified' : ' · not verified'}</dd></div>
             <div><dt className="text-ink-faint">Joined</dt><dd className="font-semibold text-ink">{formatDate(detail.date_joined)}</dd></div>
