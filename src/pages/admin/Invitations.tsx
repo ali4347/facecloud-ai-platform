@@ -17,6 +17,7 @@ import {
 import { teamsOf, useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { messageFor, useApiResource } from '../../lib/useApiResource'
 import { formatDateTime } from '../../lib/utils'
+import { userSeats } from '../../lib/seats'
 
 const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
 const FILTERS: { value: InvitationStatus | ''; label: string }[] = [
@@ -119,8 +120,10 @@ export default function InvitationsPage() {
                 <select id="inv-org" className="fc-input" value={organizationId} onChange={e => setOrganizationId(e.target.value ? Number(e.target.value) : '')} required>
                   <option value="">Choose an organization…</option>
                   {teams.map(o => {
-                    const full = Boolean(o.usage && o.limits && o.limits.moderators !== null && o.usage.moderators >= o.limits.moderators)
-                    return <option key={o.id} value={o.id} disabled={full}>{o.name}{full ? ' (moderator seats full)' : ''}</option>
+                    const roleFull = Boolean(o.usage && o.limits && o.limits.moderators !== null && o.usage.moderators >= o.limits.moderators)
+                    const planFull = Boolean(userSeats(o.usage, o.limits)?.full)          // the plan's total user limit
+                    const full = roleFull || planFull
+                    return <option key={o.id} value={o.id} disabled={full}>{o.name}{planFull ? ' (plan full)' : roleFull ? ' (moderator seats full)' : ''}</option>
                   })}
                 </select>
               )}

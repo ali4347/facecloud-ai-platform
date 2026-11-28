@@ -63,16 +63,16 @@ export default function MyOrganization() {
   useEffect(() => { if (id !== null && !suspended) void load(id) }, [id, load, suspended])
 
   const act = async (key: string, work: () => Promise<unknown>, done: string) => {
-    if (id === null) return
+    if (id === null) return false
     setBusy(key)
-    try { await work(); say(done); await load(id) } catch (caught) { say(planAwareMessage(caught, messageFor), true) } finally { setBusy(null) }
+    try { await work(); say(done); await load(id); return true } catch (caught) { say(planAwareMessage(caught, messageFor), true); return false } finally { setBusy(null) }
   }
 
   const invite = async (e: React.FormEvent) => {
     e.preventDefault()
     if (id === null) return
-    await act('invite', () => inviteOrgMember(id, inviteEmail.trim(), inviteRole), `Invitation sent to ${inviteEmail.trim()}.`)
-    setInviteEmail('')
+    // A refused invitation (plan full, address already invited…) keeps what was typed, so it can be corrected instead of typed again.
+    if (await act('invite', () => inviteOrgMember(id, inviteEmail.trim(), inviteRole), `Invitation sent to ${inviteEmail.trim()}.`)) setInviteEmail('')
   }
 
   const loadOlder = async () => {

@@ -22,7 +22,7 @@ export function seatSummary(usage?: PlanUsage, limits?: PlanLimits): string {
 }
 
 const UPGRADE_HINT = 'Ask the platform administrator to move the organization to a larger plan, or cancel invitations that are still waiting.'
-const DOWNGRADE_HINT = 'Remove people or cancel waiting invitations first, or keep the larger plan. Nobody is removed automatically.'
+const DOWNGRADE_HINT = 'Nobody is removed automatically.'          // the API's own sentence already says what to free up first
 
 /** The API's own sentence, plus what to do next when the plan's user limit stopped the action. */
 export function planAwareMessage(caught: unknown, fallback: (caught: unknown) => string): string {

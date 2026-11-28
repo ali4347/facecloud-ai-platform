@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Building2, CheckCircle, Info, Mail, Plus } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ChartCard } from '../../components/ui/ChartCard'
@@ -72,6 +72,8 @@ export default function Organizations() {
   const [working, setWorking] = useState(false)
   const [form, setForm] = useState({ name: '', plan: 'free' as OrganizationPlan, scope: 'own_members' as ModeratorDataScope, reason: '' })
 
+  const [editError, setEditError] = useState('')
+  useEffect(() => { setEditError('') }, [editing])
   const apply = async (org: AdminOrganization, patch: Parameters<typeof updateAdminOrganization>[1], doneText: string) => {
     let done = doneText
     setWorking(true); setNotice(null)
@@ -83,7 +85,11 @@ export default function Organizations() {
       }
       else setDemoPatch(p => ({ ...p, [org.id]: { ...p[org.id], ...(patch.name ? { name: patch.name } : {}), ...(patch.plan ? { plan: patch.plan } : {}), ...(patch.status ? { status: patch.status } : {}), ...(patch.moderator_data_scope ? { moderator_data_scope: patch.moderator_data_scope } : {}) } }))
       setNotice({ text: done }); setEditing(null); setSuspending(null)
-    } catch (caught) { setNotice({ text: planAwareMessage(caught, messageFor), bad: true }) } finally { setWorking(false) }
+    } catch (caught) {
+      const text = planAwareMessage(caught, messageFor)
+      // With the edit dialog open the refusal belongs inside it: a notice on the page behind the overlay would go unseen.
+      if (editing && editing.id === org.id) setEditError(text); else setNotice({ text, bad: true })
+    } finally { setWorking(false) }
   }
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -235,12 +241,13 @@ export default function Organizations() {
             <div className="space-y-1.5"><label htmlFor="edit-org-name" className={labelClass}>Name</label><input id="edit-org-name" className="fc-input" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} maxLength={150} required /></div>
             <div className="space-y-1.5"><label htmlFor="edit-org-plan" className={labelClass}>Plan</label>
               <select id="edit-org-plan" className="fc-input text-ink" value={form.plan} onChange={e => setForm(f => ({ ...f, plan: e.target.value as OrganizationPlan }))}>{PLANS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}</select>
-              <p className="text-[10px] text-ink-faint">The plan sets how many moderators and members it may have. Nobody is removed if it goes down.</p></div>
+              <p className="text-[10px] text-ink-faint">The plan sets how many people it may have in total (owner, moderators and members; waiting invitations hold a seat). A plan too small for the people it has now is refused. Nobody is removed.</p></div>
             <div className="space-y-1.5"><label htmlFor="edit-org-scope" className={labelClass}>What a moderator sees</label>
               <select id="edit-org-scope" className="fc-input text-ink" value={form.scope} onChange={e => setForm(f => ({ ...f, scope: e.target.value as ModeratorDataScope }))}>
                 <option value="own_members">Only the members they invited, and members nobody invited</option>
                 <option value="organization">Every member of the organization</option></select></div>
             <div className="space-y-1.5"><label htmlFor="edit-org-reason" className={labelClass}>Reason (kept in the audit trail)</label><input id="edit-org-reason" className="fc-input" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} maxLength={500} /></div>
+            {editError && <p role="alert" data-testid="edit-org-error" className="text-xs text-[#F87171]">{editError}</p>}
             <div className="flex justify-end gap-2 pt-1"><GradientButton type="button" variant="secondary" onClick={() => setEditing(null)} disabled={working}>Cancel</GradientButton><GradientButton type="submit" disabled={working}>{working ? 'Saving…' : 'Save changes'}</GradientButton></div>
           </form>
         </div>

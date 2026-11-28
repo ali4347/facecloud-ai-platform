@@ -7,6 +7,7 @@ import { ChartCard } from '../ui/ChartCard'
 import type { AdminOrganization } from '../../lib/api/adminOrganizations'
 import { ModeratorReasonField } from './ModeratorReasonField'
 import { normalizeReason, reasonProblem, serverReasonError } from '../../lib/moderatorReason'
+import { userSeats } from '../../lib/seats'
 
 export type NewAccountRole = 'user' | 'moderator'
 
@@ -172,8 +173,10 @@ export function NewAccountForm({ title, subtitle, roles, organizations = [], org
                 <select id="new-organization" className="fc-input" value={organizationId} onChange={e => setOrganizationId(e.target.value ? Number(e.target.value) : '')} required>
                   <option value="">Choose an organization…</option>
                   {organizations.map(o => {
-                    const seatsFull = Boolean(o.usage && o.limits && o.limits.moderators !== null && o.usage.moderators >= o.limits.moderators)
-                    return <option key={o.id} value={o.id} disabled={seatsFull}>{o.name}{seatsFull ? ' (moderator seats full)' : o.limits?.moderators != null && o.usage ? ` (${o.usage.moderators} of ${o.limits.moderators} moderators)` : ''}</option>
+                    const roleFull = Boolean(o.usage && o.limits && o.limits.moderators !== null && o.usage.moderators >= o.limits.moderators)
+                    const planFull = Boolean(userSeats(o.usage, o.limits)?.full)          // the plan's total user limit
+                    const seatsFull = roleFull || planFull
+                    return <option key={o.id} value={o.id} disabled={seatsFull}>{o.name}{planFull ? ' (plan full)' : roleFull ? ' (moderator seats full)' : o.limits?.moderators != null && o.usage ? ` (${o.usage.moderators} of ${o.limits.moderators} moderators)` : ''}</option>
                   })}
                 </select>
                 <p className="text-[10px] text-ink-faint">The moderator will only see this organization's members and photos.</p>

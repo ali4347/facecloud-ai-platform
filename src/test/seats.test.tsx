@@ -98,6 +98,8 @@ describe('admin organizations table', () => {
     fireEvent.change(await screen.findByLabelText(/Plan/i, { selector: 'select' }), { target: { value: 'free' } })
     fireEvent.click(screen.getByRole('button', { name: /Save/ }))
     expect(await screen.findByText(/has 12 users; the Free plan allows 5\./)).toBeTruthy()
+    expect(screen.getByTestId('edit-org-error').textContent).toContain('the Free plan allows 5.')      // inside the open dialog, not behind it
+    expect(screen.getByRole('dialog')).toBeTruthy()
     expect(screen.getByText(/Nobody is removed automatically/)).toBeTruthy()
     expect(update).toHaveBeenCalledWith(2, expect.objectContaining({ plan: 'free' }))
   })
@@ -121,6 +123,7 @@ describe('owner organization screen', () => {
     fireEvent.click(screen.getByRole('button', { name: /Send invitation|Invite/i }))
     await waitFor(() => expect(invite).toHaveBeenCalled())
     expect(await screen.findByText(/Your plan allows 25 users\..*larger plan/)).toBeTruthy()
+    expect((screen.getByLabelText('Email address') as HTMLInputElement).value).toBe('new@example.com')      // a refused invitation keeps what was typed
   })
 
   it('shows no user line from an older backend', async () => {
@@ -128,5 +131,21 @@ describe('owner organization screen', () => {
     render(<MemoryRouter><MyOrganization /></MemoryRouter>)
     await screen.findByText('Plan')
     expect(screen.queryByTestId('plan-seats')).toBeNull()
+  })
+})
+
+describe('administrator forms skip an organization whose plan has no user seat left', () => {
+  it('disables a full plan in the new-moderator form and says why', async () => {
+    const { NewAccountForm } = await import('../components/admin/NewAccountForm')
+    const orgs = [
+      adminOrg({ id: 1, name: 'Roomy Org', usage: { moderators: 0, members: 2, users: 3 }, limits: { moderators: 5, members: 10, users: 5 } }),
+      adminOrg({ id: 2, name: 'Packed Org', usage: { moderators: 0, members: 4, users: 5 }, limits: { moderators: 5, members: 10, users: 5 } }),
+    ]
+    render(<NewAccountForm title="New" subtitle="s" roles={['user', 'moderator']} organizations={orgs} onCreate={async () => {}} onCancel={() => {}} />)
+    fireEvent.change(screen.getByLabelText('Role'), { target: { value: 'moderator' } })
+    const packed = (await screen.findByRole('option', { name: /Packed Org/ })) as HTMLOptionElement
+    expect(packed.textContent).toContain('plan full')
+    expect(packed.disabled).toBe(true)
+    expect((screen.getByRole('option', { name: /Roomy Org/ }) as HTMLOptionElement).disabled).toBe(false)
   })
 })
