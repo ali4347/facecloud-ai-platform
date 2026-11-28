@@ -48,7 +48,8 @@ import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
 import AdminOverview from './pages/admin/AdminOverview'
-import MyOrganization from './pages/user/MyOrganization'
+import OrganizationHome from './pages/user/OrganizationHome'
+import LeaveRequests from './pages/moderator/LeaveRequests'
 import Organizations from './pages/admin/Organizations'
 import InvitationAccept from './pages/InvitationAccept'
 import AcceptInvitation from './pages/AcceptInvitation'
@@ -157,7 +158,7 @@ export default function App() {
           <Route path="download-requests/:id" element={<DownloadRequestDetail />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="activity" element={<ActivityLogs />} />
-          <Route path="organization" element={<MyOrganization />} />
+          <Route path="organization" element={<OrganizationHome />} />
           <Route path="settings" element={<Settings />} />
           {/* The separate uploader page was folded into the Upload screens (preset and lighting are chosen there); keep old bookmarks working. */}
           <Route path="enhance" element={<Navigate to="/dashboard/upload" replace />} />
@@ -214,6 +215,7 @@ export default function App() {
           <Route path="batches" element={<BatchManagement />} />
           <Route path="notifications" element={<NotificationCenter />} />
           <Route path="download-requests" element={<DownloadRequestQueue />} />
+          <Route path="leave-requests" element={<LeaveRequests />} />
           {/* Links from notifications carry ?organization=<id>; the page switches the panel to it. */}
           <Route path="download-requests/:id" element={<DownloadRequestReview />} />
           <Route path="reports" element={<ReportsExports />} />
