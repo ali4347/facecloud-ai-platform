@@ -117,7 +117,54 @@ export interface RequestOptions {
   /** Skip the Authorization header — for login, register, password reset. */
   anonymous?: boolean
   signal?: AbortSignal
+  /**
+   * The caller shows a download-approval refusal itself (the download-request pages), so the app-wide
+   * "Request download access" dialog is not opened for it. See DOWNLOAD_APPROVAL_REFUSED.
+   */
+  handlesApprovalRefusal?: boolean
 }
+
+/**
+ * Fired when an organization that requires download approval refused a file (403 `download_approval_required`).
+ * `detail` is an ApprovalRefusalDetail. One listener (DownloadAccessHost, in the user portal) offers
+ * "Request download access", so every download button gets the same help without handling it one by one.
+ */
+export const DOWNLOAD_APPROVAL_REFUSED = 'facecloud:download-approval-refused'
+
+export interface ApprovalRefusalDetail {
+  /** The API path that refused, e.g. /api/images/12/download/. */
+  path: string
+  /** no_grant, expired, revoked, used_up, not_approved, not_a_member, organization_suspended or bulk_not_allowed. */
+  reason: string
+  /** The server's sentence. */
+  message: string
+}
+
+/** The parts of a 403 `download_approval_required` answer, or null for any other error. */
+export function approvalRefusalOf(body: unknown): { reason: string; message: string } | null {
+  if (!body || typeof body !== 'object') return null
+  const record = body as Record<string, unknown>
+  if (record.code !== 'download_approval_required') return null
+  return {
+    reason: typeof record.reason === 'string' ? record.reason : 'no_grant',
+    message: typeof record.detail === 'string' ? record.detail : 'This image has not been approved for download.',
+  }
+}
+
+function announceApprovalRefusal(path: string, status: number, body: unknown, options: RequestOptions) {
+  if (status !== 403 || options.handlesApprovalRefusal) return
+  const refusal = approvalRefusalOf(body)
+  if (!refusal || typeof window === 'undefined') return
+  window.dispatchEvent(new CustomEvent<ApprovalRefusalDetail>(DOWNLOAD_APPROVAL_REFUSED, { detail: { path, ...refusal } }))
+}
+
+/**
+ * Previews the server reduced and watermarked because the image's organization requires download approval
+ * and the viewer holds none (response header `X-Preview-Restricted: approval-required`). Kept by Blob, so
+ * every existing loader keeps returning a plain Blob and AuthedImage can still say "Preview only".
+ */
+const restrictedPreviews = new WeakSet<Blob>()
+export const isRestrictedPreview = (blob: Blob): boolean => restrictedPreviews.has(blob)
 
 /**
  * One call to the API, returned unparsed.
@@ -269,6 +316,7 @@ async function load<T>(path: string, options: RequestOptions): Promise<T> {
   }
 
   if (!response.ok) {
+    announceApprovalRefusal(path, response.status, parsed, options)
     throw new ApiError(response.status, messageFrom(parsed, response.status), parsed)
   }
   return parsed as T
@@ -287,7 +335,27 @@ export async function apiFetchBlob(path: string, options: RequestOptions = {}): 
 
   if (!response.ok) {
     const parsed = await response.json().catch(() => null)
+    announceApprovalRefusal(path, response.status, parsed, options)
     throw new ApiError(response.status, messageFrom(parsed, response.status), parsed)
   }
-  return response.blob()
+  const blob = await response.blob()
+  if (response.headers.get('X-Preview-Restricted') === 'approval-required') restrictedPreviews.add(blob)
+  return blob
+}
+
+/**
+ * A file download that also says what the server called it (Content-Disposition), for the approved-download
+ * routes whose name is decided on the server (a single approved image, or the ZIP of a request).
+ */
+export async function apiFetchFile(path: string, options: RequestOptions = {}): Promise<{ blob: Blob; filename: string | null }> {
+  const response = await request(path, options)
+  if (!response.ok) {
+    const parsed = await response.json().catch(() => null)
+    announceApprovalRefusal(path, response.status, parsed, options)
+    throw new ApiError(response.status, messageFrom(parsed, response.status), parsed)
+  }
+  const disposition = response.headers.get('Content-Disposition') ?? ''
+  const match = disposition.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i)
+  const filename = match ? decodeURIComponent(match[1] ?? match[2]) : null
+  return { blob: await response.blob(), filename }
 }

@@ -1,4 +1,5 @@
 import { apiFetch, apiFetchBlob } from './client'
+import type { DenialReasonCode, DownloadRequest, DownloadRequestSummary } from './downloads'
 
 /** The moderator console's screens beyond the review queue: Batches, Identity Review, Audit, Rejected Images, Reports. */
 
@@ -225,3 +226,51 @@ export interface ReviewImageInfo {
   quality: { decision: string | null; overall_score: number | null; rejection_reasons: string[]; warnings: string[] }
   preview_url: string
 }
+
+// ── Download requests (owner or moderator) ─────────────────────────────────
+// A member asks to download images of an organization that requires approval; a moderator decides.
+// The requester never decides their own request (403 cannot_decide_own_request).
+
+export type DownloadDecisionAction = 'approve_all' | 'approve_selected' | 'deny_selected' | 'deny_all'
+
+export interface DenialReason { code: Exclude<DenialReasonCode, 'no_longer_eligible'>; text: string }
+
+export interface DownloadDecision {
+  action: DownloadDecisionAction
+  /** For approve_selected / deny_selected. approve_selected DENIES the other undecided images with `reason`; deny_selected leaves them undecided. */
+  item_ids?: number[]
+  /** Needed whenever something is denied. `other` needs text. */
+  reason?: DenialReason
+  /** Per-image reasons that replace `reason` for those images. */
+  item_reasons?: Record<string, DenialReason>
+  /** The `version` of the request as loaded: a stale one answers 409 request_changed. */
+  expected_version: number
+}
+
+export function listOrgDownloadRequests(
+  organizationId: number, filters: { status?: string; requester?: number } = {}, signal?: AbortSignal,
+): Promise<DownloadRequestSummary[]> {
+  const params = new URLSearchParams()
+  if (filters.status) params.set('status', filters.status)
+  if (filters.requester) params.set('requester', String(filters.requester))
+  const query = params.toString()
+  return array<DownloadRequestSummary>(`${root(organizationId)}/download-requests/${query ? `?${query}` : ''}`, signal)
+}
+
+export const getOrgDownloadRequest = (organizationId: number, requestId: number, signal?: AbortSignal) =>
+  apiFetch<DownloadRequest>(`${root(organizationId)}/download-requests/${requestId}/`, { signal })
+
+export const decideDownloadRequest = (organizationId: number, requestId: number, decision: DownloadDecision) =>
+  apiFetch<DownloadRequest>(`${root(organizationId)}/download-requests/${requestId}/decision/`, { method: 'POST', body: decision })
+
+/** Withdraw an approval. Takes effect at once; a file already downloaded cannot be recalled. */
+export const revokeDownloadGrant = (organizationId: number, grantId: number, reason = '') =>
+  apiFetch(`${root(organizationId)}/download-grants/${grantId}/revoke/`, { method: 'POST', body: reason.trim() ? { reason: reason.trim() } : {} })
+
+/**
+ * An image of this organization as the moderator preview route serves it (always a JPEG of at most `size`, never the file).
+ * The same route the review screens use; the server picks the variant and records the look in the audit trail.
+ */
+export const getModeratorImagePreview = (
+  organizationId: number, imageId: number, variant: 'original' | 'enhanced', size: 256 | 1024, signal?: AbortSignal,
+) => apiFetchBlob(`${base(organizationId)}/images/${imageId}/preview/?variant=${variant}&size=${size}`, { signal })

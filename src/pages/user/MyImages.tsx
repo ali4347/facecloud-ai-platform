@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AlertTriangle, FolderPlus, Heart, Images, Loader2, RefreshCw, ScanFace, Trash2, X } from 'lucide-react'
+import { AlertTriangle, FileDown, FolderPlus, Heart, Images, Loader2, Lock, RefreshCw, ScanFace, Trash2, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { ImageCard } from '../../components/features/ImageCard'
 import { SearchInput } from '../../components/ui/SearchInput'
@@ -16,6 +17,11 @@ import { useApiResource } from '../../lib/useApiResource'
 import { LibraryTabs } from '../../components/features/LibraryTabs'
 import { AddToAlbumDialog } from '../../components/features/AddToAlbumDialog'
 import { USE_API } from '../../lib/api/config'
+import { RequestDownloadDialog, type RequestCandidate } from '../../components/downloads/RequestDownloadDialog'
+import { useDownloadAccess } from '../../lib/useDownloadAccess'
+import { useApprovalOrganizations } from '../../lib/useApprovalOrganizations'
+import { displayName } from '../../lib/api/organizations'
+import { requestErrorSentence } from '../../lib/downloadApproval'
 
 /** Mirrors the pipeline's own verdicts, which is what the API filters on. */
 const STATUS_FILTERS = [
@@ -117,6 +123,18 @@ export default function MyImages() {
   /* Only an accepted upload can be analysed: the backend answers 404 for a rejected or
      still-processing photo, so those cannot be ticked. */
   const eligibleIds = useMemo(() => visible.filter(image => image.status === 'uploaded').map(image => image.id), [visible])
+  /* Download approval: only photos whose organization requires it are checked; for every other photo nothing changes. */
+  const downloadAccess = useDownloadAccess(visible)
+  const { organizations: approvalOrgs } = useApprovalOrganizations()
+  /* The photos the open request dialog is for, fixed when it opens (the selection is cleared once the request is sent). */
+  const [requestFor, setRequestFor] = useState<RequestCandidate[] | null>(null)
+  const orgNames = useMemo(() => Object.fromEntries(approvalOrgs.map(o => [o.id, displayName(o)])), [approvalOrgs])
+  const requestCandidates = useMemo<RequestCandidate[]>(
+    () => downloadAccess.gated.filter(image => selected.has(image.id)).map(image => ({ id: image.id, name: image.original_name, organizationId: image.organization_id as number })),
+    [downloadAccess.gated, selected],
+  )
+  const gatedOrgNames = [...new Set(downloadAccess.gated.map(image => orgNames[image.organization_id as number] ?? 'your organization'))]
+
   /* Any photo can be deleted, including a rejected one, so against the API every photo can be ticked. */
   const selectableIds = useMemo(() => (USE_API ? visible.map(image => image.id) : eligibleIds), [visible, eligibleIds])
 
@@ -316,6 +334,25 @@ export default function MyImages() {
         )
       })()}
 
+      {!loading && !error && downloadAccess.gated.length > 0 && (
+        <div className="p-3 mb-5 rounded-2xl text-xs border bg-surface-mute border-line text-ink-soft flex flex-wrap items-center gap-x-3 gap-y-2">
+          <Lock className="w-4 h-4 text-accent flex-shrink-0" aria-hidden />
+          <span className="flex-1 min-w-[14rem]">
+            {downloadAccess.gated.length} photo{downloadAccess.gated.length === 1 ? '' : 's'} on this page belong{downloadAccess.gated.length === 1 ? 's' : ''} to {gatedOrgNames.join(', ')}, which requires a moderator’s approval before download. Previews are reduced until then. Select photos and press “Request download access”.
+          </span>
+          {downloadAccess.eligibleIds.length > 0 && (
+            <button type="button" onClick={() => setSelected(new Set(downloadAccess.eligibleIds))} className="font-bold text-accent hover:underline cursor-pointer">
+              Select all eligible ({downloadAccess.eligibleIds.length})
+            </button>
+          )}
+          <Link to="/dashboard/download-requests" className="font-bold text-ink hover:underline">My requests</Link>
+          {downloadAccess.reviewerMissing.size > 0 && (
+            <p role="alert" className="basis-full text-[#F59E0B]">{requestErrorSentence('no_eligible_reviewer', '')}</p>
+          )}
+          {downloadAccess.error && <p role="alert" className="basis-full text-error">{downloadAccess.error}</p>}
+        </div>
+      )}
+
       {!loading && !error && visible.length > 0 && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
@@ -327,6 +364,7 @@ export default function MyImages() {
                 selected={selected.has(image.id)}
                 onToggleSelect={() => toggle(image.id)}
                 onFavoriteChange={() => { if (filter.favorite) reload() }}
+                access={downloadAccess.access.get(image.id)}
               />
             ))}
           </div>
@@ -371,7 +409,17 @@ export default function MyImages() {
                       Select all on this page
                     </button>
                   )}
+                  {downloadAccess.eligibleIds.some(id => !selected.has(id)) && (
+                    <button type="button" onClick={() => setSelected(new Set(downloadAccess.eligibleIds))} className="text-xs font-semibold text-[#FB923C] hover:underline cursor-pointer">
+                      Select all eligible for download
+                    </button>
+                  )}
                   <div className="flex-1" />
+                  {requestCandidates.length > 0 && (
+                    <GradientButton size="sm" leftIcon={<FileDown className="w-4 h-4" />} onClick={() => setRequestFor(requestCandidates)}>
+                      Request download access ({requestCandidates.length})
+                    </GradientButton>
+                  )}
                   <GradientButton
                     size="sm" leftIcon={<ScanFace className="w-4 h-4" />}
                     disabled={grouping || isDemo}
@@ -423,6 +471,14 @@ export default function MyImages() {
             </div>
           )}
         </>
+      )}
+      {requestFor && (
+        <RequestDownloadDialog
+          candidates={requestFor}
+          organizationNames={orgNames}
+          onClose={() => { setRequestFor(null); downloadAccess.refresh() }}
+          onCreated={() => { clearSelection(); downloadAccess.refresh() }}
+        />
       )}
       {addingToAlbum && (
         <AddToAlbumDialog imageIds={[...selected]} onClose={() => setAddingToAlbum(false)} onDone={text => { setNotice({ kind: 'ok', text }); clearSelection() }} />

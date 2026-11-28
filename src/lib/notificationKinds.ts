@@ -1,5 +1,5 @@
 import {
-  AlertTriangle, Camera, Download, ShieldAlert, ShieldCheck, FileText, Hourglass, Image as ImageIcon, Layers, Upload, Users, XCircle, Bell,
+  AlertTriangle, Camera, Download, FileCheck2, FileClock, FileDown, ShieldAlert, ShieldCheck, FileText, Hourglass, Image as ImageIcon, Layers, Upload, Users, XCircle, Bell,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -22,6 +22,9 @@ const KINDS: Record<string, NotificationKind> = {
   download_failed: { label: 'Download', icon: Download },
   identity_group_created: { label: 'Person folder', icon: Users },
   live_session_alert: { label: 'Live camera', icon: Camera },
+  download_request_submitted: { label: 'Download request', icon: FileClock },
+  download_request_received: { label: 'Download request', icon: FileDown },
+  download_request_decided: { label: 'Download request', icon: FileCheck2 },
 }
 
 export const notificationKind = (eventType: string): NotificationKind => KINDS[eventType] ?? { label: 'Notice', icon: Bell }
