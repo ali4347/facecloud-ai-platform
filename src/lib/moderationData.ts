@@ -147,7 +147,7 @@ function mockPerformance(days: number): ModeratorPerformance {
  * works in one at a time: the choice is kept in this browser (per person) and changing it makes every moderator screen
  * ask again for the new team's data.
  */
-export interface Team { id: number; name: string; brandName: string; accent: string; logoUrl: string | null; scope: 'own_members' | 'organization' | null }
+export interface Team { id: number; name: string; brandName: string; accent: string; logoUrl: string | null; scope: 'own_members' | 'organization' | null; /** This person's role there: a moderator decides, an owner only reads. */ role?: 'owner' | 'moderator' | null }
 const teamsCache = personCache<Team[]>()
 const CHOICE_EVENT = 'fc:moderator-organization'
 /** True when someone other than the signed-in moderator holds this review; the server refuses their Release with a 409. */
@@ -182,7 +182,7 @@ export function useModeratorOrganization(enabled = true) {
     let active = true
     listModeratorTeams()
       .then(found => {
-        const list: Team[] = found.map(o => ({ id: o.id, name: o.name, brandName: o.brand_name?.trim() || o.name, accent: o.brand_accent ?? '', logoUrl: o.logo_url ?? null, scope: o.moderator_data_scope ?? null }))
+        const list: Team[] = found.map(o => ({ id: o.id, name: o.name, brandName: o.brand_name?.trim() || o.name, accent: o.brand_accent ?? '', logoUrl: o.logo_url ?? null, scope: o.moderator_data_scope ?? null, role: (o as { membership?: { role?: string } }).membership?.role === 'owner' ? 'owner' : 'moderator' }))
         teamsCache.set(list)
         if (!active) return
         setTeams(list)

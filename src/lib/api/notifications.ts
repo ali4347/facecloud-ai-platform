@@ -62,6 +62,10 @@ const ROUTE_ALIASES: Record<string, string> = { '/dashboard/uploads': '/dashboar
 const KNOWN_PREFIXES = [
   '/dashboard/images', '/dashboard/groups', '/dashboard/downloads', '/dashboard/jobs', '/dashboard/processing',
   '/dashboard/notifications', '/dashboard/activity', '/dashboard/settings', '/dashboard/upload', '/admin/inbox',
+  // Download approval: the requester's page, and the reviewer's (which carries ?organization=<id>).
+  '/dashboard/download-requests', '/moderator/download-requests',
+  // Leave requests: the moderator's list, and the member's organization page (the backend's links for the five leave_request_* events).
+  '/moderator/leave-requests', '/dashboard/organization',
 ]
 
 export function resolveNotificationPath(path: string): string | null {

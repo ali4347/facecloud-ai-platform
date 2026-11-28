@@ -7,6 +7,7 @@ import { FloatingNav } from './FloatingNav'
 import { UploadDialog } from '../features/UploadDialog'
 import { ErrorBoundary } from '../ui/ErrorBoundary'
 import { NoOrganizationGuard } from '../moderator/NoOrganizationGuard'
+import { DownloadAccessHost } from '../downloads/DownloadAccessHost'
 import { useAppearance } from '../../lib/theme'
 import type { Role } from '../../data/mock'
 import { SESSION_LOST_EVENT } from '../../lib/api/client'
@@ -112,6 +113,8 @@ export function AppShell({ role }: AppShellProps) {
           {uploadOpen && <UploadDialog key="upload-dialog" onClose={closeUpload} />}
         </AnimatePresence>
       )}
+      {/* A download an approval-required organization refused, from any screen: explain it and offer to request access. */}
+      {role === 'user' && <DownloadAccessHost />}
     </div>
   )
 }

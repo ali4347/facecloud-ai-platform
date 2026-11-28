@@ -35,8 +35,27 @@ jobs:
       - name: Lint
         # Only this project's source; reference-templates/ vendors a jQuery copy.
         run: npx oxlint src
+      - name: Tests
+        run: npm test
+      - name: Build-safety rules
+        run: npm run test:build-safety
       - name: Production build
+        # Uses the tracked .env.production; vite.config.ts refuses to build or to finish without the live API settings.
         run: npm run build
+      - name: Production bundle talks to the live API
+        run: npm run verify:bundle
+      - name: A production build with demo settings must fail
+        run: |
+          if VITE_USE_API=false npx vite build --outDir "$RUNNER_TEMP/should-fail"; then
+            echo "::error::A production build with VITE_USE_API=false succeeded; it would ship the demo data."
+            exit 1
+          fi
+          if VITE_API_URL=http://127.0.0.1:8000 npx vite build --outDir "$RUNNER_TEMP/should-fail-local"; then
+            echo "::error::A production build pointing at 127.0.0.1 succeeded."
+            exit 1
+          fi
+      - name: The deliberate demo build still works
+        run: npx vite build --mode demo --outDir "$RUNNER_TEMP/demo-dist"
 
   audit:
     name: Dependency audit

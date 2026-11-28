@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom'
 import { Lock, Mail, AlertTriangle } from 'lucide-react'
 import { PasswordInput } from '../components/ui/PasswordInput'
 import { signInToPortal } from '../lib/api/auth'
@@ -7,6 +7,7 @@ import { ApiError } from '../lib/api/client'
 import { USE_API } from '../lib/api/config'
 import { FaceCloudLogo } from '../components/branding/FaceCloudLogo'
 import { saveSession, type Session } from '../lib/session'
+import { safeNext } from '../lib/safeNext'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -17,6 +18,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Where to go after signing in: only a page of this app (an invitation link sends the person back to accept it).
+  const next = safeNext(useSearchParams()[0].get('next'))
   const sessionExpired = (location.state as { sessionExpired?: boolean } | null)?.sessionExpired === true
   const notice = (location.state as { notice?: string } | null)?.notice
 
@@ -34,7 +37,7 @@ export default function Login() {
           // Staff accounts sign in on their own pages; this one is for users only.
           setError('This account does not have user access.')
         } else {
-          navigate('/dashboard')
+          navigate(next ?? '/dashboard')
         }
       } catch (err) {
         // The backend answers the same way for wrong password, unverified and
@@ -58,7 +61,7 @@ export default function Login() {
         emailVerified: localStorage.getItem('fc_email_verified') === 'true',
       }
       saveSession(session)
-      navigate('/dashboard')
+      navigate(next ?? '/dashboard')
     } else {
       setError('Invalid email or password.')
     }

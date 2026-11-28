@@ -48,7 +48,8 @@ import ProcessingJobs from './pages/user/ProcessingJobs'
 
 // Admin pages
 import AdminOverview from './pages/admin/AdminOverview'
-import MyOrganization from './pages/user/MyOrganization'
+import OrganizationHome from './pages/user/OrganizationHome'
+import LeaveRequests from './pages/moderator/LeaveRequests'
 import Organizations from './pages/admin/Organizations'
 import InvitationAccept from './pages/InvitationAccept'
 import AcceptInvitation from './pages/AcceptInvitation'
@@ -79,6 +80,10 @@ import AdminSettings from './pages/admin/AdminSettings'
 import MemberManagement from './pages/moderator/MemberManagement'
 import BatchManagement from './pages/moderator/BatchManagement'
 import NotificationCenter from './pages/moderator/NotificationCenter'
+import DownloadRequestQueue from './pages/moderator/DownloadRequestQueue'
+import DownloadRequestReview from './pages/moderator/DownloadRequestReview'
+import DownloadRequests from './pages/user/DownloadRequests'
+import DownloadRequestDetail from './pages/user/DownloadRequestDetail'
 import ReportsExports from './pages/moderator/ReportsExports'
 import NotFound from './pages/NotFound'
 
@@ -149,9 +154,11 @@ export default function App() {
           <Route path="groups/history" element={<FolderHistory />} />
           <Route path="groups/:id" element={<GroupDetail />} />
           <Route path="downloads" element={<Downloads />} />
+          <Route path="download-requests" element={<DownloadRequests />} />
+          <Route path="download-requests/:id" element={<DownloadRequestDetail />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="activity" element={<ActivityLogs />} />
-          <Route path="organization" element={<MyOrganization />} />
+          <Route path="organization" element={<OrganizationHome />} />
           <Route path="settings" element={<Settings />} />
           {/* The separate uploader page was folded into the Upload screens (preset and lighting are chosen there); keep old bookmarks working. */}
           <Route path="enhance" element={<Navigate to="/dashboard/upload" replace />} />
@@ -207,6 +214,10 @@ export default function App() {
           <Route path="rejected" element={<RejectedImages />} />
           <Route path="batches" element={<BatchManagement />} />
           <Route path="notifications" element={<NotificationCenter />} />
+          <Route path="download-requests" element={<DownloadRequestQueue />} />
+          <Route path="leave-requests" element={<LeaveRequests />} />
+          {/* Links from notifications carry ?organization=<id>; the page switches the panel to it. */}
+          <Route path="download-requests/:id" element={<DownloadRequestReview />} />
           <Route path="reports" element={<ReportsExports />} />
           <Route path="audit" element={<ModeratorAudit />} />
           <Route path="settings" element={<ModeratorSettings />} />

@@ -21,6 +21,7 @@ const POLL_MS = 60_000
 const MODERATOR_LEADS: Record<string, string> = {
   moderator_review_assigned: '/moderator/queue', moderator_review_overdue: '/moderator/queue',
   moderator_review_escalated: '/moderator/queue', moderator_batch_failed: '/moderator/batches',
+  leave_request_submitted: '/moderator/leave-requests',
 }
 const PANEL_ITEMS = 6
 

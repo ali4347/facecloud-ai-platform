@@ -134,8 +134,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/about`, `/contact` (public pages)
 * `/roles/moderator` (Moderator role guide — what the role can and cannot do, how a review works, build status, and a **Plans** section (Team $29/mo and Business $79/mo with seat, storage and image limits, "Coming soon"; Enterprise with no limits, "Contact us"; display only, there is no billing); an information page, not the portal; linked from the navbar as "Moderator" and from the Moderator Review card on the landing page; ends with a **Moderator FAQ** of six questions, with FAQPage structured data)
 * `/login` (User Login: the field takes an email address or a username; for user accounts only; an admin or moderator account is refused here and signs in on its own page)
-* `/register?invitation=<token>` (the same page, opened from an organization invitation: the invited email is locked and one step creates the account and joins the organization)
-* `/register` (User Registration — full name, email, password; creates a real pending account when `VITE_USE_API=true`)
+* `/register?invitation=<token>` (the same page, opened from an organization invitation: the invited email is locked and one step creates the account and joins the organization; for an **owner** invitation the account becomes the organization's owner and opens `/dashboard/organization`)
+* `/register` (User Registration — full name, email, password; creates a real pending account when `VITE_USE_API=true`. It is always a **personal** account (its own private workspace only); it never joins an organization, even when the address has a pending invitation: only accepting an invitation link does)
 * `/signup` (Redirects to `/register`)
 * `/verify-email` (Email verification. With the API on it opens from the emailed link `/verify-email?registration_id=…&token=…`, confirms it with the backend, then sends the person to `/login`; the demo build keeps a mock button)
 * `/forgot-password` (request a reset link by email; linked from all three sign-in pages)
@@ -143,7 +143,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/verify-email-change/:uid/:token` (the page the link emailed to a NEW address opens after the email was changed; it asks the server once as it opens (`GET /api/auth/verify-email/change/{uid}/{token}/`, 10 an hour) and shows: "Your email address is confirmed" (also when the server says it was already confirmed, a used link), "This link is no longer valid" (400), "Too many tries" (429, the server's wait) or "Couldn't confirm your email address" (network, with Try again). The button goes to `/login`. Needs the mail to link to the frontend address (`{FRONTEND_URL}/verify-email-change/<uid>/<token>`); until then the mail links to the backend and shows raw JSON. An account whose email was just changed cannot sign in until this succeeds)
 * `/admin/login` (Admin Console Login: email address or username; admin accounts only; reached by direct link)
 * `/moderator/login` (Moderator Panel Login: email address or username; moderator accounts only; reached by direct link)
-* `/invitations/:token` (the page an organization invitation email opens: shows who invited you, then you sign in with the invited email and join; needs the live backend)
+* `/invitations/:token` (the page an organization invitation email opens: shows who invited you and the role (owner, moderator or member). Signed in with the invited address: an explicit **Accept** (an owner then goes to My Organization). Not signed in: **Sign in** returns here through `/login?next=…` (only an invitation or `/dashboard` address is followed), or **Create account** registers from the invitation. Signed in as someone else: asked to sign in with the invited address. Needs the live backend)
 * `/accept-invitation?token=…` (the page an administrator's account invitation email opens, from Admin → Invitations: shows the invited email, the role in words ("Moderator for <organization>", "Administrator", "User") and the expiry, and lets the person choose a username and password; the server judges the password and its messages appear under the fields. It signs nobody in: it says "Account created" and offers the sign-in page of that account's own portal (`/login`, `/moderator/login` or `/admin/login`). The token is removed from the address bar after it is read. A wrong, used, cancelled or expired link shows the server's one sentence; needs the live backend. Not the same as `/invitations/:token`, which joins an organization)
 * `/unauthorized` (Access Denied page)
 * `*` (Not Found / 404 page)
@@ -170,6 +170,7 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/dashboard/groups/review` (Review matches: the photos the face grouping was not sure about, each with the suggested folder and match percent; say yes, a different person (existing or new folder), or leave the face out)
 * `/dashboard/groups/:id` (one Person Folder: its photos (click a photo to open it; tick the box on its corner to select it), rename, Move selected photos to the trash, Delete empty folder, Delete folder but keep its photos, move a photo to another folder, take it out, make it the folder cover, Merge folder (move another folder's photos into this one), Download All / Download Selected as a ZIP, and a time-limited Secure Link to the whole folder's ZIP)
 * `/dashboard/downloads` (real download history; "Your secure links" lists every link made, how often it was opened, and lets you stop one; a new line is added each time a file is downloaded; time-limited secure links for enhanced photos and Person Folder ZIPs; expired batch ZIPs can be prepared again)
+* `/dashboard/download-requests` and `/dashboard/download-requests/:id` (Download approval: the member's requests to download photos of an organization that requires a moderator's approval. List with a status filter; a request page with each photo's decision, the denial reason, the approval's expiry (or "expired" / "withdrawn"), Cancel while pending, and "Download selected" / "Download all approved (ZIP)" through the authenticated routes. In the sidebar only for a member of such an organization)
 * `/dashboard/notifications` (real notifications: mark read / mark all read, open, dismiss, paging; the top-bar bell shows the same unread count)
 * `/dashboard/activity` (your real activity history, paged; picking a type chip or searching looks through your newest 500 events (the backend's window) and shows how many of each type there are, or says there are none)
 * `/dashboard/settings` (name, organization, job title, phone, country and the picture saved to the account; Delete my account (password and a typed word); password change; the list of signed-in devices with Revoke, and sign out of all devices; notification switches saved to the account. Against a backend that predates profile details/sessions (before backend PR #67) the extras and picture stay on this device and the device list is hidden)
@@ -181,15 +182,15 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 
 ### Admin Console Routes (under `/admin`)
 * `/admin` (Admin Overview: totals, uploads, enhanced, rejected, quality pass rate, storage, with 7 / 30 / 90-day chips)
-* `/admin/users` (User directory with server search and paging, upload counts, suspend / activate, Add User)
+* `/admin/users` (User directory with server search and paging, upload counts, suspend / activate, Add User. **Account type**: a column and filters *All accounts / Personal only / Personal + Organization(s)* (`?account_type=`; an organization account keeps its personal workspace, so it reads "Personal + N Organization(s)"); **Details**: every workspace of the account (the private one marked as such), photos and storage; **Reset password** e-mails the person a link (nothing secret is shown). Add User e-mails a link to choose a password by default; setting one by hand is still possible. **Moderator reason (backend PR #176):** making someone a moderator here (Add User with role Moderator, Create moderator, or a moderator invitation) needs a **Reason for Moderator Assignment** of at least 8 characters, sent as `reason` and recorded in the organization's audit trail (`admin_moderator_override`), which its owner can read; ordinary users need none.)
 * `/admin/audit-logs` (Paged audit trail: actor, role, status, message, resource, sign-in address)
 * `/admin/security` (Alerts for repeated failed sign-ins, refused requests and rate limits, with an Acknowledge action that needs a note, and the rules behind them)
 * `/admin/privacy` (Privacy Audit, administrators only, from `GET /api/privacy/audit/`: four cards, Consent (is it required, the policy version, people with active / withdrawn / older-version consent), Requests in the last 30 days (a table of each kind with its completed and failed counts, and the number of erasures and retention purges not verified as complete), Retention and temporary files (the limit, the last purge as a table of whatever keys the server sends, stale temporary archives, orphaned media), Encryption (whether uploaded photos are encrypted at rest, the identity-data sentence, key ids, the stored identity records as a table); "Generated" time and a Refresh button. Totals only, no personal data. Bad news is said plainly ("Uploaded photos are not encrypted at rest.", unverified erasures flagged as needing attention) and a "Needs attention" panel collects it. A moderator or a user who opens the address is sent to the administrator sign-in; the server answers them 403)
-* `/admin/organizations` (Every organization: create one with an owner and a plan; a moderator is always created for one organization and only sees its members and photos)
-* `/admin/moderators` (list of moderator accounts, a form to create one, and an **Actions** column: **Suspend** (asks first, with an optional reason that is kept with the account and shown under the Suspended badge) and **Activate**, the same `PATCH /api/user/admin/users/{id}/` as on the Users screen; a suspended moderator is signed out everywhere and cannot open the moderator panel — `/admin/api-docs` and `/admin/api-test` were removed and redirect to `/admin`)
+* `/admin/organizations` (Shared organizations (`?kind=organization`; personal workspaces on request). **New organization**: Organization name, **Owner email**, Subscription plan, *Create Organization & Send Invitation*: no existing account is needed. The organization shows **Waiting for owner** (`pending_owner`, nobody belongs to it) with the invited address and the invitation status; **Invitation** opens its status, whether the e-mail went out (and why not), the expiry, **Resend** (a new link; the old one stops working) and **Cancel**. No Activate is offered for a waiting organization; it becomes active when the owner accepts. A moderator is always created for one organization and only sees its members and photos. A refusal names its field ("Owner email: …", "Subscription plan: …"); a backend older than #176 answers `owner_id: This field is required.`, and the form says so plainly: the backend has to be updated first (the request stays `owner_email`). Backend: PR #176, `docs/features/admin-owner-invitation.md`)
+* `/admin/moderators` (list of moderator accounts, a form to create one, and an **Actions** column: **Suspend** (asks first, with an optional reason that is kept with the account and shown under the Suspended badge) and **Activate**, the same `PATCH /api/user/admin/users/{id}/` as on the Users screen; a suspended moderator is signed out everywhere and cannot open the moderator panel — `/admin/api-docs` and `/admin/api-test` were removed and redirect to `/admin`. **Moderator reason (backend PR #176):** making someone a moderator here (Add User with role Moderator, Create moderator, or a moderator invitation) needs a **Reason for Moderator Assignment** of at least 8 characters, sent as `reason` and recorded in the organization's audit trail (`admin_moderator_override`), which its owner can read; ordinary users need none.)
 * `/admin/system` (Service checks, background workers, process uptime and the per-job queue table; below it the failed upload batches with a Retry for any user's batch, and the latest failed job of each kind)
 * `/admin/moderation` (Moderation Overview: reviews waiting, escalated, overdue and stale across every organization, the organizations that need attention and each moderator's workload; you choose how old counts as stale)
-* `/admin/invitations` (Invite a user or a moderator by email, with the organization for a moderator; list, resend and cancel)
+* `/admin/invitations` (Invite a user or a moderator by email, with the organization for a moderator; list, resend and cancel. **Moderator reason (backend PR #176):** making someone a moderator here (Add User with role Moderator, Create moderator, or a moderator invitation) needs a **Reason for Moderator Assignment** of at least 8 characters, sent as `reason` and recorded in the organization's audit trail (`admin_moderator_override`), which its owner can read; ordinary users need none.)
 * `/admin/statistics` (Upload trend, weekly enhancement success, live sessions and storage growth over a 7 / 30 / 90-day window)
 * `/admin/upload-statistics` (Photos received by route, daily intake, average file size)
 * `/admin/rejection-summary` (Rejected photos, rejection rate, the reasons behind them, daily rejections)
@@ -208,7 +209,8 @@ The complete route configuration as specified in [App.tsx](file:///Users/Ali/Dow
 * `/moderator/identity` (Person folders that hold photos submitted to your organization, with suggested merges of one member's folders)
 * `/moderator/rejected` (Rejected and needs-review photos submitted to your organization, with the reasons)
 * `/moderator/batches` (Uploads submitted to your organization: progress, outcome per photo, retry, cancel, reprocess)
-* `/moderator/notifications` (Assignments, deadlines, escalations and failed batches; the same items feed the bell in the top bar)
+* `/moderator/notifications` (Assignments, download requests, deadlines, escalations and failed batches; the same items feed the bell in the top bar)
+* `/moderator/download-requests` and `/moderator/download-requests/:id?organization=<id>` (Download approval queue of the working organization, filtered by status. A request page with the requester, message, previews from the moderator preview route, quality score, Approve all / Approve selected / Deny selected / Deny all with a reason (per-photo reasons optional), a confirmation before every decision, and Withdraw approval. No decision controls on the moderator's own request. A notification link switches the panel to the organization it names)
 * `/moderator/reports` (Make and download a report about your organization)
 * `/moderator/logs` (Decision Log: the latest decisions about photos, with today's counts; the full trail is Audit)
 * `/moderator/audit` (The organization's audit trail: who did what, searchable)
@@ -297,6 +299,12 @@ graph TD
 * **Review Queue**: Lists borderline files flagged by the quality validation step (e.g., high blur, low brightness, poor face-size ratio).
 * **Human-in-the-Loop Audit Card**: Allows moderators to view the raw image, quality scores, face boundaries, and choose to **Approve** (forces override index and maps to person folders) or **Reject** (logs reason and removes from active database indexes).
 * **Moderation Audit Log**: Tracks decision archives linking moderator accounts to approved or rejected items.
+* **Download approval** (backend: `docs/features/download-approval.md`). Off for every organization until the platform administrator turns it on; never for a personal workspace. When it is on:
+  * **My Images** checks the organization's photos with `POST /api/downloads/requests/check/`, shows each one's access ("Requested", "Approved", "Approval expired"…) and the server's reason when a photo cannot be requested, and adds "Select all eligible" and "Request download access" to the selection bar. Photos of a personal workspace or of an organization with approval off look and behave as before.
+  * Previews stay the server's reduced, watermarked copies until approved; they carry a "Preview only — approval required" badge (from the photo's data, and from `X-Preview-Restricted` when the browser may read it).
+  * The request dialog sends one request per organization with a `client_token` made once per dialog (a retry returns the same request) and explains every error code (`items_not_eligible`, `no_eligible_reviewer`, `approval_not_required`, `client_token_reused`, `organization_suspended`).
+  * Any download the server refuses with `403 download_approval_required` (a photo card, the editor, the comparison viewer, batch and person-folder ZIPs, share links, the download history) opens one dialog in the user portal (`DownloadAccessHost`) with the reason and, where it can help, "Request download access" for that photo and file. The address is never rebuilt by the frontend.
+  * Code: `src/lib/api/downloads.ts` (member calls), `src/lib/api/moderatorConsole.ts` (moderator calls), `src/lib/downloadApproval.ts` (wording, decision rules), `src/components/downloads/`, the four pages above. Tests: `src/test/` (Vitest).
 
 ---
 
@@ -399,11 +407,16 @@ FaceCloud is **multi-tenant**: one deployment serves many organizations, and eac
    ```txt
    http://localhost:5173
    ```
-4. **Compile and test the production build**:
+4. **Run the tests** (Vitest with Testing Library and jsdom; also run in CI):
+   ```bash
+   npm test
+   ```
+
+5. **Compile and test the production build**:
    ```bash
    npm run build
    ```
-5. **Preview the production bundle locally**:
+6. **Preview the production bundle locally**:
    ```bash
    npm run preview
    ```
@@ -438,6 +451,8 @@ cp .env.example .env
 |:---------|:--------|
 | `VITE_API_URL` | Backend origin, no trailing slash. `http://127.0.0.1:8000` for a local backend |
 | `VITE_USE_API` | `true` to call the API; anything else keeps the built-in mock data |
+
+Production builds take these from the tracked `.env.production` and are checked (see §16 Deployment); `.env` / `.env.local` are for your own machine.
 
 The flag exists so screens can be migrated one at a time: with `VITE_USE_API`
 unset the demo dashboard stays populated, and each screen switches over as its
@@ -480,11 +495,15 @@ deployed backend.
     text: team pictures say "name, role at FaceCloud"; the landing before/after demo describes the photo.
 
 > [!WARNING]
-> **Build the hosting copy as the demo, not with your local settings.** `.env.local` (which points at `http://127.0.0.1:8000` and turns the API on)
-> is read by every `npm run build` on your own machine, so a build made there carries that address and every visitor's browser would try to
-> reach *their* localhost. Build it with the settings overridden:
-> `VITE_USE_API=false VITE_API_URL= npm run build`, and check that `grep -c "127.0.0.1:8000" dist/assets/index-*.js` prints `0`
-> before uploading. (A build made from a clean checkout, which has no `.env.local`, is safe too.)
+> **A production build always talks to the live API, or it does not finish.** `npm run build` (Vite's production mode) reads the
+> tracked `.env.production` (`VITE_USE_API=true`, `VITE_API_URL=https://api.facecloudai.com`; public values, no secrets), which outranks
+> `.env.local`. `vite.config.ts` then refuses to build when the final values are anything else (an environment variable or a
+> `.env.production.local` can override the file), and refuses to finish when the bundle does not contain `https://api.facecloudai.com` or
+> contains a local API address. A missing configuration therefore fails the build instead of shipping the demo data. Rules and tests:
+> `scripts/build-safety.mjs`, `npm run test:build-safety`; check a finished folder with `npm run verify:bundle` (CI runs all of it).
+> * `npm run build:demo`: the deliberate offline demo (mode `demo`, `.env.demo`), not checked, never for the live site.
+> * `npm run build:local`: a build against your own backend (mode `development`, reads `.env.local`), not checked.
+> * `npm run dev` is unchanged.
 
 > [!IMPORTANT]
 > **`.htaccess` is a hidden file.** Most file managers and FTP clients do not show names beginning with a dot, so it

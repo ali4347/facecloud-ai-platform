@@ -5,9 +5,11 @@ import {
   LayoutDashboard, Upload, Images, Users,
   Download, Settings, BarChart3, AlertCircle,
   ClipboardList, Server, UserCog, ShieldCheck, LockKeyhole, Eye, ScrollText,
-  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck, Mail, Inbox
-} from 'lucide-react'
+  HardDrive, X, Bell, Briefcase, LineChart, UsersRound, ImageOff, Building2, ClipboardCheck, Mail, Inbox,
+  FileDown, LogOut } from 'lucide-react'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
+import { useApprovalOrganizations } from '../../lib/useApprovalOrganizations'
+import { useMemberOrganizations } from '../../lib/useMemberOrganizations'
 import { useModeratorOrganization } from '../../lib/moderationData'
 import { AuthedImage } from '../ui/AuthedImage'
 import { getOrgLogoBlob } from '../../lib/api/organizations'
@@ -59,6 +61,8 @@ const moderatorNav = [
   { label: 'Identity Review',      icon: UsersRound,      to: '/moderator/identity' },
   { label: 'Rejected Images',      icon: ImageOff,        to: '/moderator/rejected' },
   { label: 'Batch Management',     icon: Briefcase,       to: '/moderator/batches' },
+  { label: 'Download Requests',    icon: FileDown,        to: '/moderator/download-requests' },
+  { label: 'Leave Requests',       icon: LogOut,          to: '/moderator/leave-requests' },
   { label: 'Notification Center',  icon: Bell,            to: '/moderator/notifications' },
   { label: 'Reports & Exports',    icon: BarChart3,       to: '/moderator/reports' },
   { label: 'Decision Log',         icon: ClipboardCheck,  to: '/moderator/logs' },
@@ -99,8 +103,16 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   // A person who owns an organization also gets its management page, between Downloads and Settings.
   const { owned } = useOwnedOrganizations(role === 'user')
   const { team } = useModeratorOrganization(role === 'moderator')
-  const nav = role === 'user' && owned.length > 0
-    ? [...userNav.slice(0, -1), { label: 'My Organization', icon: Building2, to: '/dashboard/organization' }, userNav[userNav.length - 1]]
+  // A member of an organization that requires download approval also gets their requests, after Downloads.
+  const { organizations: approvalOrgs } = useApprovalOrganizations(role === 'user')
+  // A plain member also gets the organization page: it is where they ask to leave.
+  const { organizations: memberOrgs } = useMemberOrganizations(role === 'user')
+  const userExtras = [
+    ...(approvalOrgs.length > 0 ? [{ label: 'Download Requests', icon: FileDown, to: '/dashboard/download-requests' }] : []),
+    ...(owned.length > 0 || memberOrgs.length > 0 ? [{ label: 'My Organization', icon: Building2, to: '/dashboard/organization' }] : []),
+  ]
+  const nav = role === 'user' && userExtras.length > 0
+    ? [...userNav.slice(0, -1), ...userExtras, userNav[userNav.length - 1]]
     : navByRole[role]
   const cfg = roleConfig[role]
   // Only the user portal shows storage, so only it asks for the figures.

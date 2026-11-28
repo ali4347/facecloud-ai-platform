@@ -1,9 +1,9 @@
 import { apiFetch, apiFetchBlob } from './client'
 
 /** How many moderators and plain members a plan allows; null means unlimited. */
-export interface PlanLimits { moderators: number | null; members: number | null }
+export interface PlanLimits { moderators: number | null; members: number | null; /** Everyone in the organization (owner, moderators, members and invitations still waiting). Absent on an older backend. */ users?: number | null }
 /** Seats in use: active people plus invitations still waiting. */
-export interface PlanUsage { moderators: number; members: number }
+export interface PlanUsage { moderators: number; members: number; /** Seats taken in total, waiting invitations included. Absent on an older backend. */ users?: number }
 /** Who sees what: a moderator sees only the members they invited and those nobody invited, or the whole organization. */
 export type ModeratorDataScope = 'own_members' | 'organization'
 
@@ -24,6 +24,10 @@ export interface Organization {
   brand_accent?: string
   /** A path that needs the Authorization header (fetch it as a blob), or null when there is no logo. */
   logo_url?: string | null
+  /** Members download an image only after a moderator approved it. Read-only here; only the platform administrator changes it. Missing on older backends. */
+  download_approval_required?: boolean
+  /** How many hours an approval lasts; null = the platform default (24). */
+  download_grant_hours?: number | null
 }
 
 /** The name members should see for an organization. */
@@ -131,7 +135,8 @@ export function removeOrgMember(organizationId: number, membershipId: number): P
 export interface InvitationPreview {
   organization_name: string
   email: string
-  role: 'member' | 'moderator'
+  /** `owner` for the invitation the Platform Administrator sends when creating an organization (backend PR #176). */
+  role: 'member' | 'moderator' | 'owner'
   expires_at: string
 }
 

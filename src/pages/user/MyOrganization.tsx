@@ -15,6 +15,7 @@ import { saveBlob } from '../../lib/saveBlob'
 import { getSession } from '../../lib/session'
 import { useOwnedOrganizations } from '../../lib/useOwnedOrganizations'
 import { messageFor } from '../../lib/useApiResource'
+import { planAwareMessage, seatSummary, userSeats } from '../../lib/seats'
 import { formatDate, formatDateTime } from '../../lib/utils'
 
 const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
@@ -62,16 +63,16 @@ export default function MyOrganization() {
   useEffect(() => { if (id !== null && !suspended) void load(id) }, [id, load, suspended])
 
   const act = async (key: string, work: () => Promise<unknown>, done: string) => {
-    if (id === null) return
+    if (id === null) return false
     setBusy(key)
-    try { await work(); say(done); await load(id) } catch (caught) { say(messageFor(caught), true) } finally { setBusy(null) }
+    try { await work(); say(done); await load(id); return true } catch (caught) { say(planAwareMessage(caught, messageFor), true); return false } finally { setBusy(null) }
   }
 
   const invite = async (e: React.FormEvent) => {
     e.preventDefault()
     if (id === null) return
-    await act('invite', () => inviteOrgMember(id, inviteEmail.trim(), inviteRole), `Invitation sent to ${inviteEmail.trim()}.`)
-    setInviteEmail('')
+    // A refused invitation (plan full, address already invited…) keeps what was typed, so it can be corrected instead of typed again.
+    if (await act('invite', () => inviteOrgMember(id, inviteEmail.trim(), inviteRole), `Invitation sent to ${inviteEmail.trim()}.`)) setInviteEmail('')
   }
 
   const loadOlder = async () => {
@@ -99,7 +100,8 @@ export default function MyOrganization() {
 
   const seatFull = (kind: 'moderators' | 'members') => {
     const limit = detail?.limits?.[kind]
-    return limit !== null && limit !== undefined && (detail?.usage?.[kind] ?? 0) >= limit
+    const kindFull = limit !== null && limit !== undefined && (detail?.usage?.[kind] ?? 0) >= limit
+    return kindFull || Boolean(userSeats(detail?.usage, detail?.limits)?.full)     // the plan's total user limit stops invitations of either kind
   }
   const seatText = (kind: 'moderators' | 'members') => {
     const used = detail?.usage?.[kind]
@@ -181,10 +183,10 @@ export default function MyOrganization() {
           { label: 'Moderators', value: seatText('moderators'), icon: ShieldAlert },
           { label: 'Members', value: seatText('members'), icon: Users },
           { label: 'Waiting to join', value: String(invites.length), icon: Mail },
-          { label: 'Plan', value: org.plan.charAt(0).toUpperCase() + org.plan.slice(1), icon: Building2 },
+          { label: 'Plan', value: org.plan.charAt(0).toUpperCase() + org.plan.slice(1), note: seatSummary(detail?.usage, detail?.limits), icon: Building2 },
         ].map(card => (
           <div key={card.label} className="fc-card p-5 flex items-center justify-between">
-            <div><span className={labelClass}>{card.label}</span><p className="text-xl font-bold text-ink mt-1">{card.value}</p></div>
+            <div><span className={labelClass}>{card.label}</span><p className="text-xl font-bold text-ink mt-1">{card.value}</p>{'note' in card && card.note && <p data-testid="plan-seats" className={`text-[11px] mt-0.5 ${userSeats(detail?.usage, detail?.limits)?.full ? 'text-[#F59E0B]' : 'text-ink-faint'}`}>{card.note}</p>}</div>
             <card.icon className="w-5 h-5 text-accent" />
           </div>
         ))}
