@@ -15,6 +15,7 @@ import { USE_API } from '../../lib/api/config'
 import type { ModeratorDataScope, PlanLimits, PlanUsage } from '../../lib/api/organizations'
 import { useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { messageFor } from '../../lib/useApiResource'
+import { ApiError } from '../../lib/api/client'
 import { formatDate } from '../../lib/utils'
 
 const labelClass = 'text-[10px] font-bold uppercase tracking-widest text-ink-faint'
@@ -32,6 +33,22 @@ function orgStatusBadge(status: string) {
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const FIELD_LABELS: Record<string, string> = { name: 'Organization name', owner_email: 'Owner email', plan: 'Subscription plan', owner_id: 'Owner' }
+
+/** The server's refusal with the field it is about ("Owner email: …"), not a bare "This field is required." */
+function refusalFor(caught: unknown): string {
+  if (caught instanceof ApiError && caught.body && typeof caught.body === 'object') {
+    const body = caught.body as Record<string, unknown>
+    // An older backend (before the owner-invitation release) still asks for an existing account's id and ignores the e-mail address.
+    if (body.owner_id) return 'The server is not ready for this form yet: it still asks for an existing account (owner_id) instead of the owner’s e-mail. The backend update has to be deployed first.'
+    const parts = Object.entries(body)
+      .filter(([key]) => key in FIELD_LABELS)
+      .map(([key, value]) => `${FIELD_LABELS[key]}: ${Array.isArray(value) ? value.join(' ') : String(value)}`)
+    if (parts.length) return parts.join(' ')
+  }
+  return messageFor(caught)
+}
 
 export default function Organizations() {
   const [showPersonal, setShowPersonal] = useState(false)
@@ -81,7 +98,7 @@ export default function Organizations() {
     try {
       const answer = await createOrganizationForOwner({ name: name.trim(), owner_email: email, plan })
       setCreated(answer); setFormOpen(false); setName(''); setOwnerEmail(''); state.reload()
-    } catch (caught) { setError(messageFor(caught)) } finally { setBusy(false) }
+    } catch (caught) { setError(refusalFor(caught)) } finally { setBusy(false) }
   }
 
   return (

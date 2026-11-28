@@ -78,7 +78,29 @@ describe('admin Organizations: create from an owner e-mail', () => {
     expect(create).not.toHaveBeenCalled()
     fireEvent.change(screen.getByLabelText('Owner email'), { target: { value: 'a@b.co' } })
     fireEvent.click(screen.getByRole('button', { name: 'Create Organization & Send Invitation' }))
-    expect(await screen.findByText('Enter a valid email address.')).toBeTruthy()
+    expect(await screen.findByText('Owner email: Enter a valid email address.')).toBeTruthy()
+  })
+
+  it('names the field when the server says one is required', async () => {
+    list.mockResolvedValue([])
+    create.mockRejectedValue(new ApiError(400, 'This field is required.', { name: ['This field is required.'] }))
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'New organization' }))
+    fireEvent.change(screen.getByLabelText('Organization name'), { target: { value: 'X' } })
+    fireEvent.change(screen.getByLabelText('Owner email'), { target: { value: 'a@b.co' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Create Organization & Send Invitation' }))
+    expect(await screen.findByText('Organization name: This field is required.')).toBeTruthy()
+  })
+
+  it('explains an older backend that still asks for owner_id instead of a bare "This field is required."', async () => {
+    list.mockResolvedValue([])
+    create.mockRejectedValue(new ApiError(400, 'This field is required.', { owner_id: ['This field is required.'] }))
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'New organization' }))
+    fireEvent.change(screen.getByLabelText('Organization name'), { target: { value: 'X' } })
+    fireEvent.change(screen.getByLabelText('Owner email'), { target: { value: 'a@b.co' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Create Organization & Send Invitation' }))
+    expect(await screen.findByText(/backend update has to be deployed first/)).toBeTruthy()
   })
 
   it('labels a waiting organization, shows the invited address, never offers Activate, and opens its invitation', async () => {
