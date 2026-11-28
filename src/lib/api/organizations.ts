@@ -1,9 +1,9 @@
 import { apiFetch, apiFetchBlob } from './client'
 
 /** How many moderators and plain members a plan allows; null means unlimited. */
-export interface PlanLimits { moderators: number | null; members: number | null }
+export interface PlanLimits { moderators: number | null; members: number | null; /** Everyone in the organization (owner, moderators, members and invitations still waiting). Absent on an older backend. */ users?: number | null }
 /** Seats in use: active people plus invitations still waiting. */
-export interface PlanUsage { moderators: number; members: number }
+export interface PlanUsage { moderators: number; members: number; /** Seats taken in total, waiting invitations included. Absent on an older backend. */ users?: number }
 /** Who sees what: a moderator sees only the members they invited and those nobody invited, or the whole organization. */
 export type ModeratorDataScope = 'own_members' | 'organization'
 

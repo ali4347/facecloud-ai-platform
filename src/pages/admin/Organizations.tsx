@@ -15,6 +15,7 @@ import { USE_API } from '../../lib/api/config'
 import type { ModeratorDataScope, PlanLimits, PlanUsage } from '../../lib/api/organizations'
 import { useAdminOrganizations } from '../../lib/useAdminOrganizations'
 import { messageFor } from '../../lib/useApiResource'
+import { planAwareMessage, userSeats } from '../../lib/seats'
 import { ApiError } from '../../lib/api/client'
 import { formatDate } from '../../lib/utils'
 
@@ -82,7 +83,7 @@ export default function Organizations() {
       }
       else setDemoPatch(p => ({ ...p, [org.id]: { ...p[org.id], ...(patch.name ? { name: patch.name } : {}), ...(patch.plan ? { plan: patch.plan } : {}), ...(patch.status ? { status: patch.status } : {}), ...(patch.moderator_data_scope ? { moderator_data_scope: patch.moderator_data_scope } : {}) } }))
       setNotice({ text: done }); setEditing(null); setSuspending(null)
-    } catch (caught) { setNotice({ text: messageFor(caught), bad: true }) } finally { setWorking(false) }
+    } catch (caught) { setNotice({ text: planAwareMessage(caught, messageFor), bad: true }) } finally { setWorking(false) }
   }
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -194,7 +195,12 @@ export default function Organizations() {
                             </td>
                             <td className="text-sm text-ink-soft">{o.member_count ?? '—'}</td>
                             <td className="text-sm text-ink-soft">{seats(o.usage?.moderators, o.limits?.moderators)}{full(o.usage, o.limits) && <span className="ml-1.5 text-[10px] font-semibold text-[#F59E0B]">full</span>}</td>
-                            <td className="text-sm text-ink-soft capitalize">{o.plan}</td>
+                            <td className="text-sm text-ink-soft">
+                              <span className="capitalize">{o.plan}</span>
+                              {(() => { const seats = userSeats(o.usage, o.limits); return seats && (
+                                <span data-testid={`seats-${o.id}`} className="block text-[10px] text-ink-faint">{seats.text}{seats.remaining !== null && ` · ${seats.full ? 'full' : `${seats.remaining} left`}`}{seats.full && <span className="ml-1.5 font-semibold text-[#F59E0B]">limit reached</span>}</span>
+                              ) })()}
+                            </td>
                             <td>{orgStatusBadge(o.status)}</td>
                             <td>
                               {o.is_personal ? <span className="text-[10px] text-ink-faint">—</span> : (
