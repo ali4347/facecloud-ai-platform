@@ -8,11 +8,15 @@ const demoOrganizations = (): AdminOrganization[] => [
     moderator_data_scope: 'organization', owner: { id: 2, username: 'beta-owner' }, member_count: 3, moderator_count: 1, limits: { moderators: 1, members: 10 }, usage: { moderators: 1, members: 2 } },
 ]
 
-/** Every organization for the admin screens (the demo build has two sample ones). */
-export function useAdminOrganizations(): AsyncState<AdminOrganization[]> {
-  return useApiResource(signal => listAdminOrganizations(signal), demoOrganizations, [])
+/**
+ * The organizations for the admin screens (the demo build has two sample ones). Shared organizations only by default:
+ * every account's private workspace is also an organization row, and the screens that place moderators or invitations
+ * never want those. The Organizations screen asks for `all` when the administrator chooses to see personal workspaces too.
+ */
+export function useAdminOrganizations(kind: 'organization' | 'all' = 'organization'): AsyncState<AdminOrganization[]> {
+  return useApiResource(signal => listAdminOrganizations(signal, kind), demoOrganizations, [kind])
 }
 
-/** The teams a moderator can be placed in: shared (not personal) and active. */
+/** The teams a moderator can be placed in: shared (not personal) and active (not suspended, not waiting for its owner). */
 export const teamsOf = (organizations: AdminOrganization[] | null): AdminOrganization[] =>
   (organizations ?? []).filter(o => !o.is_personal && o.status === 'active')

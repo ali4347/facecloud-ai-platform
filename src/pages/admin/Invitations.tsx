@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { ModeratorReasonField } from '../../components/admin/ModeratorReasonField'
+import { normalizeReason, reasonProblem, serverReasonError } from '../../lib/moderatorReason'
 import { Link } from 'react-router-dom'
 import { Mail, Send } from 'lucide-react'
 import { PageHeader } from '../../components/layout/PageHeader'
@@ -35,6 +37,9 @@ export default function InvitationsPage() {
   const [organizationId, setOrganizationId] = useState<number | ''>('')
   const [sending, setSending] = useState(false)
   const [formError, setFormError] = useState('')
+  // Inviting a moderator directly is an exceptional administrator operation: it needs a reason (backend PR #176).
+  const [reason, setReason] = useState('')
+  const [reasonError, setReasonError] = useState('')
   const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [toCancel, setToCancel] = useState<AccountInvitation | null>(null)
@@ -45,12 +50,25 @@ export default function InvitationsPage() {
     setFormError(''); setNotice(null)
     if (!USE_API) { setFormError('Invitations are not sent in the demo build.'); return }
     if (role === 'moderator' && organizationId === '') { setFormError('Choose the organization this moderator will work for.'); return }
+    setReasonError('')
+    if (role === 'moderator') {
+      const problem = reasonProblem(reason)
+      if (problem) { setReasonError(problem); return }
+    }
     setSending(true)
     try {
-      await inviteAccount({ email: email.trim(), role, ...(role === 'moderator' && organizationId !== '' ? { organization_id: organizationId } : {}) })
+      await inviteAccount({
+        email: email.trim(), role,
+        ...(role === 'moderator' && organizationId !== '' ? { organization_id: organizationId } : {}),
+        ...(role === 'moderator' ? { reason: normalizeReason(reason) } : {}),
+      })
       setNotice({ text: `Invitation sent to ${email.trim()}. The link is valid for a limited time.` })
-      setEmail(''); state.reload()
-    } catch (caught) { setFormError(messageFor(caught)) } finally { setSending(false) }
+      setEmail(''); setReason(''); state.reload()
+    } catch (caught) {
+      const aboutReason = serverReasonError(caught)
+      if (aboutReason) setReasonError(aboutReason)
+      else setFormError(messageFor(caught))
+    } finally { setSending(false) }
   }
 
   const resend = async (row: AccountInvitation) => {
@@ -107,6 +125,9 @@ export default function InvitationsPage() {
                 </select>
               )}
             </div>
+          )}
+          {role === 'moderator' && (
+            <ModeratorReasonField id="inv-moderator-reason" value={reason} onChange={value => { setReason(value); setReasonError('') }} error={reasonError} />
           )}
           <GradientButton type="submit" disabled={sending || (role === 'moderator' && (teams.length === 0 || Boolean(orgs.error)))} leftIcon={<Send className="w-4 h-4" />}>
             {sending ? 'Sending…' : 'Send invitation'}
